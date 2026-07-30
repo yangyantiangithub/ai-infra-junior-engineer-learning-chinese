@@ -1,63 +1,63 @@
-# Lecture 06: Advanced Shell Scripting
+# 讲座 06：高级 Shell 脚本
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Advanced Control Structures](#advanced-control-structures)
-3. [Arrays and Associative Arrays](#arrays-and-associative-arrays)
-4. [Advanced String Manipulation](#advanced-string-manipulation)
-5. [Advanced Argument Processing](#advanced-argument-processing)
-6. [Regular Expressions in Bash](#regular-expressions-in-bash)
-7. [Advanced Error Handling and Debugging](#advanced-error-handling-and-debugging)
-8. [Script Templates and Best Practices](#script-templates-and-best-practices)
-9. [Practical AI Infrastructure Automation](#practical-ai-infrastructure-automation)
-10. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [简介](#简介)
+2. [高级控制结构](#高级控制结构)
+3. [数组和关联数组](#数组和关联数组)
+4. [高级字符串操作](#高级字符串操作)
+5. [高级参数处理](#高级参数处理)
+6. [Bash 中的正则表达式](#bash-中的正则表达式)
+7. [高级错误处理和调试](#高级错误处理和调试)
+8. [脚本模板和最佳实践](#脚本模板和最佳实践)
+9. [实际 AI 基础设施自动化](#实际-ai-基础设施自动化)
+10. [总结和要点](#总结和要点)
 
-## Introduction
+## 简介
 
-Building on the fundamentals from Lecture 05, this lecture dives into advanced shell scripting techniques. You'll learn to write sophisticated, production-ready scripts that handle complex AI infrastructure automation tasks with robustness and elegance.
+在讲座 05 的基础上，本讲座深入高级 shell 脚本技巧。你将学习编写复杂、生产就绪的脚本，以稳健和优雅的方式处理复杂的 AI 基础设施自动化任务。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Master case statements and advanced conditionals
-- Work with arrays and associative arrays
-- Perform complex string manipulation
-- Process command-line arguments professionally
-- Use regular expressions for pattern matching
-- Implement comprehensive error handling
-- Debug scripts effectively
-- Write production-ready automation scripts
-- Apply advanced techniques to AI infrastructure
+完成本讲座后，你将能够：
+- 掌握 case 语句和高级条件语句
+- 使用数组和关联数组
+- 执行复杂的字符串操作
+- 专业地处理命令行参数
+- 使用正则表达式进行模式匹配
+- 实现全面的错误处理
+- 有效调试脚本
+- 编写生产就绪的自动化脚本
+- 将高级技巧应用到 AI 基础设施
 
-### Prerequisites
-- Lecture 05 (Introduction to Shell Scripting)
-- Comfortable with basic bash scripting
-- Understanding of variables, functions, and basic control flow
+### 先决条件
+- 讲座 05（Shell 脚本入门）
+- 熟悉基本 bash 脚本
+- 理解变量、函数和基本控制流
 
-### Why Advanced Scripting?
+### 为什么需要高级脚本？
 
-**Production Readiness**: Basic scripts work for personal use; advanced scripts handle production workloads
+**生产就绪**：基本脚本适合个人使用；高级脚本处理生产工作负载
 
-**Robustness**: Handle edge cases, errors, and unexpected inputs gracefully
+**健壮性**：优雅地处理边缘情况、错误和意外输入
 
-**Maintainability**: Well-structured code is easier to debug and extend
+**可维护性**：结构良好的代码更容易调试和扩展
 
-**Scalability**: Scripts that work with one model must work with hundreds
+**可扩展性**：能处理一个模型的脚本必须能处理数百个
 
-**Professionalism**: Production infrastructure demands professional code quality
+**专业性**：生产基础设施需要专业的代码质量
 
-**Duration**: 120 minutes
-**Difficulty**: Intermediate to Advanced
+**时长**：120 分钟
+**难度**：中级到高级
 
 ---
 
-## Advanced Control Structures
+## 高级控制结构
 
-### Case Statements
+### Case 语句
 
-Case statements provide cleaner syntax than multiple if-elif-else chains.
+Case 语句提供比多个 if-elif-else 链更清晰的语法。
 
-**Basic case statement**:
+**基本 case 语句**：
 ```bash
 #!/bin/bash
 
@@ -86,10 +86,10 @@ case "$ACTION" in
 esac
 ```
 
-**Pattern matching in case**:
+**case 中的模式匹配**：
 ```bash
 #!/bin/bash
-# Process different model formats
+# 处理不同的模型格式
 
 FILE=$1
 
@@ -117,7 +117,7 @@ case "$FILE" in
 esac
 ```
 
-**Multiple patterns per case**:
+**每个 case 多个模式**：
 ```bash
 #!/bin/bash
 
@@ -157,13 +157,13 @@ echo "Replicas: $REPLICAS"
 echo "Resources: $RESOURCES"
 ```
 
-**Case with regex patterns** (using [[ ]] and =~):
+**带正则表达式的 case**（使用 [[ ]] 和 =~）：
 ```bash
 #!/bin/bash
 
 INPUT=$1
 
-# Validate version format
+# 验证版本格式
 if [[ "$INPUT" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     echo "Valid semantic version: $INPUT"
 elif [[ "$INPUT" =~ ^[0-9]+\.[0-9]+$ ]]; then
@@ -176,138 +176,138 @@ else
 fi
 ```
 
-### Advanced Conditionals
+### 高级条件语句
 
-**Double bracket [[ ]] vs single bracket [ ]**:
+**双中括号 [[ ]] 与单中括号 [ ]**：
 
 ```bash
-# [[ ]] supports additional features
-# - Pattern matching with ==
-# - Regex matching with =~
-# - Logical operators (&&, ||) without quotes
-# - String comparison without quotes
+# [[ ]] 支持额外特性
+# - 使用 == 进行模式匹配
+# - 使用 =~ 进行正则匹配
+# - 逻辑运算符（&&, ||）无需引号
+# - 字符串比较无需引号
 
-# Pattern matching
+# 模式匹配
 if [[ "$FILENAME" == *.txt ]]; then
     echo "Text file"
 fi
 
-# Regex matching
+# 正则匹配
 if [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     echo "Valid version"
 fi
 
-# Multiple conditions without escaping
+# 多个条件无需转义
 if [[ -f "model.h5" && -f "config.yaml" ]]; then
     echo "Both files exist"
 fi
 
-# String comparison without quotes
+# 字符串比较无需引号
 if [[ $STATUS == "success" ]]; then
     echo "Operation succeeded"
 fi
 ```
 
-**Ternary-style operations**:
+**三元风格操作**：
 ```bash
-# Using && and ||
+# 使用 && 和 ||
 [ -f "model.h5" ] && echo "File exists" || echo "File not found"
 
-# Assign default values
+# 分配默认值
 RESULT=$(command) || RESULT="default"
 
-# Complex ternary-style
+# 复杂的三元风格
 GPU_AVAILABLE=$(command -v nvidia-smi &> /dev/null && echo "yes" || echo "no")
 ```
 
 ---
 
-## Arrays and Associative Arrays
+## 数组和关联数组
 
-### Indexed Arrays
+### 索引数组
 
-**Creating and populating arrays**:
+**创建和填充数组**：
 ```bash
-# Method 1: Direct assignment
+# 方法 1：直接赋值
 MODELS=("resnet50" "vgg16" "inception" "mobilenet")
 
-# Method 2: Individual elements
+# 方法 2：单个元素
 GPUS[0]=0
 GPUS[1]=1
 GPUS[2]=2
 GPUS[3]=3
 
-# Method 3: From command output
+# 方法 3：来自命令输出
 FILES=($(ls *.h5))
 USERS=($(cut -d: -f1 /etc/passwd))
 ```
 
-**Accessing array elements**:
+**访问数组元素**：
 ```bash
 MODELS=("resnet50" "vgg16" "inception")
 
-echo ${MODELS[0]}           # First element: resnet50
-echo ${MODELS[1]}           # Second element: vgg16
-echo ${MODELS[-1]}          # Last element: inception
-echo ${MODELS[@]}           # All elements (as separate words)
-echo ${MODELS[*]}           # All elements (as single word)
-echo ${#MODELS[@]}          # Array length: 3
+echo ${MODELS[0]}           # 第一个元素：resnet50
+echo ${MODELS[1]}           # 第二个元素：vgg16
+echo ${MODELS[-1]}          # 最后一个元素：inception
+echo ${MODELS[@]}           # 所有元素（作为独立单词）
+echo ${MODELS[*]}           # 所有元素（作为单个单词）
+echo ${#MODELS[@]}          # 数组长度：3
 ```
 
-**Iterating over arrays**:
+**遍历数组**：
 ```bash
 MODELS=("resnet50" "vgg16" "inception" "mobilenet")
 
-# Method 1: Iterate values
+# 方法 1：遍历值
 for model in "${MODELS[@]}"; do
     echo "Training $model"
     python train.py --model "$model"
 done
 
-# Method 2: Iterate indices
+# 方法 2：遍历索引
 for i in "${!MODELS[@]}"; do
     echo "Model $i: ${MODELS[$i]}"
 done
 
-# Method 3: C-style
+# 方法 3：C 风格
 for ((i=0; i<${#MODELS[@]}; i++)); do
     echo "Model $i: ${MODELS[$i]}"
 done
 ```
 
-**Array operations**:
+**数组操作**：
 ```bash
-# Add element
+# 添加元素
 MODELS+=("squeezenet")
 
-# Remove element
+# 删除元素
 unset MODELS[2]
 
-# Slice array
+# 切片数组
 MODELS=("resnet50" "vgg16" "inception" "mobilenet" "squeezenet")
-echo ${MODELS[@]:1:3}       # vgg16 inception mobilenet (start:length)
+echo ${MODELS[@]:1:3}       # vgg16 inception mobilenet（起始:长度）
 
-# Copy array
+# 复制数组
 NEW_MODELS=("${MODELS[@]}")
 
-# Concatenate arrays
+# 连接数组
 ARRAY1=(1 2 3)
 ARRAY2=(4 5 6)
 COMBINED=("${ARRAY1[@]}" "${ARRAY2[@]}")
 ```
 
-**Practical example - Multi-GPU training**:
+**实际示例 - 多 GPU 训练**：
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-# Models to train
+# 要训练的模型
 MODELS=("resnet50" "vgg16" "inception" "mobilenet")
 
-# Available GPUs
+# 可用的 GPU
 GPUS=(0 1 2 3)
 
-# Assign models to GPUs round-robin
+# 循环分配模型到 GPU
 GPU_INDEX=0
 
 for model in "${MODELS[@]}"; do
@@ -317,31 +317,31 @@ for model in "${MODELS[@]}"; do
     CUDA_VISIBLE_DEVICES=$gpu python train.py --model "$model" \
         --output "results/${model}" &
 
-    # Next GPU (with wraparound)
+    # 下一个 GPU（循环）
     GPU_INDEX=$(( (GPU_INDEX + 1) % ${#GPUS[@]} ))
 done
 
-# Wait for all training jobs to complete
+# 等待所有训练作业完成
 wait
 
 echo "All models trained successfully"
 ```
 
-### Associative Arrays
+### 关联数组
 
-Associative arrays use strings as keys (requires Bash 4+).
+关联数组使用字符串作为键（需要 Bash 4+）。
 
-**Creating associative arrays**:
+**创建关联数组**：
 ```bash
-# Declare associative array
+# 声明关联数组
 declare -A MODEL_PATHS
 
-# Add key-value pairs
+# 添加键值对
 MODEL_PATHS["resnet50"]="/models/resnet50.h5"
 MODEL_PATHS["vgg16"]="/models/vgg16.h5"
 MODEL_PATHS["inception"]="/models/inception.h5"
 
-# Alternative: declare and populate
+# 替代：声明并填充
 declare -A CONFIG=(
     ["dev"]="config.dev.yaml"
     ["staging"]="config.staging.yaml"
@@ -349,32 +349,32 @@ declare -A CONFIG=(
 )
 ```
 
-**Accessing associative arrays**:
+**访问关联数组**：
 ```bash
 declare -A MODEL_PATHS=(
     ["resnet50"]="/models/resnet50.h5"
     ["vgg16"]="/models/vgg16.h5"
 )
 
-# Access by key
+# 按键访问
 echo ${MODEL_PATHS["resnet50"]}      # /models/resnet50.h5
 
-# All keys
+# 所有键
 echo ${!MODEL_PATHS[@]}              # resnet50 vgg16
 
-# All values
+# 所有值
 echo ${MODEL_PATHS[@]}               # /models/resnet50.h5 /models/vgg16.h5
 
-# Number of elements
+# 元素数量
 echo ${#MODEL_PATHS[@]}              # 2
 
-# Check if key exists
+# 检查键是否存在
 if [[ -v MODEL_PATHS["resnet50"] ]]; then
     echo "Key exists"
 fi
 ```
 
-**Iterating over associative arrays**:
+**遍历关联数组**：
 ```bash
 declare -A MODEL_PATHS=(
     ["resnet50"]="/models/resnet50.h5"
@@ -382,12 +382,12 @@ declare -A MODEL_PATHS=(
     ["inception"]="/models/inception.h5"
 )
 
-# Iterate over keys
+# 遍历键
 for model in "${!MODEL_PATHS[@]}"; do
     echo "$model -> ${MODEL_PATHS[$model]}"
 done
 
-# More complex iteration
+# 更复杂的遍历
 for model in "${!MODEL_PATHS[@]}"; do
     path="${MODEL_PATHS[$model]}"
 
@@ -399,12 +399,12 @@ for model in "${!MODEL_PATHS[@]}"; do
 done
 ```
 
-**Practical example - Configuration management**:
+**实际示例 - 配置管理**：
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-# Environment configurations
+# 环境配置
 declare -A CONFIGS=(
     ["dev_api_url"]="http://localhost:8000"
     ["dev_replicas"]="1"
@@ -415,9 +415,9 @@ declare -A CONFIGS=(
     ["prod_resources"]="maximum"
 )
 
-ENV=$1  # dev or prod
+ENV=$1  # dev 或 prod
 
-# Get config values for environment
+# 获取环境配置值
 API_URL=${CONFIGS["${ENV}_api_url"]}
 REPLICAS=${CONFIGS["${ENV}_replicas"]}
 RESOURCES=${CONFIGS["${ENV}_resources"]}
@@ -427,7 +427,7 @@ echo "API URL: $API_URL"
 echo "Replicas: $REPLICAS"
 echo "Resources: $RESOURCES"
 
-# Deploy with configuration
+# 使用配置部署
 kubectl apply -f deployment.yaml \
     --set apiUrl="$API_URL" \
     --set replicas="$REPLICAS" \
@@ -436,77 +436,77 @@ kubectl apply -f deployment.yaml \
 
 ---
 
-## Advanced String Manipulation
+## 高级字符串操作
 
-### String Length and Substrings
+### 字符串长度和子串
 
 ```bash
 TEXT="Hello, World!"
 
-# Length
+# 长度
 echo ${#TEXT}                    # 13
 
-# Substring (offset:length)
+# 子串（偏移量:长度）
 echo ${TEXT:0:5}                 # Hello
 echo ${TEXT:7}                   # World!
 echo ${TEXT:7:5}                 # World
-echo ${TEXT: -6}                 # World! (note space before -)
+echo ${TEXT: -6}                 # World!（注意空格）
 ```
 
-### String Replacement
+### 字符串替换
 
 ```bash
 FILENAME="model_v1_final_v1.h5"
 
-# Replace first occurrence
+# 替换第一个
 echo ${FILENAME/v1/v2}           # model_v2_final_v1.h5
 
-# Replace all occurrences
+# 替换所有
 echo ${FILENAME//v1/v2}          # model_v2_final_v2.h5
 
-# Replace prefix
+# 替换前缀
 PATH_STR="/models/resnet50"
 echo ${PATH_STR/#\/models/\/data}  # /data/resnet50
 
-# Replace suffix
+# 替换后缀
 echo ${FILENAME/%.h5/.pt}        # model_v1_final_v1.pt
 ```
 
-### Remove Patterns
+### 删除模式
 
 ```bash
 FILEPATH="/data/models/resnet50.h5"
 
-# Remove shortest prefix match
+# 删除最短前缀匹配
 echo ${FILEPATH#*/}              # data/models/resnet50.h5
 
-# Remove longest prefix match
-echo ${FILEPATH##*/}             # resnet50.h5 (basename)
+# 删除最长前缀匹配
+echo ${FILEPATH##*/}             # resnet50.h5（基本名称）
 
-# Remove shortest suffix match
+# 删除最短后缀匹配
 echo ${FILEPATH%.*}              # /data/models/resnet50
 
-# Remove longest suffix match
+# 删除最长后缀匹配
 echo ${FILEPATH%%.*}             # /data/models/resnet50
 ```
 
-**Practical example - Path manipulation**:
+**实际示例 - 路径操作**：
 ```bash
 #!/bin/bash
 
-# Extract components from path
+# 从路径中提取组件
 FULL_PATH="/data/models/production/resnet50_v2.h5"
 
-# Get directory
+# 获取目录
 DIR=${FULL_PATH%/*}              # /data/models/production
 
-# Get filename
+# 获取文件名
 FILENAME=${FULL_PATH##*/}        # resnet50_v2.h5
 
-# Get basename (no extension)
+# 获取基本名称（无扩展名）
 BASENAME=${FILENAME%.*}          # resnet50_v2
 
-# Get extension
+# 获取扩展名
 EXTENSION=${FILENAME##*.}        # h5
 
 echo "Full path: $FULL_PATH"
@@ -515,48 +515,48 @@ echo "Filename: $FILENAME"
 echo "Basename: $BASENAME"
 echo "Extension: $EXTENSION"
 
-# Convert to different format
+# 转换为不同格式
 NEW_PATH="${DIR}/${BASENAME}.onnx"
 echo "New path: $NEW_PATH"
 ```
 
-### Case Conversion
+### 大小写转换
 
 ```bash
 TEXT="Hello World"
 
 # Bash 4+
-echo ${TEXT^}                    # Hello World (first char uppercase)
-echo ${TEXT^^}                   # HELLO WORLD (all uppercase)
-echo ${TEXT,}                    # hello World (first char lowercase)
-echo ${TEXT,,}                   # hello world (all lowercase)
+echo ${TEXT^}                    # Hello World（首字符大写）
+echo ${TEXT^^}                   # HELLO WORLD（全部大写）
+echo ${TEXT,}                    # hello World（首字符小写）
+echo ${TEXT,,}                   # hello world（全部小写）
 
-# Alternative for older Bash
+# 旧 Bash 的替代方案
 echo "$TEXT" | tr '[:lower:]' '[:upper:]'   # HELLO WORLD
 echo "$TEXT" | tr '[:upper:]' '[:lower:]'   # hello world
 ```
 
-### Default Values
+### 默认值
 
 ```bash
-# Use default if unset
-echo ${VAR:-default}             # Use 'default' if VAR is unset
+# 未设置时使用默认值
+echo ${VAR:-default}             # 如果 VAR 未设置，使用 'default'
 
-# Set default if unset
-VAR=${VAR:=default}              # Set VAR to 'default' if unset
+# 未设置时设置默认值
+VAR=${VAR:=default}              # 如果 VAR 未设置，将其设置为 'default'
 
-# Use alternative if set
-echo ${VAR:+alternative}         # Use 'alternative' if VAR is set
+# 已设置时使用替代值
+echo ${VAR:+alternative}         # 如果 VAR 已设置，使用 'alternative'
 
-# Error if unset
-echo ${VAR:?error message}       # Error with message if VAR is unset
+# 未设置时出错
+echo ${VAR:?error message}       # 如果 VAR 未设置，显示错误消息
 ```
 
-**Practical example - Configuration with defaults**:
+**实际示例 - 带默认值的配置**：
 ```bash
 #!/bin/bash
 
-# ML training configuration with defaults
+# ML 训练配置及默认值
 MODEL_NAME=${MODEL_NAME:-resnet50}
 BATCH_SIZE=${BATCH_SIZE:-32}
 LEARNING_RATE=${LEARNING_RATE:-0.001}
@@ -570,30 +570,30 @@ echo "  Learning rate: $LEARNING_RATE"
 echo "  Epochs: $EPOCHS"
 echo "  GPU: $GPU_ID"
 
-# Run training
+# 运行训练
 CUDA_VISIBLE_DEVICES=$GPU_ID python train.py \
     --model "$MODEL_NAME" \
     --batch-size "$BATCH_SIZE" \
     --lr "$LEARNING_RATE" \
     --epochs "$EPOCHS"
 
-# Usage examples:
-# ./train.sh                          # All defaults
-# MODEL_NAME=vgg16 ./train.sh         # Custom model
-# BATCH_SIZE=64 EPOCHS=200 ./train.sh # Custom params
+# 使用示例：
+# ./train.sh                          # 全部默认
+# MODEL_NAME=vgg16 ./train.sh         # 自定义模型
+# BATCH_SIZE=64 EPOCHS=200 ./train.sh # 自定义参数
 ```
 
 ---
 
-## Advanced Argument Processing
+## 高级参数处理
 
-### Long Options Parsing
+### 长选项解析
 
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-# train.sh - Training script with long options
+# train.sh - 带长选项的训练脚本
 
 usage() {
     cat << EOF
@@ -618,7 +618,7 @@ EOF
     exit 1
 }
 
-# Defaults
+# 默认值
 MODEL="resnet50"
 EPOCHS=100
 BATCH_SIZE=32
@@ -627,7 +627,7 @@ OUTPUT=""
 CONFIG=""
 VERBOSE=false
 
-# Parse arguments
+# 解析参数
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --model=*)
@@ -668,13 +668,13 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Validate required arguments
+# 验证必需参数
 if [ -z "$OUTPUT" ]; then
     echo "ERROR: --output is required"
     usage
 fi
 
-# Display configuration
+# 显示配置
 echo "Training Configuration:"
 echo "  Model: $MODEL"
 echo "  Epochs: $EPOCHS"
@@ -684,22 +684,22 @@ echo "  Output: $OUTPUT"
 [ -n "$CONFIG" ] && echo "  Config: $CONFIG"
 [ "$VERBOSE" = true ] && echo "  Verbose: enabled"
 
-# Build command
+# 构建命令
 CMD="python train.py --model $MODEL --epochs $EPOCHS --batch-size $BATCH_SIZE --gpu $GPU --output $OUTPUT"
 [ -n "$CONFIG" ] && CMD="$CMD --config $CONFIG"
 [ "$VERBOSE" = true ] && CMD="$CMD --verbose"
 
-# Execute
+# 执行
 echo "Running: $CMD"
 eval "$CMD"
 ```
 
-### Mixing Short and Long Options
+### 混合短选项和长选项
 
 ```bash
 #!/bin/bash
 
-# Parse both short (-m) and long (--model=) options
+# 同时解析短选项（-m）和长选项（--model=）
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -729,13 +729,13 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Now supports:
+# 现在支持：
 # ./script.sh -m resnet50
 # ./script.sh --model resnet50
 # ./script.sh --model=resnet50
 ```
 
-### Positional Arguments After Options
+### 选项后的位置参数
 
 ```bash
 #!/bin/bash
@@ -754,12 +754,12 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         *)
-            break  # Stop at first positional argument
+            break  # 在第一个位置参数处停止
             ;;
     esac
 done
 
-# Remaining arguments are positional
+# 剩余参数是位置参数
 ENVIRONMENT=$1
 TARGET=$2
 
@@ -770,19 +770,19 @@ echo "Target: $TARGET"
 
 ---
 
-## Regular Expressions in Bash
+## Bash 中的正则表达式
 
-### Pattern Matching with =~
+### 使用 =~ 进行模式匹配
 
 ```bash
-# Regex matching requires [[ ]]
+# 正则匹配需要 [[ ]]
 
 if [[ "$STRING" =~ pattern ]]; then
     echo "Match found"
 fi
 ```
 
-**Validate version numbers**:
+**验证版本号**：
 ```bash
 VERSION="1.2.3"
 
@@ -793,7 +793,7 @@ else
 fi
 ```
 
-**Extract information with capture groups**:
+**使用捕获组提取信息**：
 ```bash
 INPUT="model_resnet50_epoch_100.h5"
 
@@ -806,61 +806,26 @@ if [[ "$INPUT" =~ model_([a-z0-9]+)_epoch_([0-9]+) ]]; then
 fi
 ```
 
-**Validate email addresses**:
-```bash
-EMAIL="user@example.com"
-
-if [[ "$EMAIL" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
-    echo "Valid email"
-else
-    echo "Invalid email"
-fi
-```
-
-**Validate IP addresses**:
+**验证 IP 地址**：
 ```bash
 IP="192.168.1.100"
 
-# Simple validation
+# 简单验证
 if [[ "$IP" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
     echo "Valid IP format"
 fi
-
-# More thorough validation
-function validate_ip() {
-    local ip=$1
-    local valid=true
-
-    if [[ $ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
-        IFS='.' read -ra OCTETS <<< "$ip"
-        for octet in "${OCTETS[@]}"; do
-            if [ "$octet" -gt 255 ]; then
-                valid=false
-                break
-            fi
-        done
-    else
-        valid=false
-    fi
-
-    $valid
-}
-
-if validate_ip "192.168.1.100"; then
-    echo "Valid IP address"
-fi
 ```
 
-**Practical example - Parse training logs**:
+**实际示例 - 解析训练日志**：
 ```bash
 #!/bin/bash
 
-# Extract metrics from training logs
+# 从训练日志中提取指标
 
 LOG_FILE="training.log"
 
 while IFS= read -r line; do
-    # Match pattern: Epoch 50/100 - loss: 0.1234 - acc: 0.9876
+    # 匹配模式：Epoch 50/100 - loss: 0.1234 - acc: 0.9876
     if [[ "$line" =~ Epoch[[:space:]]+([0-9]+)/([0-9]+).*loss:[[:space:]]+([0-9.]+).*acc:[[:space:]]+([0-9.]+) ]]; then
         EPOCH="${BASH_REMATCH[1]}"
         TOTAL="${BASH_REMATCH[2]}"
@@ -874,52 +839,52 @@ done < "$LOG_FILE"
 
 ---
 
-## Advanced Error Handling and Debugging
+## 高级错误处理和调试
 
-### Comprehensive Error Handling
+### 全面错误处理
 
 ```bash
 #!/bin/bash
 
-# Strict error handling
+# 严格错误处理
 set -euo pipefail
 IFS=$'\n\t'
 
-# Error handler function
+# 错误处理函数
 function error_handler() {
     local line=$1
     local exit_code=$2
 
     echo "ERROR at line $line: Command exited with status $exit_code" >&2
 
-    # Cleanup on error
+    # 出错时清理
     cleanup
 
     exit $exit_code
 }
 
-# Trap errors
+# 捕获错误
 trap 'error_handler ${LINENO} $?' ERR
 
-# Cleanup function
+# 清理函数
 function cleanup() {
     echo "Performing cleanup..."
-    # Remove temporary files, stop processes, etc.
+    # 删除临时文件、停止进程等
 }
 
-# Trap exit
+# 捕获退出
 trap cleanup EXIT
 
-# Trap interrupts
+# 捕获中断
 trap 'echo "Interrupted"; exit 130' INT TERM
 ```
 
-### Validation Functions
+### 验证函数
 
 ```bash
 #!/bin/bash
 
-# Validate file exists
+# 验证文件存在
 function require_file() {
     local file=$1
     local description=${2:-"File"}
@@ -930,7 +895,7 @@ function require_file() {
     fi
 }
 
-# Validate directory exists
+# 验证目录存在
 function require_directory() {
     local dir=$1
 
@@ -940,7 +905,7 @@ function require_directory() {
     fi
 }
 
-# Validate command exists
+# 验证命令存在
 function require_command() {
     local cmd=$1
 
@@ -950,7 +915,7 @@ function require_command() {
     fi
 }
 
-# Validate numeric value
+# 验证数字值
 function require_number() {
     local value=$1
     local name=$2
@@ -961,7 +926,7 @@ function require_number() {
     fi
 }
 
-# Validate GPU is available
+# 验证 GPU 可用
 function require_gpu() {
     local gpu_id=$1
 
@@ -977,7 +942,7 @@ function require_gpu() {
     fi
 }
 
-# Use in script
+# 在脚本中使用
 require_file "config.yaml" "Configuration file"
 require_directory "/data/models"
 require_command "python3"
@@ -985,12 +950,12 @@ require_number "$EPOCHS" "EPOCHS"
 require_gpu 0
 ```
 
-### Retry Logic
+### 重试逻辑
 
 ```bash
 #!/bin/bash
 
-# Retry function with exponential backoff
+# 带指数退避的重试函数
 function retry() {
     local max_attempts=$1
     shift
@@ -1008,7 +973,7 @@ function retry() {
         if [ $attempt -lt $max_attempts ]; then
             echo "Failed. Retrying in ${delay}s..."
             sleep $delay
-            delay=$((delay * 2))  # Exponential backoff
+            delay=$((delay * 2))  # 指数退避
         fi
 
         attempt=$((attempt + 1))
@@ -1018,18 +983,18 @@ function retry() {
     return 1
 }
 
-# Usage
+# 用法
 retry 3 curl -f https://api.example.com/health
 retry 5 python train.py --resume
 ```
 
-### Debugging Techniques
+### 调试技巧
 
-**Debug mode**:
+**调试模式**：
 ```bash
 #!/bin/bash
 
-# Enable debug mode with environment variable
+# 使用环境变量启用调试模式
 DEBUG=${DEBUG:-0}
 
 function debug() {
@@ -1042,25 +1007,25 @@ debug "Starting script"
 debug "Model: $MODEL_NAME"
 debug "GPU: $GPU_ID"
 
-# Usage:
+# 用法：
 # DEBUG=1 ./script.sh
 ```
 
-**Trace execution**:
+**跟踪执行**：
 ```bash
 #!/bin/bash
 
-# Enable trace for specific section
-set -x  # Start tracing
+# 为特定部分启用跟踪
+set -x  # 开始跟踪
 command1
 command2
-set +x  # Stop tracing
+set +x  # 停止跟踪
 
-# Or trace entire script
+# 或跟踪整个脚本
 bash -x script.sh
 ```
 
-**Verbose mode**:
+**详细模式**：
 ```bash
 #!/bin/bash
 
@@ -1072,7 +1037,7 @@ function log() {
     fi
 }
 
-# Parse --verbose flag
+# 解析 --verbose 标志
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --verbose|-v)
@@ -1091,39 +1056,39 @@ log "Loading model"
 
 ---
 
-## Script Templates and Best Practices
+## 脚本模板和最佳实践
 
-### Production Script Template
+### 生产脚本模板
 
 ```bash
 #!/bin/bash
 
 ################################################################################
-# Script Name: production-template.sh
-# Description: Production-ready script template with all best practices
-# Author: Your Name
-# Date: $(date +%Y-%m-%d)
-# Version: 1.0.0
+# 脚本名称：production-template.sh
+# 描述：包含所有最佳实践的生产就绪脚本模板
+# 作者：你的名字
+# 日期：$(date +%Y-%m-%d)
+# 版本：1.0.0
 #
-# Usage: ./production-template.sh [OPTIONS] <required_arg>
+# 用法：./production-template.sh [OPTIONS] <required_arg>
 #
-# Requirements:
+# 要求：
 #   - Bash 4.0+
-#   - Required commands: python3, nvidia-smi
+#   - 必需命令：python3、nvidia-smi
 #
-# Exit codes:
-#   0 - Success
-#   1 - General error
-#   2 - Invalid arguments
-#   3 - Missing dependencies
+# 退出码：
+#   0 - 成功
+#   1 - 一般错误
+#   2 - 无效参数
+#   3 - 缺少依赖
 ################################################################################
 
-# Strict mode
+# 严格模式
 set -euo pipefail
 IFS=$'\n\t'
 
 ################################################################################
-# GLOBAL VARIABLES
+# 全局变量
 ################################################################################
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -1131,36 +1096,36 @@ readonly SCRIPT_NAME="$(basename "$0")"
 readonly SCRIPT_VERSION="1.0.0"
 readonly LOG_FILE="${LOG_FILE:-/var/log/${SCRIPT_NAME%.sh}.log}"
 
-# Default values
+# 默认值
 MODEL_NAME="${MODEL_NAME:-resnet50}"
 EPOCHS="${EPOCHS:-100}"
 VERBOSE=false
 DRY_RUN=false
 
 ################################################################################
-# UTILITY FUNCTIONS
+# 工具函数
 ################################################################################
 
-# Print colored output
+# 打印彩色输出
 function print_red()    { echo -e "\033[0;31m$@\033[0m"; }
 function print_green()  { echo -e "\033[0;32m$@\033[0m"; }
 function print_yellow() { echo -e "\033[0;33m$@\033[0m"; }
 function print_blue()   { echo -e "\033[0;34m$@\033[0m"; }
 
-# Logging functions
+# 日志函数
 function log_info()  { echo "[$(date +'%Y-%m-%d %H:%M:%S')] [INFO]  $@" | tee -a "$LOG_FILE"; }
 function log_warn()  { echo "[$(date +'%Y-%m-%d %H:%M:%S')] [WARN]  $@" | tee -a "$LOG_FILE"; }
 function log_error() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] [ERROR] $@" | tee -a "$LOG_FILE" >&2; }
 function log_debug() { [ "$VERBOSE" = true ] && echo "[$(date +'%Y-%m-%d %H:%M:%S')] [DEBUG] $@" | tee -a "$LOG_FILE" >&2 || true; }
 
-# Error handling
+# 错误处理
 function die() {
     log_error "$@"
     exit 1
 }
 
 ################################################################################
-# ERROR HANDLING
+# 错误处理
 ################################################################################
 
 function error_handler() {
@@ -1172,14 +1137,14 @@ trap 'error_handler ${LINENO}' ERR
 
 function cleanup() {
     log_info "Performing cleanup..."
-    # Add cleanup code here
+    # 在此添加清理代码
 }
 
 trap cleanup EXIT
 trap 'log_warn "Interrupted"; exit 130' INT TERM
 
 ################################################################################
-# VALIDATION FUNCTIONS
+# 验证函数
 ################################################################################
 
 function check_dependencies() {
@@ -1196,19 +1161,19 @@ function check_dependencies() {
 function validate_arguments() {
     log_debug "Validating arguments..."
 
-    # Validate model name
+    # 验证模型名称
     if [ -z "$MODEL_NAME" ]; then
         die "MODEL_NAME cannot be empty"
     fi
 
-    # Validate epochs
+    # 验证 epochs
     if ! [[ "$EPOCHS" =~ ^[0-9]+$ ]] || [ "$EPOCHS" -lt 1 ]; then
         die "EPOCHS must be a positive integer"
     fi
 }
 
 ################################################################################
-# USAGE AND HELP
+# 用法和帮助
 ################################################################################
 
 function usage() {
@@ -1245,7 +1210,7 @@ function version() {
 }
 
 ################################################################################
-# ARGUMENT PARSING
+# 参数解析
 ################################################################################
 
 function parse_arguments() {
@@ -1289,7 +1254,7 @@ function parse_arguments() {
 }
 
 ################################################################################
-# MAIN FUNCTIONS
+# 主函数
 ################################################################################
 
 function do_something() {
@@ -1300,7 +1265,7 @@ function do_something() {
         return
     fi
 
-    # Actual work here
+    # 实际工作在此
     python train.py --model "$MODEL_NAME" --epochs "$EPOCHS"
 }
 
@@ -1316,65 +1281,65 @@ function main() {
 }
 
 ################################################################################
-# SCRIPT EXECUTION
+# 脚本执行
 ################################################################################
 
-# Parse arguments
+# 解析参数
 parse_arguments "$@"
 
-# Run main function
+# 运行主函数
 main
 ```
 
-### Best Practices Checklist
+### 最佳实践检查清单
 
-✅ **Shebang**: Start with `#!/bin/bash`
-✅ **Strict mode**: Use `set -euo pipefail`
-✅ **Header comment**: Script name, description, author, date
-✅ **Constants**: Use `readonly` for constants
-✅ **Functions**: Break code into reusable functions
-✅ **Quotes**: Always quote variables: `"$VAR"`
-✅ **Local variables**: Use `local` in functions
-✅ **Error handling**: Use `trap` and error handlers
-✅ **Logging**: Log important events with timestamps
-✅ **Validation**: Validate inputs before using
-✅ **Usage function**: Provide clear usage information
-✅ **Exit codes**: Use meaningful exit codes
-✅ **Comments**: Explain why, not what
-✅ **Dry-run mode**: Support --dry-run for testing
-✅ **Version info**: Include --version flag
+✅ **Shebang**：以 `#!/bin/bash` 开头
+✅ **严格模式**：使用 `set -euo pipefail`
+✅ **头部注释**：脚本名称、描述、作者、日期
+✅ **常量**：使用 `readonly` 声明常量
+✅ **函数**：将代码分解为可重用的函数
+✅ **引用**：始终引用变量：`"$VAR"`
+✅ **局部变量**：在函数中使用 `local`
+✅ **错误处理**：使用 `trap` 和错误处理器
+✅ **日志记录**：记录重要事件并带时间戳
+✅ **验证**：使用前验证输入
+✅ **用法函数**：提供清晰的用法信息
+✅ **退出码**：使用有意义的退出码
+✅ **注释**：解释为什么，而不是什么
+✅ **空运行模式**：支持 --dry-run 用于测试
+✅ **版本信息**：包含 --version 标志
 
 ---
 
-## Practical AI Infrastructure Automation
+## 实际 AI 基础设施自动化
 
-### Complete Model Deployment Pipeline
+### 完整模型部署管道
 
 ```bash
 #!/bin/bash
 set -euo pipefail
 
 ################################################################################
-# deploy-ml-model.sh - Complete ML model deployment pipeline
+# deploy-ml-model.sh - 完整的 ML 模型部署管道
 ################################################################################
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly LOG_FILE="/var/log/model-deployment.log"
 
-# Configuration
+# 配置
 MODEL_REGISTRY="/models/registry"
 STAGING_DIR="/models/staging"
 PRODUCTION_DIR="/models/production"
 BACKUP_DIR="/backups/models"
 SERVICE_NAME="ml-inference-api"
 
-# Colors
+# 颜色
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
-# Logging
+# 日志记录
 function log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $@" | tee -a "$LOG_FILE"
 }
@@ -1391,26 +1356,26 @@ function log_warning() {
     echo -e "${YELLOW}[WARNING]${NC} $@" | tee -a "$LOG_FILE"
 }
 
-# Validation
+# 验证模型
 function validate_model() {
     local model_path=$1
 
     log "Validating model: $model_path"
 
-    # Check file exists
+    # 检查文件是否存在
     if [ ! -f "$model_path" ]; then
         log_error "Model file not found: $model_path"
         return 1
     fi
 
-    # Check file size
+    # 检查文件大小
     local size=$(stat -f%z "$model_path" 2>/dev/null || stat -c%s "$model_path")
     if [ "$size" -lt 1000 ]; then
         log_error "Model file too small: $size bytes"
         return 1
     fi
 
-    # Validate model format
+    # 验证模型格式
     if ! python -c "import tensorflow as tf; tf.keras.models.load_model('$model_path')" &> /dev/null; then
         log_error "Invalid model format"
         return 1
@@ -1420,7 +1385,7 @@ function validate_model() {
     return 0
 }
 
-# Backup current model
+# 备份当前模型
 function backup_current_model() {
     log "Backing up current production model..."
 
@@ -1439,12 +1404,12 @@ function backup_current_model() {
 
     log_success "Backup saved: $backup_path"
 
-    # Keep only last 10 backups
+    # 仅保留最近 10 个备份
     log "Cleaning old backups..."
     ls -t "$BACKUP_DIR"/model_*.h5 | tail -n +11 | xargs -r rm
 }
 
-# Deploy to staging
+# 部署到暂存环境
 function deploy_to_staging() {
     local source_model=$1
 
@@ -1456,7 +1421,7 @@ function deploy_to_staging() {
     log_success "Deployed to staging"
 }
 
-# Run validation tests
+# 运行验证测试
 function run_validation_tests() {
     log "Running validation tests..."
 
@@ -1476,7 +1441,7 @@ function run_validation_tests() {
     fi
 }
 
-# Promote to production
+# 推广到生产
 function promote_to_production() {
     log "Promoting to production..."
 
@@ -1488,17 +1453,17 @@ function promote_to_production() {
     log_success "Model promoted to production"
 }
 
-# Restart service
+# 重启服务
 function restart_service() {
     log "Restarting $SERVICE_NAME..."
 
     if systemctl restart "$SERVICE_NAME"; then
         log_success "Service restarted successfully"
 
-        # Wait for service to be ready
+        # 等待服务就绪
         sleep 5
 
-        # Health check
+        # 健康检查
         if systemctl is-active "$SERVICE_NAME" &> /dev/null; then
             log_success "Service is running"
         else
@@ -1511,7 +1476,7 @@ function restart_service() {
     fi
 }
 
-# Rollback
+# 回滚
 function rollback() {
     log_warning "Rolling back deployment..."
 
@@ -1528,7 +1493,7 @@ function rollback() {
     log_success "Rollback completed"
 }
 
-# Main deployment pipeline
+# 主部署管道
 function main() {
     local model_path=$1
 
@@ -1540,32 +1505,32 @@ function main() {
     log "=== Starting Model Deployment Pipeline ==="
     log "Model: $model_path"
 
-    # Validation
+    # 验证
     if ! validate_model "$model_path"; then
         log_error "Model validation failed"
         exit 1
     fi
 
-    # Deploy to staging
+    # 部署到暂存环境
     if ! deploy_to_staging "$model_path"; then
         log_error "Staging deployment failed"
         exit 1
     fi
 
-    # Run tests
+    # 运行测试
     if ! run_validation_tests; then
         log_error "Validation tests failed"
         exit 1
     fi
 
-    # Promote to production
+    # 推广到生产
     if ! promote_to_production; then
         log_error "Production promotion failed"
         rollback
         exit 1
     fi
 
-    # Restart service
+    # 重启服务
     if ! restart_service; then
         log_error "Service restart failed"
         rollback
@@ -1575,110 +1540,110 @@ function main() {
     log_success "=== Deployment completed successfully ==="
 }
 
-# Execute
+# 执行
 main "$@"
 ```
 
 ---
 
-## Summary and Key Takeaways
+## 总结和要点
 
-### Advanced Techniques Mastered
+### 掌握的高级技巧
 
-**Control Structures**:
-- Case statements for cleaner conditionals
-- Advanced pattern matching
-- Complex conditional expressions with [[ ]]
+**控制结构**：
+- Case 语句用于更清晰的条件判断
+- 高级模式匹配
+- 使用 [[ ]] 的复杂条件表达式
 
-**Data Structures**:
-- Indexed arrays for lists
-- Associative arrays for key-value pairs
-- Array operations and iterations
+**数据结构**：
+- 索引数组用于列表
+- 关联数组用于键值对
+- 数组操作和遍历
 
-**String Processing**:
-- Advanced substitution and replacement
-- Pattern removal (prefix/suffix)
-- Case conversion
+**字符串处理**：
+- 高级替换和替代
+- 模式删除（前缀/后缀）
+- 大小写转换
 
-**Arguments**:
-- Long option parsing (--option=value)
-- Mixed short and long options
-- Positional arguments with options
+**参数**：
+- 长选项解析（--option=value）
+- 混合短选项和长选项
+- 带选项的位置参数
 
-**Regular Expressions**:
-- Pattern matching with =~
-- Capture groups with BASH_REMATCH
-- Input validation
+**正则表达式**：
+- 使用 =~ 进行模式匹配
+- 使用 BASH_REMATCH 的捕获组
+- 输入验证
 
-**Error Handling**:
-- Comprehensive error trapping
-- Validation functions
-- Retry logic
-- Debugging techniques
+**错误处理**：
+- 全面错误捕获
+- 验证函数
+- 重试逻辑
+- 调试技巧
 
-### Production Best Practices
+### 生产最佳实践
 
-✅ **Use strict mode**: `set -euo pipefail`
-✅ **Validate all inputs**: Never trust user input
-✅ **Log everything**: Timestamps and severity levels
-✅ **Handle errors gracefully**: Trap, cleanup, rollback
-✅ **Support dry-run mode**: Test without executing
-✅ **Provide clear usage**: --help with examples
-✅ **Version your scripts**: Track changes over time
-✅ **Document thoroughly**: Comments, headers, README
-✅ **Make idempotent**: Safe to run multiple times
-✅ **Test extensively**: Unit tests for functions
+✅ **使用严格模式**：`set -euo pipefail`
+✅ **验证所有输入**：永远不要信任用户输入
+✅ **记录所有内容**：时间戳和严重级别
+✅ **优雅处理错误**：捕获、清理、回滚
+✅ **支持空运行模式**：不执行的情况下测试
+✅ **提供清晰的用法**：带示例的 --help
+✅ **对脚本进行版本控制**：跟踪随时间的变化
+✅ **彻底记录**：注释、头部、README
+✅ **使其幂等**：多次运行安全
+✅ **广泛测试**：函数的单元测试
 
-### AI Infrastructure Applications
+### AI 基础设施应用
 
-**Model Deployment**: Automated pipelines with validation and rollback
-**Training Automation**: Multi-model, multi-GPU orchestration
-**Resource Management**: Health checks, alerting, auto-scaling
-**Data Processing**: ETL pipelines for datasets
-**Monitoring**: Metrics collection and analysis
-**Backup/Recovery**: Automated backups with retention policies
+**模型部署**：带验证和回滚的自动化管道
+**训练自动化**：多模型、多 GPU 编排
+**资源管理**：健康检查、告警、自动扩缩
+**数据处理**：数据集的 ETL 管道
+**监控**：指标收集和分析
+**备份/恢复**：带保留策略的自动化备份
 
-### Next Steps
+### 下一步
 
-In **Lecture 07: Text Processing Tools**, you'll learn:
-- grep for pattern matching
-- sed for stream editing
-- awk for text processing and reports
-- Combining tools in pipelines
-- Analyzing ML logs and metrics
+在**讲座 07：文本处理工具**中，你将学习：
+- grep 用于模式匹配
+- sed 用于流编辑
+- awk 用于文本处理和报告
+- 在管道中组合工具
+- 分析 ML 日志和指标
 
-### Quick Reference
+### 快速参考
 
 ```bash
-# Case statement
+# Case 语句
 case "$VAR" in
     pattern1) commands ;;
     pattern2) commands ;;
     *) default ;;
 esac
 
-# Arrays
+# 数组
 ARRAY=(item1 item2 item3)
 echo ${ARRAY[0]}
 for item in "${ARRAY[@]}"; do echo $item; done
 
-# Associative arrays
+# 关联数组
 declare -A MAP
 MAP["key"]="value"
 echo ${MAP["key"]}
 
-# String manipulation
-${VAR#pattern}      # Remove prefix
-${VAR%pattern}      # Remove suffix
-${VAR/old/new}      # Replace first
-${VAR//old/new}     # Replace all
+# 字符串操作
+${VAR#pattern}      # 删除前缀
+${VAR%pattern}      # 删除后缀
+${VAR/old/new}      # 替换第一个
+${VAR//old/new}     # 替换所有
 
-# Regex matching
+# 正则匹配
 if [[ "$VAR" =~ pattern ]]; then
     echo ${BASH_REMATCH[0]}
 fi
 
-# Error handling
+# 错误处理
 set -euo pipefail
 trap cleanup EXIT
 trap 'error_handler ${LINENO}' ERR
@@ -1686,8 +1651,8 @@ trap 'error_handler ${LINENO}' ERR
 
 ---
 
-**End of Lecture 06: Advanced Shell Scripting**
+**讲座 06：高级 Shell 脚本结束**
 
-You now have advanced shell scripting skills for production AI infrastructure automation. These techniques enable you to write robust, maintainable scripts that handle real-world complexity.
+你现在已经拥有了生产 AI 基础设施自动化的高级 shell 脚本技能。这些技巧使你能够编写健壮、可维护的脚本，处理真实的复杂性。
 
-**Next**: Lecture 07 - Text Processing Tools (grep, sed, awk)
+**下一步**：讲座 07 - 文本处理工具（grep、sed、awk）

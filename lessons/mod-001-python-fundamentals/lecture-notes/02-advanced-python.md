@@ -1,71 +1,71 @@
-# Lecture 02: Advanced Python for Infrastructure - Type Hints, Logging, and Configuration
+# Lecture 02：基础设施高级 Python - 类型提示、日志记录和配置
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Type Hints and Static Typing](#type-hints-and-static-typing)
-3. [Production Logging Strategies](#production-logging-strategies)
-4. [Configuration Management](#configuration-management)
-5. [Working with Data Formats](#working-with-data-formats)
-6. [Error Handling Patterns](#error-handling-patterns)
-7. [Summary and Best Practices](#summary-and-best-practices)
-
----
-
-## Introduction
-
-### The Production Code Challenge
-
-Writing code that works is easy. Writing code that:
-- **Works reliably** in production
-- **Can be debugged** when things go wrong
-- **Is maintained** by other engineers
-- **Handles** unexpected inputs gracefully
-- **Scales** from development to enterprise
-
-...is the challenge of infrastructure engineering.
-
-This lecture covers three pillars of production-grade Python:
-
-1. **Type Hints**: Make code self-documenting and catch errors before runtime
-2. **Logging**: Understand what's happening in production systems
-3. **Configuration Management**: Run the same code across multiple environments
-
-### Why These Matter for AI Infrastructure
-
-**Type Hints**: ML pipelines involve complex data structures (tensors, dataframes, model configs). Type hints prevent passing a `List[Dict]` where you expected `pd.DataFrame`.
-
-**Logging**: When a model serving endpoint returns wrong predictions at 3 AM, logs are your only window into what happened.
-
-**Configuration**: Training hyperparameters, model paths, API endpoints—all differ between dev, staging, and production. Configuration management keeps this maintainable.
-
-### Learning Objectives
-
-By the end of this lecture, you will:
-- Write comprehensively type-hinted Python code
-- Use mypy for static type checking
-- Implement structured logging for production systems
-- Design configuration systems for multiple environments
-- Handle different data formats (JSON, YAML, TOML)
-- Apply error handling patterns for infrastructure code
+## 目录
+1. [引言](#引言)
+2. [类型提示与静态类型](#类型提示与静态类型)
+3. [生产日志记录策略](#生产日志记录策略)
+4. [配置管理](#配置管理)
+5. [处理数据格式](#处理数据格式)
+6. [错误处理模式](#错误处理模式)
+7. [总结与最佳实践](#总结与最佳实践)
 
 ---
 
-## Type Hints and Static Typing
+## 引言
 
-### Why Type Hints?
+### 生产代码的挑战
 
-Consider this function:
+编写能运行的代码很容易。编写能够：
+- 在生产环境中**可靠运行**
+- 在出问题时**可被调试**
+- **被其他工程师维护**
+- 优雅**处理**意外输入
+- 从开发**扩展到**企业级
+
+...是基础设施工程的挑战。
+
+本讲座涵盖生产级 Python 的三大支柱：
+
+1. **类型提示**：使代码自文档化，在运行时之前捕获错误
+2. **日志记录**：了解生产系统中发生的情况
+3. **配置管理**：跨多个环境运行相同代码
+
+### 为什么这些对 AI 基础设施很重要
+
+**类型提示**：ML 流水线涉及复杂的数据结构（tensor、dataframe、模型配置）。类型提示可防止在你期望 `pd.DataFrame` 时传递 `List[Dict]`。
+
+**日志记录**：当模型服务端点在凌晨 3 点返回错误预测时，日志是你了解发生了什么事的唯一窗口。
+
+**配置**：训练超参数、模型路径、API 端点——所有这些在开发、预发布和生产环境中都不同。配置管理使其保持可维护。
+
+### 学习目标
+
+完成本讲座后，你将能够：
+- 编写全面类型注解的 Python 代码
+- 使用 mypy 进行静态类型检查
+- 为生产系统实现结构化日志记录
+- 设计支持多环境的配置系统
+- 处理不同的数据格式（JSON、YAML、TOML）
+- 为基础架构代码应用错误处理模式
+
+---
+
+## 类型提示与静态类型
+
+### 为什么使用类型提示？
+
+考虑以下函数：
 
 ```python
 def train_model(data, config, epochs):
-    # What are these types?
-    # data: DataFrame? List? numpy array?
-    # config: dict? object? string path?
-    # epochs: int? string?
+    # 这些是什么类型？
+    # data: DataFrame？List？numpy array？
+    # config: dict？object？string path？
+    # epochs: int？string？
     pass
 ```
 
-Now with type hints:
+现在使用类型提示：
 
 ```python
 import pandas as pd
@@ -76,81 +76,81 @@ def train_model(
     config: Dict[str, Any],
     epochs: int
 ) -> Dict[str, float]:
-    """Train ML model with given data and configuration.
+    """使用给定数据和配置训练 ML 模型。
 
-    Returns metrics dict with training/validation loss.
+    返回包含训练/验证损失的指标字典。
     """
     pass
 ```
 
-**Immediately clearer**:
-- `data` must be a pandas DataFrame
-- `config` is a dictionary with string keys
-- `epochs` is an integer
-- Returns a dict mapping metric names to float values
+**立即更清晰**：
+- `data` 必须是 pandas DataFrame
+- `config` 是键为字符串的字典
+- `epochs` 是整数
+- 返回一个将指标名称映射到浮点值的字典
 
-### Basic Type Annotations
+### 基本类型注解
 
-#### Primitive Types
+#### 基本类型
 
 ```python
-# Basic types
+# 基本类型
 name: str = "model-v1"
 version: int = 42
 learning_rate: float = 0.001
 is_training: bool = True
 
-# Function parameters and return
+# 函数参数和返回值
 def get_batch_size(training: bool) -> int:
     return 32 if training else 64
 
-# None type
+# None 类型
 def log_message(message: str) -> None:
     print(message)
 ```
 
-#### Collection Types
+#### 集合类型
 
 ```python
 from typing import List, Dict, Set, Tuple
 
-# List of strings
+# 字符串列表
 model_names: List[str] = ["bert", "gpt", "t5"]
 
-# Dict mapping strings to integers
+# 字符串到整数的字典
 layer_sizes: Dict[str, int] = {
     "input": 768,
     "hidden": 1024,
     "output": 512
 }
 
-# Set of unique identifiers
+# 唯一标识符的集合
 seen_ids: Set[int] = {1, 2, 3}
 
-# Tuple with fixed size and types
+# 固定大小和类型的元组
 dimensions: Tuple[int, int, int] = (224, 224, 3)
 
-# Tuple with variable length (all same type)
+# 可变长度元组（所有类型相同）
 from typing import Tuple
 scores: Tuple[float, ...] = (0.9, 0.85, 0.92, 0.88)
 ```
 
-#### Optional and Union Types
+#### Optional 和 Union 类型
 
 ```python
 from typing import Optional, Union
 
-# Optional means "could be None"
+# Optional 表示"可能是 None"
 def load_checkpoint(path: Optional[str] = None) -> Dict[str, Any]:
     if path is None:
         return {}
-    # load from path
+    # 从路径加载
 
-# Modern syntax (Python 3.10+)
+# 现代语法（Python 3.10+）
 def load_checkpoint(path: str | None = None) -> Dict[str, Any]:
     pass
 
-# Union of multiple types
+# 多种类型的联合
 from typing import Union
 def process_input(data: Union[str, bytes, List[str]]) -> str:
     if isinstance(data, str):
@@ -160,17 +160,17 @@ def process_input(data: Union[str, bytes, List[str]]) -> str:
     else:
         return " ".join(data)
 
-# Modern union syntax (Python 3.10+)
+# 现代联合语法（Python 3.10+）
 def process_input(data: str | bytes | List[str]) -> str:
     pass
 ```
 
-#### Complex Types
+#### 复杂类型
 
 ```python
 from typing import List, Dict, Any, Callable
 
-# Nested structures
+# 嵌套结构
 ModelConfig = Dict[str, Any]
 TrainingConfigs = Dict[str, ModelConfig]
 
@@ -179,13 +179,13 @@ configs: TrainingConfigs = {
     "gpt": {"layers": 24, "hidden_size": 1024}
 }
 
-# Callable (function) types
+# Callable（函数）类型
 ProcessingFunction = Callable[[str], str]
 
 def apply_processing(text: str, func: ProcessingFunction) -> str:
     return func(text)
 
-# More specific callable
+# 更具体的 Callable
 from typing import Callable
 MetricCalculator = Callable[[List[float], List[float]], float]
 
@@ -197,12 +197,12 @@ def evaluate(
     return metric_fn(predictions, labels)
 ```
 
-### Type Aliases for Readability
+### 提高可读性的类型别名
 
 ```python
 from typing import Dict, List, Tuple, Any
 
-# Define once, reuse everywhere
+# 定义一次，到处重用
 ModelPath = str
 Hyperparameters = Dict[str, Any]
 TrainingData = List[Tuple[str, int]]
@@ -213,10 +213,10 @@ def train_model(
     hyperparams: Hyperparameters,
     data: TrainingData
 ) -> Metrics:
-    """Much more readable than raw types"""
+    """比原始类型更易读"""
     pass
 
-# For ML infrastructure
+# 用于 ML 基础设施
 import pandas as pd
 import torch
 
@@ -231,9 +231,9 @@ def prepare_batch(
     pass
 ```
 
-### Advanced Type Hints
+### 高级类型提示
 
-#### Generic Types
+#### 泛型类型
 
 ```python
 from typing import TypeVar, Generic, List
@@ -241,7 +241,7 @@ from typing import TypeVar, Generic, List
 T = TypeVar('T')
 
 class DataLoader(Generic[T]):
-    """Generic data loader for any type"""
+    """任意类型的泛型数据加载器"""
 
     def __init__(self, data: List[T]):
         self.data = data
@@ -249,29 +249,29 @@ class DataLoader(Generic[T]):
     def get_batch(self, size: int) -> List[T]:
         return self.data[:size]
 
-# Use with specific types
+# 使用特定类型
 int_loader: DataLoader[int] = DataLoader([1, 2, 3])
 str_loader: DataLoader[str] = DataLoader(["a", "b", "c"])
 ```
 
-#### Protocol Types (Structural Subtyping)
+#### 协议类型（结构子类型）
 
 ```python
 from typing import Protocol
 
 class ModelProtocol(Protocol):
-    """Any class with these methods is a "Model" """
+    """任何具有这些方法的类都是"Model" """
 
     def train(self, data: Any) -> None: ...
     def predict(self, input: Any) -> Any: ...
 
 def train_and_evaluate(model: ModelProtocol, data: Any) -> float:
-    """Accepts any object with train() and predict() methods"""
+    """接受任何具有 train() 和 predict() 方法的对象"""
     model.train(data)
     predictions = model.predict(data)
     return evaluate(predictions)
 
-# Both work without inheritance!
+# 两者都可以，无需继承！
 class PyTorchModel:
     def train(self, data): pass
     def predict(self, input): pass
@@ -281,7 +281,7 @@ class TensorFlowModel:
     def predict(self, input): pass
 ```
 
-#### Literal Types
+#### Literal 类型
 
 ```python
 from typing import Literal
@@ -289,7 +289,7 @@ from typing import Literal
 ModelType = Literal["bert", "gpt", "t5"]
 
 def load_model(model_type: ModelType) -> Any:
-    """model_type must be exactly one of these strings"""
+    """model_type 必须是这些字符串之一"""
     if model_type == "bert":
         return BertModel()
     elif model_type == "gpt":
@@ -297,19 +297,19 @@ def load_model(model_type: ModelType) -> Any:
     else:
         return T5Model()
 
-# Type checker ensures only valid values
+# 类型检查器确保只使用有效值
 load_model("bert")     # ✓ OK
-load_model("invalid")  # ✗ Type error
+load_model("invalid")  # ✗ 类型错误
 ```
 
-### Using mypy for Type Checking
+### 使用 mypy 进行类型检查
 
-Install mypy:
+安装 mypy：
 ```bash
 pip install mypy
 ```
 
-**Example code** (`training.py`):
+**示例代码**（`training.py`）：
 ```python
 from typing import List, Dict
 
@@ -318,24 +318,24 @@ def calculate_average(numbers: List[float]) -> float:
 
 def main() -> None:
     scores: List[float] = [0.9, 0.85, 0.92]
-    avg: str = calculate_average(scores)  # Type error!
+    avg: str = calculate_average(scores)  # 类型错误！
     print(avg)
 ```
 
-**Run mypy**:
+**运行 mypy**：
 ```bash
 mypy training.py
 ```
 
-**Output**:
+**输出**：
 ```
 training.py:8: error: Incompatible types in assignment (expression has type "float", variable has type "str")
 Found 1 error in 1 file (checked 1 source file)
 ```
 
-#### Mypy Configuration
+#### Mypy 配置
 
-Create `mypy.ini` or add to `pyproject.toml`:
+创建 `mypy.ini` 或添加到 `pyproject.toml`：
 
 ```ini
 # mypy.ini
@@ -343,7 +343,7 @@ Create `mypy.ini` or add to `pyproject.toml`:
 python_version = 3.11
 warn_return_any = True
 warn_unused_configs = True
-disallow_untyped_defs = True  # All functions must have types
+disallow_untyped_defs = True  # 所有函数必须有类型
 disallow_incomplete_defs = True
 check_untyped_defs = True
 no_implicit_optional = True
@@ -352,15 +352,15 @@ warn_unused_ignores = True
 warn_unreachable = True
 strict_equality = True
 
-# Per-module settings
+# 每个模块的设置
 [mypy-numpy.*]
-ignore_missing_imports = True  # Numpy doesn't have complete type stubs
+ignore_missing_imports = True  # Numpy 没有完整的类型存根
 
 [mypy-pandas.*]
 ignore_missing_imports = True
 ```
 
-**Or in pyproject.toml**:
+**或在 pyproject.toml 中**：
 ```toml
 [tool.mypy]
 python_version = "3.11"
@@ -369,18 +369,18 @@ warn_return_any = true
 no_implicit_optional = true
 ```
 
-#### Gradual Typing Strategy
+#### 渐进式类型化策略
 
-Don't type everything at once. Start with:
+不要一次全部添加类型。从以下开始：
 
-**Level 1: Type function signatures**
+**级别 1：为函数签名添加类型**
 ```python
 def train_model(config: Dict, data: Any) -> Any:
-    # Function body not typed yet
+    # 函数体尚未添加类型
     pass
 ```
 
-**Level 2: Type critical functions completely**
+**级别 2：为关键函数完整添加类型**
 ```python
 def train_model(
     config: Dict[str, Any],
@@ -392,63 +392,63 @@ def train_model(
     return {"loss": 0.5, "accuracy": 0.95}
 ```
 
-**Level 3: Enable strict mode**
+**级别 3：启用严格模式**
 ```python
-# Add to top of file
+# 添加到文件顶部
 # mypy: strict
 
-# or use --strict flag
+# 或使用 --strict 标志
 # mypy --strict training.py
 ```
 
 ---
 
-## Production Logging Strategies
+## 生产日志记录策略
 
-### Why Logging Matters
+### 为什么日志记录很重要
 
-**Scenario**: Model serving API returns incorrect predictions. Without logging:
-- No idea what input caused the issue
-- Don't know which code path executed
-- Can't reproduce the error
-- Can't see performance metrics
+**场景**：模型服务 API 返回错误的预测。没有日志记录：
+- 不知道是什么输入导致了问题
+- 不知道执行了哪个代码路径
+- 无法重现错误
+- 无法查看性能指标
 
-**With proper logging**:
-- Trace exact request that failed
-- See model version, input features, prediction
-- Identify if it's data issue, model issue, or code bug
-- Measure latency, throughput, error rates
+**有了适当的日志记录**：
+- 追踪导致失败的确切请求
+- 查看模型版本、输入特征、预测结果
+- 确定是数据问题、模型问题还是代码 bug
+- 测量延迟、吞吐量、错误率
 
-### Python's Logging Module
-
-```python
-import logging
-
-# Basic logging
-logging.debug("Detailed information for debugging")
-logging.info("General informational messages")
-logging.warning("Warning: something unexpected happened")
-logging.error("Error: something failed")
-logging.critical("Critical: system is unusable")
-```
-
-**Log levels**:
-```
-DEBUG    (10): Detailed diagnostic information
-INFO     (20): Confirmation things are working
-WARNING  (30): Something unexpected but handled
-ERROR    (40): Serious problem, function failed
-CRITICAL (50): System-level failure
-```
-
-### Configuring Logging
-
-#### Basic Configuration
+### Python 的日志模块
 
 ```python
 import logging
 
-# Configure logging at application startup
+# 基本日志记录
+logging.debug("用于调试的详细信息")
+logging.info("一般性信息消息")
+logging.warning("警告：发生了意外情况")
+logging.error("错误：某些操作失败")
+logging.critical("严重：系统不可用")
+```
+
+**日志级别**：
+```
+DEBUG    (10)：详细诊断信息
+INFO     (20)：确认正在工作
+WARNING  (30)：发生意外但已处理
+ERROR    (40)：严重问题，函数失败
+CRITICAL (50)：系统级故障
+```
+
+### 配置日志记录
+
+#### 基本配置
+
+```python
+import logging
+
+# 在应用程序启动时配置日志
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -461,29 +461,29 @@ logger.info("Application started")
 logger.warning("Configuration file not found, using defaults")
 ```
 
-**Output**:
+**输出**：
 ```
 2025-10-18 10:30:45 - __main__ - INFO - Application started
 2025-10-18 10:30:45 - __main__ - WARNING - Configuration file not found, using defaults
 ```
 
-#### Logger Hierarchy
+#### 日志记录器层次结构
 
 ```python
-# File: ml_pipeline/training/trainer.py
-logger = logging.getLogger(__name__)  # Creates: ml_pipeline.training.trainer
+# 文件：ml_pipeline/training/trainer.py
+logger = logging.getLogger(__name__)  # 创建：ml_pipeline.training.trainer
 
-# File: ml_pipeline/data/loader.py
-logger = logging.getLogger(__name__)  # Creates: ml_pipeline.data.loader
+# 文件：ml_pipeline/data/loader.py
+logger = logging.getLogger(__name__)  # 创建：ml_pipeline.data.loader
 
-# Configure root or parent loggers
+# 配置根日志记录器或父日志记录器
 logging.getLogger("ml_pipeline").setLevel(logging.INFO)
-logging.getLogger("ml_pipeline.training").setLevel(logging.DEBUG)  # More verbose
+logging.getLogger("ml_pipeline.training").setLevel(logging.DEBUG)  # 更详细
 ```
 
-### Advanced Logging Configuration
+### 高级日志记录配置
 
-#### Multiple Handlers
+#### 多个处理器
 
 ```python
 import logging
@@ -491,11 +491,11 @@ from logging.handlers import RotatingFileHandler
 import sys
 
 def setup_logging():
-    # Create logger
+    # 创建日志记录器
     logger = logging.getLogger("ml_pipeline")
     logger.setLevel(logging.DEBUG)
 
-    # Console handler (INFO and above)
+    # 控制台处理器（INFO 及以上）
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.INFO)
     console_format = logging.Formatter(
@@ -503,7 +503,7 @@ def setup_logging():
     )
     console_handler.setFormatter(console_format)
 
-    # File handler (DEBUG and above, with rotation)
+    # 文件处理器（DEBUG 及以上，带轮转）
     file_handler = RotatingFileHandler(
         'ml_pipeline.log',
         maxBytes=10*1024*1024,  # 10 MB
@@ -515,7 +515,7 @@ def setup_logging():
     )
     file_handler.setFormatter(file_format)
 
-    # Add handlers
+    # 添加处理器
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
 
@@ -525,9 +525,9 @@ logger = setup_logging()
 logger.info("Logging configured")
 ```
 
-#### Structured Logging (JSON)
+#### 结构化日志（JSON）
 
-For centralized logging systems (ELK, Datadog, CloudWatch):
+用于集中式日志系统（ELK、Datadog、CloudWatch）：
 
 ```python
 import logging
@@ -546,11 +546,11 @@ class JSONFormatter(logging.Formatter):
             "line": record.lineno
         }
 
-        # Add exception info if present
+        # 如果有异常信息则添加
         if record.exc_info:
             log_data["exception"] = self.formatException(record.exc_info)
 
-        # Add custom fields
+        # 添加自定义字段
         if hasattr(record, "user_id"):
             log_data["user_id"] = record.user_id
         if hasattr(record, "request_id"):
@@ -558,14 +558,14 @@ class JSONFormatter(logging.Formatter):
 
         return json.dumps(log_data)
 
-# Setup
+# 设置
 handler = logging.StreamHandler()
 handler.setFormatter(JSONFormatter())
 logger = logging.getLogger("api")
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-# Use with extra context
+# 使用额外上下文
 logger.info(
     "Model prediction completed",
     extra={
@@ -577,7 +577,7 @@ logger.info(
 )
 ```
 
-**Output**:
+**输出**：
 ```json
 {
   "timestamp": "2025-10-18T10:30:45.123456",
@@ -594,51 +594,51 @@ logger.info(
 }
 ```
 
-### Logging Best Practices for ML Systems
+### ML 系统的日志记录最佳实践
 
-#### 1. Log at Appropriate Levels
+#### 1. 在适当的级别记录
 
 ```python
 logger = logging.getLogger(__name__)
 
-# DEBUG: Detailed diagnostic info
+# DEBUG：详细的诊断信息
 logger.debug(f"Processing batch {batch_id}, shape: {data.shape}")
 logger.debug(f"Model weights: {model.state_dict().keys()}")
 
-# INFO: Major steps, milestones
+# INFO：主要步骤、里程碑
 logger.info("Training started for model v2.1")
 logger.info(f"Epoch {epoch}/{total_epochs} completed, loss: {loss:.4f}")
 logger.info("Model saved to /models/checkpoint-100.pt")
 
-# WARNING: Unexpected but handled
+# WARNING：意外但已处理
 logger.warning("GPU not available, falling back to CPU")
 logger.warning(f"Validation loss increased: {prev_loss:.4f} -> {curr_loss:.4f}")
 
-# ERROR: Operation failed
+# ERROR：操作失败
 logger.error(f"Failed to load checkpoint: {checkpoint_path}")
-logger.error("Model prediction failed", exc_info=True)  # Includes traceback
+logger.error("Model prediction failed", exc_info=True)  # 包含回溯
 
-# CRITICAL: System failure
+# CRITICAL：系统故障
 logger.critical("Out of memory, cannot continue training")
 ```
 
-#### 2. Include Context
+#### 2. 包含上下文
 
 ```python
-# Bad: Not enough context
+# 不好：上下文不足
 logger.info("Training complete")
 
-# Good: Includes relevant details
+# 好：包含相关细节
 logger.info(
     f"Training complete - model: {model_name}, "
     f"epochs: {epochs}, final_loss: {final_loss:.4f}, "
     f"duration: {duration:.2f}s"
 )
 
-# Bad: Just the error
+# 不好：只有错误
 logger.error("Prediction failed")
 
-# Good: Includes context for debugging
+# 好：包含调试上下文
 logger.error(
     f"Prediction failed for input shape {input_shape}, "
     f"model_version: {model_version}, "
@@ -646,13 +646,13 @@ logger.error(
 )
 ```
 
-#### 3. Use Structured Logging
+#### 3. 使用结构化日志
 
 ```python
 import logging
 import structlog
 
-# Configure structlog
+# 配置 structlog
 structlog.configure(
     processors=[
         structlog.stdlib.add_log_level,
@@ -666,7 +666,7 @@ structlog.configure(
 
 logger = structlog.get_logger()
 
-# Log with structured context
+# 使用结构化上下文记录
 logger.info(
     "model_prediction",
     model_id="bert-v2",
@@ -676,7 +676,7 @@ logger.info(
 )
 ```
 
-#### 4. Context Managers for Request Tracing
+#### 4. 用于请求追踪的上下文管理器
 
 ```python
 import logging
@@ -687,11 +687,11 @@ logger = logging.getLogger(__name__)
 
 @contextmanager
 def request_context(request_id: str | None = None):
-    """Add request ID to all logs within context"""
+    """在上下文中为所有日志添加请求 ID"""
     if request_id is None:
         request_id = str(uuid.uuid4())
 
-    # Create logger adapter that adds request_id
+    # 创建添加 request_id 的日志记录器适配器
     adapter = logging.LoggerAdapter(
         logger,
         {"request_id": request_id}
@@ -702,7 +702,7 @@ def request_context(request_id: str | None = None):
     finally:
         pass
 
-# Usage
+# 使用
 def handle_prediction(input_data):
     with request_context() as log:
         log.info("Prediction request received")
@@ -712,23 +712,23 @@ def handle_prediction(input_data):
 
         return result
 
-# All logs include request_id automatically!
+# 所有日志自动包含 request_id！
 ```
 
 ---
 
-## Configuration Management
+## 配置管理
 
-### The Configuration Challenge
+### 配置的挑战
 
-Same code, different environments:
+相同代码，不同环境：
 
 ```
 Development:
 - Model: /local/models/dev-model.pt
 - Database: localhost:5432
 - Log level: DEBUG
-- Batch size: 8 (small for quick testing)
+- Batch size: 8（小批量，便于快速测试）
 
 Staging:
 - Model: s3://staging-models/model-v2.pt
@@ -744,43 +744,43 @@ Production:
 - TLS: Required
 ```
 
-**Goal**: Single codebase, configuration drives behavior.
+**目标**：单一代码库，配置驱动行为。
 
-### Configuration Strategies
+### 配置策略
 
-#### 1. Environment Variables
+#### 1. 环境变量
 
 ```python
 import os
 
-# Read from environment
+# 从环境读取
 MODEL_PATH = os.getenv("MODEL_PATH", "/default/model.pt")
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", "32"))
 DEBUG_MODE = os.getenv("DEBUG", "false").lower() == "true"
 
-# Validate required variables
-DB_HOST = os.environ["DB_HOST"]  # Raises KeyError if missing
+# 验证必需的变量
+DB_HOST = os.environ["DB_HOST"]  # 如果缺失则引发 KeyError
 ```
 
-**Set environment variables**:
+**设置环境变量**：
 ```bash
-# Development
+# 开发
 export MODEL_PATH=/local/models/dev-model.pt
 export BATCH_SIZE=8
 export DEBUG=true
 
-# Or in one line
+# 或在一行中
 MODEL_PATH=/local/models/dev-model.pt python train.py
 ```
 
-#### 2. .env Files
+#### 2. .env 文件
 
-Install python-dotenv:
+安装 python-dotenv：
 ```bash
 pip install python-dotenv
 ```
 
-**`.env` file**:
+**`.env` 文件**：
 ```bash
 # .env
 MODEL_PATH=/local/models/model.pt
@@ -791,39 +791,39 @@ DB_PORT=5432
 DB_PASSWORD=secretpassword
 ```
 
-**Load in Python**:
+**在 Python 中加载**：
 ```python
 from dotenv import load_dotenv
 import os
 
-# Load .env file
+# 加载 .env 文件
 load_dotenv()
 
-# Now read from environment
+# 现在从环境读取
 model_path = os.getenv("MODEL_PATH")
 batch_size = int(os.getenv("BATCH_SIZE"))
 ```
 
-**Multiple environment files**:
+**多个环境文件**：
 ```bash
-.env                 # Default
-.env.development     # Development overrides
-.env.staging         # Staging overrides
-.env.production      # Production overrides
+.env                 # 默认
+.env.development     # 开发覆盖
+.env.staging         # 预发布覆盖
+.env.production      # 生产覆盖
 ```
 
 ```python
 from dotenv import load_dotenv
 import os
 
-# Load based on environment
+# 根据环境加载
 env = os.getenv("ENVIRONMENT", "development")
 load_dotenv(f".env.{env}")
 ```
 
-#### 3. Configuration Files (YAML)
+#### 3. 配置文件（YAML）
 
-**config.yaml**:
+**config.yaml**：
 ```yaml
 # config.yaml
 application:
@@ -856,7 +856,7 @@ logging:
       path: /var/log/ml-training.log
 ```
 
-**Load YAML config**:
+**加载 YAML 配置**：
 ```python
 import yaml
 from typing import Dict, Any
@@ -872,7 +872,7 @@ model_path = config['model']['path']
 db_host = config['database']['host']
 ```
 
-#### 4. Validated Configuration with Pydantic
+#### 4. 使用 Pydantic 进行验证配置
 
 ```python
 from pydantic import BaseModel, Field, validator
@@ -907,25 +907,25 @@ class AppConfig(BaseModel):
     training: TrainingConfig
     database: DatabaseConfig
 
-# Load and validate
+# 加载和验证
 with open('config.yaml') as f:
     config_dict = yaml.safe_load(f)
 
-config = AppConfig(**config_dict)  # Validates all fields!
+config = AppConfig(**config_dict)  # 验证所有字段！
 
-# Type-safe access
+# 类型安全的访问
 batch_size: int = config.training.batch_size
 model_path: str = config.model.path
 ```
 
-**Benefits**:
-- Type safety
-- Automatic validation
-- Clear error messages
-- IDE autocomplete
-- Documentation via field descriptions
+**好处**：
+- 类型安全
+- 自动验证
+- 清晰的错误消息
+- IDE 自动补全
+- 通过字段描述生成文档
 
-#### 5. Hierarchical Configuration
+#### 5. 分层配置
 
 ```python
 from pathlib import Path
@@ -938,17 +938,17 @@ class Config:
         self._config = self._load_config()
 
     def _load_config(self) -> Dict[str, Any]:
-        """Load base config + environment overrides"""
-        # Load base configuration
+        """加载基础配置 + 环境覆盖"""
+        # 加载基础配置
         base_config = self._load_yaml("config.yaml")
 
-        # Load environment-specific overrides
+        # 加载环境特定的覆盖
         env_config_path = f"config.{self.environment}.yaml"
         if Path(env_config_path).exists():
             env_config = self._load_yaml(env_config_path)
             base_config = self._deep_merge(base_config, env_config)
 
-        # Override with environment variables
+        # 使用环境变量覆盖
         self._apply_env_overrides(base_config)
 
         return base_config
@@ -962,7 +962,7 @@ class Config:
         base: Dict[str, Any],
         override: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """Recursively merge override into base"""
+        """递归地将覆盖合并到基础配置中"""
         result = base.copy()
         for key, value in override.items():
             if key in result and isinstance(result[key], dict) and isinstance(value, dict):
@@ -972,7 +972,7 @@ class Config:
         return result
 
     def _apply_env_overrides(self, config: Dict[str, Any]) -> None:
-        """Override config from environment variables"""
+        """从环境变量覆盖配置"""
         import os
 
         # ML_TRAINING_BATCH_SIZE -> config['training']['batch_size']
@@ -982,10 +982,10 @@ class Config:
                 self._set_nested(config, key[3:].lower().split('_'), value)
 
     def _set_nested(self, d: Dict, keys: list, value: str) -> None:
-        """Set nested dict value from key path"""
+        """从键路径设置嵌套字典值"""
         for key in keys[:-1]:
             d = d.setdefault(key, {})
-        # Try to convert to appropriate type
+        # 尝试转换为适当类型
         try:
             d[keys[-1]] = int(value)
         except ValueError:
@@ -994,19 +994,19 @@ class Config:
             except ValueError:
                 d[keys[-1]] = value
 
-# Usage
+# 使用
 config = Config(environment="production")
 ```
 
-**Configuration precedence** (highest to lowest):
-1. Environment variables (highest priority)
-2. Environment-specific config file (config.production.yaml)
-3. Base config file (config.yaml)
-4. Code defaults (lowest priority)
+**配置优先级**（从高到低）：
+1. 环境变量（最高优先级）
+2. 环境特定配置文件（config.production.yaml）
+3. 基础配置文件（config.yaml）
+4. 代码默认值（最低优先级）
 
 ---
 
-## Working with Data Formats
+## 处理数据格式
 
 ### JSON
 
@@ -1014,7 +1014,7 @@ config = Config(environment="production")
 import json
 from typing import Dict, Any
 
-# Write JSON
+# 写入 JSON
 config: Dict[str, Any] = {
     "model": "bert-base",
     "batch_size": 32,
@@ -1024,11 +1024,11 @@ config: Dict[str, Any] = {
 with open("config.json", "w") as f:
     json.dump(config, f, indent=2)
 
-# Read JSON
+# 读取 JSON
 with open("config.json", "r") as f:
     loaded_config = json.load(f)
 
-# JSON string
+# JSON 字符串
 json_string = json.dumps(config)
 parsed = json.loads(json_string)
 ```
@@ -1038,7 +1038,7 @@ parsed = json.loads(json_string)
 ```python
 import yaml
 
-# Write YAML
+# 写入 YAML
 config = {
     "model": {
         "name": "bert-base",
@@ -1052,18 +1052,18 @@ config = {
 with open("config.yaml", "w") as f:
     yaml.dump(config, f, default_flow_style=False)
 
-# Read YAML
+# 读取 YAML
 with open("config.yaml", "r") as f:
-    loaded = yaml.safe_load(f)  # Use safe_load!
+    loaded = yaml.safe_load(f)  # 使用 safe_load！
 ```
 
 ### TOML
 
 ```python
-import tomli  # Python 3.11+ has tomllib in stdlib
+import tomli  # Python 3.11+ 标准库中有 tomllib
 import tomli_w
 
-# Write TOML
+# 写入 TOML
 config = {
     "model": {
         "name": "bert-base",
@@ -1078,16 +1078,16 @@ config = {
 with open("config.toml", "wb") as f:
     tomli_w.dump(config, f)
 
-# Read TOML
+# 读取 TOML
 with open("config.toml", "rb") as f:
     loaded = tomli.load(f)
 ```
 
 ---
 
-## Error Handling Patterns
+## 错误处理模式
 
-### Specific Exception Handling
+### 特定异常处理
 
 ```python
 import logging
@@ -1111,7 +1111,7 @@ def load_model(path: str) -> Optional[Any]:
         raise
 ```
 
-### Retry Logic for Infrastructure
+### 基础设施的重试逻辑
 
 ```python
 import time
@@ -1127,7 +1127,7 @@ def retry(
     delay: float = 1.0,
     backoff: float = 2.0
 ) -> T:
-    """Retry function with exponential backoff"""
+    """使用指数退避重试函数"""
     attempt = 0
     current_delay = delay
 
@@ -1147,9 +1147,9 @@ def retry(
             time.sleep(current_delay)
             current_delay *= backoff
 
-# Usage
+# 使用
 def fetch_data():
-    # Might fail due to network issues
+    # 可能因网络问题失败
     response = requests.get("https://api.example.com/data")
     response.raise_for_status()
     return response.json()
@@ -1159,41 +1159,41 @@ data = retry(fetch_data, max_attempts=5, delay=2.0)
 
 ---
 
-## Summary and Best Practices
+## 总结与最佳实践
 
-### Type Hints Checklist
+### 类型提示检查清单
 
-✅ Annotate all function signatures
-✅ Use type aliases for complex types
-✅ Enable mypy in CI/CD
-✅ Use `Optional[T]` for nullable values
-✅ Leverage `Protocol` for flexible interfaces
-✅ Use `Literal` for fixed string choices
+✅ 注解所有函数签名
+✅ 对复杂类型使用类型别名
+✅ 在 CI/CD 中启用 mypy
+✅ 对可空值使用 `Optional[T]`
+✅ 利用 `Protocol` 实现灵活的接口
+✅ 对固定字符串选择使用 `Literal`
 
-### Logging Checklist
+### 日志记录检查清单
 
-✅ Configure logging at application startup
-✅ Use appropriate log levels (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-✅ Include context in log messages
-✅ Use structured logging (JSON) for production
-✅ Implement log rotation for file handlers
-✅ Never log sensitive data (passwords, tokens)
+✅ 在应用程序启动时配置日志
+✅ 使用适当的日志级别（DEBUG、INFO、WARNING、ERROR、CRITICAL）
+✅ 在日志消息中包含上下文
+✅ 在生产环境中使用结构化日志（JSON）
+✅ 为文件处理器实现日志轮转
+✅ 永远不要记录敏感数据（密码、令牌）
 
-### Configuration Checklist
+### 配置检查清单
 
-✅ Never hardcode configuration
-✅ Use environment variables for deployment-specific config
-✅ Use `.env` files for development
-✅ Validate configuration on startup
-✅ Document all configuration options
-✅ Provide sensible defaults
-✅ Use configuration hierarchies (base + overrides)
+✅ 永远不要硬编码配置
+✅ 对部署特定配置使用环境变量
+✅ 在开发中使用 `.env` 文件
+✅ 在启动时验证配置
+✅ 记录所有配置选项
+✅ 提供合理的默认值
+✅ 使用配置层次结构（基础 + 覆盖）
 
 ---
 
-**Lecture Version**: 1.0
-**Last Updated**: October 2025
-**Word Count**: ~4,200 words
-**Estimated Reading Time**: 50-70 minutes
+**讲座版本**：1.0
+**最后更新**：2025 年 10 月
+**字数**：约 4,200 字
+**预计阅读时间**：50-70 分钟
 
-**Next**: Continue to `03-python-devops.md` for subprocess management, file operations, and CLI development.
+**下一步**：进入 `03-python-devops.md` 学习子进程管理、文件操作和 CLI 开发。

@@ -1,100 +1,100 @@
-# Lecture 04: Advanced Git Techniques
+# Lecture 04: 高级 Git 技术
 
 ## Table of Contents
-1. [Introduction](#introduction)
-2. [Interactive Rebasing](#interactive-rebasing)
-3. [Cherry-Picking Commits](#cherry-picking-commits)
-4. [Stashing Changes](#stashing-changes)
+1. [引言](#introduction)
+2. [交互式 Rebase](#interactive-rebasing)
+3. [Cherry-Pick commit](#cherry-picking-commits)
+4. [Stash 更改](#stashing-changes)
 5. [Git Hooks](#git-hooks)
-6. [Submodules and Subtrees](#submodules-and-subtrees)
-7. [Tags and Releases](#tags-and-releases)
-8. [Advanced History Manipulation](#advanced-history-manipulation)
-9. [Git for Machine Learning](#git-for-machine-learning)
-10. [Performance and Optimization](#performance-and-optimization)
-11. [Recovery and Disaster Management](#recovery-and-disaster-management)
-12. [Summary and Key Takeaways](#summary-and-key-takeaways)
+6. [Submodule 和 Subtree](#submodules-and-subtrees)
+7. [Tag 和 Release](#tags-and-releases)
+8. [高级历史操作](#advanced-history-manipulation)
+9. [Git 在机器学习中的应用](#git-for-machine-learning)
+10. [性能与优化](#performance-and-optimization)
+11. [恢复与灾难管理](#recovery-and-disaster-management)
+12. [总结与要点](#summary-and-key-takeaways)
 
 ---
 
-## Introduction
+## 引言
 
-### Why Master Advanced Git?
+### 为什么要掌握高级 Git
 
-You've learned Git basics, branching, and collaboration. You can handle day-to-day work. So why go further?
+你已经学会了 Git 基础、branch 和协作。你可以处理日常工作。那么为什么还要更进一步？
 
-Advanced Git techniques transform you from competent to exceptional:
-- **Clean up messy history** before others see it
-- **Automate repetitive tasks** with hooks
-- **Recover from disasters** that would panic others
-- **Optimize workflows** for ML-specific challenges
-- **Manage complex projects** with submodules
-- **Handle emergencies** with surgical precision
+高级 Git 技术能让你从称职变为杰出：
+- **在他人看到之前清理杂乱的历史**
+- **用 hooks 自动化重复性任务**
+- **从让他人恐慌的灾难中恢复**
+- **针对 ML 特有挑战优化工作流**
+- **用 submodule 管理复杂项目**
+- **以手术般精准的方式处理紧急情况**
 
-In AI infrastructure, these skills separate junior from senior engineers.
+在 AI 基础设施领域，这些技能区分了初级工程师和高级工程师。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
+学完本讲后，你将：
 
-- Use interactive rebase to clean up commit history
-- Cherry-pick specific commits between branches
-- Stash work-in-progress to switch contexts quickly
-- Create Git hooks to automate testing, linting, and deployment
-- Manage large ML projects with submodules
-- Tag releases properly for model versioning
-- Use advanced commands: reflog, bisect, filter-branch
-- Recover from seemingly catastrophic mistakes
-- Apply Git best practices specific to ML workflows
-- Optimize Git performance for large repositories
+- 使用交互式 rebase 来清理 commit 历史
+- 在分支之间 cherry-pick 特定 commit
+- 用 stash 暂存进行中的工作以便快速切换上下文
+- 创建 Git hooks 来自动化测试、linting 和部署
+- 用 submodule 管理大型 ML 项目
+- 正确使用 tag 进行模型版本管理
+- 使用高级命令：reflog、bisect、filter-branch
+- 从看似灾难性的错误中恢复
+- 应用针对 ML 工作流的 Git 最佳实践
+- 优化大规模仓库的 Git 性能
 
-### The AI Infrastructure Context
+### AI 基础设施背景
 
-Advanced Git enables:
+高级 Git 能够实现：
 
-**Experiment management:**
-- Clean up experimental commits before merging
-- Cherry-pick successful experiments to production
-- Tag model versions for reproducibility
+**实验管理：**
+- 在 merge 前清理实验性 commit
+- Cherry-pick 成功的实验到生产环境
+- 用 tag 标记模型版本以实现可复现性
 
-**Automation:**
-- Pre-commit hooks: Lint code, check for secrets
-- Pre-push hooks: Run tests before pushing
-- Post-merge hooks: Trigger model retraining
+**自动化：**
+- Pre-commit hooks：检查代码格式、检测 secrets
+- Pre-push hooks：在 push 前运行测试
+- Post-merge hooks：触发模型重新训练
 
-**Project organization:**
-- Submodules for shared libraries (data utils, model architectures)
-- Subtrees for vendored dependencies
-- Tags for model releases and deployments
+**项目组织：**
+- Submodule 用于共享库（数据处理工具、模型架构）
+- Subtree 用于供应商依赖
+- Tag 用于模型发布和部署
 
-**Disaster recovery:**
-- Recover deleted branches
-- Fix accidentally pushed secrets
-- Undo problematic merges
+**灾难恢复：**
+- 恢复已删除的分支
+- 修复意外推送的 secrets
+- 撤销有问题的 merge
 
 ---
 
-## Interactive Rebasing
+## 交互式 Rebase
 
-### What is Interactive Rebase?
+### 什么是交互式 Rebase
 
-Interactive rebase (`git rebase -i`) lets you edit commit history:
-- Reorder commits
-- Squash multiple commits into one
-- Edit commit messages
-- Split commits
-- Delete commits
+交互式 rebase（`git rebase -i`）让你编辑 commit 历史：
+- 重新排序 commit
+- 将多个 commit 压缩为一个
+- 编辑 commit message
+- 拆分 commit
+- 删除 commit
 
-**Golden Rule**: Only rebase commits that haven't been pushed to shared branches.
+**黄金法则**：只 rebase 那些尚未 push 到共享分支的 commit。
 
-### When to Use Interactive Rebase
+### 何时使用交互式 Rebase
 
-**Use cases:**
-- Clean up messy local commits before creating PR
-- Fix typos in commit messages
-- Reorder commits logically
-- Combine WIP commits into meaningful commits
+**使用场景：**
+- 在创建 PR 前清理杂乱的本地 commit
+- 修正 commit message 中的拼写错误
+- 按逻辑顺序重新排列 commit
+- 将零散的 WIP commit 合并为有意义的 commit
 
-**Example scenario**:
+**示例场景**：
 ```
 Your local commits:
 * 789 Fix typo
@@ -102,29 +102,29 @@ Your local commits:
 * 123 WIP: add feature
 ```
 
-You want clean history:
+你想要干净的历史：
 ```
 * abc Implement user authentication feature
 ```
 
-### Interactive Rebase: Step by Step
+### 交互式 Rebase 分步讲解
 
-#### Step 1: Start Interactive Rebase
+#### 第 1 步：启动交互式 Rebase
 
 ```bash
-# Rebase last 3 commits
+# 对最近 3 个 commit 进行 rebase
 git rebase -i HEAD~3
 
-# Rebase from specific commit (not including that commit)
+# 从指定 commit 开始 rebase（不包括该 commit）
 git rebase -i abc123
 
-# Rebase from branch point
+# 从分支起点开始 rebase
 git rebase -i main
 ```
 
-#### Step 2: Choose Actions
+#### 第 2 步：选择操作
 
-Git opens an editor showing commits:
+Git 会打开一个编辑器显示 commit：
 
 ```
 pick 123 WIP: add feature
@@ -143,20 +143,20 @@ pick 789 Fix typo
 # d, drop = remove commit
 ```
 
-#### Step 3: Modify the Plan
+#### 第 3 步：修改计划
 
-**To squash all commits into one:**
+**将所有 commit 压缩为一个：**
 ```
 pick 123 WIP: add feature
 squash 456 WIP: still working
 squash 789 Fix typo
 ```
 
-Save and close the editor.
+保存并关闭编辑器。
 
-#### Step 4: Edit Commit Message
+#### 第 4 步：编辑 Commit Message
 
-Git opens another editor for the combined commit message:
+Git 会打开另一个编辑器供你编辑合并后的 commit message：
 
 ```
 # This is a combination of 3 commits.
@@ -170,7 +170,7 @@ WIP: still working
 Fix typo
 ```
 
-Replace with:
+替换为：
 ```
 Implement user authentication feature
 
@@ -178,70 +178,70 @@ Added login/logout functionality with JWT tokens.
 Includes input validation and error handling.
 ```
 
-Save and close.
+保存并关闭。
 
-#### Step 5: Result
+#### 第 5 步：结果
 
 ```bash
 git log --oneline
 # abc Implement user authentication feature
 ```
 
-Three messy commits are now one clean commit.
+三个杂乱的 commit 现在变成了一个干净的 commit。
 
-### Interactive Rebase Actions
+### 交互式 Rebase 操作
 
-**Pick** (default): Use commit as-is
+**Pick**（默认）：照原样使用 commit
 ```
 pick 123 Add feature
 ```
 
-**Reword**: Change commit message
+**Reword**：修改 commit message
 ```
 reword 123 Add feature
-# Git will open editor to change message
+# Git 将打开编辑器来修改 message
 ```
 
-**Edit**: Stop at commit to amend
+**Edit**：停留在该 commit 以便修改
 ```
 edit 123 Add feature
-# Git pauses; you can make changes
+# Git 暂停；你可以进行修改
 git add modified_file.py
 git commit --amend
 git rebase --continue
 ```
 
-**Squash**: Combine with previous commit, keep both messages
+**Squash**：与上一个 commit 合并，保留两者的 message
 ```
 pick 123 Add feature
 squash 456 Add tests
-# Git combines commits, lets you edit combined message
+# Git 合并 commit，让你编辑合并后的 message
 ```
 
-**Fixup**: Combine with previous commit, discard this message
+**Fixup**：与上一个 commit 合并，丢弃此 commit 的 message
 ```
 pick 123 Add feature
 fixup 456 Fix typo
-# Git combines commits, keeps only first message
+# Git 合并 commit，只保留第一个 message
 ```
 
-**Drop**: Remove commit
+**Drop**：删除 commit
 ```
 drop 123 Experimental change
 ```
 
-**Exec**: Run shell command
+**Exec**：运行 shell 命令
 ```
 pick 123 Add feature
 exec pytest tests/
 pick 456 Add another feature
 exec pytest tests/
-# Runs tests after each commit; stops if tests fail
+# 在每个 commit 后运行测试；如果测试失败则停止
 ```
 
-### Reordering Commits
+### 重排序 Commit
 
-Simply reorder lines:
+只需重新排列各行：
 
 ```
 pick 789 Fix documentation
@@ -249,46 +249,46 @@ pick 123 Add feature
 pick 456 Add tests
 ```
 
-Commits will be applied in this order.
+Commit 将按此顺序应用。
 
-### Splitting a Commit
+### 拆分 Commit
 
-**Scenario**: One commit did too much; you want to split it.
+**场景**：一个 commit 做了太多事，你想拆分开。
 
 ```bash
 git rebase -i HEAD~1
-# Mark the commit as 'edit'
+# 将该 commit 标记为 'edit'
 
-# Git pauses at the commit
-git reset HEAD^   # Unstage everything
+# Git 在该 commit 处暂停
+git reset HEAD^   # 取消暂存所有内容
 
-# Now commit changes separately
+# 现在分别提交更改
 git add file1.py
 git commit -m "Add feature A"
 
 git add file2.py
 git commit -m "Add feature B"
 
-# Continue rebase
+# 继续 rebase
 git rebase --continue
 ```
 
-### Aborting a Rebase
+### 中止 Rebase
 
-If things go wrong:
+如果出现问题：
 ```bash
 git rebase --abort
 ```
 
-Returns to pre-rebase state.
+返回到 rebase 前的状态。
 
 ---
 
-## Cherry-Picking Commits
+## Cherry-Pick commit
 
-### What is Cherry-Picking?
+### 什么是 Cherry-Pick
 
-Cherry-pick applies a specific commit from one branch to another without merging the entire branch.
+Cherry-pick 将某个特定 commit 从一个分支应用到另一个分支，而不需要 merge 整个分支。
 
 ```
 main:     A ← B ← C
@@ -296,55 +296,55 @@ main:     A ← B ← C
 feature:  A ← B ← D ← E ← F
 ```
 
-After cherry-pick:
+Cherry-pick 之后：
 ```
 main:     A ← B ← C ← D'
 feature:  A ← B ← D ← E ← F
 ```
 
-Note: `D'` is a new commit with same changes as `D` but different hash.
+注意：`D'` 是一个新的 commit，与 `D` 有相同的更改但 hash 不同。
 
-### When to Cherry-Pick
+### 何时使用 Cherry-Pick
 
-**Use cases:**
-- Hotfix: Apply urgent fix from develop to production
-- Selective merging: Want specific commits, not entire branch
-- Bug fix: Apply fix from feature branch to main before feature is ready
-- Experiment: Try a commit from another branch
+**使用场景：**
+- Hotfix：将紧急修复从 develop 应用到生产分支
+- 选择性 merge：只想取特定 commit，而非整个分支
+- Bug 修复：在功能分支完成前将修复应用到 main
+- 实验：尝试另一个分支的某个 commit
 
-### Cherry-Pick: Basic Usage
+### Cherry-Pick 基本用法
 
 ```bash
-# Cherry-pick a single commit
+# Cherry-pick 单个 commit
 git checkout main
 git cherry-pick abc123
 
-# Cherry-pick multiple commits
+# Cherry-pick 多个 commit
 git cherry-pick abc123 def456 ghi789
 
-# Cherry-pick a range of commits
+# Cherry-pick 一段范围的 commit
 git cherry-pick abc123..def456
 ```
 
-### Cherry-Pick with Options
+### Cherry-Pick 的选项
 
 ```bash
-# Cherry-pick without committing (review first)
+# Cherry-pick 但不提交（先审查）
 git cherry-pick -n abc123
-# Make changes if needed
+# 根据需要修改
 git commit
 
-# Cherry-pick and edit commit message
+# Cherry-pick 并编辑 commit message
 git cherry-pick -e abc123
 
-# Cherry-pick without recording original commit
+# Cherry-pick 时记录原始 commit
 git cherry-pick -x abc123
-# Adds "(cherry picked from commit abc123)" to message
+# 会在 message 中添加 "(cherry picked from commit abc123)"
 ```
 
-### Handling Cherry-Pick Conflicts
+### 处理 Cherry-Pick 冲突
 
-If conflicts occur:
+如果发生冲突：
 
 ```bash
 git cherry-pick abc123
@@ -352,183 +352,183 @@ git cherry-pick abc123
 # CONFLICT (content): Merge conflict in model.py
 # Automatic cherry-pick failed; fix conflicts and commit
 
-# Fix conflicts in files
+# 在文件中解决冲突
 git add model.py
 git cherry-pick --continue
 
-# Or abort
+# 或中止
 git cherry-pick --abort
 ```
 
-### Cherry-Pick Use Case: Hotfix
+### Cherry-Pick 用例：Hotfix
 
-**Scenario**: Critical bug in production, fix exists on develop branch.
+**场景**：生产环境出现严重 bug，修复已在 develop 分支上。
 
 ```bash
-# Current state:
+# 当前状态：
 # main:    A ← B ← C (production)
 # develop: A ← B ← D ← E ← F (fix in E)
 
-# Apply fix to production
+# 应用修复到生产分支
 git checkout main
 git cherry-pick <commit-hash-of-E>
 git push origin main
 
-# Deploy to production
+# 部署到生产环境
 # main:    A ← B ← C ← E'
 ```
 
 ---
 
-## Stashing Changes
+## Stash 更改
 
-### What is Stashing?
+### 什么是 Stash
 
-Stash temporarily shelves (stashes) changes so you can switch branches without committing.
+Stash 可以临时搁置（stash）更改，让你无需 commit 就能切换分支。
 
-**Scenario**:
-- Working on feature A
-- Urgent bug requires switching to another branch
-- Changes aren't ready to commit
-- Solution: Stash them
+**场景**：
+- 正在处理功能 A
+- 有紧急 bug 需要切换到另一个分支
+- 更改还没准备好 commit
+- 解决方案：将其 stash
 
-### Basic Stashing
+### 基本 Stashing
 
 ```bash
-# Stash current changes
+# Stash 当前更改
 git stash
 
-# Output:
+# 输出：
 # Saved working directory and index state WIP on main: abc123 Last commit message
 
-# Now working directory is clean
+# 现在工作目录是干净的
 git status
 # nothing to commit, working tree clean
 
-# Switch branches, do urgent work
+# 切换分支，处理紧急工作
 git checkout hotfix
-# fix bug, commit, push
+# 修复 bug，commit，push
 
-# Return to original work
+# 回到原来的工作
 git checkout main
-git stash pop   # Apply and remove from stash
+git stash pop   # 应用并从 stash 中移除
 ```
 
-### Stash Commands
+### Stash 命令
 
 ```bash
-# Stash with a message
+# 带 message 的 stash
 git stash push -m "WIP: implementing caching"
 
-# Stash including untracked files
+# Stash 包含未跟踪的文件
 git stash -u
 
-# Stash including ignored files
+# Stash 包含被忽略的文件
 git stash -a
 
-# List stashes
+# 列出所有 stash
 git stash list
 # stash@{0}: WIP on main: abc123 Last commit
 # stash@{1}: WIP on feature: def456 Previous commit
 
-# Show stash contents
+# 显示 stash 内容
 git stash show stash@{0}
 
-# Show detailed diff
+# 显示详细 diff
 git stash show -p stash@{0}
 ```
 
-### Applying Stashes
+### 应用 Stash
 
 ```bash
-# Apply most recent stash (keep in stash list)
+# 应用最近的 stash（保留在 stash 列表中）
 git stash apply
 
-# Apply specific stash
+# 应用指定 stash
 git stash apply stash@{1}
 
-# Apply and remove from stash list
+# 应用并从 stash 列表中移除
 git stash pop
 
-# Apply to different branch
+# 应用到不同分支
 git checkout other-branch
 git stash apply stash@{0}
 ```
 
-### Managing Stashes
+### 管理 Stash
 
 ```bash
-# Delete specific stash
+# 删除指定 stash
 git stash drop stash@{0}
 
-# Delete all stashes
+# 删除所有 stash
 git stash clear
 
-# Create branch from stash
+# 从 stash 创建分支
 git stash branch feature/new-work stash@{0}
-# Creates branch, applies stash, drops stash
+# 创建分支，应用 stash，删除 stash
 ```
 
-### Partial Stashing
+### 部分 Stash
 
 ```bash
-# Stash only specific files
+# 只 stash 特定文件
 git stash push -m "Partial stash" file1.py file2.py
 
-# Interactive stashing
+# 交互式 stashing
 git stash -p
-# Git asks for each change:
+# Git 会逐个询问每个更改：
 # Stash this hunk [y,n,q,a,d,/,s,e,?]?
 ```
 
-### Stash Use Case: Context Switching
+### Stash 用例：上下文切换
 
-**Scenario**: Implementing new model architecture when critical production issue arises.
+**场景**：正在实现新的模型架构时，出现了关键的生产问题。
 
 ```bash
-# Working on new model
-# Multiple files modified, not ready to commit
+# 正在开发新模型
+# 多个文件已修改，但尚未准备好 commit
 
-# Urgent: production issue
+# 紧急：生产问题
 git stash push -u -m "WIP: transformer architecture"
 
-# Fix production issue
+# 修复生产问题
 git checkout main
 git checkout -b hotfix/memory-leak
-# fix issue
+# 修复问题
 git add .
 git commit -m "Fix memory leak in batch processing"
 git push origin hotfix/memory-leak
 
-# Return to model work
+# 回到模型开发工作
 git checkout feature/transformer
 git stash pop
 
-# Continue working
+# 继续工作
 ```
 
 ---
 
 ## Git Hooks
 
-### What are Git Hooks?
+### 什么是 Git Hooks
 
-Git hooks are scripts that Git executes automatically at certain points:
-- Before/after commits
-- Before/after pushes
-- Before/after merges
-- etc.
+Git hooks 是 Git 在特定时间点自动执行的脚本：
+- commit 之前/之后
+- push 之前/之后
+- merge 之前/之后
+- 等等
 
-Hooks enable automation:
-- Lint code before committing
-- Run tests before pushing
-- Check for secrets
-- Format commit messages
-- Deploy after merge
+Hooks 能够实现自动化：
+- 在 commit 前检查代码格式
+- 在 push 前运行测试
+- 检测 secrets
+- 格式化 commit message
+- merge 后部署
 
-### Where Hooks Live
+### Hooks 存储位置
 
-Hooks are stored in `.git/hooks/`:
+Hooks 存储在 `.git/hooks/` 目录下：
 
 ```bash
 ls .git/hooks/
@@ -538,37 +538,37 @@ ls .git/hooks/
 # ...
 ```
 
-Remove `.sample` extension to activate.
+移除 `.sample` 扩展名即可激活。
 
-### Client-Side Hooks
+### 客户端 Hooks
 
-**pre-commit**: Runs before commit is created
-- Lint code
-- Check for secrets
-- Run quick tests
+**pre-commit**：在 commit 创建前运行
+- 检查代码格式
+- 检测 secrets
+- 运行快速测试
 
-**prepare-commit-msg**: Modify commit message template
-- Add ticket numbers
-- Enforce message format
+**prepare-commit-msg**：修改 commit message 模板
+- 添加工单号
+- 强制执行 message 格式
 
-**commit-msg**: Validate commit message
-- Enforce message conventions
-- Check message length
+**commit-msg**：验证 commit message
+- 强制执行 message 约定
+- 检查 message 长度
 
-**post-commit**: Runs after commit
-- Send notifications
-- Log commits
+**post-commit**：在 commit 后运行
+- 发送通知
+- 记录 commit
 
-**pre-push**: Runs before push
-- Run full test suite
-- Check branch naming
-- Prevent force push
+**pre-push**：在 push 前运行
+- 运行完整测试套件
+- 检查分支命名
+- 防止强制 push
 
-### Creating a Pre-Commit Hook
+### 创建 Pre-Commit Hook
 
-**Example**: Prevent committing files with "TODO" comments.
+**示例**：防止提交含有 "TODO" 注释的文件。
 
-Create `.git/hooks/pre-commit`:
+创建 `.git/hooks/pre-commit`：
 
 ```bash
 #!/bin/bash
@@ -584,24 +584,24 @@ echo "Pre-commit checks passed"
 exit 0
 ```
 
-Make it executable:
+赋予可执行权限：
 ```bash
 chmod +x .git/hooks/pre-commit
 ```
 
-Test it:
+测试它：
 ```bash
 echo "# TODO: fix this" >> model.py
 git add model.py
 git commit -m "Add model"
 
-# Output:
+# 输出：
 # model.py:1:# TODO: fix this
 # Error: Commit contains TODO comments
 # Remove TODOs or skip this check with --no-verify
 ```
 
-### Pre-Commit Hook: Linting
+### Pre-Commit Hook：代码格式化
 
 ```bash
 #!/bin/bash
@@ -632,7 +632,7 @@ echo "All pre-commit checks passed!"
 exit 0
 ```
 
-### Pre-Push Hook: Testing
+### Pre-Push Hook：测试
 
 ```bash
 #!/bin/bash
@@ -650,9 +650,9 @@ echo "All tests passed!"
 exit 0
 ```
 
-### Pre-Commit Hook: Secrets Detection
+### Pre-Commit Hook：Secrets 检测
 
-Critical for ML projects that handle credentials:
+对于处理凭据的 ML 项目至关重要：
 
 ```bash
 #!/bin/bash
@@ -675,16 +675,16 @@ echo "No secrets detected"
 exit 0
 ```
 
-### Using Pre-Commit Framework
+### 使用 Pre-Commit 框架
 
-Instead of manual hook scripts, use the `pre-commit` framework:
+除了手动编写 hook 脚本，还可以使用 `pre-commit` 框架：
 
-Install:
+安装：
 ```bash
 pip install pre-commit
 ```
 
-Create `.pre-commit-config.yaml`:
+创建 `.pre-commit-config.yaml`：
 
 ```yaml
 repos:
@@ -715,138 +715,138 @@ repos:
         additional_dependencies: [types-all]
 ```
 
-Install hooks:
+安装 hooks：
 ```bash
 pre-commit install
 ```
 
-Now hooks run automatically on every commit.
+现在 hooks 会在每次 commit 时自动运行。
 
-Run manually:
+手动运行：
 ```bash
 pre-commit run --all-files
 ```
 
-### Server-Side Hooks
+### 服务端 Hooks
 
-**pre-receive**: Enforce policies on server
-- Reject commits without ticket numbers
-- Enforce branch naming
-- Prevent force pushes to main
+**pre-receive**：在服务端强制执行策略
+- 拒绝没有工单号的 commit
+- 强制执行分支命名
+- 防止对 main 分支强制 push
 
-**post-receive**: Trigger actions after push
-- Deploy to production
-- Send notifications
-- Trigger CI/CD
+**post-receive**：在 push 后触发操作
+- 部署到生产环境
+- 发送通知
+- 触发 CI/CD
 
-**Note**: Server-side hooks require server access (not possible on GitHub/GitLab free tier). Use GitHub Actions or GitLab CI instead.
+**注意**：服务端 hooks 需要服务器访问权限（在 GitHub/GitLab 免费版上不可用）。请使用 GitHub Actions 或 GitLab CI 代替。
 
 ---
 
-## Submodules and Subtrees
+## Submodule 和 Subtree
 
-### What are Submodules?
+### 什么是 Submodule
 
-Submodules let you include one Git repository inside another. Useful for:
-- Shared libraries
-- Vendored dependencies
-- Common utilities
+Submodule 允许你在一个 Git 仓库中包含另一个 Git 仓库。适用于：
+- 共享库
+- 供应商依赖
+- 公共工具
 
-### Adding a Submodule
+### 添加 Submodule
 
 ```bash
-# Add submodule
+# 添加 submodule
 git submodule add https://github.com/org/ml-utils.git lib/ml-utils
 
-# This creates:
-# - lib/ml-utils/ directory (the submodule)
-# - .gitmodules file (submodule configuration)
+# 这会创建：
+# - lib/ml-utils/ 目录（submodule）
+# - .gitmodules 文件（submodule 配置）
 
-# Commit the submodule
+# 提交 submodule
 git add .gitmodules lib/ml-utils
 git commit -m "Add ml-utils submodule"
 ```
 
-### Cloning Repository with Submodules
+### 克隆带有 Submodule 的仓库
 
 ```bash
-# Clone repository
+# 克隆仓库
 git clone https://github.com/org/ml-pipeline.git
 
-# Initialize and update submodules
+# 初始化和更新 submodule
 cd ml-pipeline
 git submodule init
 git submodule update
 
-# Or in one command:
+# 或一步完成：
 git clone --recurse-submodules https://github.com/org/ml-pipeline.git
 ```
 
-### Updating Submodules
+### 更新 Submodule
 
 ```bash
-# Update submodule to latest commit
+# 将 submodule 更新到最新 commit
 cd lib/ml-utils
 git pull origin main
 
-# Return to main repo
+# 返回主仓库
 cd ../..
 git add lib/ml-utils
 git commit -m "Update ml-utils submodule"
 
-# Update all submodules at once
+# 一次更新所有 submodule
 git submodule update --remote --merge
 ```
 
-### Removing Submodules
+### 删除 Submodule
 
 ```bash
-# Remove submodule
+# 删除 submodule
 git submodule deinit lib/ml-utils
 git rm lib/ml-utils
 rm -rf .git/modules/lib/ml-utils
 git commit -m "Remove ml-utils submodule"
 ```
 
-### Submodule Challenges
+### Submodule 的挑战
 
-Submodules are powerful but tricky:
-- Easy to forget to update
-- Detached HEAD state confusing
-- Requires extra commands after clone
-- Collaboration can be difficult
+Submodule 功能强大但使用起来有技巧：
+- 容易忘记更新
+- Detached HEAD 状态令人困惑
+- 克隆后需要额外命令
+- 协作可能比较困难
 
-**Alternative**: Git subtree (simpler but less flexible).
+**替代方案**：Git subtree（更简单但灵活性较低）。
 
 ### Git Subtree
 
-Subtree integrates another repository into a subdirectory:
+Subtree 将另一个仓库整合到一个子目录中：
 
 ```bash
-# Add subtree
+# 添加 subtree
 git subtree add --prefix lib/ml-utils https://github.com/org/ml-utils.git main --squash
 
-# Pull updates
+# Pull 更新
 git subtree pull --prefix lib/ml-utils https://github.com/org/ml-utils.git main --squash
 
-# Push changes back to upstream
+# 将更改推回上游
 git subtree push --prefix lib/ml-utils https://github.com/org/ml-utils.git main
 ```
 
-**Subtree advantages:**
-- No `.gitmodules` file
-- Clones work normally
-- Simpler for collaborators
+**Subtree 优点：**
+- 不需要 `.gitmodules` 文件
+- 克隆正常工作
+- 对协作者更简单
 
-**Subtree disadvantages:**
-- History can get messy
-- Harder to contribute changes upstream
+**Subtree 缺点：**
+- 历史可能变得杂乱
+- 向上游贡献更改更困难
 
-### ML Project Use Case
+### ML 项目用例
 
-**Scenario**: Multiple ML projects share data preprocessing utilities.
+**场景**：多个 ML 项目共享数据预处理工具。
 
-**Option 1: Submodule**
+**选项 1：Submodule**
 ```
 ml-training-pipeline/
 ├── .gitmodules
@@ -861,635 +861,635 @@ ml-inference-api/
     └── data-utils/  (submodule: github.com/org/data-utils)
 ```
 
-Both projects reference the same shared library. Updates in `data-utils` are reflected in both.
+两个项目引用同一个共享库。`data-utils` 中的更新会反映在两个项目中。
 
-**Option 2: Package**
-Better for ML: Publish as pip package.
+**选项 2：Package**
+对于 ML 来说更好：发布为 pip 包。
 
 ```bash
-# In data-utils repo
+# 在 data-utils 仓库中
 python -m build
 twine upload dist/*
 
-# In other projects
+# 在其他项目中
 pip install data-utils
 ```
 
-More maintainable for Python projects.
+对于 Python 项目来说更易于维护。
 
 ---
 
-## Tags and Releases
+## Tag 和 Release
 
-### What are Tags?
+### 什么是 Tag
 
-Tags are named references to specific commits. Unlike branches, tags don't move.
+Tag 是对特定 commit 的命名引用。与 branch 不同，tag 不会移动。
 
-**Use cases:**
-- Mark releases (v1.0.0, v2.1.3)
-- Mark model versions (model-v1, model-v2)
-- Mark important points (experiment-baseline)
+**使用场景：**
+- 标记发布（v1.0.0、v2.1.3）
+- 标记模型版本（model-v1、model-v2）
+- 标记重要节点（experiment-baseline）
 
-### Lightweight vs Annotated Tags
+### 轻量 Tag 与注解 Tag
 
-**Lightweight tag** (simple pointer):
+**轻量 tag**（简单指针）：
 ```bash
 git tag v1.0.0
 ```
 
-**Annotated tag** (full object with metadata):
+**注解 tag**（带有元数据的完整对象）：
 ```bash
 git tag -a v1.0.0 -m "Release version 1.0.0"
 ```
 
-Annotated tags include:
-- Tagger name and email
-- Date
-- Message
-- GPG signature (optional)
+注解 tag 包含：
+- 标注者姓名和邮箱
+- 日期
+- 消息
+- GPG 签名（可选）
 
-**Always use annotated tags for releases.**
+**发布时始终使用注解 tag。**
 
-### Creating Tags
+### 创建 Tag
 
 ```bash
-# Create annotated tag
+# 创建注解 tag
 git tag -a v1.0.0 -m "First production release"
 
-# Tag specific commit
+# 为特定 commit 打 tag
 git tag -a v0.9.0 abc123 -m "Beta release"
 
-# Signed tag (with GPG key)
+# 签名 tag（使用 GPG 密钥）
 git tag -s v1.0.0 -m "Signed release"
 ```
 
-### Listing Tags
+### 列出 Tag
 
 ```bash
-# List all tags
+# 列出所有 tag
 git tag
 
-# List tags matching pattern
+# 列出匹配模式的 tag
 git tag -l "v1.*"
 # v1.0.0
 # v1.0.1
 # v1.1.0
 
-# Show tag details
+# 显示 tag 详情
 git show v1.0.0
 ```
 
-### Pushing Tags
+### 推送 Tag
 
-Tags aren't pushed automatically:
+Tag 不会自动推送：
 
 ```bash
-# Push specific tag
+# 推送特定 tag
 git push origin v1.0.0
 
-# Push all tags
+# 推送所有 tag
 git push origin --tags
 
-# Push annotated tags only
+# 仅推送注解 tag
 git push origin --follow-tags
 ```
 
-### Deleting Tags
+### 删除 Tag
 
 ```bash
-# Delete local tag
+# 删除本地 tag
 git tag -d v1.0.0
 
-# Delete remote tag
+# 删除远程 tag
 git push origin --delete v1.0.0
 ```
 
-### Checking Out Tags
+### 检出 Tag
 
 ```bash
-# Checkout tag (detached HEAD)
+# 检出 tag（detached HEAD 状态）
 git checkout v1.0.0
 
-# Create branch from tag
+# 从 tag 创建分支
 git checkout -b hotfix/v1.0.1 v1.0.0
 ```
 
-### Semantic Versioning for ML
+### 机器学习项目的语义化版本
 
-Use semantic versioning (semver): `MAJOR.MINOR.PATCH`
+使用语义化版本（semver）：`MAJOR.MINOR.PATCH`
 
-**For model versions:**
-- `MAJOR`: Breaking API changes, different model architecture
-- `MINOR`: New features, backward-compatible improvements
-- `PATCH`: Bug fixes, minor tweaks
+**对于模型版本：**
+- `MAJOR`：破坏性 API 变更，不同的模型架构
+- `MINOR`：新功能，向后兼容的改进
+- `PATCH`：Bug 修复，小的调整
 
-Examples:
-- `model-v1.0.0`: Initial production model
-- `model-v1.1.0`: Added support for new input features
-- `model-v1.1.1`: Fixed preprocessing bug
-- `model-v2.0.0`: Switched from ResNet to Transformer (breaking change)
+示例：
+- `model-v1.0.0`：初始生产模型
+- `model-v1.1.0`：添加了对新输入特征的支持
+- `model-v1.1.1`：修复了预处理 bug
+- `model-v2.0.0`：从 ResNet 切换到 Transformer（破坏性变更）
 
-### Creating GitHub Releases
+### 创建 GitHub Release
 
 ```bash
-# Create tag
+# 创建 tag
 git tag -a v1.0.0 -m "Release 1.0.0"
 git push origin v1.0.0
 ```
 
-On GitHub:
-1. Go to "Releases"
-2. Click "Draft a new release"
-3. Select tag v1.0.0
-4. Add release notes
-5. Attach binaries (model files, if appropriate)
-6. Publish release
+在 GitHub 上：
+1. 转到 "Releases"
+2. 点击 "Draft a new release"
+3. 选择 tag v1.0.0
+4. 添加 release notes
+5. 附上二进制文件（模型文件，如适用）
+6. 发布 release
 
-Or use GitHub CLI:
+或使用 GitHub CLI：
 ```bash
 gh release create v1.0.0 --notes "Release notes here" model.onnx
 ```
 
 ---
 
-## Advanced History Manipulation
+## 高级历史操作
 
-### Git Reflog: Your Safety Net
+### Git Reflog：你的安全网
 
-Reflog records every change to HEAD:
+Reflog 记录了对 HEAD 的每一次变更：
 
 ```bash
 git reflog
 
-# Output:
+# 输出：
 # abc123 HEAD@{0}: commit: Add feature
 # def456 HEAD@{1}: checkout: moving from main to feature
 # ghi789 HEAD@{2}: commit: Fix bug
 ```
 
-Reflog entries expire after ~90 days but can save you from disasters.
+Reflog 条目大约 90 天后过期，但可以在灾难中拯救你。
 
-### Recovering Deleted Branches
+### 恢复已删除的分支
 
 ```bash
-# Oops, deleted branch with important work
+# 哎呀，删除了包含重要工作的分支
 git branch -D important-feature
 
-# Find it in reflog
+# 在 reflog 中找到它
 git reflog
 # abc123 HEAD@{5}: commit: Important feature work
 
-# Recreate branch
+# 重新创建分支
 git checkout -b important-feature abc123
 ```
 
-### Recovering Lost Commits
+### 恢复丢失的 Commit
 
 ```bash
-# Reset to wrong commit, lost work
+# 重置到了错误的 commit，丢失了工作
 git reset --hard HEAD~10
 
-# Find lost commits in reflog
+# 在 reflog 中找到丢失的 commit
 git reflog
 # abc123 HEAD@{3}: commit: The commit I need
 
-# Create branch from lost commit
+# 从丢失的 commit 创建分支
 git branch recovered abc123
 ```
 
-### Git Bisect: Binary Search for Bugs
+### Git Bisect：二分查找 Bug
 
-**Scenario**: Tests passed 100 commits ago, failing now. Which commit broke it?
+**场景**：100 个 commit 前测试通过，现在失败了。是哪个 commit 导致的？
 
-Manual testing would take hours. Bisect automates it using binary search.
+手动测试需要几个小时。Bisect 使用二分查找自动完成。
 
 ```bash
-# Start bisect
+# 启动 bisect
 git bisect start
 
-# Mark current commit as bad
+# 将当前 commit 标记为 bad
 git bisect bad
 
-# Mark known good commit
+# 标记已知正常的 commit
 git bisect good abc123
 
-# Git checks out middle commit
-# Test it manually or automatically
+# Git 检出中间的 commit
+# 手动或自动测试它
 pytest tests/
 
-# If tests pass:
+# 如果测试通过：
 git bisect good
 
-# If tests fail:
+# 如果测试失败：
 git bisect bad
 
-# Git continues binary search
-# After ~log2(n) steps, identifies problematic commit
+# Git 继续二分查找
+# 大约 log2(n) 步后，找到有问题的 commit
 
-# Reset after finding
+# 找到后重置
 git bisect reset
 ```
 
-Automated bisect:
+自动化 bisect：
 ```bash
 git bisect start HEAD abc123
 git bisect run pytest tests/
-# Git automatically tests each commit until it finds the breakage
+# Git 自动测试每个 commit，直到找到导致问题的那个
 ```
 
-### Git Filter-Branch: Rewriting History
+### Git Filter-Branch：重写历史
 
-**Warning**: Powerful and dangerous. Only use if you know what you're doing.
+**警告**：功能强大且危险。只有在明确知道自己在做什么时才使用。
 
-**Use case**: Remove sensitive file from entire history.
+**用例**：从整个历史中删除敏感文件。
 
 ```bash
-# Remove file from all commits
+# 从所有 commit 中删除文件
 git filter-branch --tree-filter 'rm -f secrets.yaml' HEAD
 
-# Remove file from index
+# 从 index 中删除文件
 git filter-branch --index-filter 'git rm --cached --ignore-unmatch secrets.yaml' HEAD
 ```
 
-**Better alternative**: Use BFG Repo-Cleaner (faster, safer).
+**更好的替代方案**：使用 BFG Repo-Cleaner（更快、更安全）。
 
 ```bash
-# Install BFG
-brew install bfg  # or download JAR
+# 安装 BFG
+brew install bfg  # 或下载 JAR
 
-# Remove file
+# 删除文件
 bfg --delete-files secrets.yaml
 
-# Clean up
+# 清理
 git reflog expire --expire=now --all
 git gc --prune=now --aggressive
 ```
 
-### Rewriting Author Information
+### 重写作者信息
 
 ```bash
-# Change author for last commit
+# 修改最近一次 commit 的作者
 git commit --amend --author="New Name <new@email.com>"
 
-# Change author for multiple commits
+# 修改多个 commit 的作者
 git rebase -i HEAD~5
-# Mark commits as 'edit'
-# For each:
+# 将 commit 标记为 'edit'
+# 对每个 commit：
 git commit --amend --author="New Name <new@email.com>"
 git rebase --continue
 ```
 
 ---
 
-## Git for Machine Learning
+## Git 在机器学习中的应用
 
-### DVC: Data Version Control
+### DVC：数据版本控制
 
-Git isn't designed for large files. DVC extends Git for ML:
+Git 不适合处理大文件。DVC 将 Git 扩展到 ML 领域：
 
 ```bash
-# Install DVC
+# 安装 DVC
 pip install dvc
 
-# Initialize DVC
+# 初始化 DVC
 dvc init
 
-# Track large file
+# 跟踪大文件
 dvc add data/train.csv
 git add data/train.csv.dvc .gitignore
 git commit -m "Add training data"
 
-# Push data to remote storage (S3, GCS, etc.)
+# 将数据推送到远程存储（S3、GCS 等）
 dvc push
 
-# Clone and get data
+# 克隆并获取数据
 git clone repo.git
 dvc pull
 ```
 
-DVC creates `.dvc` files that Git tracks, while actual data goes to cloud storage.
+DVC 创建 `.dvc` 文件由 Git 跟踪，而实际数据存储在云存储中。
 
-### MLflow Integration
+### MLflow 集成
 
-Track experiments with Git integration:
+通过 Git 集成跟踪实验：
 
 ```python
 import mlflow
 
-# Log Git metadata automatically
+# 自动记录 Git 元数据
 with mlflow.start_run():
     mlflow.log_param("learning_rate", 0.001)
     mlflow.log_metric("accuracy", 0.95)
 
-    # MLflow records:
+    # MLflow 记录：
     # - Git commit hash
     # - Git branch
     # - Git repo URL
 ```
 
-Reproduce experiments:
+复现实验：
 ```bash
-# Find experiment's Git commit
+# 查找实验的 Git commit
 mlflow experiments list
 
-# Checkout that commit
+# 检出该 commit
 git checkout abc123
 
-# Rerun experiment
+# 重新运行实验
 python train.py
 ```
 
-### Git Workflow for Experiments
+### 实验的 Git 工作流
 
 ```bash
-# Create experiment branch
+# 创建实验分支
 git checkout -b experiment/resnet-dropout-05
 
-# Modify config
+# 修改配置
 cat > config.yaml << EOF
 model: resnet50
 dropout: 0.5
 learning_rate: 0.001
 EOF
 
-# Run experiment
+# 运行实验
 python train.py --config config.yaml
 
-# Commit results
+# 提交结果
 git add config.yaml results.json
 git commit -m "Experiment: ResNet50 with dropout=0.5, acc=0.89"
 
-# Tag for future reference
+# 打 tag 以备将来参考
 git tag -a exp-dropout-05 -m "Dropout experiment, accuracy=0.89"
 
-# If successful, merge to main
+# 如果成功，merge 到 main
 git checkout main
 git merge experiment/resnet-dropout-05
 ```
 
-### .gitattributes for ML Projects
+### ML 项目的 .gitattributes
 
 ```
 # .gitattributes
 
-# Mark large files as binary (don't try to diff)
+# 将大文件标记为二进制（不尝试 diff）
 *.pkl binary
 *.h5 binary
 *.pth binary
 *.onnx binary
 
-# Track notebooks without output (cleaner diffs)
+# 无输出地跟踪 notebook（更干净的 diff）
 *.ipynb filter=nbstrip_full
 
-# Use LFS for large files
+# 对大文件使用 LFS
 *.pth filter=lfs diff=lfs merge=lfs -text
 *.h5 filter=lfs diff=lfs merge=lfs -text
 ```
 
-### Jupyter Notebook Version Control
+### Jupyter Notebook 版本控制
 
-Notebooks are JSON, hard to diff. Solutions:
+Notebook 是 JSON 格式，难以 diff。解决方案：
 
-**Option 1: Strip output before committing**
+**选项 1：在 commit 前剥离输出**
 
-Install nbstripout:
+安装 nbstripout：
 ```bash
 pip install nbstripout
 nbstripout --install
 ```
 
-Now notebooks are committed without output (cleaner diffs).
+现在 notebook 在 commit 时不包含输出（更干净的 diff）。
 
-**Option 2: ReviewNB (GitHub App)**
+**选项 2：ReviewNB（GitHub App）**
 
-Provides visual notebook diffs in Pull Requests.
+在 Pull Request 中提供可视化的 notebook diff。
 
-**Option 3: Jupytext**
+**选项 3：Jupytext**
 
-Convert notebooks to .py files:
+将 notebook 转换为 .py 文件：
 ```bash
 pip install jupytext
 jupytext --to py notebook.ipynb
 ```
 
-Track the .py version in Git.
+在 Git 中跟踪 .py 版本。
 
 ---
 
-## Performance and Optimization
+## 性能与优化
 
-### Shallow Clones
+### 浅克隆
 
-For CI/CD, you don't need full history:
+对于 CI/CD，你不需要完整历史：
 
 ```bash
-# Clone only latest commit
+# 仅克隆最新 commit
 git clone --depth 1 https://github.com/org/repo.git
 
-# Clone last 10 commits
+# 克隆最近 10 个 commit
 git clone --depth 10 https://github.com/org/repo.git
 ```
 
-**Pros**: Much faster, smaller download
-**Cons**: Limited history, can't push
+**优点**：更快，下载更小
+**缺点**：历史有限，无法 push
 
-### Partial Clones
+### 部分克隆
 
-Clone without large files:
+克隆时不包含大文件：
 
 ```bash
 git clone --filter=blob:limit=1m https://github.com/org/repo.git
-# Only downloads files < 1MB
-# Larger files downloaded on demand
+# 仅下载 < 1MB 的文件
+# 更大的文件按需下载
 ```
 
-### Git LFS for Large Files
+### Git LFS 用于大文件
 
 ```bash
-# Install Git LFS
+# 安装 Git LFS
 git lfs install
 
-# Track file types
+# 跟踪文件类型
 git lfs track "*.pth"
 git lfs track "*.h5"
 
-# Git LFS stores pointers in repo, actual files in LFS storage
+# Git LFS 在仓库中存储指针，实际文件存储在 LFS 存储中
 ```
 
-### Optimizing Repository
+### 优化仓库
 
 ```bash
-# Garbage collect
+# 垃圾回收
 git gc --aggressive --prune=now
 
-# Verify repository integrity
+# 验证仓库完整性
 git fsck
 
-# Count objects
+# 统计对象数量
 git count-objects -vH
 ```
 
-### Git Configuration for Performance
+### Git 性能配置
 
 ```bash
-# Increase HTTP buffer for large files
+# 增加大文件的 HTTP 缓冲区
 git config --global http.postBuffer 524288000
 
-# Enable parallel fetch
+# 启用并行 fetch
 git config --global fetch.parallel 4
 
-# Enable file system cache (Windows)
+# 启用文件系统缓存（Windows）
 git config --global core.fscache true
 
-# Enable commit graph for faster operations
+# 启用 commit graph 以加快操作速度
 git config --global core.commitGraph true
 git config --global gc.writeCommitGraph true
 ```
 
 ---
 
-## Recovery and Disaster Management
+## 恢复与灾难管理
 
-### Recovering from Reset --hard
+### 从 Reset --hard 恢复
 
 ```bash
-# Accidentally ran:
+# 意外执行了：
 git reset --hard HEAD~5
 
-# Recover with reflog
+# 通过 reflog 恢复
 git reflog
-# Find the commit before reset
+# 找到 reset 之前的 commit
 git reset --hard HEAD@{1}
 ```
 
-### Recovering from Rebase Disaster
+### 从 Rebase 灾难恢复
 
 ```bash
-# Rebase went wrong
-git rebase --abort  # If still in progress
+# Rebase 出了问题
+git rebase --abort  # 如果仍在进行中
 
-# If already finished
+# 如果已经完成
 git reflog
-# Find pre-rebase state
+# 找到 rebase 前的状态
 git reset --hard HEAD@{5}
 ```
 
-### Undoing Git Push
+### 撤销 Git Push
 
 ```bash
-# Pushed wrong commit to remote
+# 推送了错误的 commit 到远程
 
-# Option 1: Revert (safe, creates new commit)
+# 选项 1：Revert（安全，创建新的 commit）
 git revert abc123
 git push origin main
 
-# Option 2: Force push (dangerous!)
+# 选项 2：强制 push（危险！）
 git reset --hard HEAD~1
 git push --force-with-lease origin main
 ```
 
-### Recovering from Deleted Repository
+### 从已删除的仓库恢复
 
-If you have local clone:
+如果你有本地克隆：
 ```bash
-# Your local clone is a full backup
-# Recreate remote repository
-# Push everything
+# 你的本地克隆就是一个完整的备份
+# 重新创建远程仓库
+# Push 所有内容
 git push --all origin
 git push --tags origin
 ```
 
-If you don't have local clone: Contact GitHub support.
+如果没有本地克隆：联系 GitHub 支持。
 
 ---
 
-## Summary and Key Takeaways
+## 总结与要点
 
-### Core Concepts
+### 核心概念
 
-1. **Interactive rebase**: Clean up history before sharing
-2. **Cherry-pick**: Apply specific commits between branches
-3. **Stash**: Temporarily save work to switch context
-4. **Hooks**: Automate tasks at Git lifecycle points
-5. **Tags**: Mark important points (releases, experiments)
-6. **Reflog**: Safety net for recovering lost work
+1. **交互式 rebase**：在共享之前清理历史
+2. **Cherry-pick**：在分支之间应用特定 commit
+3. **Stash**：临时保存工作以便切换上下文
+4. **Hooks**：在 Git 生命周期节点实现自动化
+5. **Tag**：标记重要节点（发布、实验）
+6. **Reflog**：恢复丢失工作的安全网
 
-### Essential Commands Cheat Sheet
+### 必备命令速查表
 
 ```bash
-# Interactive rebase
-git rebase -i HEAD~3          # Rebase last 3 commits
-git rebase -i main            # Rebase from branch point
+# 交互式 rebase
+git rebase -i HEAD~3          # 对最近 3 个 commit 进行 rebase
+git rebase -i main            # 从分支起点开始 rebase
 
 # Cherry-pick
-git cherry-pick abc123        # Apply specific commit
-git cherry-pick abc..def      # Apply range of commits
+git cherry-pick abc123        # 应用特定 commit
+git cherry-pick abc..def      # 应用一段范围的 commit
 
 # Stash
-git stash                     # Stash changes
-git stash pop                 # Apply and remove stash
-git stash list                # List stashes
+git stash                     # Stash 更改
+git stash pop                 # 应用并移除 stash
+git stash list                # 列出 stash
 
-# Tags
-git tag -a v1.0.0 -m "msg"   # Create annotated tag
-git push origin v1.0.0        # Push tag
-git push origin --tags        # Push all tags
+# Tag
+git tag -a v1.0.0 -m "msg"   # 创建注解 tag
+git push origin v1.0.0        # 推送 tag
+git push origin --tags        # 推送所有 tag
 
-# Recovery
-git reflog                    # View reflog
-git reset --hard HEAD@{1}     # Reset to reflog entry
+# 恢复
+git reflog                    # 查看 reflog
+git reset --hard HEAD@{1}     # 重置到 reflog 条目
 
 # Bisect
-git bisect start              # Start bisect
-git bisect good/bad           # Mark commits
-git bisect reset              # End bisect
+git bisect start              # 启动 bisect
+git bisect good/bad           # 标记 commit
+git bisect reset              # 结束 bisect
 ```
 
-### Best Practices
+### 最佳实践
 
-1. **Never rebase shared branches**: Only rebase local, unpushed commits
-2. **Use pre-commit hooks**: Catch issues before they enter history
-3. **Tag releases**: Always tag production deployments
-4. **Keep reflog**: Don't run `git reflog expire` unless necessary
-5. **Cherry-pick sparingly**: Prefer merging when possible
-6. **Stash frequently**: Better than messy commits
-7. **Test interactive rebase**: Practice on test repos first
-8. **Document hooks**: Add README explaining what hooks do
-9. **Use DVC for data**: Not Git
-10. **Sign tags**: For verified releases
+1. **绝不对共享分支使用 rebase**：只 rebase 本地、未推送的 commit
+2. **使用 pre-commit hooks**：在问题进入历史之前捕获它们
+3. **使用 tag 标记发布**：始终为生产部署打 tag
+4. **保留 reflog**：除非必要，不要运行 `git reflog expire`
+5. **谨慎使用 cherry-pick**：尽可能优先使用 merge
+6. **经常 stash**：比杂乱的 commit 更好
+7. **测试交互式 rebase**：先在测试仓库上练习
+8. **为 hooks 编写文档**：添加 README 说明 hooks 的功能
+9. **数据使用 DVC**：而不是 Git
+10. **签名 tag**：实现已验证的发布
 
-### For AI/ML Projects
+### 给 AI/ML 项目的建议
 
-- **Experiment branches**: One branch per experiment, tag successful ones
-- **Pre-commit hooks**: Check for large files, secrets, and lint code
-- **DVC integration**: Version data and models properly
-- **MLflow tracking**: Record Git metadata with experiments
-- **Semantic versioning**: Tag model releases properly
-- **Jupyter notebooks**: Strip output or use Jupytext
-- **Git LFS**: For model weights that must be in Git
+- **实验分支**：每个实验一个分支，成功的打 tag
+- **Pre-commit hooks**：检查大文件、secrets 和代码格式
+- **DVC 集成**：正确地对数据和模型进行版本管理
+- **MLflow 跟踪**：将 Git 元数据与实验一起记录
+- **语义化版本**：正确地为模型发布打 tag
+- **Jupyter notebook**：剥离输出或使用 Jupytext
+- **Git LFS**：用于必须放在 Git 中的模型权重
 
-### What's Next
+### 下一步
 
-This completes the Git module. You now know:
-- Git fundamentals (Lecture 1)
-- Branching and merging (Lecture 2)
-- Collaboration (Lecture 3)
-- Advanced techniques (Lecture 4)
+至此，Git 模块完成。你现在掌握了：
+- Git 基础（第 1 讲）
+- Branch 和 merge（第 2 讲）
+- 协作（第 3 讲）
+- 高级技术（第 4 讲）
 
-**Next steps:**
-1. Complete all exercises to practice these concepts
-2. Set up pre-commit hooks in your projects
-3. Contribute to an open-source project
-4. Implement Git workflows in your team
+**后续步骤：**
+1. 完成所有练习来实践这些概念
+2. 在你的项目中设置 pre-commit hooks
+3. 为开源项目做贡献
+4. 在你的团队中实施 Git 工作流
 
-### Further Reading
+### 延伸阅读
 
-- Pro Git book (entire book): https://git-scm.com/book/en/v2
-- Git documentation: https://git-scm.com/doc
-- DVC documentation: https://dvc.org/doc
-- Pre-commit framework: https://pre-commit.com/
-- Semantic versioning: https://semver.org/
+- Pro Git book（全书）：https://git-scm.com/book/en/v2
+- Git 文档：https://git-scm.com/doc
+- DVC 文档：https://dvc.org/doc
+- Pre-commit 框架：https://pre-commit.com/
+- 语义化版本：https://semver.org/
 
 ---
 
-**Practice Exercises**: Complete Exercises 06 and 07 to master advanced Git techniques through hands-on ML project scenarios.
+**练习题**：完成 Exercise 06 和 07，通过动手 ML 项目场景掌握高级 Git 技术。

@@ -1,62 +1,62 @@
-# Exercise 01: Build a Basic REST API
+# 练习 01：构建基本 REST API
 
-## Overview
+## 概述
 
-In this exercise, you'll build a basic REST API for managing ML models metadata using FastAPI. This exercise reinforces the fundamental concepts of REST architecture, HTTP methods, status codes, and FastAPI basics.
+在此练习中，你将使用 FastAPI 构建一个用于管理 ML 模型元数据的基本 REST API。本练习强化了 REST 架构、HTTP 方法、状态码和 FastAPI 基础的核心概念。
 
-**Difficulty:** Beginner
-**Estimated Time:** 2-3 hours
-**Prerequisites:**
-- Lecture 01: API Fundamentals & REST
-- Lecture 02: FastAPI Framework
-- Python 3.7+ installed
-- Basic Python knowledge
+**难度：** 初级
+**预计时间：** 2-3 小时
+**先决条件：**
+- 讲座 01：API 基础和 REST
+- 讲座 02：FastAPI 框架
+- 已安装 Python 3.7+
+- 基本 Python 知识
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
-- Set up a FastAPI project from scratch
-- Implement CRUD operations following REST principles
-- Use proper HTTP methods and status codes
-- Define Pydantic models for request/response validation
-- Handle errors gracefully
-- Test your API using interactive documentation
-- Understand RESTful resource design
+完成此练习后，你将：
+- 从头开始设置 FastAPI 项目
+- 按照 REST 原则实现 CRUD 操作
+- 使用适当的 HTTP 方法和状态码
+- 为请求/响应验证定义 Pydantic 模型
+- 优雅地处理错误
+- 使用交互式文档测试你的 API
+- 理解 RESTful 资源设计
 
-## Scenario
+## 场景
 
-You're building a simple model registry API that allows users to:
-- List all registered ML models
-- Get details about a specific model
-- Register a new model
-- Update model information
-- Delete a model
-- Search/filter models by framework or status
+你在构建一个简单的模型注册表 API，允许用户：
+- 列出所有已注册的 ML 模型
+- 获取特定模型的详细信息
+- 注册新模型
+- 更新模型信息
+- 删除模型
+- 按框架或状态搜索/过滤模型
 
-## Project Setup
+## 项目设置
 
-### 1. Create Project Directory
+### 1. 创建项目目录
 
 ```bash
 mkdir ml-model-registry
 cd ml-model-registry
 ```
 
-### 2. Create Virtual Environment
+### 2. 创建虚拟环境
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # 在 Windows 上：venv\Scripts\activate
 ```
 
-### 3. Install Dependencies
+### 3. 安装依赖
 
 ```bash
 pip install fastapi uvicorn pydantic
-pip install pytest httpx  # For testing
+pip install pytest httpx  # 用于测试
 ```
 
-### 4. Create Project Structure
+### 4. 创建项目结构
 
 ```
 ml-model-registry/
@@ -72,11 +72,11 @@ ml-model-registry/
 └── README.md
 ```
 
-## Part 1: Define Data Models
+## 第一部分：定义数据模型
 
-**File: app/models.py**
+**文件：app/models.py**
 
-Create Pydantic models to represent your data:
+创建 Pydantic 模型来表示你的数据：
 
 ```python
 from pydantic import BaseModel, Field
@@ -84,49 +84,49 @@ from typing import Optional, List, Literal
 from datetime import datetime
 from enum import Enum
 
-# TODO: Define ModelFramework enum
-# Hint: Should include pytorch, tensorflow, sklearn, xgboost
+# TODO: 定义 ModelFramework 枚举
+# 提示：应包括 pytorch、tensorflow、sklearn、xgboost
 
-# TODO: Define ModelStatus enum
-# Hint: Should include training, ready, deployed, archived
+# TODO: 定义 ModelStatus 枚举
+# 提示：应包括 training、ready、deployed、archived
 
-# TODO: Create Model class (BaseModel)
-# Required fields:
-#   - id: str (unique identifier)
-#   - name: str (model name)
+# TODO: 创建 Model 类 (BaseModel)
+# 必填字段：
+#   - id: str (唯一标识符)
+#   - name: str (模型名称)
 #   - framework: ModelFramework
-#   - version: str (semantic version, default "1.0.0")
-#   - status: ModelStatus (default "ready")
+#   - version: str (语义版本，默认 "1.0.0")
+#   - status: ModelStatus (默认 "ready")
 #   - created_at: datetime
 #   - updated_at: datetime
-# Optional fields:
+# 可选字段：
 #   - description: Optional[str]
-#   - accuracy: Optional[float] (range 0-1)
-#   - tags: List[str] (default empty list)
+#   - accuracy: Optional[float] (范围 0-1)
+#   - tags: List[str] (默认空列表)
 #   - model_size_mb: Optional[float]
 
-# TODO: Create ModelCreate class (BaseModel)
-# This is what users send when creating a model
-# Should NOT include: id, created_at, updated_at (server generates these)
+# TODO: 创建 ModelCreate 类 (BaseModel)
+# 这是用户创建模型时发送的数据
+# 不应包含：id、created_at、updated_at (服务器生成)
 
-# TODO: Create ModelUpdate class (BaseModel)
-# All fields should be optional (for partial updates)
-# Should NOT include: id, created_at (these can't be changed)
+# TODO: 创建 ModelUpdate 类 (BaseModel)
+# 所有字段应为可选 (用于部分更新)
+# 不应包含：id、created_at (这些不能更改)
 
-# TODO: Add Config class with example for documentation
+# TODO: 添加 Config 类，提供文档示例
 ```
 
-**What You'll Learn:**
-- How to use Pydantic for data validation
-- Difference between request and response models
-- Using Enums for constrained values
-- Field validation with constraints
+**你将学到的：**
+- 如何使用 Pydantic 进行数据验证
+- 请求模型和响应模型的区别
+- 使用 Enum 限定值
+- 带约束的字段验证
 
-## Part 2: Implement In-Memory Database
+## 第二部分：实现内存数据库
 
-**File: app/database.py**
+**文件：app/database.py**
 
-Implement a simple in-memory database (Python dictionary):
+实现一个简单的内存数据库（Python 字典）：
 
 ```python
 from typing import Dict, List, Optional
@@ -134,29 +134,29 @@ from app.models import Model
 from datetime import datetime
 import uuid
 
-# TODO: Create a global dictionary to store models
-# Key: model_id (str)
-# Value: Model object
+# TODO: 创建一个全局字典来存储模型
+# 键：model_id (str)
+# 值：Model 对象
 
 class ModelDB:
-    """In-memory database for models"""
+    """模型的内存数据库"""
 
     def __init__(self):
-        # TODO: Initialize empty models dictionary
+        # TODO: 初始化空模型字典
         pass
 
     def create_model(self, model_data: dict) -> Model:
-        """Create a new model"""
-        # TODO: Generate unique ID using uuid.uuid4()
-        # TODO: Add created_at and updated_at timestamps
-        # TODO: Create Model object
-        # TODO: Store in dictionary
-        # TODO: Return the created model
+        """创建新模型"""
+        # TODO: 使用 uuid.uuid4() 生成唯一 ID
+        # TODO: 添加 created_at 和 updated_at 时间戳
+        # TODO: 创建 Model 对象
+        # TODO: 存储在字典中
+        # TODO: 返回创建的模型
         pass
 
     def get_model(self, model_id: str) -> Optional[Model]:
-        """Get a model by ID"""
-        # TODO: Return model if exists, None otherwise
+        """按 ID 获取模型"""
+        # TODO: 如果存在返回模型，否则返回 None
         pass
 
     def get_all_models(self,
@@ -164,48 +164,48 @@ class ModelDB:
                        limit: int = 100,
                        framework: Optional[str] = None,
                        status: Optional[str] = None) -> List[Model]:
-        """Get all models with optional filtering"""
-        # TODO: Get all models from dictionary
-        # TODO: Filter by framework if provided
-        # TODO: Filter by status if provided
-        # TODO: Apply pagination (skip, limit)
-        # TODO: Return list of models
+        """获取所有模型，带有可选过滤"""
+        # TODO: 从字典中获取所有模型
+        # TODO: 如果提供了 framework 则过滤
+        # TODO: 如果提供了 status 则过滤
+        # TODO: 应用分页 (skip, limit)
+        # TODO: 返回模型列表
         pass
 
     def update_model(self, model_id: str, update_data: dict) -> Optional[Model]:
-        """Update a model"""
-        # TODO: Check if model exists
-        # TODO: Update fields that are provided
-        # TODO: Update updated_at timestamp
-        # TODO: Return updated model
+        """更新模型"""
+        # TODO: 检查模型是否存在
+        # TODO: 更新提供的字段
+        # TODO: 更新 updated_at 时间戳
+        # TODO: 返回更新后的模型
         pass
 
     def delete_model(self, model_id: str) -> bool:
-        """Delete a model"""
-        # TODO: Check if model exists
-        # TODO: Delete from dictionary
-        # TODO: Return True if deleted, False if not found
+        """删除模型"""
+        # TODO: 检查模型是否存在
+        # TODO: 从字典中删除
+        # TODO: 如果删除返回 True，如果未找到返回 False
         pass
 
     def model_exists(self, model_id: str) -> bool:
-        """Check if model exists"""
-        # TODO: Return True if model_id in dictionary
+        """检查模型是否存在"""
+        # TODO: 如果 model_id 在字典中返回 True
         pass
 
-# Create global database instance
+# 创建全局数据库实例
 db = ModelDB()
 ```
 
-**What You'll Learn:**
-- CRUD operations implementation
-- Data filtering and pagination
-- Handling optional parameters
+**你将学到的：**
+- CRUD 操作实现
+- 数据过滤和分页
+- 处理可选参数
 
-## Part 3: Create API Endpoints
+## 第三部分：创建 API Endpoint
 
-**File: app/main.py**
+**文件：app/main.py**
 
-Implement the REST API endpoints:
+实现 REST API endpoint：
 
 ```python
 from fastapi import FastAPI, HTTPException, status, Query
@@ -213,29 +213,29 @@ from typing import List, Optional
 from app.models import Model, ModelCreate, ModelUpdate
 from app.database import db
 
-# TODO: Create FastAPI app instance with title and version
+# TODO: 创建 FastAPI 应用实例，带标题和版本
 app = FastAPI(
     title="ML Model Registry API",
     version="1.0.0",
     description="API for managing ML model metadata"
 )
 
-# TODO: Implement GET / endpoint
-# Return welcome message and API info
+# TODO: 实现 GET / endpoint
+# 返回欢迎消息和 API 信息
 @app.get("/")
 def root():
     pass
 
-# TODO: Implement GET /health endpoint
-# Return health status of the API
+# TODO: 实现 GET /health endpoint
+# 返回 API 的健康状态
 @app.get("/health")
 def health_check():
     pass
 
-# TODO: Implement GET /api/v1/models endpoint
-# Parameters: skip (default 0), limit (default 100), framework (optional), status (optional)
-# Return: List of models
-# Response model: List[Model]
+# TODO: 实现 GET /api/v1/models endpoint
+# 参数：skip (默认 0)、limit (默认 100)、framework (可选)、status (可选)
+# 返回：模型列表
+# 响应模型：List[Model]
 @app.get("/api/v1/models", response_model=List[Model])
 def list_models(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
@@ -243,96 +243,96 @@ def list_models(
     framework: Optional[str] = Query(None, description="Filter by framework"),
     status: Optional[str] = Query(None, description="Filter by status")
 ):
-    # TODO: Call db.get_all_models() with parameters
-    # TODO: Return results
+    # TODO: 使用参数调用 db.get_all_models()
+    # TODO: 返回结果
     pass
 
-# TODO: Implement POST /api/v1/models endpoint
-# Body: ModelCreate
-# Return: Created model with 201 status
-# Response model: Model
+# TODO: 实现 POST /api/v1/models endpoint
+# 请求体：ModelCreate
+# 返回：创建的模型，状态 201
+# 响应模型：Model
 @app.post("/api/v1/models", response_model=Model, status_code=status.HTTP_201_CREATED)
 def create_model(model: ModelCreate):
-    # TODO: Call db.create_model() with model data
-    # TODO: Return created model
+    # TODO: 使用模型数据调用 db.create_model()
+    # TODO: 返回创建的模型
     pass
 
-# TODO: Implement GET /api/v1/models/{model_id} endpoint
-# Return: Model details
-# Response model: Model
-# Errors: 404 if not found
+# TODO: 实现 GET /api/v1/models/{model_id} endpoint
+# 返回：模型详情
+# 响应模型：Model
+# 错误：404 如果未找到
 @app.get("/api/v1/models/{model_id}", response_model=Model)
 def get_model(model_id: str):
-    # TODO: Call db.get_model()
-    # TODO: If not found, raise HTTPException with 404
-    # TODO: Return model
+    # TODO: 调用 db.get_model()
+    # TODO: 如果未找到，抛出 HTTPException 404
+    # TODO: 返回模型
     pass
 
-# TODO: Implement PUT /api/v1/models/{model_id} endpoint
-# Body: ModelUpdate
-# Return: Updated model
-# Response model: Model
-# Errors: 404 if not found
+# TODO: 实现 PUT /api/v1/models/{model_id} endpoint
+# 请求体：ModelUpdate
+# 返回：更新后的模型
+# 响应模型：Model
+# 错误：404 如果未找到
 @app.put("/api/v1/models/{model_id}", response_model=Model)
 def update_model(model_id: str, model_update: ModelUpdate):
-    # TODO: Check if model exists using db.model_exists()
-    # TODO: If not found, raise HTTPException with 404
-    # TODO: Call db.update_model() with non-null fields from model_update
-    # TODO: Return updated model
+    # TODO: 使用 db.model_exists() 检查模型是否存在
+    # TODO: 如果未找到，抛出 HTTPException 404
+    # TODO: 使用 model_update 中非空的字段调用 db.update_model()
+    # TODO: 返回更新后的模型
     pass
 
-# TODO: Implement DELETE /api/v1/models/{model_id} endpoint
-# Return: 204 No Content on success
-# Errors: 404 if not found
+# TODO: 实现 DELETE /api/v1/models/{model_id} endpoint
+# 返回：204 No Content 成功
+# 错误：404 如果未找到
 @app.delete("/api/v1/models/{model_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_model(model_id: str):
-    # TODO: Call db.delete_model()
-    # TODO: If not found, raise HTTPException with 404
-    # TODO: Return None (204 has no response body)
+    # TODO: 调用 db.delete_model()
+    # TODO: 如果未找到，抛出 HTTPException 404
+    # TODO: 返回 None (204 无响应体)
     pass
 
-# TODO: Implement GET /api/v1/models/search endpoint
-# Query parameter: q (search term)
-# Search in model name, description, and tags
+# TODO: 实现 GET /api/v1/models/search endpoint
+# 查询参数：q (搜索词)
+# 搜索模型名称、描述和标签
 @app.get("/api/v1/models/search", response_model=List[Model])
 def search_models(q: str = Query(..., min_length=1, description="Search query")):
-    # TODO: Get all models
-    # TODO: Filter models where q appears in name, description, or tags
-    # TODO: Return matching models
+    # TODO: 获取所有模型
+    # TODO: 过滤出 q 出现在名称、描述或标签中的模型
+    # TODO: 返回匹配的模型
     pass
 ```
 
-**What You'll Learn:**
-- Defining path operations with proper HTTP methods
-- Using path parameters and query parameters
-- Request body validation with Pydantic
-- Setting proper status codes
-- Error handling with HTTPException
-- Response model specification
+**你将学到的：**
+- 使用适当 HTTP 方法定义路径操作
+- 使用路径参数和查询参数
+- 使用 Pydantic 进行请求体验证
+- 设置适当的状态码
+- 使用 HTTPException 进行错误处理
+- 响应模型规范
 
-## Part 4: Run and Test Your API
+## 第四部分：运行和测试你的 API
 
-### 1. Run the Server
+### 1. 运行服务器
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Expected output:
+预期输出：
 ```
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
 INFO:     Started reloader process [12345] using watchfiles
 ```
 
-### 2. Access Interactive Documentation
+### 2. 访问交互式文档
 
-Open browser and go to:
-- Swagger UI: http://127.0.0.1:8000/docs
-- ReDoc: http://127.0.0.1:8000/redoc
+打开浏览器并访问：
+- Swagger UI：http://127.0.0.1:8000/docs
+- ReDoc：http://127.0.0.1:8000/redoc
 
-### 3. Test Endpoints Using Swagger UI
+### 3. 使用 Swagger UI 测试 Endpoint
 
-**Create a Model:**
+**创建模型：**
 ```json
 POST /api/v1/models
 {
@@ -346,19 +346,19 @@ POST /api/v1/models
 }
 ```
 
-**List Models:**
+**列出模型：**
 ```
 GET /api/v1/models
 GET /api/v1/models?framework=pytorch
 GET /api/v1/models?status=ready&limit=10
 ```
 
-**Get Specific Model:**
+**获取特定模型：**
 ```
 GET /api/v1/models/{model_id}
 ```
 
-**Update Model:**
+**更新模型：**
 ```json
 PUT /api/v1/models/{model_id}
 {
@@ -367,20 +367,20 @@ PUT /api/v1/models/{model_id}
 }
 ```
 
-**Delete Model:**
+**删除模型：**
 ```
 DELETE /api/v1/models/{model_id}
 ```
 
-**Search Models:**
+**搜索模型：**
 ```
 GET /api/v1/models/search?q=bert
 ```
 
-### 4. Test with curl
+### 4. 使用 curl 测试
 
 ```bash
-# Create model
+# 创建模型
 curl -X POST "http://localhost:8000/api/v1/models" \
   -H "Content-Type: application/json" \
   -d '{
@@ -390,24 +390,24 @@ curl -X POST "http://localhost:8000/api/v1/models" \
     "tags": ["nlp", "generation"]
   }'
 
-# List models
+# 列出模型
 curl "http://localhost:8000/api/v1/models"
 
-# Get specific model
+# 获取特定模型
 curl "http://localhost:8000/api/v1/models/{model_id}"
 
-# Update model
+# 更新模型
 curl -X PUT "http://localhost:8000/api/v1/models/{model_id}" \
   -H "Content-Type: application/json" \
   -d '{"status": "deployed"}'
 
-# Delete model
+# 删除模型
 curl -X DELETE "http://localhost:8000/api/v1/models/{model_id}"
 ```
 
-## Part 5: Write Tests
+## 第五部分：编写测试
 
-**File: tests/test_api.py**
+**文件：tests/test_api.py**
 
 ```python
 from fastapi.testclient import TestClient
@@ -416,21 +416,21 @@ from app.main import app
 client = TestClient(app)
 
 def test_root():
-    """Test root endpoint"""
-    # TODO: Make GET request to /
-    # TODO: Assert status code is 200
-    # TODO: Assert response contains expected message
+    """测试根 endpoint"""
+    # TODO: 向 / 发起 GET 请求
+    # TODO: 断言状态码是 200
+    # TODO: 断言响应包含预期消息
     pass
 
 def test_health_check():
-    """Test health endpoint"""
-    # TODO: Make GET request to /health
-    # TODO: Assert status code is 200
-    # TODO: Assert status is healthy
+    """测试健康 endpoint"""
+    # TODO: 向 /health 发起 GET 请求
+    # TODO: 断言状态码是 200
+    # TODO: 断言状态为 healthy
     pass
 
 def test_create_model():
-    """Test creating a model"""
+    """测试创建模型"""
     model_data = {
         "name": "Test Model",
         "framework": "pytorch",
@@ -438,79 +438,79 @@ def test_create_model():
         "tags": ["test"]
     }
 
-    # TODO: Make POST request to /api/v1/models
-    # TODO: Assert status code is 201
-    # TODO: Assert response contains id
-    # TODO: Assert name matches
+    # TODO: 向 /api/v1/models 发起 POST 请求
+    # TODO: 断言状态码是 201
+    # TODO: 断言响应包含 id
+    # TODO: 断言名称匹配
     pass
 
 def test_get_model():
-    """Test getting a specific model"""
-    # TODO: First create a model
-    # TODO: Extract model_id from response
-    # TODO: Make GET request to /api/v1/models/{model_id}
-    # TODO: Assert status code is 200
-    # TODO: Assert model data matches
+    """测试获取特定模型"""
+    # TODO: 首先创建一个模型
+    # TODO: 从响应中提取 model_id
+    # TODO: 向 /api/v1/models/{model_id} 发起 GET 请求
+    # TODO: 断言状态码是 200
+    # TODO: 断言模型数据匹配
     pass
 
 def test_get_nonexistent_model():
-    """Test getting a model that doesn't exist"""
-    # TODO: Make GET request with invalid ID
-    # TODO: Assert status code is 404
+    """测试获取不存在的模型"""
+    # TODO: 使用无效 ID 发起 GET 请求
+    # TODO: 断言状态码是 404
     pass
 
 def test_list_models():
-    """Test listing models"""
-    # TODO: Create 2-3 models
-    # TODO: Make GET request to /api/v1/models
-    # TODO: Assert status code is 200
-    # TODO: Assert response is a list
-    # TODO: Assert list contains created models
+    """测试列出模型"""
+    # TODO: 创建 2-3 个模型
+    # TODO: 向 /api/v1/models 发起 GET 请求
+    # TODO: 断言状态码是 200
+    # TODO: 断言响应是列表
+    # TODO: 断言列表包含创建的模型
     pass
 
 def test_update_model():
-    """Test updating a model"""
-    # TODO: Create a model
-    # TODO: Update the model with new data
-    # TODO: Assert status code is 200
-    # TODO: Assert updated_at changed
-    # TODO: Assert new values are reflected
+    """测试更新模型"""
+    # TODO: 创建一个模型
+    # TODO: 使用新数据更新模型
+    # TODO: 断言状态码是 200
+    # TODO: 断言 updated_at 已更改
+    # TODO: 断言新值已反映
     pass
 
 def test_delete_model():
-    """Test deleting a model"""
-    # TODO: Create a model
-    # TODO: Delete the model
-    # TODO: Assert status code is 204
-    # TODO: Try to get the model again
-    # TODO: Assert it returns 404
+    """测试删除模型"""
+    # TODO: 创建一个模型
+    # TODO: 删除模型
+    # TODO: 断言状态码是 204
+    # TODO: 再次尝试获取模型
+    # TODO: 断言返回 404
     pass
 
 def test_filter_by_framework():
-    """Test filtering models by framework"""
-    # TODO: Create models with different frameworks
-    # TODO: Filter by framework
-    # TODO: Assert only matching models are returned
+    """测试按框架过滤模型"""
+    # TODO: 创建不同框架的模型
+    # TODO: 按框架过滤
+    # TODO: 断言只返回匹配的模型
     pass
 
 def test_search_models():
-    """Test search functionality"""
-    # TODO: Create models with specific names/tags
-    # TODO: Search for a term
-    # TODO: Assert matching models are returned
+    """测试搜索功能"""
+    # TODO: 创建具有特定名称/标签的模型
+    # TODO: 搜索某个词
+    # TODO: 断言返回匹配的模型
     pass
 ```
 
-**Run tests:**
+**运行测试：**
 ```bash
 pytest tests/test_api.py -v
 ```
 
-## Challenges and Extensions
+## 挑战和扩展
 
-### Challenge 1: Add Pagination Metadata
+### 挑战 1：添加分页元数据
 
-Enhance the list endpoint to return pagination metadata:
+增强列表 endpoint 以返回分页元数据：
 
 ```json
 {
@@ -522,14 +522,14 @@ Enhance the list endpoint to return pagination metadata:
 }
 ```
 
-### Challenge 2: Add Sorting
+### 挑战 2：添加排序
 
-Allow sorting by different fields:
+允许按不同字段排序：
 ```
 GET /api/v1/models?sort_by=created_at&order=desc
 ```
 
-### Challenge 3: Add Model Statistics Endpoint
+### 挑战 3：添加模型统计 Endpoint
 
 ```
 GET /api/v1/models/stats
@@ -548,14 +548,14 @@ GET /api/v1/models/stats
 }
 ```
 
-### Challenge 4: Add Validation
+### 挑战 4：添加验证
 
-- Model names must be unique
-- Version must follow semantic versioning (X.Y.Z)
-- Tags should be lowercase with no spaces
-- Accuracy must be between 0 and 1
+- 模型名称必须唯一
+- 版本必须遵循语义版本控制 (X.Y.Z)
+- 标签应为小写且不含空格
+- 准确度必须在 0 到 1 之间
 
-### Challenge 5: Add Batch Operations
+### 挑战 5：添加批量操作
 
 ```python
 POST /api/v1/models/batch
@@ -567,80 +567,80 @@ POST /api/v1/models/batch
 }
 ```
 
-## Common Issues and Solutions
+## 常见问题及解决方案
 
-### Issue 1: Import Errors
+### 问题 1：导入错误
 
-**Problem:** `ModuleNotFoundError: No module named 'app'`
+**问题：** `ModuleNotFoundError: No module named 'app'`
 
-**Solution:**
-- Make sure you're in the project root directory
-- Run with: `uvicorn app.main:app --reload`
-- Or add `__init__.py` files to make directories into packages
+**解决方案：**
+- 确保在项目根目录中
+- 使用运行：`uvicorn app.main:app --reload`
+- 或添加 `__init__.py` 文件使目录成为包
 
-### Issue 2: Pydantic Validation Errors
+### 问题 2：Pydantic 验证错误
 
-**Problem:** `ValidationError` when creating models
+**问题：** 创建模型时出现 `ValidationError`
 
-**Solution:**
-- Check that all required fields are provided
-- Ensure data types match (e.g., accuracy as float, not string)
-- Use `.dict()` or `.model_dump()` to convert Pydantic models to dicts
+**解决方案：**
+- 检查是否提供了所有必填字段
+- 确保数据类型匹配（例如，accuracy 为 float 而非 string）
+- 使用 `.dict()` 或 `.model_dump()` 将 Pydantic 模型转换为字典
 
-### Issue 3: 422 Unprocessable Entity
+### 问题 3：422 Unprocessable Entity
 
-**Problem:** API returns 422 when sending requests
+**问题：** 发送请求时 API 返回 422
 
-**Solution:**
-- Check request body matches the expected Pydantic model
-- Ensure JSON is valid
-- Check that enum values are correct
+**解决方案：**
+- 检查请求体是否与预期的 Pydantic 模型匹配
+- 确保 JSON 有效
+- 检查枚举值是否正确
 
-## Deliverables
+## 交付物
 
-By the end of this exercise, you should have:
+到本练习结束时，你应该拥有：
 
-1. ✅ Working FastAPI application with CRUD endpoints
-2. ✅ Pydantic models for request/response validation
-3. ✅ In-memory database implementation
-4. ✅ Proper HTTP status codes for all responses
-5. ✅ Error handling for invalid requests
-6. ✅ Interactive API documentation (Swagger UI)
-7. ✅ Test suite with 90%+ coverage
-8. ✅ README with setup and usage instructions
+1. ✅ 带有 CRUD endpoint 的工作 FastAPI 应用程序
+2. ✅ 用于请求/响应验证的 Pydantic 模型
+3. ✅ 内存数据库实现
+4. ✅ 所有响应的适当 HTTP 状态码
+5. ✅ 无效请求的错误处理
+6. ✅ 交互式 API 文档 (Swagger UI)
+7. ✅ 90%+ 覆盖率的测试套件
+8. ✅ 带有设置和使用说明的 README
 
-## Submission Checklist
+## 提交清单
 
-- [ ] All endpoints implemented and working
-- [ ] All tests passing (`pytest`)
-- [ ] Interactive documentation accessible at `/docs`
-- [ ] Code follows Python style guidelines (use `black` for formatting)
-- [ ] No hardcoded values (use environment variables or config)
-- [ ] README.md with:
-  - [ ] Setup instructions
-  - [ ] API endpoint documentation
-  - [ ] Example requests and responses
-  - [ ] How to run tests
+- [ ] 所有 endpoint 已实现并正常工作
+- [ ] 所有测试通过 (`pytest`)
+- [ ] 交互式文档可在 `/docs` 访问
+- [ ] 代码遵循 Python 风格指南（使用 `black` 格式化）
+- [ ] 无硬编码值（使用环境变量或配置）
+- [ ] README.md 包含：
+  - [ ] 设置说明
+  - [ ] API endpoint 文档
+  - [ ] 示例请求和响应
+  - [ ] 如何运行测试
 
-## Key Takeaways
+## 关键要点
 
-After completing this exercise, you should understand:
+完成此练习后，你应该理解：
 
-1. **REST Principles:** Resource-based URLs, HTTP methods, status codes
-2. **FastAPI Basics:** Path operations, Pydantic models, automatic validation
-3. **CRUD Operations:** Create, Read, Update, Delete patterns
-4. **Error Handling:** Proper HTTP exceptions and status codes
-5. **API Testing:** Using TestClient for automated testing
-6. **Documentation:** Auto-generated interactive docs
+1. **REST 原则：** 基于资源的 URL、HTTP 方法、状态码
+2. **FastAPI 基础：** 路径操作、Pydantic 模型、自动验证
+3. **CRUD 操作：** 创建、读取、更新、删除模式
+4. **错误处理：** 适当的 HTTP 异常和状态码
+5. **API 测试：** 使用 TestClient 进行自动化测试
+6. **文档：** 自动生成的交互式文档
 
-## Next Steps
+## 下一步
 
-- Exercise 02: Build a model serving API with actual ML models
-- Exercise 03: Add JWT authentication to your API
-- Exercise 04: Deploy your API to production
+- 练习 02：构建带有实际 ML 模型的模型服务 API
+- 练习 03：为你的 API 添加 JWT 认证
+- 练习 04：将你的 API 部署到生产环境
 
 ---
 
-**Estimated Completion Time:** 2-3 hours
-**Difficulty:** Beginner
-**Focus:** REST API fundamentals, FastAPI basics, CRUD operations
+**预计完成时间：** 2-3 小时
+**难度：** 初级
+**重点：** REST API 基础、FastAPI 基础、CRUD 操作

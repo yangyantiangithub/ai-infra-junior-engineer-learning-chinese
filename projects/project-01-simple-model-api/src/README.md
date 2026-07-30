@@ -1,92 +1,92 @@
-# Source Code Implementation Guide
+# 源代码实现指南
 
-**Project:** Simple Model API Deployment
-**Directory:** `src/`
-
----
-
-## Overview
-
-This directory contains the core application code for the Model API. The code is organized into three main modules:
-
-1. **`config.py`** - Configuration management and environment variables
-2. **`model_loader.py`** - ML model loading, preprocessing, and inference
-3. **`app.py`** - REST API implementation with Flask/FastAPI
+**项目：** 简单模型 API 部署
+**目录：** `src/`
 
 ---
 
-## Implementation Order
+## 概述
 
-Follow this order to build the application:
+此目录包含模型 API 的核心应用代码。代码组织为三个主要模块：
 
-### 1. Start with Configuration (`config.py`)
-- Simplest module, no dependencies
-- Defines all configuration values
-- Sets up environment variable loading
-- Estimated time: 1-2 hours
-
-### 2. Implement Model Loader (`model_loader.py`)
-- Core ML functionality
-- Depends only on ML framework (PyTorch/TensorFlow)
-- Can be tested independently
-- Estimated time: 4-6 hours
-
-### 3. Build the API (`app.py`)
-- Ties everything together
-- Depends on config and model_loader
-- Implements REST endpoints
-- Estimated time: 6-8 hours
+1. **`config.py`** - 配置管理和环境变量
+2. **`model_loader.py`** - ML 模型加载、预处理和推理
+3. **`app.py`** - 使用 Flask/FastAPI 实现的 REST API
 
 ---
 
-## Code Structure
+## 实现顺序
+
+按以下顺序构建应用：
+
+### 1. 从配置开始（`config.py`）
+- 最简单的模块，无依赖
+- 定义所有配置值
+- 设置环境变量加载
+- 预计时间：1-2 小时
+
+### 2. 实现模型加载器（`model_loader.py`）
+- 核心 ML 功能
+- 仅依赖 ML 框架（PyTorch/TensorFlow）
+- 可独立测试
+- 预计时间：4-6 小时
+
+### 3. 构建 API（`app.py`）
+- 将所有内容串联起来
+- 依赖于 config 和 model_loader
+- 实现 REST 端点
+- 预计时间：6-8 小时
+
+---
+
+## 代码结构
 
 ```
 src/
-├── README.md              # This file
-├── app.py                 # Main application (STUB)
-├── model_loader.py        # Model management (STUB)
-└── config.py              # Configuration (STUB)
+├── README.md              # 本文件
+├── app.py                 # 主应用（存根）
+├── model_loader.py        # 模型管理（存根）
+└── config.py              # 配置（存根）
 ```
 
 ---
 
-## Module Descriptions
+## 模块说明
 
-### `config.py` - Configuration Management
+### `config.py` - 配置管理
 
-**Purpose:** Centralize all configuration values and environment variables
+**目的：** 集中管理所有配置值和环境变量
 
-**What to Implement:**
-- Environment variable loading with defaults
-- Configuration validation
-- Type conversions (string to int, bool, etc.)
-- Configuration class or dictionary
+**需要实现的内容：**
+- 带默认值的环境变量加载
+- 配置验证
+- 类型转换（字符串转整数、布尔值等）
+- 配置类或字典
 
-**Key Configuration Values:**
+**关键配置值：**
 ```python
-# Model Configuration
-MODEL_NAME: str = "resnet50"  # or "mobilenet_v2"
+# 模型配置
+MODEL_NAME: str = "resnet50"  # 或 "mobilenet_v2"
 MODEL_PATH: str = "~/.cache/torch/hub"
-DEVICE: str = "cpu"  # or "cuda"
+DEVICE: str = "cpu"  # 或 "cuda"
 
-# API Configuration
+# API 配置
 HOST: str = "0.0.0.0"
 PORT: int = 5000
 DEBUG: bool = False
 
-# Limits
+# 限制
 MAX_FILE_SIZE: int = 10 * 1024 * 1024  # 10MB
-REQUEST_TIMEOUT: int = 30  # seconds
+REQUEST_TIMEOUT: int = 30  # 秒
 
-# Logging
+# 日志
 LOG_LEVEL: str = "INFO"
-LOG_FORMAT: str = "json"  # or "text"
+LOG_FORMAT: str = "json"  # 或 "text"
 ```
 
-**Testing:**
+**测试：**
 ```python
-# Test that config loads correctly
+# 测试配置是否正确加载
 from config import Config
 
 config = Config()
@@ -97,111 +97,111 @@ assert config.MAX_FILE_SIZE > 0
 
 ---
 
-### `model_loader.py` - Model Management
+### `model_loader.py` - 模型管理
 
-**Purpose:** Handle all ML model operations (loading, preprocessing, inference)
+**目的：** 处理所有 ML 模型操作（加载、预处理、推理）
 
-**What to Implement:**
+**需要实现的内容：**
 
-#### 1. Model Loading
+#### 1. 模型加载
 ```python
 def load_model(model_name: str, device: str) -> torch.nn.Module:
     """
-    Load pre-trained model from torchvision.
+    从 torchvision 加载预训练模型。
 
     TODO:
-    - Import appropriate model from torchvision.models
-    - Load with pretrained=True
-    - Move model to specified device
-    - Set model to eval() mode
-    - Return model instance
+    - 从 torchvision.models 导入相应模型
+    - 以 pretrained=True 加载
+    - 将模型移动到指定设备
+    - 将模型设置为 eval() 模式
+    - 返回模型实例
     """
 ```
 
-#### 2. Image Preprocessing
+#### 2. 图片预处理
 ```python
 def preprocess_image(image: PIL.Image) -> torch.Tensor:
     """
-    Preprocess image for model inference.
+    预处理图片以供模型推理。
 
     TODO:
-    - Convert image to RGB (handle grayscale, RGBA)
-    - Resize to 224x224
-    - Convert to tensor
-    - Normalize with ImageNet stats
-    - Add batch dimension
-    - Return preprocessed tensor
+    - 将图片转换为 RGB（处理灰度图、RGBA）
+    - 调整为 224x224
+    - 转换为 tensor
+    - 使用 ImageNet 统计数据进行归一化
+    - 添加批次维度
+    - 返回预处理后的 tensor
     """
 ```
 
-#### 3. Inference
+#### 3. 推理
 ```python
 def predict(model: torch.nn.Module,
            image_tensor: torch.Tensor,
            top_k: int = 5) -> List[Dict]:
     """
-    Generate predictions from model.
+    从模型生成预测结果。
 
     TODO:
-    - Disable gradient computation (torch.no_grad())
-    - Run forward pass
-    - Apply softmax to get probabilities
-    - Get top-K predictions
-    - Map indices to class labels
-    - Format as list of dicts
-    - Return predictions
+    - 禁用梯度计算（torch.no_grad()）
+    - 执行前向传播
+    - 应用 softmax 获取概率
+    - 获取 top-K 预测结果
+    - 将索引映射到类别标签
+    - 格式化为字典列表
+    - 返回预测结果
     """
 ```
 
-#### 4. Class Label Loading
+#### 4. 类别标签加载
 ```python
 def load_imagenet_labels() -> Dict[int, str]:
     """
-    Load ImageNet class labels.
+    加载 ImageNet 类别标签。
 
     TODO:
-    - Download or load ImageNet labels
-    - Parse into dictionary {index: label}
-    - Handle missing label file
-    - Return label mapping
+    - 下载或加载 ImageNet 标签
+    - 解析为字典 {index: label}
+    - 处理标签文件缺失的情况
+    - 返回标签映射
     """
 ```
 
-**Model Loader Class Structure:**
+**模型加载器类结构：**
 ```python
 class ModelLoader:
-    """Manages ML model lifecycle and inference."""
+    """管理 ML 模型生命周期和推理。"""
 
     def __init__(self, model_name: str = "resnet50", device: str = "cpu"):
-        """Initialize ModelLoader with configuration."""
+        """使用配置初始化 ModelLoader。"""
 
     def load(self) -> None:
-        """Load model weights and prepare for inference."""
+        """加载模型权重并准备推理。"""
 
     def preprocess(self, image: PIL.Image) -> torch.Tensor:
-        """Preprocess image for model input."""
+        """预处理图片以输入模型。"""
 
     def predict(self, image: PIL.Image, top_k: int = 5) -> List[Dict]:
-        """Generate top-K predictions for image."""
+        """为图片生成 top-K 预测结果。"""
 
     def get_model_info(self) -> Dict:
-        """Return model metadata."""
+        """返回模型元数据。"""
 ```
 
-**Testing:**
+**测试：**
 ```python
-# Test model loading
+# 测试模型加载
 loader = ModelLoader(model_name="resnet50")
 loader.load()
 assert loader.model is not None
 
-# Test preprocessing
+# 测试预处理
 from PIL import Image
 test_image = Image.open("test.jpg")
 tensor = loader.preprocess(test_image)
 assert tensor.shape == (1, 3, 224, 224)
 
-# Test prediction
+# 测试预测
 predictions = loader.predict(test_image)
 assert len(predictions) == 5
 assert all(0 <= p['confidence'] <= 1 for p in predictions)
@@ -209,15 +209,15 @@ assert all(0 <= p['confidence'] <= 1 for p in predictions)
 
 ---
 
-### `app.py` - REST API Implementation
+### `app.py` - REST API 实现
 
-**Purpose:** Implement HTTP API endpoints and request handling
+**目的：** 实现 HTTP API 端点和请求处理
 
-**What to Implement:**
+**需要实现的内容：**
 
-#### 1. Application Setup
+#### 1. 应用设置
 ```python
-# Flask example
+# Flask 示例
 from flask import Flask, request, jsonify
 import logging
 
@@ -225,121 +225,121 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize model loader
+# 初始化模型加载器
 model_loader = ModelLoader()
 model_loader.load()
 ```
 
-#### 2. Health Check Endpoint
+#### 2. 健康检查端点
 ```python
 @app.route('/health', methods=['GET'])
 def health():
     """
-    Health check endpoint.
+    健康检查端点。
 
     TODO:
-    - Check if model is loaded
-    - Return status: "healthy" or "unhealthy"
-    - Include model name
-    - Return 200 if healthy, 503 if not
+    - 检查模型是否已加载
+    - 返回状态："healthy" 或 "unhealthy"
+    - 包含模型名称
+    - 健康时返回 200，否则返回 503
     """
 ```
 
-#### 3. Info Endpoint
+#### 3. 信息端点
 ```python
 @app.route('/info', methods=['GET'])
 def info():
     """
-    Model information endpoint.
+    模型信息端点。
 
     TODO:
-    - Get model metadata from model_loader
-    - Include API version
-    - Include supported endpoints
-    - Include limits (file size, timeout)
-    - Return as JSON
+    - 从 model_loader 获取模型元数据
+    - 包含 API 版本
+    - 包含支持的端点
+    - 包含限制（文件大小、超时）
+    - 以 JSON 格式返回
     """
 ```
 
-#### 4. Predict Endpoint
+#### 4. 预测端点
 ```python
 @app.route('/predict', methods=['POST'])
 def predict():
     """
-    Prediction endpoint.
+    预测端点。
 
     TODO:
-    - Validate request has file
-    - Check Content-Type
-    - Validate file size
-    - Load image with PIL
-    - Handle image loading errors
-    - Call model_loader.predict()
-    - Format response with predictions
-    - Add latency measurement
-    - Log request with correlation ID
-    - Handle all errors gracefully
-    - Return JSON response
+    - 验证请求包含文件
+    - 检查 Content-Type
+    - 验证文件大小
+    - 使用 PIL 加载图片
+    - 处理图片加载错误
+    - 调用 model_loader.predict()
+    - 格式化包含预测结果的响应
+    - 添加延迟测量
+    - 使用关联 ID 记录请求
+    - 优雅地处理所有错误
+    - 返回 JSON 响应
     """
 ```
 
-#### 5. Error Handling
+#### 5. 错误处理
 ```python
 @app.errorhandler(400)
 def bad_request(error):
-    """Handle 400 errors."""
+    """处理 400 错误。"""
 
 @app.errorhandler(413)
 def payload_too_large(error):
-    """Handle file too large errors."""
+    """处理文件过大错误。"""
 
 @app.errorhandler(500)
 def internal_error(error):
-    """Handle internal server errors."""
+    """处理服务器内部错误。"""
 ```
 
-#### 6. Request Validation
+#### 6. 请求验证
 ```python
 def validate_image_file(file) -> Tuple[bool, Optional[str]]:
     """
-    Validate uploaded image file.
+    验证上传的图片文件。
 
     TODO:
-    - Check file is not None
-    - Validate file size
-    - Attempt to open with PIL
-    - Verify it's actually an image
-    - Return (is_valid, error_message)
+    - 检查文件不为 None
+    - 验证文件大小
+    - 尝试使用 PIL 打开
+    - 确认它确实是图片
+    - 返回 (is_valid, error_message)
     """
 ```
 
-#### 7. Response Formatting
+#### 7. 响应格式化
 ```python
 def format_success_response(predictions: List[Dict],
                           latency_ms: float) -> Dict:
-    """Format successful prediction response."""
+    """格式化成功的预测响应。"""
 
 def format_error_response(error_code: str,
                          message: str,
                          correlation_id: str) -> Dict:
-    """Format error response."""
+    """格式化错误响应。"""
 ```
 
-#### 8. Correlation ID Generation
+#### 8. 关联 ID 生成
 ```python
 import uuid
 
 def generate_correlation_id() -> str:
-    """Generate unique correlation ID for request tracking."""
+    """生成用于请求跟踪的唯一关联 ID。"""
     return f"req-{uuid.uuid4().hex[:8]}"
 ```
 
-**Flask vs FastAPI:**
+**Flask vs FastAPI：**
 
-This guide shows Flask examples, but you can also use FastAPI:
+本指南展示 Flask 示例，但你也可以使用 FastAPI：
 
 ```python
-# FastAPI example
+# FastAPI 示例
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from typing import List
 
@@ -351,58 +351,58 @@ async def health():
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...), top_k: int = 5):
-    # Implementation here
+    # 在此处实现
     pass
 ```
 
-**Choose one framework and stick with it throughout the project.**
+**选择一个框架并在整个项目中坚持使用。**
 
 ---
 
-## Implementation Guidelines
+## 实现指南
 
-### Code Style
+### 代码风格
 
-Follow PEP 8 style guide:
-- 4 spaces for indentation (no tabs)
-- Maximum line length: 88 characters (Black formatter)
-- Two blank lines between top-level functions/classes
-- One blank line between methods
-- Lowercase with underscores for functions/variables
-- CamelCase for class names
+遵循 PEP 8 风格指南：
+- 缩进使用 4 个空格（不使用制表符）
+- 最大行长度：88 个字符（Black 格式化工具）
+- 顶层函数/类之间空两行
+- 方法之间空一行
+- 函数/变量使用小写加下划线
+- 类名使用 CamelCase
 
-### Type Hints
+### 类型提示
 
-Add type hints to all functions:
+为所有函数添加类型提示：
 ```python
 from typing import List, Dict, Tuple, Optional
 from PIL import Image
 import torch
 
 def predict(image: Image.Image, top_k: int = 5) -> List[Dict[str, any]]:
-    """Generate predictions with type safety."""
+    """以类型安全的方式生成预测结果。"""
     pass
 ```
 
-### Docstrings
+### 文档字符串
 
-Use Google-style docstrings:
+使用 Google 风格的文档字符串：
 ```python
 def preprocess_image(image: Image.Image) -> torch.Tensor:
     """
-    Preprocess image for model inference.
+    预处理图片以供模型推理。
 
-    Converts image to RGB, resizes to 224x224, normalizes with ImageNet
-    statistics, and converts to PyTorch tensor.
+    将图片转换为 RGB，调整为 224x224，使用 ImageNet 统计数据进行
+    归一化，并转换为 PyTorch tensor。
 
     Args:
-        image: PIL Image object to preprocess
+        image: 要预处理的 PIL Image 对象
 
     Returns:
-        Preprocessed image tensor with shape (1, 3, 224, 224)
+        预处理后的图片 tensor，形状为 (1, 3, 224, 224)
 
     Raises:
-        ValueError: If image cannot be converted to RGB
+        ValueError: 如果图片无法转换为 RGB
 
     Example:
         >>> from PIL import Image
@@ -414,9 +414,9 @@ def preprocess_image(image: Image.Image) -> torch.Tensor:
     pass
 ```
 
-### Error Handling
+### 错误处理
 
-Always handle errors gracefully:
+始终优雅地处理错误：
 ```python
 try:
     image = Image.open(file_bytes)
@@ -426,24 +426,24 @@ except Exception as e:
     return {"error": "Invalid image file"}, 400
 ```
 
-### Logging
+### 日志记录
 
-Log at appropriate levels:
+在适当的级别记录日志：
 ```python
-logger.debug("Preprocessing image")       # Detailed debugging info
-logger.info("Model loaded successfully")  # Normal operations
-logger.warning("File size near limit")    # Unusual but recoverable
-logger.error("Invalid image format")      # Request failed
-logger.critical("Model failed to load")   # System failure
+logger.debug("Preprocessing image")       # 详细调试信息
+logger.info("Model loaded successfully")  # 正常操作
+logger.warning("File size near limit")    # 异常但可恢复
+logger.error("Invalid image format")      # 请求失败
+logger.critical("Model failed to load")   # 系统故障
 ```
 
 ---
 
-## Testing Your Implementation
+## 测试你的实现
 
-### Unit Tests
+### 单元测试
 
-Test each module independently:
+独立测试每个模块：
 
 ```python
 # tests/test_config.py
@@ -477,17 +477,17 @@ def test_predict_endpoint(client):
     assert response.status_code == 200
 ```
 
-### Manual Testing
+### 手动测试
 
-Test with cURL:
+使用 cURL 测试：
 ```bash
-# Health check
+# 健康检查
 curl http://localhost:5000/health
 
-# Model info
+# 模型信息
 curl http://localhost:5000/info
 
-# Prediction
+# 预测
 curl -X POST \
   -F "file=@dog.jpg" \
   http://localhost:5000/predict
@@ -495,55 +495,55 @@ curl -X POST \
 
 ---
 
-## Common Pitfalls
+## 常见陷阱
 
-### 1. Model Not in Eval Mode
+### 1. 模型未处于评估模式
 ```python
-# WRONG
+# 错误
 model = models.resnet50(pretrained=True)
 
-# CORRECT
+# 正确
 model = models.resnet50(pretrained=True)
-model.eval()  # Disable dropout and batch normalization
+model.eval()  # 禁用 dropout 和 batch normalization
 ```
 
-### 2. Incorrect Tensor Dimensions
+### 2. 错误的 Tensor 维度
 ```python
-# WRONG - Missing batch dimension
-tensor = transform(image)  # Shape: (3, 224, 224)
-output = model(tensor)     # ERROR!
+# 错误 - 缺少批次维度
+tensor = transform(image)  # 形状: (3, 224, 224)
+output = model(tensor)     # 错误！
 
-# CORRECT - Add batch dimension
-tensor = transform(image).unsqueeze(0)  # Shape: (1, 3, 224, 224)
-output = model(tensor)  # Works!
+# 正确 - 添加批次维度
+tensor = transform(image).unsqueeze(0)  # 形状: (1, 3, 224, 224)
+output = model(tensor)  # 正常工作！
 ```
 
-### 3. Forgetting torch.no_grad()
+### 3. 忘记使用 torch.no_grad()
 ```python
-# WRONG - Wastes memory tracking gradients
+# 错误 - 浪费内存跟踪梯度
 output = model(tensor)
 
-# CORRECT - Disable gradient computation
+# 正确 - 禁用梯度计算
 with torch.no_grad():
     output = model(tensor)
 ```
 
-### 4. Not Converting Image to RGB
+### 4. 未将图片转换为 RGB
 ```python
-# WRONG - May be grayscale or RGBA
+# 错误 - 可能是灰度图或 RGBA
 image = Image.open(file)
 
-# CORRECT - Ensure RGB
+# 正确 - 确保为 RGB
 image = Image.open(file).convert('RGB')
 ```
 
-### 5. Hardcoded Values
+### 5. 硬编码值
 ```python
-# WRONG
+# 错误
 PORT = 5000
 MODEL_NAME = "resnet50"
 
-# CORRECT
+# 正确
 from config import Config
 config = Config()
 PORT = config.PORT
@@ -552,25 +552,25 @@ MODEL_NAME = config.MODEL_NAME
 
 ---
 
-## Performance Tips
+## 性能提示
 
-### 1. Load Model Once
+### 1. 仅加载一次模型
 ```python
-# WRONG - Loads model on every request (very slow!)
+# 错误 - 每次请求都加载模型（非常慢！）
 @app.route('/predict', methods=['POST'])
 def predict():
-    model = load_model()  # DON'T DO THIS
+    model = load_model()  # 不要这样做
 
-# CORRECT - Load once at startup
+# 正确 - 启动时仅加载一次
 model_loader = ModelLoader()
-model_loader.load()  # Once during initialization
+model_loader.load()  # 初始化期间仅一次
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    predictions = model_loader.predict(image)  # Fast
+    predictions = model_loader.predict(image)  # 快速
 ```
 
-### 2. Measure Latency
+### 2. 测量延迟
 ```python
 import time
 
@@ -580,9 +580,9 @@ latency_ms = (time.time() - start_time) * 1000
 logger.info(f"Prediction latency: {latency_ms:.2f}ms")
 ```
 
-### 3. Efficient Image Loading
+### 3. 高效的图片加载
 ```python
-# Load directly from bytes (no disk I/O)
+# 直接从字节加载（无磁盘 I/O）
 import io
 from PIL import Image
 
@@ -592,30 +592,30 @@ image = Image.open(io.BytesIO(file_bytes))
 
 ---
 
-## Next Steps
+## 后续步骤
 
-1. **Implement config.py** - Start with configuration
-2. **Implement model_loader.py** - Build core ML functionality
-3. **Test model_loader independently** - Ensure it works before API
-4. **Implement app.py** - Build the REST API
-5. **Test locally** - Run the server and test with cURL/Postman
-6. **Write unit tests** - Ensure code quality
-7. **Containerize** - Move to Docker phase
-
----
-
-## Getting Help
-
-- Read the TODO comments in each stub file carefully
-- Reference the architecture.md for system design
-- Check official documentation (Flask, PyTorch, etc.)
-- Test each component before moving to the next
-- Use print statements liberally during development
-- Ask for help in office hours if stuck
+1. **实现 config.py** - 从配置开始
+2. **实现 model_loader.py** - 构建核心 ML 功能
+3. **独立测试 model_loader** - 确保在 API 之前正常工作
+4. **实现 app.py** - 构建 REST API
+5. **本地测试** - 运行服务器并使用 cURL/Postman 测试
+6. **编写单元测试** - 确保代码质量
+7. **容器化** - 进入 Docker 阶段
 
 ---
 
-**Good luck with your implementation!**
+## 获取帮助
 
-**Document Version:** 1.0
-**Last Updated:** October 2025
+- 仔细阅读每个存根文件中的 TODO 注释
+- 参考 architecture.md 了解系统设计
+- 查看官方文档（Flask、PyTorch 等）
+- 在进入下一步之前测试每个组件
+- 开发时大量使用 print 语句
+- 遇到困难时在答疑时间寻求帮助
+
+---
+
+**祝你实现顺利！**
+
+**文档版本：** 1.0
+**最后更新：** 2025 年 10 月

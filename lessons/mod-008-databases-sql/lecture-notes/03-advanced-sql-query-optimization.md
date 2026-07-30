@@ -1,49 +1,49 @@
-# Lecture 03: Advanced SQL & Query Optimization
+# Lecture 03: 高级 SQL 与查询优化
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [JOINs in Depth](#joins-in-depth)
-3. [Subqueries](#subqueries)
-4. [Common Table Expressions (CTEs)](#common-table-expressions-ctes)
-5. [Aggregations and GROUP BY](#aggregations-and-group-by)
-6. [Window Functions](#window-functions)
-7. [Query Optimization Fundamentals](#query-optimization-fundamentals)
-8. [Indexes and Performance](#indexes-and-performance)
-9. [EXPLAIN and Query Plans](#explain-and-query-plans)
-10. [Advanced SQL Patterns for ML](#advanced-sql-patterns-for-ml)
-11. [Best Practices](#best-practices)
-12. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [引言](#introduction)
+2. [深入理解 JOIN](#joins-in-depth)
+3. [子查询](#subqueries)
+4. [公用表表达式（CTE）](#common-table-expressions-ctes)
+5. [聚合与 GROUP BY](#aggregations-and-group-by)
+6. [窗口函数](#window-functions)
+7. [查询优化基础](#query-optimization-fundamentals)
+8. [索引与性能](#indexes-and-performance)
+9. [EXPLAIN 与查询计划](#explain-and-query-plans)
+10. [ML 的高级 SQL 模式](#advanced-sql-patterns-for-ml)
+11. [最佳实践](#best-practices)
+12. [总结与关键要点](#summary-and-key-takeaways)
 
-## Introduction
+## 引言
 
-Advanced SQL enables you to perform complex data analysis, combine data from multiple sources, and optimize query performance. For ML infrastructure, these skills are essential for analyzing experiment results, computing metrics, and managing large-scale data pipelines efficiently.
+高级 SQL 使你能够执行复杂的数据分析、组合来自多个来源的数据以及优化查询性能。对于 ML 基础设施，这些技能对于分析实验结果、计算指标和高效管理大规模数据管道至关重要。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Master different types of JOINs and when to use each
-- Write subqueries and Common Table Expressions (CTEs)
-- Use aggregate functions and GROUP BY effectively
-- Apply window functions for advanced analytics
-- Understand query optimization principles
-- Create and use indexes strategically
-- Read and interpret query execution plans
-- Optimize SQL queries for ML workloads
+在本讲座结束时，你将：
+- 掌握不同类型的 JOIN 及其使用时机
+- 编写子查询和公用表表达式（CTE）
+- 有效使用聚合函数和 GROUP BY
+- 应用窗口函数进行高级分析
+- 理解查询优化原则
+- 策略性地创建和使用索引
+- 阅读和解释查询执行计划
+- 为 ML 工作负载优化 SQL 查询
 
-### Prerequisites
-- Lecture 01: Database Fundamentals & SQL Basics
-- Lecture 02: Database Design & Normalization
-- Proficiency with basic SQL (SELECT, WHERE, INSERT, UPDATE, DELETE)
+### 前置条件
+- 讲座 01：数据库基础与 SQL 入门
+- 讲座 02：数据库设计与范式
+- 熟练掌握基本 SQL（SELECT、WHERE、INSERT、UPDATE、DELETE）
 
-### Estimated Time
-5-6 hours (including hands-on optimization exercises)
+### 预计时间
+5-6 小时（包括动手优化练习）
 
-## JOINs in Depth
+## 深入理解 JOIN
 
-###Schema for Examples
+### 示例 Schema
 
 ```sql
--- Models table
+-- Models 表
 models:
 model_id | name      | framework
 ---------|-----------|----------
@@ -51,7 +51,7 @@ model_id | name      | framework
 2        | ResNet    | TensorFlow
 3        | GPT-2     | PyTorch
 
--- Experiments table
+-- Experiments 表
 experiments:
 exp_id | model_id | accuracy | dataset
 -------|----------|----------|--------
@@ -63,7 +63,7 @@ exp_id | model_id | accuracy | dataset
 
 ### INNER JOIN
 
-Returns only rows that have matching values in both tables.
+仅返回在两个表中都有匹配值的行。
 
 ```sql
 SELECT
@@ -74,7 +74,7 @@ FROM models m
 INNER JOIN experiments e ON m.model_id = e.model_id;
 ```
 
-**Result:**
+**结果：**
 ```
 name   | accuracy | dataset
 -------|----------|----------
@@ -83,13 +83,13 @@ BERT   | 0.88     | SST-2
 ResNet | 0.76     | ImageNet
 ```
 
-**Note:** GPT-2 (no experiments) and experiment 104 (no model) are excluded.
+**注意：** GPT-2（无实验）和实验 104（无模型）被排除。
 
-**When to use:** Most common JOIN type; use when you only want matching records.
+**何时使用：** 最常见的 JOIN 类型；仅当你想要匹配的记录时使用。
 
-### LEFT (OUTER) JOIN
+### LEFT（OUTER）JOIN
 
-Returns all rows from the left table, with matching rows from the right table (or NULL if no match).
+返回左表中的所有行，以及右表中匹配的行（若无匹配则为 NULL）。
 
 ```sql
 SELECT
@@ -100,31 +100,31 @@ FROM models m
 LEFT JOIN experiments e ON m.model_id = e.model_id;
 ```
 
-**Result:**
+**结果：**
 ```
 name   | accuracy | dataset
 -------|----------|----------
 BERT   | 0.92     | IMDB
 BERT   | 0.88     | SST-2
 ResNet | 0.76     | ImageNet
-GPT-2  | NULL     | NULL      ← No experiments, but still included
+GPT-2  | NULL     | NULL      ← 无实验，但仍被包含
 ```
 
-**When to use:** Find models without experiments, users without orders, etc.
+**何时使用：** 查找没有实验的模型、没有订单的用户等。
 
-**Find models with NO experiments:**
+**查找没有实验的模型：**
 ```sql
 SELECT m.name
 FROM models m
 LEFT JOIN experiments e ON m.model_id = e.model_id
 WHERE e.exp_id IS NULL;
 
--- Result: GPT-2
+-- 结果：GPT-2
 ```
 
-### RIGHT (OUTER) JOIN
+### RIGHT（OUTER）JOIN
 
-Returns all rows from the right table, with matching rows from the left table (or NULL if no match).
+返回右表中的所有行，以及左表中匹配的行（若无匹配则为 NULL）。
 
 ```sql
 SELECT
@@ -135,21 +135,21 @@ FROM models m
 RIGHT JOIN experiments e ON m.model_id = e.model_id;
 ```
 
-**Result:**
+**结果：**
 ```
 name   | accuracy | dataset
 -------|----------|----------
 BERT   | 0.92     | IMDB
 BERT   | 0.88     | SST-2
 ResNet | 0.76     | ImageNet
-NULL   | 0.85     | CIFAR-10  ← Experiment without model
+NULL   | 0.85     | CIFAR-10  ← 没有模型的实验
 ```
 
-**Note:** RIGHT JOIN is less common; you can usually rewrite as LEFT JOIN.
+**注意：** RIGHT JOIN 不常见；通常可以改写为 LEFT JOIN。
 
 ### FULL OUTER JOIN
 
-Returns all rows from both tables, with NULLs where there's no match.
+返回两个表中的所有行，无匹配处为 NULL。
 
 ```sql
 SELECT
@@ -160,22 +160,22 @@ FROM models m
 FULL OUTER JOIN experiments e ON m.model_id = e.model_id;
 ```
 
-**Result:**
+**结果：**
 ```
 name   | accuracy | dataset
 -------|----------|----------
 BERT   | 0.92     | IMDB
 BERT   | 0.88     | SST-2
 ResNet | 0.76     | ImageNet
-GPT-2  | NULL     | NULL      ← Model without experiments
-NULL   | 0.85     | CIFAR-10  ← Experiment without model
+GPT-2  | NULL     | NULL      ← 无实验的模型
+NULL   | 0.85     | CIFAR-10  ← 无模型的实验
 ```
 
-**When to use:** Find orphaned records on both sides.
+**何时使用：** 查找两侧的孤立记录。
 
 ### CROSS JOIN
 
-Cartesian product: every row from first table paired with every row from second table.
+笛卡尔积：第一个表中的每一行与第二个表中的每一行配对。
 
 ```sql
 SELECT m.name, f.framework_name
@@ -183,29 +183,29 @@ FROM models m
 CROSS JOIN (VALUES ('PyTorch'), ('TensorFlow'), ('JAX')) AS f(framework_name);
 ```
 
-**Result:** 3 models × 3 frameworks = 9 rows
+**结果：** 3 个模型 × 3 个框架 = 9 行
 
-**When to use:** Generate combinations, create test data.
+**何时使用：** 生成组合、创建测试数据。
 
-### SELF JOIN
+### 自连接
 
-Join a table to itself.
+将表与自身连接。
 
 ```sql
--- Find experiments with similar accuracy
+-- 查找具有相似准确率的实验
 SELECT
     e1.exp_id AS exp1,
     e2.exp_id AS exp2,
     e1.accuracy
 FROM experiments e1
 JOIN experiments e2 ON ABS(e1.accuracy - e2.accuracy) < 0.01
-WHERE e1.exp_id < e2.exp_id;  -- Avoid duplicates
+WHERE e1.exp_id < e2.exp_id;  -- 避免重复
 ```
 
-### Multiple JOINs
+### 多表 JOIN
 
 ```sql
--- Get experiment results with model and user info
+-- 获取实验结果以及模型和用户信息
 SELECT
     u.username,
     m.name AS model_name,
@@ -218,14 +218,14 @@ WHERE e.accuracy > 0.85
 ORDER BY e.accuracy DESC;
 ```
 
-## Subqueries
+## 子查询
 
-A query nested inside another query.
+嵌套在另一个查询中的查询。
 
-### Subquery in WHERE
+### WHERE 中的子查询
 
 ```sql
--- Find models more accurate than average
+-- 查找比平均水平更准确的模型
 SELECT name, accuracy
 FROM models
 WHERE accuracy > (
@@ -235,10 +235,10 @@ WHERE accuracy > (
 );
 ```
 
-### Subquery with IN
+### 带 IN 的子查询
 
 ```sql
--- Find models used in experiments
+-- 查找在实验中使用的模型
 SELECT name
 FROM models
 WHERE model_id IN (
@@ -247,16 +247,16 @@ WHERE model_id IN (
     WHERE model_id IS NOT NULL
 );
 
--- Alternative using JOIN (often faster):
+-- 使用 JOIN 的替代方案（通常更快）：
 SELECT DISTINCT m.name
 FROM models m
 INNER JOIN experiments e ON m.model_id = e.model_id;
 ```
 
-### Subquery in SELECT
+### SELECT 中的子查询
 
 ```sql
--- Count experiments per model
+-- 计算每个模型的实验数
 SELECT
     name,
     (SELECT COUNT(*)
@@ -265,12 +265,12 @@ SELECT
 FROM models m;
 ```
 
-### Correlated Subquery
+### 相关子查询
 
-Subquery references the outer query.
+子查询引用外部查询。
 
 ```sql
--- Find each model's best accuracy
+-- 查找每个模型的最佳准确率
 SELECT
     m.name,
     (SELECT MAX(e.accuracy)
@@ -279,14 +279,14 @@ SELECT
 FROM models m;
 ```
 
-**Note:** Correlated subqueries can be slow; consider JOINs or window functions instead.
+**注意：** 相关子查询可能较慢；考虑改用 JOIN 或窗口函数。
 
 ### EXISTS
 
-Check if subquery returns any rows.
+检查子查询是否返回任何行。
 
 ```sql
--- Models that have experiments
+-- 有实验的模型
 SELECT name
 FROM models m
 WHERE EXISTS (
@@ -295,7 +295,7 @@ WHERE EXISTS (
     WHERE e.model_id = m.model_id
 );
 
--- Models that have NO experiments
+-- 没有实验的模型
 SELECT name
 FROM models m
 WHERE NOT EXISTS (
@@ -305,11 +305,11 @@ WHERE NOT EXISTS (
 );
 ```
 
-## Common Table Expressions (CTEs)
+## 公用表表达式（CTE）
 
-CTEs make complex queries more readable by breaking them into named steps.
+CTE 通过将复杂查询分解为命名步骤来提高可读性。
 
-### Basic CTE
+### 基本 CTE
 
 ```sql
 WITH high_accuracy_experiments AS (
@@ -325,7 +325,7 @@ FROM models m
 INNER JOIN high_accuracy_experiments h ON m.model_id = h.model_id;
 ```
 
-### Multiple CTEs
+### 多个 CTE
 
 ```sql
 WITH
@@ -347,21 +347,21 @@ INNER JOIN recent_experiments r ON p.model_id = r.model_id
 GROUP BY p.name;
 ```
 
-### Recursive CTE
+### 递归 CTE
 
-Useful for hierarchical or graph data.
+适用于层次结构或图形数据。
 
 ```sql
--- Example: Model lineage (models derived from other models)
+-- 示例：模型谱系（从其他模型衍生的模型）
 WITH RECURSIVE model_lineage AS (
-    -- Base case: root models
+    -- 基础情况：根模型
     SELECT model_id, name, parent_model_id, 1 AS level
     FROM models
     WHERE parent_model_id IS NULL
 
     UNION ALL
 
-    -- Recursive case: child models
+    -- 递归情况：子模型
     SELECT m.model_id, m.name, m.parent_model_id, ml.level + 1
     FROM models m
     INNER JOIN model_lineage ml ON m.parent_model_id = ml.model_id
@@ -370,34 +370,34 @@ SELECT * FROM model_lineage
 ORDER BY level, name;
 ```
 
-## Aggregations and GROUP BY
+## 聚合与 GROUP BY
 
-### Aggregate Functions
+### 聚合函数
 
 ```sql
--- Count all experiments
+-- 统计所有实验
 SELECT COUNT(*) FROM experiments;
 
--- Count non-NULL accuracies
+-- 统计非 NULL 的准确率
 SELECT COUNT(accuracy) FROM experiments;
 
--- Count distinct models
+-- 统计不同模型
 SELECT COUNT(DISTINCT model_id) FROM experiments;
 
--- Average accuracy
+-- 平均准确率
 SELECT AVG(accuracy) FROM experiments;
 
--- Min and Max accuracy
+-- 最小和最大准确率
 SELECT MIN(accuracy), MAX(accuracy) FROM experiments;
 
--- Sum of all accuracies
+-- 所有准确率之和
 SELECT SUM(accuracy) FROM experiments;
 ```
 
 ### GROUP BY
 
 ```sql
--- Average accuracy per model
+-- 每个模型的平均准确率
 SELECT
     model_id,
     AVG(accuracy) AS avg_accuracy,
@@ -406,7 +406,7 @@ FROM experiments
 GROUP BY model_id;
 ```
 
-**Result:**
+**结果：**
 ```
 model_id | avg_accuracy | experiment_count
 ---------|--------------|------------------
@@ -415,10 +415,10 @@ model_id | avg_accuracy | experiment_count
 NULL     | 0.85         | 1
 ```
 
-### GROUP BY with JOIN
+### 带 JOIN 的 GROUP BY
 
 ```sql
--- Average accuracy per model (with model name)
+-- 每个模型的平均准确率（含模型名称）
 SELECT
     m.name,
     m.framework,
@@ -432,10 +432,10 @@ ORDER BY avg_accuracy DESC NULLS LAST;
 
 ### HAVING
 
-Filter groups (like WHERE but for aggregated data).
+过滤组（类似于 WHERE，但用于聚合数据）。
 
 ```sql
--- Models with average accuracy > 0.85
+-- 平均准确率 > 0.85 的模型
 SELECT
     model_id,
     AVG(accuracy) AS avg_accuracy
@@ -444,26 +444,26 @@ GROUP BY model_id
 HAVING AVG(accuracy) > 0.85;
 ```
 
-**Note:** WHERE filters rows BEFORE grouping; HAVING filters groups AFTER aggregation.
+**注意：** WHERE 在分组之前过滤行；HAVING 在聚合之后过滤组。
 
 ```sql
--- Find frameworks with more than 1 model and avg accuracy > 0.88
+-- 查找超过 1 个模型且平均准确率 > 0.88 的框架
 SELECT
     framework,
     COUNT(*) AS model_count,
     AVG(accuracy) AS avg_accuracy
 FROM models m
 LEFT JOIN experiments e ON m.model_id = e.model_id
-WHERE m.created_at > '2024-01-01'  -- Filter rows first
+WHERE m.created_at > '2024-01-01'  -- 先过滤行
 GROUP BY framework
-HAVING COUNT(*) > 1                -- Then filter groups
+HAVING COUNT(*) > 1                -- 然后过滤组
    AND AVG(accuracy) > 0.88;
 ```
 
-### GROUP BY Multiple Columns
+### 多列 GROUP BY
 
 ```sql
--- Experiments per model per dataset
+-- 每个模型每个数据集的实验数
 SELECT
     model_id,
     dataset,
@@ -473,16 +473,16 @@ FROM experiments
 GROUP BY model_id, dataset;
 ```
 
-## Window Functions
+## 窗口函数
 
-Window functions perform calculations across related rows without collapsing them.
+窗口函数在相关行之间执行计算而不折叠它们。
 
 ### ROW_NUMBER()
 
-Assign a unique number to each row within a partition.
+为每个分区内的行分配唯一编号。
 
 ```sql
--- Number experiments per model
+-- 对每个模型的实验编号
 SELECT
     model_id,
     exp_id,
@@ -491,7 +491,7 @@ SELECT
 FROM experiments;
 ```
 
-**Result:**
+**结果：**
 ```
 model_id | exp_id | accuracy | rank_in_model
 ---------|--------|----------|---------------
@@ -500,11 +500,11 @@ model_id | exp_id | accuracy | rank_in_model
 2        | 103    | 0.76     | 1
 ```
 
-### RANK() and DENSE_RANK()
+### RANK() 和 DENSE_RANK()
 
 ```sql
--- RANK: Gaps in ranking for ties
--- DENSE_RANK: No gaps
+-- RANK：并列时排名有间隔
+-- DENSE_RANK：无间隔
 SELECT
     exp_id,
     accuracy,
@@ -513,7 +513,7 @@ SELECT
 FROM experiments;
 ```
 
-**Result:**
+**结果：**
 ```
 exp_id | accuracy | rank | dense_rank
 -------|----------|------|------------
@@ -525,10 +525,10 @@ exp_id | accuracy | rank | dense_rank
 
 ### NTILE()
 
-Divide rows into N equal buckets.
+将行划分为 N 个相等的桶。
 
 ```sql
--- Divide experiments into quartiles by accuracy
+-- 将实验按准确率分为四分位数
 SELECT
     exp_id,
     accuracy,
@@ -536,12 +536,12 @@ SELECT
 FROM experiments;
 ```
 
-### LAG() and LEAD()
+### LAG() 和 LEAD()
 
-Access previous/next row values.
+访问前一个/下一个行的值。
 
 ```sql
--- Compare each experiment with previous
+-- 比较每个实验与前一个实验
 SELECT
     exp_id,
     accuracy,
@@ -550,10 +550,10 @@ SELECT
 FROM experiments;
 ```
 
-### Aggregate Window Functions
+### 聚合窗口函数
 
 ```sql
--- Running average of accuracy
+-- 准确率的运行平均值
 SELECT
     exp_id,
     accuracy,
@@ -563,7 +563,7 @@ SELECT
     ) AS running_avg
 FROM experiments;
 
--- Moving average (last 3 experiments)
+-- 移动平均（最近 3 个实验）
 SELECT
     exp_id,
     accuracy,
@@ -574,10 +574,10 @@ SELECT
 FROM experiments;
 ```
 
-### Practical ML Example
+### 实用 ML 示例
 
 ```sql
--- Find best experiment per model, with improvement over previous
+-- 查找每个模型的最佳实验，以及相较于之前的改进
 WITH ranked_experiments AS (
     SELECT
         model_id,
@@ -597,179 +597,179 @@ FROM ranked_experiments
 WHERE rank = 1;
 ```
 
-## Query Optimization Fundamentals
+## 查询优化基础
 
-### Understanding Query Execution
+### 理解查询执行
 
-SQL queries are executed in this order:
+SQL 查询按此顺序执行：
 
 ```sql
-SELECT column_list          -- 5. Select columns
-FROM table                  -- 1. Get data
-JOIN other_table ON ...     -- 2. Join tables
-WHERE conditions            -- 3. Filter rows
-GROUP BY columns            -- 4. Group rows
-HAVING group_conditions     -- 4a. Filter groups
-ORDER BY columns            -- 6. Sort results
-LIMIT n;                    -- 7. Limit results
+SELECT column_list          -- 5. 选择列
+FROM table                  -- 1. 获取数据
+JOIN other_table ON ...     -- 2. 连接表
+WHERE conditions            -- 3. 过滤行
+GROUP BY columns            -- 4. 分组行
+HAVING group_conditions     -- 4a. 过滤组
+ORDER BY columns            -- 6. 排序结果
+LIMIT n;                    -- 7. 限制结果
 ```
 
-### Optimization Principles
+### 优化原则
 
-#### 1. Select Only Needed Columns
+#### 1. 只选择需要的列
 
 ```sql
--- BAD: Fetches all columns (wasteful)
+-- 不好：获取所有列（浪费）
 SELECT * FROM experiments WHERE accuracy > 0.90;
 
--- GOOD: Only fetch what you need
+-- 好：只获取所需内容
 SELECT exp_id, model_id, accuracy FROM experiments WHERE accuracy > 0.90;
 ```
 
-#### 2. Filter Early with WHERE
+#### 2. 使用 WHERE 尽早过滤
 
 ```sql
--- BAD: Joins all data then filters
+-- 不好：连接所有数据然后过滤
 SELECT m.name, e.accuracy
 FROM models m
 JOIN experiments e ON m.model_id = e.model_id
 WHERE e.accuracy > 0.90;
 
--- BETTER: Filter before joining (if possible)
+-- 较好：如果可能，在连接前过滤
 SELECT m.name, e.accuracy
 FROM models m
 JOIN (SELECT * FROM experiments WHERE accuracy > 0.90) e
   ON m.model_id = e.model_id;
 
--- BEST: Database optimizer usually handles this, but explicit helps
+-- 最佳：数据库优化器通常能处理，但显式指定有助于优化
 ```
 
-#### 3. Use EXISTS Instead of IN for Large Subqueries
+#### 3. 对于大型子查询，使用 EXISTS 而非 IN
 
 ```sql
--- CAN BE SLOW: IN with large subquery
+-- 可能较慢：使用 IN 的大型子查询
 SELECT name FROM models
 WHERE model_id IN (SELECT model_id FROM experiments);
 
--- FASTER: EXISTS (stops at first match)
+-- 更快：EXISTS（在第一个匹配处停止）
 SELECT name FROM models m
 WHERE EXISTS (SELECT 1 FROM experiments e WHERE e.model_id = m.model_id);
 ```
 
-#### 4. Avoid SELECT DISTINCT When Possible
+#### 4. 尽可能避免 SELECT DISTINCT
 
 ```sql
--- SLOW: DISTINCT requires sorting/deduplication
+-- 慢：DISTINCT 需要排序/去重
 SELECT DISTINCT model_id FROM experiments;
 
--- FASTER: Use GROUP BY if aggregating anyway
+-- 更快：如果需要聚合，使用 GROUP BY
 SELECT model_id, COUNT(*) FROM experiments GROUP BY model_id;
 ```
 
-#### 5. Limit Results Early
+#### 5. 尽早限制结果
 
 ```sql
--- Get top 10 models by accuracy
+-- 获取按准确率排序的前 10 个模型
 SELECT name, accuracy
 FROM models
 WHERE accuracy IS NOT NULL
 ORDER BY accuracy DESC
-LIMIT 10;  -- Stops after finding 10 results
+LIMIT 10;  -- 找到 10 个结果后停止
 ```
 
-## Indexes and Performance
+## 索引与性能
 
-### What is an Index?
+### 什么是索引？
 
-An index is a data structure that speeds up data retrieval at the cost of slower writes and more storage.
+索引是一种数据结构，可加快数据检索速度，但代价是写入速度变慢和存储空间增加。
 
-**Analogy:** Book index lets you find topics quickly without reading every page.
+**类比：** 书的索引让你无需阅读每一页就能快速找到主题。
 
-### Types of Indexes
+### 索引类型
 
-#### B-Tree Index (Default)
+#### B-Tree 索引（默认）
 
-Best for equality and range queries.
+最适合等值和范围查询。
 
 ```sql
 CREATE INDEX idx_experiments_accuracy ON experiments(accuracy);
 
--- Now this is fast:
+-- 现在这样查询很快：
 SELECT * FROM experiments WHERE accuracy > 0.90;
 SELECT * FROM experiments WHERE accuracy BETWEEN 0.85 AND 0.95;
 ```
 
-#### Hash Index
+#### Hash 索引
 
-Best for equality queries only.
+仅最适合等值查询。
 
 ```sql
 CREATE INDEX idx_models_name_hash ON models USING HASH (name);
 
--- Fast:
+-- 快：
 SELECT * FROM models WHERE name = 'BERT';
 
--- Won't use index (hash doesn't support ranges):
+-- 不会使用索引（hash 不支持范围）：
 SELECT * FROM models WHERE name LIKE 'BERT%';
 ```
 
-#### Composite Index
+#### 复合索引
 
-Index on multiple columns.
+基于多个列的索引。
 
 ```sql
 CREATE INDEX idx_exp_model_accuracy ON experiments(model_id, accuracy);
 
--- Uses index:
+-- 使用索引：
 SELECT * FROM experiments WHERE model_id = 1 AND accuracy > 0.90;
-SELECT * FROM experiments WHERE model_id = 1;  -- Uses first column
+SELECT * FROM experiments WHERE model_id = 1;  -- 使用第一列
 
--- Won't use index efficiently:
-SELECT * FROM experiments WHERE accuracy > 0.90;  -- Skips first column
+-- 不会高效使用索引：
+SELECT * FROM experiments WHERE accuracy > 0.90;  -- 跳过第一列
 ```
 
-**Order matters:** Put most selective column first.
+**顺序很重要：** 将选择性最高的列放在前面。
 
-#### Unique Index
+#### 唯一索引
 
-Enforces uniqueness and speeds up lookups.
+强制唯一性并加快查找速度。
 
 ```sql
 CREATE UNIQUE INDEX idx_models_name_unique ON models(name);
 
--- Prevents duplicates AND makes lookups fast
+-- 防止重复，同时使查找快速
 ```
 
-### When to Index
+### 何时建立索引
 
-**Index these:**
-- Primary keys (automatically indexed)
-- Foreign keys
-- Columns in WHERE clauses
-- Columns in JOIN conditions
-- Columns in ORDER BY
-- Columns in GROUP BY
+**为这些建立索引：**
+- 主键（自动索引）
+- 外键
+- WHERE 子句中的列
+- JOIN 条件中的列
+- ORDER BY 中的列
+- GROUP BY 中的列
 
-**Don't over-index:**
+**不要过度索引：**
 ```sql
--- BAD: Index every column
-CREATE INDEX idx1 ON experiments(exp_id);        -- Already primary key
-CREATE INDEX idx2 ON experiments(model_id);      -- Maybe useful
-CREATE INDEX idx3 ON experiments(accuracy);      -- Maybe useful
-CREATE INDEX idx4 ON experiments(loss);          -- Probably not needed
-CREATE INDEX idx5 ON experiments(created_at);    -- Depends on queries
-CREATE INDEX idx6 ON experiments(batch_size);    -- Probably not needed
+-- 不好：索引每一列
+CREATE INDEX idx1 ON experiments(exp_id);        -- 已经是主键
+CREATE INDEX idx2 ON experiments(model_id);      -- 可能有用
+CREATE INDEX idx3 ON experiments(accuracy);      -- 可能有用
+CREATE INDEX idx4 ON experiments(loss);          -- 可能不需要
+CREATE INDEX idx5 ON experiments(created_at);    -- 取决于查询
+CREATE INDEX idx6 ON experiments(batch_size);    -- 可能不需要
 ```
 
-**Each index:**
-- ✅ Speeds up reads
-- ❌ Slows down writes (INSERT, UPDATE, DELETE)
-- ❌ Takes up storage
+**每个索引：**
+- ✅ 加快读取速度
+- ❌ 减慢写入速度（INSERT、UPDATE、DELETE）
+- ❌ 占用存储空间
 
-### Monitoring Index Usage
+### 监控索引使用情况
 
 ```sql
--- PostgreSQL: Check unused indexes
+-- PostgreSQL：检查未使用的索引
 SELECT
     schemaname,
     tablename,
@@ -779,27 +779,27 @@ SELECT
     idx_tup_fetch AS tuples_fetched
 FROM pg_stat_user_indexes
 WHERE idx_scan = 0
-  AND indexname NOT LIKE '%_pkey';  -- Exclude primary keys
+  AND indexname NOT LIKE '%_pkey';  -- 排除主键
 
--- Drop unused indexes
+-- 删除未使用的索引
 DROP INDEX idx_rarely_used;
 ```
 
-## EXPLAIN and Query Plans
+## EXPLAIN 与查询计划
 
-### Using EXPLAIN
+### 使用 EXPLAIN
 
 ```sql
--- See query execution plan
+-- 查看查询执行计划
 EXPLAIN SELECT * FROM experiments WHERE accuracy > 0.90;
 
--- Include actual execution statistics
+-- 包含实际执行统计信息
 EXPLAIN ANALYZE SELECT * FROM experiments WHERE accuracy > 0.90;
 ```
 
-### Reading EXPLAIN Output
+### 阅读 EXPLAIN 输出
 
-**Example:**
+**示例：**
 ```
 QUERY PLAN
 --------------------------------------------------------------
@@ -807,13 +807,13 @@ Seq Scan on experiments  (cost=0.00..35.50 rows=5 width=40)
   Filter: (accuracy > 0.90)
 ```
 
-**Components:**
-- **Seq Scan**: Sequential scan (reads whole table)
-- **cost=0.00..35.50**: Estimated cost (startup..total)
-- **rows=5**: Estimated rows returned
-- **width=40**: Estimated bytes per row
+**组成部分：**
+- **Seq Scan**：顺序扫描（读取整个表）
+- **cost=0.00..35.50**：预估成本（启动..总计）
+- **rows=5**：预估返回行数
+- **width=40**：每行预估字节数
 
-### With Index
+### 使用索引后
 
 ```sql
 CREATE INDEX idx_experiments_accuracy ON experiments(accuracy);
@@ -821,29 +821,29 @@ CREATE INDEX idx_experiments_accuracy ON experiments(accuracy);
 EXPLAIN SELECT * FROM experiments WHERE accuracy > 0.90;
 ```
 
-**Output:**
+**输出：**
 ```
 Index Scan using idx_experiments_accuracy on experiments
   (cost=0.15..8.17 rows=5 width=40)
   Index Cond: (accuracy > 0.90)
 ```
 
-**Index Scan** instead of **Seq Scan** = faster!
+**Index Scan** 取代 **Seq Scan** = 更快！
 
-### Common Plan Nodes
+### 常见计划节点
 
-- **Seq Scan**: Full table scan (slow for large tables)
-- **Index Scan**: Uses index (fast)
-- **Index Only Scan**: Gets data from index without accessing table (fastest)
-- **Bitmap Index Scan**: Scans index, then fetches rows (medium)
-- **Hash Join**: Joins using hash table
-- **Merge Join**: Joins sorted data
-- **Nested Loop**: For each row in first table, scan second table
+- **Seq Scan**：全表扫描（对大表慢）
+- **Index Scan**：使用索引（快）
+- **Index Only Scan**：从索引获取数据，不访问表（最快）
+- **Bitmap Index Scan**：扫描索引，然后获取行（中等）
+- **Hash Join**：使用哈希表连接
+- **Merge Join**：连接已排序的数据
+- **Nested Loop**：对于第一个表中的每一行，扫描第二个表
 
-### Optimization Based on EXPLAIN
+### 基于 EXPLAIN 的优化
 
 ```sql
--- Slow query
+-- 慢查询
 EXPLAIN ANALYZE
 SELECT m.name, AVG(e.accuracy)
 FROM models m
@@ -851,19 +851,19 @@ JOIN experiments e ON m.model_id = e.model_id
 WHERE e.created_at > '2024-01-01'
 GROUP BY m.name;
 
--- If you see Seq Scan on experiments, add index:
+-- 如果看到 experiments 上的 Seq Scan，添加索引：
 CREATE INDEX idx_experiments_created_at ON experiments(created_at);
 
--- If you see slow join, ensure foreign key is indexed:
+-- 如果看到慢连接，确保外键已索引：
 CREATE INDEX idx_experiments_model_id ON experiments(model_id);
 ```
 
-## Advanced SQL Patterns for ML
+## ML 的高级 SQL 模式
 
-### Pattern 1: Pivot Table (Metrics by Model)
+### 模式 1：数据透视表（按模型查看指标）
 
 ```sql
--- Pivot metrics from rows to columns
+-- 将指标从行转换为列
 SELECT
     model_id,
     MAX(CASE WHEN metric_name = 'accuracy' THEN metric_value END) AS accuracy,
@@ -874,10 +874,10 @@ FROM experiment_metrics
 GROUP BY model_id;
 ```
 
-### Pattern 2: Cohort Analysis
+### 模式 2：同期群分析
 
 ```sql
--- Analyze model performance by training month
+-- 按训练月份分析模型性能
 SELECT
     DATE_TRUNC('month', created_at) AS training_month,
     framework,
@@ -890,10 +890,10 @@ GROUP BY training_month, framework
 ORDER BY training_month, framework;
 ```
 
-### Pattern 3: Percentile Analysis
+### 模式 3：百分位分析
 
 ```sql
--- Find 95th percentile inference latency
+-- 查找推理延迟的第 95 百分位
 SELECT
     model_id,
     PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY latency_ms) AS p95_latency
@@ -901,10 +901,10 @@ FROM predictions
 GROUP BY model_id;
 ```
 
-### Pattern 4: Time Series Aggregation
+### 模式 4：时间序列聚合
 
 ```sql
--- Daily prediction counts with 7-day moving average
+-- 每日预测计数，附带 7 天移动平均
 SELECT
     DATE(created_at) AS date,
     COUNT(*) AS predictions_count,
@@ -917,10 +917,10 @@ GROUP BY DATE(created_at)
 ORDER BY date;
 ```
 
-### Pattern 5: Finding Outliers
+### 模式 5：查找异常值
 
 ```sql
--- Find experiments with anomalous results (> 2 std devs from mean)
+-- 查找结果异常的实验（距离均值 > 2 个标准差）
 WITH stats AS (
     SELECT
         AVG(accuracy) AS mean_accuracy,
@@ -932,12 +932,12 @@ FROM experiments e, stats s
 WHERE ABS(e.accuracy - s.mean_accuracy) > 2 * s.stddev_accuracy;
 ```
 
-## Best Practices
+## 最佳实践
 
-### 1. Write Readable Queries
+### 1. 编写可读的查询
 
 ```sql
--- GOOD: Clear, formatted
+-- 好：清晰、格式良好
 SELECT
     m.name,
     m.framework,
@@ -951,14 +951,14 @@ HAVING COUNT(e.exp_id) > 0
 ORDER BY avg_accuracy DESC
 LIMIT 10;
 
--- BAD: Unreadable
+-- 不好：不可读
 select m.name,m.framework,count(e.exp_id),avg(e.accuracy) from models m left join experiments e on m.model_id=e.model_id where m.created_at>'2024-01-01' group by m.model_id,m.name,m.framework having count(e.exp_id)>0 order by avg_accuracy desc limit 10;
 ```
 
-### 2. Use CTEs for Complex Queries
+### 2. 复杂查询使用 CTE
 
 ```sql
--- Instead of nested subqueries, use CTEs
+-- 使用 CTE 而非嵌套子查询
 WITH recent_models AS (
     SELECT * FROM models WHERE created_at > '2024-01-01'
 ),
@@ -973,19 +973,19 @@ JOIN high_accuracy_experiments e ON m.model_id = e.model_id
 GROUP BY m.name;
 ```
 
-### 3. Test Queries on Sample Data
+### 3. 在样本数据上测试查询
 
 ```sql
--- Test on small subset first
+-- 先在小子集上测试
 SELECT * FROM large_table WHERE ... LIMIT 100;
 
--- Then remove LIMIT for full query
+-- 然后移除 LIMIT 进行完整查询
 ```
 
-### 4. Monitor Query Performance
+### 4. 监控查询性能
 
 ```sql
--- PostgreSQL: Find slow queries
+-- PostgreSQL：查找慢查询
 SELECT
     query,
     calls,
@@ -997,67 +997,67 @@ ORDER BY mean_time DESC
 LIMIT 10;
 ```
 
-### 5. Regular Maintenance
+### 5. 定期维护
 
 ```sql
--- PostgreSQL: Update statistics for better query plans
+-- PostgreSQL：更新统计信息以获得更好的查询计划
 ANALYZE experiments;
 
--- Rebuild indexes if fragmented
+-- 如果索引碎片化则重建
 REINDEX TABLE experiments;
 
--- Clean up deleted rows
+-- 清理已删除的行
 VACUUM experiments;
 ```
 
-## Summary and Key Takeaways
+## 总结与关键要点
 
-### Core SQL Techniques
+### 核心 SQL 技术
 
-1. **JOINs**: Combine data from multiple tables (INNER, LEFT, RIGHT, FULL OUTER)
-2. **Subqueries**: Nested queries for complex filtering
-3. **CTEs**: Named query blocks for readability
-4. **GROUP BY**: Aggregate data by categories
-5. **Window Functions**: Advanced analytics without collapsing rows
+1. **JOIN**：组合来自多个表的数据（INNER、LEFT、RIGHT、FULL OUTER）
+2. **子查询**：用于复杂过滤的嵌套查询
+3. **CTE**：用于可读性的命名查询块
+4. **GROUP BY**：按类别聚合数据
+5. **窗口函数**：不折叠行的高级分析
 
-### Optimization Principles
+### 优化原则
 
-1. **Select specific columns**, not `*`
-2. **Filter early** with WHERE
-3. **Index strategically** (foreign keys, WHERE columns, JOIN columns)
-4. **Avoid over-indexing** (each index has cost)
-5. **Use EXPLAIN** to understand query plans
-6. **Monitor performance** and optimize slow queries
+1. **选择特定列**，而非 `*`
+2. **尽早过滤**，使用 WHERE
+3. **策略性地使用索引**（外键、WHERE 列、JOIN 列）
+4. **避免过度索引**（每个索引都有成本）
+5. **使用 EXPLAIN** 理解查询计划
+6. **监控性能**并优化慢查询
 
-### Advanced Patterns
+### 高级模式
 
-- **Pivoting**: Transform rows to columns
-- **Percentiles**: Statistical analysis
-- **Moving Averages**: Time series analysis
-- **Outlier Detection**: Find anomalies
-- **Cohort Analysis**: Group by time periods
+- **数据透视**：将行转换为列
+- **百分位数**：统计分析
+- **移动平均**：时间序列分析
+- **异常值检测**：发现异常
+- **同期群分析**：按时间段分组
 
-### ML-Specific Applications
+### ML 特定应用
 
-- Compare experiment results across models
-- Track model performance over time
-- Analyze prediction patterns
-- Compute aggregate metrics
-- Monitor inference latency
-- Find best hyperparameters
+- 跨模型比较实验结果
+- 跟踪模型随时间的性能
+- 分析预测模式
+- 计算聚合指标
+- 监控推理延迟
+- 查找最佳超参数
 
-### Next Steps
+### 后续步骤
 
-In the next lecture, we'll cover:
-- Object-Relational Mapping (ORMs)
-- SQLAlchemy for Python
-- Database migrations
-- Connection pooling
-- Transaction management
-- Integration patterns for ML applications
+在下一讲中，我们将涵盖：
+- 对象关系映射（ORM）
+- 用于 Python 的 SQLAlchemy
+- 数据库迁移
+- 连接池
+- 事务管理
+- ML 应用的集成模式
 
 ---
 
-**Estimated Study Time:** 5-6 hours
-**Hands-on Practice:** Complete Exercise 03: Advanced SQL Queries
-**Assessment:** Quiz covers JOINs, aggregations, window functions, and optimization
+**预计学习时间：** 5-6 小时
+**动手练习：** 完成练习 03：高级 SQL 查询
+**评估：** 测验涵盖 JOIN、聚合、窗口函数和优化

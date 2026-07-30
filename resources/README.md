@@ -1,242 +1,242 @@
-# Resources
+# 资源
 
-## Overview
+## 概述
 
-This directory contains supplementary materials to support your learning journey as a Junior AI Infrastructure Engineer. These resources are designed to complement the core curriculum and provide quick references, reading lists, and tool recommendations.
+此目录包含辅助材料，用于支持你作为初级 AI 基础设施工程师的学习之旅。这些资源旨在补充核心课程，提供快速参考、阅读清单和工具推荐。
 
 ---
 
-## Directory Contents
+## 目录内容
 
-### Cheat Sheets
+### 速查表
 
-Quick reference guides for commonly used tools and commands:
+常用工具和命令的快速参考指南：
 
 1. **[docker-cheat-sheet.md](cheat-sheets/docker-cheat-sheet.md)**
-   - Essential Docker commands
-   - Dockerfile syntax
-   - Docker Compose basics
-   - Troubleshooting tips
+   - 基本 Docker 命令
+   - Dockerfile 语法
+   - Docker Compose 基础
+   - 故障排查技巧
 
 2. **[kubernetes-cheat-sheet.md](cheat-sheets/kubernetes-cheat-sheet.md)**
-   - kubectl commands
-   - Resource types and syntax
-   - Common debugging techniques
-   - Best practices
+   - kubectl 命令
+   - 资源类型和语法
+   - 常见调试技术
+   - 最佳实践
 
 3. **[git-cheat-sheet.md](cheat-sheets/git-cheat-sheet.md)**
-   - Basic Git workflow
-   - Branching strategies
-   - Resolving conflicts
-   - Advanced operations
+   - 基本 Git 工作流
+   - 分支策略
+   - 解决冲突
+   - 高级操作
 
-### Reading Lists
+### 阅读清单
 
-Curated resources for deepening your knowledge:
+精选资源，用于深化你的知识：
 
 1. **[beginner-path.md](reading-lists/beginner-path.md)**
-   - Books for beginners
-   - Online courses
-   - Video tutorials
-   - Blog posts and articles
-   - Podcasts
+   - 面向初学者的书籍
+   - 在线课程
+   - 视频教程
+   - 博客文章和文章
+   - 播客
 
-### Tools Guide
+### 工具指南
 
 1. **[tools.md](tools.md)**
-   - Development environment setup
-   - Recommended tools and IDEs
-   - Browser extensions
-   - CLI utilities
-   - Monitoring and debugging tools
+   - 开发环境搭建
+   - 推荐工具和 IDE
+   - 浏览器扩展
+   - CLI 工具
+   - 监控和调试工具
 
 ---
 
-## How to Use These Resources
+## 如何使用这些资源
 
-### For Daily Work
-- Keep cheat sheets bookmarked for quick command reference
-- Print commonly used commands and keep them near your workspace
-- Practice commands regularly to build muscle memory
+### 日常工作中
+- 将速查表加入书签，方便快速查找命令
+- 打印常用命令并放在工作区附近
+- 定期练习命令以形成肌肉记忆
 
-### For Learning
-- Follow the beginner reading path sequentially
-- Complete at least one resource from each category
-- Take notes and experiment with examples
-- Share interesting findings with study groups
+### 学习过程中
+- 按顺序跟随初级阅读路径
+- 每个类别至少完成一个资源
+- 做笔记并尝试示例
+- 与学习小组分享有趣的发现
 
-### For Projects
-- Refer to tools.md when setting up your development environment
-- Use cheat sheets to find the right commands quickly
-- Consult reading lists for deeper understanding of concepts
+### 做项目时
+- 搭建开发环境时参考 tools.md
+- 使用速查表快速找到正确的命令
+- 查阅阅读清单以深入理解概念
 
 ---
 
-## Additional Resources by Topic
+## 按主题分类的额外资源
 
-### Docker and Containerization
+### Docker 与容器化
 
-**Official Documentation**:
+**官方文档**：
 - [Docker Documentation](https://docs.docker.com/)
 - [Docker Hub](https://hub.docker.com/)
 
-**Interactive Learning**:
+**交互式学习**：
 - [Play with Docker](https://labs.play-with-docker.com/)
 - [Docker Curriculum](https://docker-curriculum.com/)
 
-**Video Tutorials**:
+**视频教程**：
 - [Docker Tutorial for Beginners - Programming with Mosh](https://www.youtube.com/watch?v=pTFZFxd4hOI)
 - [Docker Mastery - Udemy](https://www.udemy.com/course/docker-mastery/)
 
 ### Kubernetes
 
-**Official Documentation**:
+**官方文档**：
 - [Kubernetes Documentation](https://kubernetes.io/docs/home/)
 - [Kubernetes Tutorials](https://kubernetes.io/docs/tutorials/)
 
-**Interactive Learning**:
-- [Killercoda Kubernetes Scenarios](https://killercoda.com/playgrounds/scenario/kubernetes) — successor to Katacoda after O'Reilly shut it down in 2022
+**交互式学习**：
+- [Killercoda Kubernetes Scenarios](https://killercoda.com/playgrounds/scenario/kubernetes) — 在 O'Reilly 于 2022 年关闭 Katacoda 后的继任者
 - [Play with Kubernetes](https://labs.play-with-k8s.com/)
 
-**Books**:
+**书籍**：
 - "Kubernetes Up & Running" by Kelsey Hightower
 - "The Kubernetes Book" by Nigel Poulton
 
-### Machine Learning Fundamentals
+### 机器学习基础
 
-**Courses**:
+**课程**：
 - [Machine Learning by Andrew Ng - Coursera](https://www.coursera.org/learn/machine-learning)
 - [Fast.ai Practical Deep Learning](https://course.fast.ai/)
 
-**Books**:
+**书籍**：
 - "Hands-On Machine Learning" by Aurélien Géron
 - "Deep Learning" by Ian Goodfellow
 
-### Python for Data Science and ML
+### 数据科学与 ML 的 Python
 
-**Documentation**:
+**文档**：
 - [Python Official Documentation](https://docs.python.org/3/)
 - [NumPy Documentation](https://numpy.org/doc/)
 - [Pandas Documentation](https://pandas.pydata.org/docs/)
 
-**Courses**:
+**课程**：
 - [Python for Data Science - Coursera](https://www.coursera.org/specializations/python)
 - [Real Python Tutorials](https://realpython.com/)
 
-### DevOps and CI/CD
+### DevOps 与 CI/CD
 
-**Resources**:
-- [The Phoenix Project](https://www.amazon.com/Phoenix-Project-DevOps-Helping-Business/dp/0988262592) (Book)
-- [The DevOps Handbook](https://www.amazon.com/DevOps-Handbook-World-Class-Reliability-Organizations/dp/1942788002) (Book)
+**资源**：
+- [The Phoenix Project](https://www.amazon.com/Phoenix-Project-DevOps-Helping-Business/dp/0988262592)（书籍）
+- [The DevOps Handbook](https://www.amazon.com/DevOps-Handbook-World-Class-Reliability-Organizations/dp/1942788002)（书籍）
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 
-**Courses**:
+**课程**：
 - [DevOps Engineering Course - freeCodeCamp](https://www.youtube.com/watch?v=j5Zsa_eOXeY)
 
-### Monitoring and Observability
+### 监控与可观测性
 
-**Official Documentation**:
+**官方文档**：
 - [Prometheus Documentation](https://prometheus.io/docs/introduction/overview/)
 - [Grafana Documentation](https://grafana.com/docs/grafana/latest/)
 - [ELK Stack Guide](https://www.elastic.co/guide/index.html)
 
-**Tutorials**:
-- [Prometheus Getting Started](https://prometheus.io/docs/prometheus/latest/getting_started/) — first-party intro from the project
+**教程**：
+- [Prometheus Getting Started](https://prometheus.io/docs/prometheus/latest/getting_started/) — 来自项目官方的入门指南
 - [Grafana Fundamentals](https://grafana.com/tutorials/grafana-fundamentals/)
 
-### Databases
+### 数据库
 
-**SQL**:
+**SQL**：
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [SQL Tutorial - W3Schools](https://www.w3schools.com/sql/)
 - [Mode SQL Tutorial](https://mode.com/sql-tutorial/)
 
-**NoSQL**:
-- [MongoDB University](https://university.mongodb.com/) (Free courses)
+**NoSQL**：
+- [MongoDB University](https://university.mongodb.com/)（免费课程）
 - [Redis Documentation](https://redis.io/documentation)
 
-### Cloud Platforms
+### 云平台
 
-**AWS**:
+**AWS**：
 - [AWS Training and Certification](https://aws.amazon.com/training/)
 - [A Cloud Guru AWS Courses](https://acloudguru.com/aws-cloud-training)
 
-**Google Cloud**:
+**Google Cloud**：
 - [Google Cloud Training](https://cloud.google.com/training)
 - [Coursera Google Cloud Specializations](https://www.coursera.org/googlecloud)
 
-**Azure**:
+**Azure**：
 - [Microsoft Learn - Azure](https://docs.microsoft.com/en-us/learn/azure/)
 
 ---
 
-## Practice Platforms
+## 练习平台
 
-### Coding Practice
-- [LeetCode](https://leetcode.com/) - Algorithm practice
-- [HackerRank Domains](https://www.hackerrank.com/domains) - Python, SQL, and more
-- [Exercism](https://exercism.org/) - Programming practice with mentorship
+### 编码练习
+- [LeetCode](https://leetcode.com/) - 算法练习
+- [HackerRank Domains](https://www.hackerrank.com/domains) - Python、SQL 等
+- [Exercism](https://exercism.org/) - 带辅导的编程练习
 
-### Infrastructure Practice
+### 基础设施练习
 - [Kubernetes the Hard Way](https://github.com/kelseyhightower/kubernetes-the-hard-way)
 - [AWS Free Tier](https://aws.amazon.com/free/)
 - [Google Cloud Free Tier](https://cloud.google.com/free)
 - [Play with Docker](https://labs.play-with-docker.com/)
 
-### ML Practice
-- [Kaggle Competitions](https://www.kaggle.com/competitions) - Data science competitions and datasets
-- [Papers with Code](https://paperswithcode.com/) - ML papers with implementations
-- [Hugging Face](https://huggingface.co/) - Pre-trained models and datasets
+### ML 练习
+- [Kaggle Competitions](https://www.kaggle.com/competitions) - 数据科学竞赛和数据集
+- [Papers with Code](https://paperswithcode.com/) - 带实现的 ML 论文
+- [Hugging Face](https://huggingface.co/) - 预训练模型和数据集
 
 ---
 
-## Communities and Forums
+## 社区与论坛
 
-### Discussion Forums
-- [Stack Overflow](https://stackoverflow.com/) - Q&A for technical issues
+### 讨论论坛
+- [Stack Overflow](https://stackoverflow.com/) - 技术问题问答
 - [Reddit - r/devops](https://www.reddit.com/r/devops/)
 - [Reddit - r/kubernetes](https://www.reddit.com/r/kubernetes/)
 - [Reddit - r/MachineLearning](https://www.reddit.com/r/MachineLearning/)
 
-### Slack/Discord Communities
+### Slack/Discord 社区
 - [Kubernetes Slack](https://kubernetes.slack.com/)
 - [Docker Community Slack](https://www.docker.com/docker-community)
 - [DevOps Chat](https://devopschat.co/)
 - [MLOps Community](https://mlops.community/)
 
-### Conferences and Meetups
+### 会议与聚会
 - [KubeCon + CloudNativeCon](https://www.cncf.io/kubecon-cloudnativecon-events/)
-- [DockerCon](https://www.docker.com/events/) — annual; URL updates per event
+- [DockerCon](https://www.docker.com/events/) — 年度会议；URL 随活动更新
 - [MLOps World](https://mlopsworld.com/)
-- [Local meetup groups on Meetup.com](https://www.meetup.com/)
+- [Meetup.com 上的本地聚会小组](https://www.meetup.com/)
 
 ---
 
-## Certifications
+## 认证
 
-### Entry-Level Certifications
+### 初级认证
 - **Docker Certified Associate (DCA)**
 - **Certified Kubernetes Application Developer (CKAD)**
 - **AWS Certified Cloud Practitioner**
 
-### Intermediate Certifications
+### 中级认证
 - **Certified Kubernetes Administrator (CKA)**
 - **AWS Certified Solutions Architect - Associate**
 - **Google Cloud Professional Cloud Architect**
 
 ---
 
-## Blogs and Newsletters
+## 博客与新闻通讯
 
-### Must-Follow Blogs
+### 必关注博客
 - [Kubernetes Blog](https://kubernetes.io/blog/)
 - [Docker Blog](https://www.docker.com/blog/)
 - [AWS Blog - Machine Learning](https://aws.amazon.com/blogs/machine-learning/)
 - [Google Cloud Blog - AI & ML](https://cloud.google.com/blog/products/ai-machine-learning)
-- [Neptune.ai Blog](https://neptune.ai/blog) - MLOps content
+- [Neptune.ai Blog](https://neptune.ai/blog) - MLOps 内容
 - [Made With ML](https://madewithml.com/)
 
-### Newsletters
+### 新闻通讯
 - [TLDR DevOps](https://tldr.tech/devops)
 - [KubeWeekly](https://www.cncf.io/kubeweekly/)
 - [Docker Weekly](https://www.docker.com/newsletter-subscription)
@@ -245,37 +245,37 @@ Curated resources for deepening your knowledge:
 
 ---
 
-## YouTube Channels
+## YouTube 频道
 
-### General DevOps and Infrastructure
+### 通用 DevOps 与基础设施
 - [TechWorld with Nana](https://www.youtube.com/c/TechWorldwithNana)
 - [DevOps Directive](https://www.youtube.com/c/DevOpsDirective)
 - [Cloud Advocate](https://www.youtube.com/c/CloudAdvocate)
 
-### Kubernetes-Specific
+### Kubernetes 专题
 - [Just me and Opensource](https://www.youtube.com/c/wenkatn-justmeandopensource)
 - [That DevOps Guy](https://www.youtube.com/c/MarcelDempers)
 
-### Machine Learning
+### 机器学习
 - [Sentdex](https://www.youtube.com/c/sentdex)
 - [Two Minute Papers](https://www.youtube.com/@TwoMinutePapers)
 - [Yannic Kilcher](https://www.youtube.com/c/YannicKilcher)
 
 ---
 
-## Books Library
+## 图书库
 
-### Infrastructure and DevOps
+### 基础设施与 DevOps
 1. "The Phoenix Project" by Gene Kim, Kevin Behr, George Spafford
 2. "The DevOps Handbook" by Gene Kim, Patrick Debois, John Willis
-3. "Site Reliability Engineering" by Google (free online)
+3. "Site Reliability Engineering" by Google（免费在线阅读）
 4. "Kubernetes Up & Running" by Kelsey Hightower, Brendan Burns, Joe Beda
 5. "Docker Deep Dive" by Nigel Poulton
 
-### Machine Learning
+### 机器学习
 1. "Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow" by Aurélien Géron
 2. "Deep Learning" by Ian Goodfellow, Yoshua Bengio, Aaron Courville
-3. "Machine Learning Yearning" by Andrew Ng (free)
+3. "Machine Learning Yearning" by Andrew Ng（免费）
 4. "Designing Machine Learning Systems" by Chip Huyen
 
 ### Python
@@ -283,94 +283,94 @@ Curated resources for deepening your knowledge:
 2. "Fluent Python" by Luciano Ramalho
 3. "Effective Python" by Brett Slatkin
 
-### General Software Engineering
+### 通用软件工程
 1. "Clean Code" by Robert C. Martin
 2. "The Pragmatic Programmer" by David Thomas and Andrew Hunt
-3. "Design Patterns" by Gang of Four
+3. "Design Patterns" by 四人组 (Gang of Four)
 
 ---
 
-## Podcasts
+## 播客
 
-### DevOps and Infrastructure
+### DevOps 与基础设施
 - [The Cloudcast](https://www.thecloudcast.net/)
 - [DevOps and Docker Talk](https://podcast.bretfisher.com/)
 - [Kubernetes Podcast from Google](https://kubernetespodcast.com/)
 
-### Machine Learning and AI
+### 机器学习与 AI
 - [The TWIML AI Podcast](https://twimlai.com/podcast/twimlai/)
 - [Data Skeptic](https://dataskeptic.com/)
 - [Linear Digressions](http://lineardigressions.com/)
 
 ---
 
-## Staying Updated
+## 保持更新
 
-### Daily Habits
-- [ ] Check one technical blog
-- [ ] Review Docker Hub for popular images
-- [ ] Browse Kubernetes releases and updates
-- [ ] Read one article or tutorial
+### 每日习惯
+- [ ] 查看一个技术博客
+- [ ] 浏览 Docker Hub 热门镜像
+- [ ] 关注 Kubernetes 版本和更新
+- [ ] 阅读一篇文章或教程
 
-### Weekly Habits
-- [ ] Complete one tutorial or lesson
-- [ ] Watch one technical talk or conference video
-- [ ] Practice on one new tool or technology
-- [ ] Participate in community discussions
+### 每周习惯
+- [ ] 完成一个教程或课程
+- [ ] 观看一个技术演讲或会议视频
+- [ ] 练习一个新工具或新技术
+- [ ] 参与社区讨论
 
-### Monthly Habits
-- [ ] Read one technical book chapter
-- [ ] Contribute to an open-source project
-- [ ] Write a blog post or tutorial
-- [ ] Attend a meetup or webinar
-
----
-
-## Contributing
-
-Found a great resource? Help improve this guide:
-
-1. Check if it's already listed
-2. Verify the resource is high-quality and relevant
-3. Add it to the appropriate section
-4. Include a brief description
-5. Submit a pull request
+### 每月习惯
+- [ ] 阅读一个技术书籍章节
+- [ ] 贡献一个开源项目
+- [ ] 写一篇博客或教程
+- [ ] 参加一个聚会或网络研讨会
 
 ---
 
-## Resource Quality Criteria
+## 贡献
 
-When evaluating resources, consider:
-- **Accuracy**: Is the information correct and up-to-date?
-- **Relevance**: Does it apply to Junior AI Infrastructure Engineer role?
-- **Accessibility**: Is it free or reasonably priced?
-- **Depth**: Does it provide sufficient detail?
-- **Reputation**: Is the source credible?
+发现了好资源？帮助改进本指南：
 
----
-
-## Need Help?
-
-If you're overwhelmed by the number of resources:
-
-1. **Start with the cheat sheets** - They're quick wins
-2. **Follow the beginner reading path** - It's curated and sequential
-3. **Pick one resource per category** - Don't try to consume everything
-4. **Focus on hands-on practice** - Theory + practice = mastery
-5. **Ask the community** - See `community/FAQ.md` for where to get help
+1. 检查是否已列出
+2. 验证资源的质量和相关性
+3. 将其添加到相应部分
+4. 包含简要描述
+5. 提交 Pull Request
 
 ---
 
-## Feedback
+## 资源质量标准
 
-Help us improve these resources:
-- Report broken links
-- Suggest new resources
-- Share what worked for you
-- Let us know what's missing
-
-Open an issue in the repository or reach out via the community channels.
+评估资源时，考虑：
+- **准确性**：信息是否正确且最新？
+- **相关性**：是否适用于初级 AI 基础设施工程师角色？
+- **可获取性**：是否免费或价格合理？
+- **深度**：是否提供了足够的细节？
+- **声誉**：来源是否可信？
 
 ---
 
-**Remember**: Quality over quantity. It's better to deeply understand a few resources than to superficially skim many. Choose resources that match your learning style and stick with them!
+## 需要帮助？
+
+如果资源过多让你不知所措：
+
+1. **从速查表开始**——它们是快速见效的选择
+2. **跟随初级阅读路径**——经过精心策划和顺序编排
+3. **每个类别选一个资源**——不要试图全部消化
+4. **注重动手实践**——理论 + 实践 = 精通
+5. **询问社区**——查看 `community/FAQ.md` 了解如何获取帮助
+
+---
+
+## 反馈
+
+帮助我们改进这些资源：
+- 报告失效链接
+- 推荐新资源
+- 分享对你有用的内容
+- 告诉我们缺失了什么
+
+在仓库中提交 Issue，或通过社区渠道联系我们。
+
+---
+
+**记住**：质量胜于数量。深入理解少量资源，胜过肤浅浏览大量资源。选择适合你学习风格的资源并坚持下去！

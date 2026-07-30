@@ -1,577 +1,577 @@
-# Module 009 Quiz: Monitoring & Observability
+# Module 009 测验：监控与可观测性
 
-## Quiz Information
+## 测验信息
 
-- **Module:** Monitoring & Observability Basics
-- **Total Questions:** 50
-- **Time Limit:** 90 minutes
-- **Passing Score:** 80% (40/50 correct)
-- **Topics Covered:**
-  - Observability foundations, SLOs/SLA/error budgets
-  - Prometheus architecture, exporters, PromQL, alerting
-  - Grafana dashboards, templating, provisioning, alerting
-  - Logging pipelines (Loki/Elasticsearch), structured logging, correlation
-  - Incident response, ML-specific monitoring (drift, fairness, GPU usage)
+- **模块：** 监控与可观测性基础
+- **题目总数：** 50
+- **时间限制：** 90 分钟
+- **通过分数：** 80%（50 题中答对 40 题）
+- **涵盖主题：**
+  - 可观测性基础、SLO/SLA/error budgets
+  - Prometheus 架构、exporters、PromQL、告警
+  - Grafana Dashboard、模板化、provisioning、告警
+  - 日志管道（Loki/Elasticsearch）、结构化日志、关联
+  - 事件响应、ML 特定监控（漂移、公平性、GPU 使用）
 
-## Instructions
+## 说明
 
-1. Answer all questions; only one answer is correct unless explicitly stated.
-2. Some scenario questions require selecting the best operational choice.
-3. Explanations follow each answer to reinforce core concepts.
-4. The answer key for instructors resides in the solutions repository (`ai-infra-junior-engineer-solutions`).
-
----
-
-### 1. Which statement best differentiates monitoring from observability?
-A) Monitoring focuses on logs; observability focuses on metrics.  
-B) Monitoring answers whether the system is healthy; observability helps explain *why* it behaves a certain way.  
-C) Monitoring is reactive; observability is proactive; both use the same data.  
-D) Monitoring is only for infrastructure; observability is only for applications.
-
-**Correct Answer:** B  
-**Explanation:** Monitoring checks predefined indicators, whereas observability enables understanding of internal state through signals like metrics, logs, and traces.
+1. 回答所有问题；除非明确说明，否则只有一个答案正确
+2. 部分场景题需要选择最佳操作方案
+3. 每个答案后附有解释以强化核心概念
+4. 教师用答案密钥位于解决方案仓库（`ai-infra-junior-engineer-solutions`）
 
 ---
 
-### 2. What is an error budget if the SLO is 99.5% availability over 30 days?
-A) 0.5% downtime allowed (~3.6 hours)  
-B) 0.5% uptime allowed (~3.6 hours)  
-C) 99.5% uptime allowed (~28.5 days)  
-D) 0.05% downtime allowed (~22 minutes)
+### 1. 哪项陈述最能区分监控与可观测性？
+A) 监控关注日志；可观测性关注指标  
+B) 监控回答系统是否健康；可观测性帮助解释*为什么*系统表现出某种行为  
+C) 监控是被动的；可观测性是主动的；两者使用相同数据  
+D) 监控仅用于基础设施；可观测性仅用于应用程序
 
-**Correct Answer:** A  
-**Explanation:** Error budget is the complement of the SLO. For 99.5%, 0.5% downtime ≈ 3.6 hours per 30-day window.
+**正确答案：** B  
+**解释：** 监控检查预定义的指标，而可观测性通过 metrics、logs 和 traces 等信号理解内部状态。
 
 ---
 
-### 3. Which Prometheus component is responsible for storing metrics and evaluating rules?
+### 2. 如果 SLO 是 30 天内 99.5% 的可用性，error budget 是多少？
+A) 允许 0.5% 的停机时间（约 3.6 小时）  
+B) 允许 0.5% 的正常运行时间（约 3.6 小时）  
+C) 允许 99.5% 的正常运行时间（约 28.5 天）  
+D) 允许 0.05% 的停机时间（约 22 分钟）
+
+**正确答案：** A  
+**解释：** Error budget 是 SLO 的补集。对于 99.5%，0.5% 的停机时间 ≈ 每 30 天窗口约 3.6 小时。
+
+---
+
+### 3. 哪个 Prometheus 组件负责存储指标和评估规则？
 A) Alertmanager  
 B) Pushgateway  
 C) Prometheus server  
 D) Exporter
 
-**Correct Answer:** C  
-**Explanation:** Prometheus server scrapes targets, stores time series, and evaluates recording/alerting rules before forwarding alerts to Alertmanager.
+**正确答案：** C  
+**解释：** Prometheus server 抓取目标、存储时间序列，并在将告警转发到 Alertmanager 之前评估 recording/alerting 规则。
 
 ---
 
-### 4. When should the Prometheus Pushgateway be used?
-A) For long-running services behind firewalls  
-B) For short-lived batch jobs that cannot be scraped directly  
-C) For exporting traces to Jaeger  
-D) For scaling Prometheus horizontally
+### 4. 何时应使用 Prometheus Pushgateway？
+A) 用于防火墙后面的长期运行服务  
+B) 用于无法直接抓取的短期批处理任务  
+C) 用于向 Jaeger 导出 traces  
+D) 用于水平扩展 Prometheus
 
-**Correct Answer:** B  
-**Explanation:** Pushgateway buffers metrics from ephemeral jobs; it is not intended for long-running services or scaling.
+**正确答案：** B  
+**解释：** Pushgateway 缓冲来自临时任务的指标；不适用于长期运行的服务或扩展。
 
 ---
 
-### 5. Which PromQL function returns the per-second rate of a monotonically increasing counter over a range?
+### 5. 哪个 PromQL 函数返回单调递增 counter 在范围内的每秒速率？
 A) `increase()`  
 B) `rate()`  
 C) `avg_over_time()`  
 D) `histogram_quantile()`
 
-**Correct Answer:** B  
-**Explanation:** `rate()` computes the per-second average rate for counters over the specified range vector; `increase()` returns the total increase, not per-second rate.
+**正确答案：** B  
+**解释：** `rate()` 计算指定 range vector 内 counters 的每秒平均速率；`increase()` 返回总增量，而非每秒速率。
 
 ---
 
-### 6. What is the primary risk of high-cardinality metrics in Prometheus?
-A) Alerts become too sensitive  
-B) Dashboards cannot display them  
-C) TSDB memory usage and query performance degrade sharply  
-D) Counter resets become impossible to detect
+### 6. Prometheus 中高基数指标的主要风险是什么？
+A) 告警变得过于敏感  
+B) Dashboard 无法显示它们  
+C) TSDB 内存使用和查询性能急剧下降  
+D) Counter 重置变得无法检测
 
-**Correct Answer:** C  
-**Explanation:** Each unique label set increases series count; high cardinality inflates memory, storage, and query costs.
+**正确答案：** C  
+**解释：** 每个唯一的 label 集都会增加序列数；高基数会膨胀内存、存储和查询成本。
 
 ---
 
-### 7. In Grafana, which feature allows the same dashboard to filter by environment, cluster, or team without duplicating panels?
+### 7. 在 Grafana 中，哪个功能允许同一个 Dashboard 按环境、集群或团队过滤而无需复制面板？
 A) Transformations  
 B) Canvas panels  
-C) Templating variables  
-D) Dashboard permissions
+C) 模板化变量  
+D) Dashboard 权限
 
-**Correct Answer:** C  
-**Explanation:** Variables (templating) enable parameterized queries so dashboards adapt to different contexts.
-
----
-
-### 8. What is the benefit of provisioning Grafana dashboards as code?
-A) It allows real-time editing without restart  
-B) It enables Git-based version control and consistent deployment across environments  
-C) It automatically generates alert rules  
-D) It converts PromQL to SQL
-
-**Correct Answer:** B  
-**Explanation:** Provisioning ensures dashboards are reproducible, reviewed via Git, and deployed via CI/CD or GitOps workflows.
+**正确答案：** C  
+**解释：** 变量（模板化）支持参数化查询，使 Dashboard 适应不同上下文。
 
 ---
 
-### 9. In a Loki pipeline, which stage parses JSON fields so they can be used as labels or filters?
+### 8. 将 Grafana Dashboard 作为代码进行 provision 有什么好处？
+A) 无需重启即可进行实时编辑  
+B) 实现基于 Git 的版本控制和跨环境的一致部署  
+C) 自动生成告警规则  
+D) 将 PromQL 转换为 SQL
+
+**正确答案：** B  
+**解释：** Provisioning 确保 Dashboard 可重现、通过 Git 审查，并通过 CI/CD 或 GitOps 工作流部署。
+
+---
+
+### 9. 在 Loki 管道中，哪个阶段解析 JSON 字段以便它们可以用作 labels 或 filters？
 A) `docker {}`  
 B) `json {}`  
 C) `match {}`  
-D) `drop {}`  
+D) `drop {}`
 
-**Correct Answer:** B  
-**Explanation:** The `json` stage extracts fields from structured logs, enabling filtering by keys like `level` or `trace_id`.
+**正确答案：** B  
+**解释：** `json` 阶段从结构化日志中提取字段，支持按 `level` 或 `trace_id` 等键进行过滤。
 
 ---
 
-### 10. Which metric best captures SLO compliance for inference latency?
+### 10. 哪个指标最能捕捉推理延迟的 SLO 合规性？
 A) `avg_over_time(inference_latency_seconds[5m])`  
 B) `histogram_quantile(0.99, sum(rate(inference_latency_seconds_bucket[5m])) by (le))`  
 C) `max(inference_latency_seconds)`  
 D) `sum(inference_latency_seconds_count)`
 
-**Correct Answer:** B  
-**Explanation:** Using histogram buckets with `histogram_quantile` computes latency percentiles (e.g., P99) that directly map to latency SLOs.
+**正确答案：** B  
+**解释：** 使用带有 `histogram_quantile` 的 histogram buckets 计算延迟百分位数（例如：P99），直接映射到延迟 SLO。
 
 ---
 
-### 11. What is the purpose of multi-window, multi-burn-rate alerting?
-A) To verify Kubernetes autoscaling before generating an alert  
-B) To combine fast and slow detection windows so alerts trigger only when sustained SLO violations occur  
-C) To alert simultaneously on latency and error rate  
-D) To reduce the number of Alertmanager receivers
+### 11. 多窗口、多 burn rate 告警的目的是什么？
+A) 在生成告警前验证 Kubernetes 自动扩缩  
+B) 结合快速和慢速检测窗口，使得仅当持续 SLO 违规时才触发告警  
+C) 同时告警延迟和错误率  
+D) 减少 Alertmanager 接收者数量
 
-**Correct Answer:** B  
-**Explanation:** Using different windows balances responsiveness with noise reduction—fast window catches severe spikes, long window confirms persistence.
+**正确答案：** B  
+**解释：** 使用不同的窗口在响应性和降噪之间取得平衡——快速窗口捕获严重峰值，长窗口确认持续性。
 
 ---
 
-### 12. Which Grafana panel type is best for visualizing latency distribution across GPU IDs?
+### 12. 哪个 Grafana 面板类型最适合可视化跨 GPU ID 的延迟分布？
 A) Stat panel  
 B) Gauge panel  
 C) Heatmap  
 D) Bar gauge
 
-**Correct Answer:** C  
-**Explanation:** Heatmaps effectively show changes across two dimensions (e.g., GPU ID vs time) with intensity representing utilization or latency.
+**正确答案：** C  
+**解释：** Heatmaps 能有效显示两个维度的变化（例如：GPU ID vs 时间），强度代表利用率或延迟。
 
 ---
 
-### 13. What should you do before deleting a column via database migration that dashboards rely on?
-A) Drop the column immediately and fix dashboards later  
-B) Scale Prometheus to avoid downtime  
-C) Audit dashboard queries, update or provide fallback views, and notify stakeholders  
-D) Convert the column to JSONB
+### 13. 在通过数据库迁移删除 Dashboard 依赖的列之前，应该做什么？
+A) 立即删除列，稍后修复 Dashboard  
+B) 扩展 Prometheus 以避免停机  
+C) 审计 Dashboard 查询、更新或提供回退视图，并通知利益相关者  
+D) 将列转换为 JSONB
 
-**Correct Answer:** C  
-**Explanation:** Observability artifacts often depend on schema; audit and stage changes to prevent broken dashboards/alerts.
+**正确答案：** C  
+**解释：** 可观测性 artifacts 通常依赖 schema；审计并分阶段更改以防止 Dashboard/告警损坏。
 
 ---
 
-### 14. Which tool enriches FastAPI logs with trace IDs when using OpenTelemetry?
-A) `structlog` with manual span context extraction  
-B) Promtail pipeline stages  
+### 14. 在使用 OpenTelemetry 时，哪个工具可以用 trace ID 丰富 FastAPI 日志？
+A) 使用手动 span 上下文提取的 `structlog`  
+B) Promtail 管道阶段  
 C) Grafana Tempo  
 D) Prometheus relabeling
 
-**Correct Answer:** A  
-**Explanation:** Trace context must be captured in the service; e.g., `structlog` can pull IDs via `get_current_span()` and add them to log records.
+**正确答案：** A  
+**解释：** Trace 上下文必须在服务中捕获；例如：`structlog` 可以通过 `get_current_span()` 提取 ID 并将其添加到日志记录中。
 
 ---
 
-### 15. What is a key advantage of structured JSON logging over plain text?
-A) It reduces disk usage  
-B) It increases log verbosity  
-C) It enables reliable parsing, filtering, and correlation in log analysis tools  
-D) It eliminates the need for log aggregation
+### 15. 结构化 JSON 日志相对于纯文本的主要优势是什么？
+A) 减少磁盘使用  
+B) 增加日志冗长度  
+C) 在日志分析工具中实现可靠的解析、过滤和关联  
+D) 消除日志聚合的需求
 
-**Correct Answer:** C  
-**Explanation:** Structured logs allow downstream systems to parse fields consistently, enabling filtering and correlation across logs, metrics, and traces.
+**正确答案：** C  
+**解释：** 结构化日志允许下游系统一致地解析字段，实现跨日志、指标和 traces 的过滤和关联。
 
 ---
 
-### 16. Which Prometheus query detects when a target stops exposing metrics entirely?
+### 16. 哪个 Prometheus 查询检测到目标完全停止暴露指标？
 A) `up == 1`  
 B) `increase(up[5m])`  
 C) `absent(up{job="inference-gateway"})`  
 D) `rate(up[5m]) > 0`
 
-**Correct Answer:** C  
-**Explanation:** `absent()` returns a vector when no series match; useful for alerting on missing scrapes.
+**正确答案：** C  
+**解释：** `absent()` 在没有任何匹配序列时返回一个向量；用于告警丢失抓取。
 
 ---
 
-### 17. What is the primary role of Alertmanager in the Prometheus ecosystem?
-A) Running PromQL queries  
-B) Storing time-series data  
-C) Deduplicating, silencing, and routing alerts to notifications  
-D) Rendering Grafana dashboards
+### 17. Alertmanager 在 Prometheus 生态系统中的主要角色是什么？
+A) 运行 PromQL 查询  
+B) 存储时间序列数据  
+C) 去重、静默和路由告警到通知  
+D) 渲染 Grafana Dashboard
 
-**Correct Answer:** C  
-**Explanation:** Alertmanager manages alert delivery (Slack, PagerDuty, email) and handles grouping/silencing.
-
----
-
-### 18. During an incident, which dashboard panels should appear at the top of an on-call dashboard?
-A) Experiment results and feature flags  
-B) SLO compliance, error rate, request volume, and high-level resource saturation  
-C) Cost analytics and marketing KPIs  
-D) Historical release notes
-
-**Correct Answer:** B  
-**Explanation:** On-call dashboards must surface actionable SLI/SLO metrics and resource health immediately for rapid triage.
+**正确答案：** C  
+**解释：** Alertmanager 管理告警投递（Slack、PagerDuty、email）并处理分组/静默。
 
 ---
 
-### 19. Which description best matches a burn-rate alert?
-A) Alerts when CPU usage >90% for 5 minutes  
-B) Alerts when the ratio of errors to budgeted errors exceeds a threshold over a window  
-C) Alerts when Prometheus cannot reach Alertmanager  
-D) Alerts when Grafana dashboards are edited
+### 18. 在事件期间，on-call Dashboard 顶部应出现哪些面板？
+A) 实验结果和功能标志  
+B) SLO 合规、错误率、请求量和高层资源饱和  
+C) 成本分析和营销 KPI  
+D) 历史发布说明
 
-**Correct Answer:** B  
-**Explanation:** Burn rate compares actual error budget consumption versus allowable rate, enabling SLO enforcement.
-
----
-
-### 20. Why should logs avoid high-cardinality labels like `user_id`?
-A) They cause dashboards to be unreadable  
-B) They make alerting impossible  
-C) They introduce privacy/compliance risks and create storage/query explosions  
-D) They prevent tracing integration
-
-**Correct Answer:** C  
-**Explanation:** High-cardinality fields in logs balloon storage and can expose sensitive data; prefer hashed or aggregated identifiers.
+**正确答案：** B  
+**解释：** On-call Dashboard 必须立即展示可操作的 SLI/SLO 指标和资源健康状态，以便快速分流。
 
 ---
 
-### 21. Which metric indicates GPU overheating risk for inference workloads?
+### 19. 哪个描述最符合 burn rate 告警？
+A) CPU 使用率 >90% 持续 5 分钟时告警  
+B) 当错误与预算错误的比例在窗口内超过阈值时告警  
+C) 当 Prometheus 无法到达 Alertmanager 时告警  
+D) 当 Grafana Dashboard 被编辑时告警
+
+**正确答案：** B  
+**解释：** Burn rate 比较实际 error budget 消耗与允许速率，实现 SLO 执行。
+
+---
+
+### 20. 为什么日志应避免使用 `user_id` 等高基数 labels？
+A) 它们使 Dashboard 不可读  
+B) 它们使告警不可能  
+C) 它们引入隐私/合规风险并造成存储/查询爆炸  
+D) 它们阻止 tracing 集成
+
+**正确答案：** C  
+**解释：** 日志中的高基数字段会膨胀存储并可能暴露敏感数据；优选哈希或聚合标识符。
+
+---
+
+### 21. 哪个指标指示推理工作负载的 GPU 过热风险？
 A) `ai_infra_inference_requests_total`  
 B) `node_disk_io_time_seconds_total`  
 C) `DCGM_FI_DEV_GPU_TEMP`  
 D) `container_memory_rss`
 
-**Correct Answer:** C  
-**Explanation:** DCGM exporter exposes GPU metrics; temperature enables proactive throttling or scaling decisions.
+**正确答案：** C  
+**解释：** DCGM exporter 暴露 GPU 指标；温度可以启用主动节流或扩缩容决策。
 
 ---
 
-### 22. What is the best practice for storing Grafana alert rule definitions?
-A) Manual entry only  
-B) Embedded in Prometheus configuration  
-C) Managed via code or API exports stored in Git, aligned with dashboards  
-D) Stored in Excel spreadsheets
+### 22. 存储 Grafana 告警规则定义的最佳实践是什么？
+A) 仅手动输入  
+B) 嵌入 Prometheus 配置中  
+C) 通过代码或 API 导出管理，存储在 Git 中，与 Dashboard 对齐  
+D) 存储在 Excel 电子表格中
 
-**Correct Answer:** C  
-**Explanation:** Treat alert rules as code—versioned, reviewed, and deployed alongside dashboards ensures consistency and auditability.
+**正确答案：** C  
+**解释：** 将告警规则视为代码——版本化、审查，并与 Dashboard 一同部署，确保一致性和可审计性。
 
 ---
 
-### 23. Which LogQL query counts error-level logs for the inference service in the past 10 minutes?
+### 23. 哪个 LogQL 查询统计过去 10 分钟内推理服务的 error 级别日志？
 A) `{service="inference-gateway"} |= "error"`  
 B) `count_over_time({service="inference-gateway", level="error"}[10m])`  
 C) `sum(rate({service="inference-gateway"}[10m]))`  
 D) `increase({level="error"}[10m])`
 
-**Correct Answer:** B  
-**Explanation:** `count_over_time` returns occurrences within the range; combine with `sum` if grouping is needed.
+**正确答案：** B  
+**解释：** `count_over_time` 返回范围内的出现次数；如果需要分组，结合 `sum` 使用。
 
 ---
 
-### 24. Which step best prepares an on-call engineer before a major release?
-A) Disable all alerts to reduce noise  
-B) Review runbooks, confirm dashboards/alerts reference the upcoming release, and schedule maintenance windows  
-C) Scale down Prometheus to reduce costs  
-D) Only monitor models, ignore infrastructure
+### 24. 哪个步骤最能帮助 on-call 工程师在重大发布前做好准备？
+A) 禁用所有告警以减少噪音  
+B) 审查 runbook、确认 Dashboard/告警引用即将发布的版本，并安排维护窗口  
+C) 缩减 Prometheus 以降低成本  
+D) 仅监控模型，忽略基础设施
 
-**Correct Answer:** B  
-**Explanation:** Pre-release readiness includes aligning runbooks, verifying observability assets, and planning silences if necessary.
+**正确答案：** B  
+**解释：** 发布前准备包括对齐 runbook、验证可观测性资产，以及必要时规划静默。
 
 ---
 
-### 25. In ML observability, what metric detects covariate drift?
+### 25. 在 ML 可观测性中，哪个指标检测 covariate drift？
 A) Error budget burn rate  
-B) Population Stability Index (PSI) comparing feature distributions  
-C) Request latency  
-D) CPU saturation
+B) 比较特征分布的 Population Stability Index (PSI)  
+C) 请求延迟  
+D) CPU 饱和
 
-**Correct Answer:** B  
-**Explanation:** PSI and similar measures track distribution shifts in input features, signaling covariate drift.
-
----
-
-### 26. Which approach ensures log data remains compliant with privacy regulations?
-A) Keep all raw logs forever  
-B) Delete logs daily regardless of policy  
-C) Apply redaction/masking at ingestion, define retention per log class, enforce access controls and deletion workflows  
-D) Store logs in public object storage for transparency
-
-**Correct Answer:** C  
-**Explanation:** Compliance demands intentional retention, redaction, and access management; policies must be enforced programmatically.
+**正确答案：** B  
+**解释：** PSI 和类似指标跟踪输入特征中的分布偏移，表明 covariate drift。
 
 ---
 
-### 27. Why is it important to pair alert annotations with runbook links?
-A) They automatically resolve the alert  
-B) They provide immediate context and next steps, reducing Mean Time to Mitigate  
-C) They change alert severity automatically  
-D) They disable duplicate alerts
+### 26. 哪种方法确保日志数据符合隐私法规？
+A) 永远保留所有原始日志  
+B) 无论策略如何，每天删除日志  
+C) 在摄取时应用脱敏/屏蔽、按日志类别定义保留、强制访问控制和删除工作流  
+D) 将日志存储在公共对象存储中以保持透明
 
-**Correct Answer:** B  
-**Explanation:** Annotations with runbook links enable responders to act quickly with relevant instructions.
-
----
-
-### 28. What is the most effective way to validate observability changes in CI/CD?
-A) Deploy directly to production; roll back if issues arise  
-B) Run promtool/linting checks, deploy to staging, execute smoke tests, and monitor for regressions before production rollout  
-C) Manually check dashboards weekly  
-D) Disable CI checks for speed
-
-**Correct Answer:** B  
-**Explanation:** Treat observability assets like code—lint/test, stage, and observe before production to prevent incidents.
+**正确答案：** C  
+**解释：** 合规要求有意的保留、脱敏和访问管理；策略必须以编程方式强制执行。
 
 ---
 
-### 29. Which KPI best reflects the health of an on-call rotation?
-A) Number of dashboards created  
-B) Mean Time To Acknowledge (MTTA) and alert volume per shift  
-C) Amount of log storage used  
-D) Number of Prometheus rules
+### 27. 为什么将告警注释与 runbook 链接配对很重要？
+A) 它们自动解决告警  
+B) 它们提供即时的上下文和下一步操作，减少平均缓解时间  
+C) 它们自动更改告警严重级别  
+D) 它们禁用重复告警
 
-**Correct Answer:** B  
-**Explanation:** MTTA and alert load indicate responder fatigue and effectiveness, guiding adjustments to alerting and staffing.
-
----
-
-### 30. During a post-incident review, what should be the focus?
-A) Assigning blame to individuals  
-B) Confirming that downtime penalties are charged  
-C) Identifying systemic improvements, documenting timeline, root causes, and action items with owners  
-D) Reducing logging to prevent future incidents
-
-**Correct Answer:** C  
-**Explanation:** Blameless postmortems emphasize learning and systemic fixes, producing actionable tasks to prevent recurrence.
+**正确答案：** B  
+**解释：** 带有 runbook 链接的注释使响应者能够快速按照相关说明行动。
 
 ---
 
-### 31. What is the purpose of multi-window burn rate alerts in SLO monitoring?
-A) To reduce alert noise by requiring multiple consecutive breaches
-B) To detect both fast (short window) and slow (long window) error budget consumption
-C) To send alerts to multiple on-call engineers
-D) To automatically scale infrastructure based on SLO violations
+### 28. 在 CI/CD 中验证可观测性更改的最有效方法是什么？
+A) 直接部署到生产；如果出现问题则回滚  
+B) 运行 promtool/linting 检查、部署到 staging、执行冒烟测试，并在生产 rollout 前监控回归  
+C) 每周手动检查 Dashboard  
+D) 为加速禁用 CI 检查
 
-**Correct Answer:** B
-**Explanation:** Multi-window alerts (e.g., 5m/1h windows) catch rapid SLO violations (short window) and gradual degradation (long window), providing comprehensive coverage.
+**正确答案：** B  
+**解释：** 将可观测性资产视为代码——在推广到生产之前进行 lint/测试、staging 和观察，以防止事件。
 
 ---
 
-### 32. Given a 99.9% availability SLO, what burn rate multiplier indicates critical error budget exhaustion in <6 hours?
+### 29. 哪个 KPI 最能反映 on-call 轮换的健康状况？
+A) 创建的 Dashboard 数量  
+B) 平均确认时间（MTTA）和每班次的告警量  
+C) 使用的日志存储量  
+D) Prometheus 规则数量
+
+**正确答案：** B  
+**解释：** MTTA 和告警负载表明响应者疲劳和有效性，指导告警和人员配置的调整。
+
+---
+
+### 30. 在事后审查中，重点应该是什么？
+A) 将责任归咎于个人  
+B) 确认停机处罚已收取  
+C) 识别系统性改进、记录时间线、根本原因以及带有所有者的行动项  
+D) 减少日志以防止未来事件
+
+**正确答案：** C  
+**解释：** 无指责的事后分析强调学习和系统性修复，产生可操作的任务以防止复发。
+
+---
+
+### 31. 在 SLO 监控中，多窗口 burn rate 告警的目的是什么？
+A) 通过要求多次连续违规来减少告警噪音
+B) 检测快速（短窗口）和慢速（长窗口）的 error budget 消耗
+C) 向多位 on-call 工程师发送告警
+D) 基于 SLO 违规自动扩展基础设施
+
+**正确答案：** B
+**解释：** 多窗口告警（例如：5m/1h 窗口）捕获快速 SLO 违规（短窗口）和逐渐退化（长窗口），提供全面覆盖。
+
+---
+
+### 32. 给定 99.9% 可用性 SLO，哪个 burn rate 乘数指示在 <6 小时内耗尽 error budget？
 A) 1x
 B) 6x
 C) 14.4x
 D) 100x
 
-**Correct Answer:** C
-**Explanation:** A burn rate of 14.4x means you're consuming error budget 14.4 times faster than acceptable, exhausting a 30-day budget in ~50 hours (< 6 hours at sustained rate).
+**正确答案：** C
+**解释：** 14.4x 的 burn rate 意味着你消耗 error budget 的速度是可接受速度的 14.4 倍，在 <6 小时（持续速率）内耗尽 30 天的预算。
 
 ---
 
-### 33. Which Alertmanager feature prevents duplicate notifications when multiple related alerts fire?
+### 33. 哪个 Alertmanager 功能可在多个相关告警触发时防止重复通知？
 A) Grouping
 B) Inhibition rules
 C) Silences
 D) Time intervals
 
-**Correct Answer:** B
-**Explanation:** Inhibition rules suppress alerts based on other active alerts (e.g., suppress node alerts if cluster is down).
+**正确答案：** B
+**解释：** Inhibition rules 基于其他活跃告警抑制告警（例如：如果集群宕机则抑制节点告警）。
 
 ---
 
-### 34. What is the recommended structure for a production runbook?
-A) Just list the alert name and contact
-B) Impact, symptoms, triage steps (<5 min), investigation queries, mitigation procedures, escalation path, post-incident tasks
-C) Only include Prometheus queries
-D) Defer all details to verbal communication
+### 34. 生产 runbook 的推荐结构是什么？
+A) 仅列出告警名称和联系人
+B) 影响、症状、分流步骤（<5 分钟）、调查查询、缓解过程、升级路径、事后任务
+C) 仅包括 Prometheus 查询
+D) 将所有细节推迟到口头沟通
 
-**Correct Answer:** B
-**Explanation:** Comprehensive runbooks enable rapid response by providing complete troubleshooting workflows and escalation procedures.
-
----
-
-### 35. During an incident, what metric measures time from issue occurrence to detection?
-A) MTTR (Mean Time To Repair)
-B) MTTD (Mean Time To Detect)
-C) MTTA (Mean Time To Acknowledge)
-D) MTBF (Mean Time Between Failures)
-
-**Correct Answer:** B
-**Explanation:** MTTD is the time between when an issue starts and when monitoring/alerting detects it.
+**正确答案：** B
+**解释：** 全面的 runbook 通过提供完整的故障排除工作流和升级流程来实现快速响应。
 
 ---
 
-### 36. Which PromQL query calculates the P95 latency from histogram buckets?
+### 35. 在事件期间，哪个指标衡量从问题发生到检测的时间？
+A) MTTR（平均修复时间）
+B) MTTD（平均检测时间）
+C) MTTA（平均确认时间）
+D) MTBF（平均故障间隔时间）
+
+**正确答案：** B
+**解释：** MTTD 是问题开始与监控/告警检测到它之间的时间。
+
+---
+
+### 36. 哪个 PromQL 查询从 histogram buckets 计算 P95 延迟？
 A) `rate(http_request_duration_seconds_sum[5m])`
 B) `histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))`
 C) `avg(http_request_duration_seconds)`
 D) `max(http_request_duration_seconds)`
 
-**Correct Answer:** B
-**Explanation:** `histogram_quantile()` computes quantiles from histogram buckets; 0.95 = P95, rate() provides per-second rates.
+**正确答案：** B
+**解释：** `histogram_quantile()` 从 histogram buckets 计算分位数；0.95 = P95，rate() 提供每秒速率。
 
 ---
 
-### 37. What is a Population Stability Index (PSI) threshold indicating significant feature drift?
+### 37. 指示显著特征漂移的 Population Stability Index (PSI) 阈值是多少？
 A) PSI < 0.1
 B) PSI 0.1-0.2
 C) PSI > 0.2
 D) PSI = 1.0
 
-**Correct Answer:** C
-**Explanation:** PSI > 0.2 indicates significant distribution shift; PSI > 0.25 typically triggers model retraining.
+**正确答案：** C
+**解释：** PSI > 0.2 表示显著分布偏移；PSI > 0.25 通常触发模型重新训练。
 
 ---
 
-### 38. In a blameless postmortem, what should be the primary focus?
-A) Identifying the engineer who caused the issue
-B) Documenting timeline, root cause analysis (systemic), and preventive action items
-C) Calculating financial penalties
-D) Reducing monitoring to prevent future alerts
+### 38. 在无指责的事后分析中，主要重点应放在什么？
+A) 识别引起问题的工程师
+B) 记录时间线、根本原因分析（系统性）和预防措施项
+C) 计算经济处罚
+D) 减少监控以防止未来告警
 
-**Correct Answer:** B
-**Explanation:** Blameless postmortems focus on systemic improvements, not individual blame, to foster learning and prevent recurrence.
-
----
-
-### 39. Which log redaction technique is most effective for PII compliance?
-A) Delete all logs
-B) Apply regex patterns at ingestion to mask/redact sensitive data (SSN, credit cards, emails)
-C) Store logs in plain text for transparency
-D) Only log errors, not info-level logs
-
-**Correct Answer:** B
-**Explanation:** Automated redaction at ingestion (using Promtail pipeline stages or similar) prevents PII from ever reaching storage.
+**正确答案：** B
+**解释：** 无指责的事后分析侧重于系统性改进，而非个人指责，以促进学习和防止复发。
 
 ---
 
-### 40. What is the recommended approach for incident simulation and runbook practice?
-A) Wait for real incidents to practice
-B) Create automated simulation scripts that inject faults, trigger alerts, and generate incident timelines
-C) Only test in production during business hours
-D) Avoid testing to prevent false alarms
+### 39. 哪种日志脱敏技术对 PII 合规最有效？
+A) 删除所有日志
+B) 在摄取时应用正则表达式模式以屏蔽/脱敏敏感数据（SSN、信用卡、email）
+C) 以纯文本存储日志以保持透明
+D) 仅记录错误，不记录 info 级别日志
 
-**Correct Answer:** B
-**Explanation:** Regular incident simulations (chaos engineering, game days) validate runbooks and build muscle memory without impacting users.
-
----
-
-### 41. When should you escalate an incident to the next level?
-A) Immediately for all incidents
-B) After 30 minutes if unresolved, impact is increasing, or root cause unclear
-C) Never escalate to avoid looking incompetent
-D) Only during business hours
-
-**Correct Answer:** B
-**Explanation:** Escalation criteria should be time-based, impact-based, or complexity-based to ensure appropriate expertise is engaged.
+**正确答案：** B
+**解释：** 在摄取时自动脱敏（使用 Promtail 管道阶段或类似方法）可防止 PII 进入存储。
 
 ---
 
-### 42. Which Grafana feature allows dashboard variables to be populated from Prometheus label values?
+### 40. 事件模拟和 runbook 实践的推荐方法是什么？
+A) 等待真实事件来练习
+B) 创建自动化模拟脚本，注入故障、触发告警并生成事件时间线
+C) 仅在工作时间于生产环境中测试
+D) 避免测试以防止误报
+
+**正确答案：** B
+**解释：** 定期的事件模拟（混沌工程、游戏日）验证 runbook 并建立肌肉记忆，而不会影响用户。
+
+---
+
+### 41. 何时应将事件升级到下一级？
+A) 所有事件立即升级
+B) 30 分钟后如果未解决、影响在增加或根本原因不明确
+C) 绝不升级以避免看起来不称职
+D) 仅在工作时间
+
+**正确答案：** B
+**解释：** 升级标准应基于时间、影响或复杂性，以确保适当的专业知识参与。
+
+---
+
+### 42. 哪个 Grafana 功能允许从 Prometheus label 值填充 Dashboard 变量？
 A) Static variables
-B) Query variables with label_values()
+B) 带有 label_values() 的 Query variables
 C) Constant variables
 D) Text box variables
 
-**Correct Answer:** B
-**Explanation:** Query variables using `label_values(metric, label)` dynamically populate dropdown filters based on Prometheus data.
+**正确答案：** B
+**解释：** 使用 `label_values(metric, label)` 的 Query variables 基于 Prometheus 数据动态填充下拉过滤器。
 
 ---
 
-### 43. What is the benefit of correlation IDs in distributed tracing?
-A) They reduce log storage costs
-B) They enable end-to-end request tracking across multiple services and link traces to logs
-C) They automatically fix performance issues
-D) They disable unnecessary metrics
+### 43. 分布式 tracing 中关联 ID 的好处是什么？
+A) 它们降低日志存储成本
+B) 它们实现跨多个服务的端到端请求跟踪，并将 traces 链接到日志
+C) 它们自动修复性能问题
+D) 它们禁用不必要的指标
 
-**Correct Answer:** B
-**Explanation:** Correlation IDs (trace IDs) link logs and traces for a single request across microservices, enabling comprehensive debugging.
-
----
-
-### 44. Which metric best indicates GPU saturation in an inference service?
-A) CPU usage
-B) GPU utilization at 95-100% with increasing queue depth
-C) Network bandwidth
-D) Disk I/O
-
-**Correct Answer:** B
-**Explanation:** High GPU utilization combined with growing queue depth indicates saturation; additional GPU capacity needed.
+**正确答案：** B
+**解释：** 关联 ID（trace ID）将跨微服务的单个请求的日志和 traces 链接起来，实现全面调试。
 
 ---
 
-### 45. What is the correct order of actions when responding to a critical SLO burn rate alert?
-A) Rollback → Investigate → Notify stakeholders → Document
-B) Verify alert → Assess scope → Investigate root cause → Mitigate → Document → Post-incident review
-C) Disable alerts → Fix issue later → Re-enable alerts
-D) Wait to see if it resolves itself
+### 44. 哪个指标最能指示推理服务中的 GPU 饱和？
+A) CPU 使用率
+B) GPU 利用率在 95-100% 且队列深度增加
+C) 网络带宽
+D) 磁盘 I/O
 
-**Correct Answer:** B
-**Explanation:** Structured incident response follows: verify (avoid false positives), assess (scope/impact), investigate, mitigate, document, and learn.
+**正确答案：** B
+**解释：** 高 GPU 利用率加上不断增长的队列深度表明饱和；需要额外的 GPU 容量。
 
 ---
 
-### 46. Which Log QL query detects log ingestion outages?
+### 45. 响应严重 SLO burn rate 告警时，正确的操作顺序是什么？
+A) 回滚 → 调查 → 通知利益相关者 → 文档化
+B) 验证告警 → 评估范围 → 调查根本原因 → 缓解 → 文档化 → 事后审查
+C) 禁用告警 → 稍后修复 → 重新启用告警
+D) 等待其自行解决
+
+**正确答案：** B
+**解释：** 结构化的事件响应遵循：验证（避免误报）、评估（范围/影响）、调查、缓解、文档化和学习。
+
+---
+
+### 46. 哪个 LogQL 查询检测日志摄取中断？
 A) `{job="logs"} |= "error"`
 B) `absent_over_time({job="docker-logs"}[10m])`
 C) `rate({job="logs"}[5m])`
 D) `count({job="logs"})`
 
-**Correct Answer:** B
-**Explanation:** `absent_over_time()` returns 1 when no logs exist in the time range, indicating ingestion failure.
+**正确答案：** B
+**解释：** `absent_over_time()` 在时间范围内不存在日志时返回 1，表明摄取失败。
 
 ---
 
-### 47. What is the purpose of Alertmanager's `group_wait` parameter?
-A) How long to wait before sending the first notification for a group of alerts
-B) How long to wait between re-sending notifications
-C) How long to keep alerts in memory
-D) How long to wait for user acknowledgment
+### 47. Alertmanager 的 `group_wait` 参数的目的是什么？
+A) 在发送一组告警的首次通知之前等待多长时间
+B) 重新发送通知之间等待多长时间
+C) 在内存中保留告警多长时间
+D) 等待用户确认多长时间
 
-**Correct Answer:** A
-**Explanation:** `group_wait` buffers alerts briefly to group related alerts together in a single notification, reducing noise.
-
----
-
-### 48. When monitoring model fairness, what metric detects demographic parity violations?
-A) Latency P95
-B) Absolute difference in prediction rates between demographic groups exceeding threshold (e.g., > 0.1)
-C) Error budget consumption
-D) GPU temperature
-
-**Correct Answer:** B
-**Explanation:** Demographic parity compares positive prediction rates across groups; significant differences (> 10%) indicate potential bias.
+**正确答案：** A
+**解释：** `group_wait` 短暂缓冲告警以将相关告警分组到单个通知中，减少噪音。
 
 ---
 
-### 49. Which practice reduces alert fatigue in on-call rotations?
-A) Send all alerts to pagers for maximum awareness
-B) Implement SLO-based alerting, tune thresholds quarterly, automate common mitigations, and track alerts/week/person
-C) Disable all non-critical alerts permanently
-D) Only alert during business hours
+### 48. 在监控模型公平性时，哪个指标检测人口均等违规？
+A) 延迟 P95
+B) 不同人口群体之间预测率的绝对差异超过阈值（例如：> 0.1）
+C) Error budget 消耗
+D) GPU 温度
 
-**Correct Answer:** B
-**Explanation:** Alert fatigue is reduced by focusing on user impact (SLOs), regularly tuning thresholds, automation, and monitoring workload metrics.
-
----
-
-### 50. What is the recommended retention period for incident timelines and postmortems?
-A) Delete after resolution
-B) Keep for 30 days
-C) Archive indefinitely for organizational learning and compliance
-D) Only keep if incident was critical
-
-**Correct Answer:** C
-**Explanation:** Incident documentation provides historical context for future issues, supports compliance, and enables long-term reliability improvements.
+**正确答案：** B
+**解释：** 人口均等比较跨群体的正面预测率；显著差异（> 10%）表明潜在偏差。
 
 ---
 
-## Quiz Complete!
+### 49. 哪种做法可减少 on-call 轮换中的告警疲劳？
+A) 将所有告警发送到寻呼器以最大程度地提高意识
+B) 实施基于 SLO 的告警、每季度调整阈值、自动化常见缓解措施并跟踪每人每周的告警数
+C) 永久禁用所有非严重告警
+D) 仅在工作时间告警
 
-**Reminder for Instructors:** The detailed answer key and solution walkthroughs reside in the corresponding solutions repository (`ai-infra-junior-engineer-solutions/quizzes/module-009/quiz-01-monitoring-observability-answer-key.md`). Update both learning and solutions repos in lockstep when modifying quiz content.
+**正确答案：** B
+**解释：** 通过关注用户影响（SLO）、定期调整阈值、自动化和监控工作负载指标来减少告警疲劳。
+
+---
+
+### 50. 事件时间线和事后分析的建议保留期限是多长？
+A) 解决后删除
+B) 保留 30 天
+C) 无限期归档以用于组织学习和合规
+D) 仅当事件严重时才保留
+
+**正确答案：** C
+**解释：** 事件文档为未来问题提供历史背景、支持合规并实现长期可靠性改进。
+
+---
+
+## 测验完成！
+
+**教师提醒：** 详细的答案密钥和解决方案指南位于相应的解决方案仓库（`ai-infra-junior-engineer-solutions/quizzes/module-009/quiz-01-monitoring-observability-answer-key.md`）。修改测验内容时，请同时更新学习和解决方案仓库。

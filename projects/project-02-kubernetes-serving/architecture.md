@@ -1,59 +1,59 @@
-# Project 02: Architecture Documentation
+# Project 02：架构文档
 
-## Table of Contents
-1. [System Overview](#system-overview)
-2. [Kubernetes Architecture](#kubernetes-architecture)
-3. [Component Details](#component-details)
-4. [Network Architecture](#network-architecture)
-5. [Monitoring Architecture](#monitoring-architecture)
-6. [Deployment Architecture](#deployment-architecture)
-7. [Scaling Architecture](#scaling-architecture)
-8. [High Availability Design](#high-availability-design)
-
----
-
-## System Overview
-
-### Purpose
-Transform a simple model serving API into a production-grade, highly available, auto-scaling system using Kubernetes orchestration. This architecture demonstrates industry-standard practices for deploying ML inference services at scale.
-
-### Key Characteristics
-- **Highly Available:** Multiple replicas with automatic failover
-- **Scalable:** Auto-scaling from 3 to 10 pods based on load
-- **Resilient:** Self-healing with health checks and automatic restarts
-- **Observable:** Comprehensive metrics and monitoring
-- **Maintainable:** Zero-downtime deployments and rollbacks
-
-### Architecture Style
-- **Microservices:** Single-purpose model serving API
-- **Container Orchestration:** Kubernetes-managed lifecycle
-- **Cloud-Native:** Infrastructure-as-code, declarative configuration
+## 目录
+1. [系统概述](#system-overview)
+2. [Kubernetes 架构](#kubernetes-architecture)
+3. [组件详情](#component-details)
+4. [网络架构](#network-architecture)
+5. [监控架构](#monitoring-architecture)
+6. [部署架构](#deployment-architecture)
+7. [伸缩架构](#scaling-architecture)
+8. [高可用设计](#high-availability-design)
 
 ---
 
-## Kubernetes Architecture
+## 系统概述
 
-### High-Level Architecture Diagram
+### 目的
+将简单的模型服务 API 通过 Kubernetes 编排转变为生产级、高可用、自动伸缩的系统。该架构展示了大规模部署 ML 推理服务的行业标准实践。
+
+### 关键特性
+- **高可用：** 多副本自动故障转移
+- **可伸缩：** 根据负载在 3 到 10 个 Pod 间自动伸缩
+- **弹性：** 通过健康检查和自动重启实现自愈
+- **可观测：** 全面的指标和监控
+- **可维护：** 零停机部署和回滚
+
+### 架构风格
+- **微服务：** 单一用途的模型服务 API
+- **容器编排：** Kubernetes 托管生命周期
+- **云原生：** 基础设施即代码，声明式配置
+
+---
+
+## Kubernetes 架构
+
+### 高层架构图
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                          Internet / Users                           │
+│                          互联网 / 用户                               │
 └────────────────────────────┬────────────────────────────────────────┘
                              │
                              │ HTTPS/HTTP
                              ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│                   Cloud Load Balancer (AWS/GCP/Azure)               │
-│                   External IP: x.x.x.x                              │
+│                    云负载均衡器 (AWS/GCP/Azure)                      │
+│                    外部 IP: x.x.x.x                                 │
 └────────────────────────────┬────────────────────────────────────────┘
                              │
                              │
                              ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│                    Kubernetes Cluster                               │
+│                      Kubernetes 集群                                │
 │  ┌───────────────────────────────────────────────────────────────┐  │
-│  │                 Ingress Controller (NGINX)                    │  │
-│  │  Rules:                                                       │  │
+│  │                  Ingress 控制器 (NGINX)                       │  │
+│  │  规则：                                                       │  │
 │  │  - model-api.example.com/predict  → model-api-service       │  │
 │  │  - model-api.example.com/health   → model-api-service       │  │
 │  │  - model-api.example.com/metrics  → model-api-service       │  │
@@ -62,9 +62,9 @@ Transform a simple model serving API into a production-grade, highly available, 
 │                            ▼                                         │
 │  ┌───────────────────────────────────────────────────────────────┐  │
 │  │         Service: model-api-service (ClusterIP)                │  │
-│  │         Type: ClusterIP                                       │  │
-│  │         Port: 80 → TargetPort: 5000                          │  │
-│  │         Selector: app=model-api                              │  │
+│  │         类型: ClusterIP                                       │  │
+│  │         端口: 80 → 目标端口: 5000                             │  │
+│  │         选择器: app=model-api                                 │  │
 │  └─────────────────────────┬─────────────────────────────────────┘  │
 │                            │                                         │
 │           ┌────────────────┼────────────────┐                       │
@@ -73,15 +73,15 @@ Transform a simple model serving API into a production-grade, highly available, 
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐             │
 │  │   Pod 1      │  │   Pod 2      │  │   Pod 3      │             │
 │  │              │  │              │  │              │             │
-│  │ Container:   │  │ Container:   │  │ Container:   │             │
+│  │ 容器：       │  │ 容器：       │  │ 容器：       │             │
 │  │ model-api    │  │ model-api    │  │ model-api    │             │
 │  │ v1.0         │  │ v1.0         │  │ v1.0         │             │
 │  │              │  │              │  │              │             │
-│  │ Port: 5000   │  │ Port: 5000   │  │ Port: 5000   │             │
+│  │ 端口: 5000   │  │ 端口: 5000   │  │ 端口: 5000   │             │
 │  │              │  │              │  │              │             │
-│  │ Resources:   │  │ Resources:   │  │ Resources:   │             │
+│  │ 资源：       │  │ 资源：       │  │ 资源：       │             │
 │  │ CPU: 500m-1  │  │ CPU: 500m-1  │  │ CPU: 500m-1  │             │
-│  │ Mem: 1-2Gi   │  │ Mem: 1-2Gi   │  │ Mem: 1-2Gi   │             │
+│  │ 内存: 1-2Gi  │  │ 内存: 1-2Gi  │  │ 内存: 1-2Gi  │             │
 │  └──────────────┘  └──────────────┘  └──────────────┘             │
 │         │                 │                 │                       │
 │         └─────────────────┴─────────────────┘                       │
@@ -89,10 +89,10 @@ Transform a simple model serving API into a production-grade, highly available, 
 │                           ▼                                         │
 │  ┌───────────────────────────────────────────────────────────────┐  │
 │  │      Horizontal Pod Autoscaler (HPA)                          │  │
-│  │      - Min Replicas: 3                                        │  │
-│  │      - Max Replicas: 10                                       │  │
-│  │      - Target CPU: 70%                                        │  │
-│  │      - Target Memory: 80%                                     │  │
+│  │      - 最小副本数: 3                                           │  │
+│  │      - 最大副本数: 10                                          │  │
+│  │      - 目标 CPU: 70%                                           │  │
+│  │      - 目标内存: 80%                                           │  │
 │  └───────────────────────────────────────────────────────────────┘  │
 │                                                                      │
 │  ┌───────────────────────────────────────────────────────────────┐  │
@@ -107,13 +107,13 @@ Transform a simple model serving API into a production-grade, highly available, 
 
 ---
 
-## Component Details
+## 组件详情
 
 ### 1. Deployment
 
-**Purpose:** Manages pod lifecycle and rolling updates
+**用途：** 管理 Pod 生命周期和滚动更新
 
-**Specification:**
+**规格说明：**
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -125,17 +125,17 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 1        # Can create 1 extra pod during update
-      maxUnavailable: 0  # Always maintain minimum replicas
+      maxSurge: 1        # 更新期间可以创建 1 个额外的 Pod
+      maxUnavailable: 0  # 始终保持最少副本数
 ```
 
-**Key Features:**
-- **Declarative Management:** Desired state specified, Kubernetes maintains it
-- **Self-Healing:** Automatically replaces failed pods
-- **Rolling Updates:** Gradual replacement for zero downtime
-- **Rollback Support:** Maintains revision history
+**关键特性：**
+- **声明式管理：** 指定期望状态，Kubernetes 维持该状态
+- **自愈：** 自动替换失败的 Pod
+- **滚动更新：** 逐步替换以实现零停机
+- **回滚支持：** 维护修订历史
 
-**Pod Template:**
+**Pod 模板：**
 ```yaml
 template:
   spec:
@@ -157,21 +157,21 @@ template:
 
 ### 2. Service (ClusterIP)
 
-**Purpose:** Stable network endpoint for pod communication
+**用途：** Pod 通信的稳定网络端点
 
-**How It Works:**
-1. Service selector matches pod labels: `app: model-api`
-2. Service creates Endpoints object listing pod IPs
-3. kube-proxy configures iptables rules for load balancing
-4. DNS entry created: `model-api-service.ml-serving.svc.cluster.local`
+**工作原理：**
+1. Service 选择器匹配 Pod 标签：`app: model-api`
+2. Service 创建 Endpoints 对象，列出 Pod IP
+3. kube-proxy 配置 iptables 规则实现负载均衡
+4. 创建 DNS 条目：`model-api-service.ml-serving.svc.cluster.local`
 
-**Load Balancing Algorithm:**
-- **Default:** Round-robin across healthy endpoints
-- **Session Affinity:** Optional ClientIP-based affinity
+**负载均衡算法：**
+- **默认：** 在健康端点间轮询
+- **会话亲和性：** 可选的基于 ClientIP 的亲和性
 
-**Service Discovery:**
+**服务发现：**
 ```bash
-# Within cluster, any pod can access:
+# 集群内任意 Pod 均可访问：
 curl http://model-api-service/health
 curl http://model-api-service.ml-serving/health
 curl http://model-api-service.ml-serving.svc.cluster.local/health
@@ -181,42 +181,42 @@ curl http://model-api-service.ml-serving.svc.cluster.local/health
 
 ### 3. Service (LoadBalancer)
 
-**Purpose:** External access to application
+**用途：** 应用的对外访问
 
-**Cloud Provider Integration:**
-- **AWS EKS:** Provisions Classic ELB or Network Load Balancer
-- **GCP GKE:** Provisions TCP/UDP Load Balancer
-- **Azure AKS:** Provisions Azure Load Balancer
+**云提供商集成：**
+- **AWS EKS：** 预置 Classic ELB 或 Network Load Balancer
+- **GCP GKE：** 预置 TCP/UDP Load Balancer
+- **Azure AKS：** 预置 Azure Load Balancer
 
-**Behavior:**
+**行为：**
 ```yaml
 spec:
   type: LoadBalancer
   ports:
-  - port: 80           # External port
-    targetPort: 5000   # Container port
+  - port: 80           # 外部端口
+    targetPort: 5000   # 容器端口
   selector:
     app: model-api
 ```
 
-**Traffic Flow:**
+**流量流向：**
 ```
-Internet → Cloud LB (x.x.x.x:80) → Node IP:NodePort → Pod IP:5000
+互联网 → 云负载均衡器 (x.x.x.x:80) → 节点 IP:NodePort → Pod IP:5000
 ```
 
 ---
 
 ### 4. Ingress (NGINX)
 
-**Purpose:** HTTP/HTTPS routing and SSL/TLS termination
+**用途：** HTTP/HTTPS 路由和 SSL/TLS 终止
 
-**Why Use Ingress:**
-- **Cost Efficiency:** Single load balancer for multiple services
-- **Advanced Routing:** Path-based, host-based routing
-- **SSL/TLS Termination:** Centralized certificate management
-- **Rate Limiting:** Request throttling and protection
+**为何使用 Ingress：**
+- **成本效率：** 多个服务共享单个负载均衡器
+- **高级路由：** 基于路径、基于主机的路由
+- **SSL/TLS 终止：** 集中式证书管理
+- **速率限制：** 请求限流和保护
 
-**Routing Rules:**
+**路由规则：**
 ```yaml
 spec:
   rules:
@@ -232,15 +232,15 @@ spec:
               number: 80
 ```
 
-**Ingress Controller Architecture:**
+**Ingress 控制器架构：**
 ```
 ┌────────────────────────────────────────┐
-│   Ingress Controller (NGINX Pod)      │
+│   Ingress 控制器 (NGINX Pod)          │
 │                                        │
-│   - Watches Ingress resources          │
-│   - Generates nginx.conf               │
-│   - Reloads NGINX on changes           │
-│   - Exposes LoadBalancer Service       │
+│   - 监听 Ingress 资源                   │
+│   - 生成 nginx.conf                    │
+│   - 变更时重新加载 NGINX                │
+│   - 暴露 LoadBalancer Service           │
 └────────────────────────────────────────┘
 ```
 
@@ -248,59 +248,59 @@ spec:
 
 ### 5. Horizontal Pod Autoscaler (HPA)
 
-**Purpose:** Automatically adjust replica count based on metrics
+**用途：** 根据指标自动调整副本数量
 
-**Control Loop:**
+**控制循环：**
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    HPA Control Loop                         │
+│                    HPA 控制循环                              │
 │                                                             │
-│  1. Every 15 seconds:                                       │
-│     - Query Metrics Server for current CPU/Memory          │
-│     - Calculate: current / target = ratio                  │
+│  1. 每 15 秒：                                              │
+│     - 查询 Metrics Server 获取当前 CPU/内存                  │
+│     - 计算：当前值 / 目标值 = 比率                           │
 │                                                             │
-│  2. Calculate desired replicas:                            │
+│  2. 计算期望副本数：                                        │
 │     desiredReplicas = ceil(currentReplicas * ratio)        │
 │                                                             │
-│  3. Apply scaling policies:                                │
-│     - Check min/max limits (3-10)                          │
-│     - Apply stabilization window                           │
-│     - Apply scale-up/down policies                         │
+│  3. 应用伸缩策略：                                          │
+│     - 检查最小/最大限制 (3-10)                               │
+│     - 应用稳定窗口                                         │
+│     - 应用扩容/缩容策略                                     │
 │                                                             │
-│  4. Update Deployment if needed                            │
+│  4. 必要时更新 Deployment                                   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Example Calculation:**
+**计算示例：**
 ```
-Current Replicas: 3
-Current CPU: 85% (above target of 70%)
-Ratio: 85 / 70 = 1.21
+当前副本数: 3
+当前 CPU: 85% (高于 70% 的目标)
+比率: 85 / 70 = 1.21
 
-Desired Replicas = ceil(3 * 1.21) = 4
+期望副本数 = ceil(3 * 1.21) = 4
 
-Action: Scale from 3 → 4 pods
+操作: 从 3 扩容至 4 个 Pod
 ```
 
-**Scaling Behavior:**
+**伸缩行为：**
 ```yaml
 behavior:
   scaleUp:
-    stabilizationWindowSeconds: 0      # Scale up immediately
+    stabilizationWindowSeconds: 0      # 立即扩容
     policies:
     - type: Percent
-      value: 100                       # Can double pod count
+      value: 100                       # 可翻倍 Pod 数量
       periodSeconds: 30
     - type: Pods
-      value: 2                         # Or add max 2 pods
+      value: 2                         # 或最多增加 2 个 Pod
       periodSeconds: 30
-    selectPolicy: Max                  # Use most aggressive
+    selectPolicy: Max                  # 使用最激进的策略
 
   scaleDown:
-    stabilizationWindowSeconds: 300    # Wait 5 min before scale down
+    stabilizationWindowSeconds: 300    # 缩容前等待 5 分钟
     policies:
     - type: Percent
-      value: 50                        # Max 50% reduction
+      value: 50                        # 最大减少 50%
       periodSeconds: 60
 ```
 
@@ -308,17 +308,17 @@ behavior:
 
 ### 6. ConfigMap
 
-**Purpose:** External configuration management
+**用途：** 外部配置管理
 
-**Benefits:**
-- **Separation of Concerns:** Config separate from code
-- **Environment-Specific:** Different configs for dev/staging/prod
-- **No Image Rebuilds:** Update config without new image
-- **Kubernetes-Native:** Integrated with pod lifecycle
+**优势：**
+- **关注点分离：** 配置与代码分离
+- **环境特定：** 不同环境（开发/预发布/生产）的不同配置
+- **无需重建镜像：** 更新配置无需新镜像
+- **Kubernetes 原生：** 与 Pod 生命周期集成
 
-**Usage Patterns:**
+**使用模式：**
 
-**Pattern 1: Environment Variables**
+**模式 1：环境变量**
 ```yaml
 env:
 - name: MODEL_NAME
@@ -328,7 +328,7 @@ env:
       key: model_name
 ```
 
-**Pattern 2: Volume Mount (for files)**
+**模式 2：卷挂载（用于文件）**
 ```yaml
 volumes:
 - name: config-volume
@@ -340,132 +340,132 @@ volumeMounts:
   mountPath: /etc/config
 ```
 
-**Configuration Versioning:**
-To trigger pod updates when ConfigMap changes:
-1. Add checksum annotation to pod template
-2. Use ConfigMap hash in name (ConfigMap-v2-abc123)
-3. Use tools like Reloader to watch ConfigMaps
+**配置版本控制：**
+在 ConfigMap 变更时触发 Pod 更新：
+1. 向 Pod 模板添加校验和注解
+2. 在名称中使用 ConfigMap 哈希（ConfigMap-v2-abc123）
+3. 使用 Reloader 等工具监控 ConfigMap
 
 ---
 
-### 7. Health Checks
+### 7. 健康检查
 
-**Purpose:** Monitor application health and control traffic routing
+**用途：** 监控应用健康状态并控制流量路由
 
-#### Liveness Probe
-**When to Use:** Detect deadlocks or unrecoverable errors
+#### 存活探针
+**使用场景：** 检测死锁或不可恢复的错误
 
-**Configuration:**
+**配置：**
 ```yaml
 livenessProbe:
   httpGet:
     path: /health
     port: 5000
-  initialDelaySeconds: 30    # Wait for startup
-  periodSeconds: 10          # Check every 10s
-  timeoutSeconds: 5          # Timeout after 5s
-  failureThreshold: 3        # Fail after 3 consecutive failures
+  initialDelaySeconds: 30    # 等待启动
+  periodSeconds: 10          # 每 10 秒检查一次
+  timeoutSeconds: 5          # 5 秒超时
+  failureThreshold: 3        # 连续 3 次失败后重启
 ```
 
-**Behavior:**
-- **Success:** Pod continues running
-- **Failure (3 consecutive):** Kubernetes restarts container
-- **Restart Policy:** Always (default for Deployments)
+**行为：**
+- **成功：** Pod 继续运行
+- **失败（连续 3 次）：** Kubernetes 重启容器
+- **重启策略：** Always（Deployment 默认）
 
-**Implementation:**
+**实现：**
 ```python
 @app.route('/health')
 def health():
-    # Check application is responsive
-    # NOT just return 200 - actually verify internal state
+    # 检查应用是否响应
+    # 不仅仅是返回 200 - 需要验证内部状态
     if not model_loaded:
         return jsonify({"status": "unhealthy"}), 500
     return jsonify({"status": "healthy"}), 200
 ```
 
-#### Readiness Probe
-**When to Use:** Control traffic routing during startup/shutdown
+#### 就绪探针
+**使用场景：** 在启动/关闭期间控制流量路由
 
-**Configuration:**
+**配置：**
 ```yaml
 readinessProbe:
   httpGet:
     path: /health
     port: 5000
-  initialDelaySeconds: 10    # Faster than liveness
-  periodSeconds: 5           # More frequent checks
+  initialDelaySeconds: 10    # 比存活探针更快
+  periodSeconds: 5           # 更频繁的检查
   timeoutSeconds: 3
   failureThreshold: 3
 ```
 
-**Behavior:**
-- **Success:** Pod added to Service endpoints (receives traffic)
-- **Failure:** Pod removed from Service endpoints (no traffic)
-- **No Restart:** Pod keeps running, just doesn't receive traffic
+**行为：**
+- **成功：** Pod 被添加到 Service 端点（接收流量）
+- **失败：** Pod 从 Service 端点中移除（无流量）
+- **不重启：** Pod 继续运行，只是不接收流量
 
-**Use Cases:**
-- Model loading (large models take time)
-- Database connection establishment
-- Cache warming
-- Dependency checks
+**使用场景：**
+- 模型加载（大型模型需要时间）
+- 数据库连接建立
+- 缓存预热
+- 依赖检查
 
-**Traffic Flow with Readiness:**
+**就绪探针的流量流程：**
 ```
-Pod Lifecycle:
-1. Pod created → Not Ready → No traffic
-2. Container starts → Readiness probe begins
-3. Model loads (20 seconds)
-4. Readiness probe succeeds → Ready → Receives traffic
-5. During shutdown → Readiness fails → Graceful traffic drain
+Pod 生命周期：
+1. Pod 创建 → 未就绪 → 无流量
+2. 容器启动 → 就绪探针开始
+3. 模型加载（20 秒）
+4. 就绪探针成功 → 就绪 → 接收流量
+5. 关闭期间 → 就绪探针失败 → 优雅排空流量
 ```
 
 ---
 
-## Network Architecture
+## 网络架构
 
-### Three-Tier Network Model
+### 三层网络模型
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                  Tier 1: External Access                    │
+│                  第 1 层：外部访问                           │
 │                                                             │
 │  ┌────────────────────────────────────────────────────┐    │
-│  │  Cloud Load Balancer                               │    │
-│  │  - Public IP: x.x.x.x                             │    │
-│  │  - SSL/TLS Termination                            │    │
-│  │  - Health Checks                                  │    │
-│  │  - DDoS Protection                                │    │
+│  │  云负载均衡器                                       │    │
+│  │  - 公网 IP: x.x.x.x                                │    │
+│  │  - SSL/TLS 终止                                    │    │
+│  │  - 健康检查                                        │    │
+│  │  - DDoS 防护                                       │    │
 │  └────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────┘
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                  Tier 2: Ingress Layer                      │
+│                  第 2 层：Ingress 层                        │
 │                                                             │
 │  ┌────────────────────────────────────────────────────┐    │
-│  │  Ingress Controller (NGINX)                        │    │
-│  │  - Host-based routing                              │    │
-│  │  - Path-based routing                              │    │
-│  │  - Rate limiting                                   │    │
-│  │  - Request buffering                               │    │
+│  │  Ingress 控制器 (NGINX)                           │    │
+│  │  - 基于主机的路由                                  │    │
+│  │  - 基于路径的路由                                  │    │
+│  │  - 速率限制                                      │    │
+│  │  - 请求缓冲                                      │    │
 │  └────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────┘
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                  Tier 3: Service Layer                      │
+│                  第 3 层：Service 层                        │
 │                                                             │
 │  ┌────────────────────────────────────────────────────┐    │
 │  │  ClusterIP Service                                 │    │
-│  │  - Internal load balancing                         │    │
-│  │  - Service discovery (DNS)                         │    │
-│  │  - Endpoint management                             │    │
+│  │  - 内部负载均衡                                    │    │
+│  │  - 服务发现 (DNS)                                  │    │
+│  │  - 端点管理                                        │    │
 │  └────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────┘
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                  Tier 4: Pod Network                        │
+│                  第 4 层：Pod 网络                          │
 │                                                             │
 │  ┌──────────┐    ┌──────────┐    ┌──────────┐            │
 │  │  Pod 1   │    │  Pod 2   │    │  Pod 3   │            │
@@ -474,9 +474,9 @@ Pod Lifecycle:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Network Policies
+### 网络策略
 
-**Purpose:** Restrict pod-to-pod communication for security
+**用途：** 为安全目的限制 Pod 间通信
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -503,30 +503,30 @@ spec:
     - namespaceSelector: {}
     ports:
     - protocol: TCP
-      port: 443  # Allow HTTPS to download models
+      port: 443  # 允许 HTTPS 下载模型
 ```
 
 ---
 
-## Monitoring Architecture
+## 监控架构
 
-### Prometheus Architecture
+### Prometheus 架构
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                    Prometheus Server                         │
+│                    Prometheus 服务器                          │
 │  ┌────────────────────────────────────────────────────┐      │
-│  │             Time Series Database                   │      │
-│  │  - Stores metrics with labels                     │      │
-│  │  - Retention: 7 days                              │      │
-│  │  - Compression: ~3.5 bytes/sample                 │      │
+│  │             时序数据库                             │      │
+│  │  - 带标签存储指标                                  │      │
+│  │  - 保留期：7 天                                    │      │
+│  │  - 压缩率：约 3.5 字节/样本                        │      │
 │  └────────────────────────────────────────────────────┘      │
 │                                                              │
 │  ┌────────────────────────────────────────────────────┐      │
-│  │             Scrape Configuration                   │      │
-│  │  - Scrape interval: 30s                           │      │
-│  │  - Scrape timeout: 10s                            │      │
-│  │  - Targets: 50+                                   │      │
+│  │             抓取配置                                │      │
+│  │  - 抓取间隔：30 秒                                  │      │
+│  │  - 抓取超时：10 秒                                  │      │
+│  │  - 目标数：50+                                      │      │
 │  └────────────────────────────────────────────────────┘      │
 └──────────────────────────────────────────────────────────────┘
                           │
@@ -534,319 +534,319 @@ spec:
         │                 │                 │
         ▼                 ▼                 ▼
 ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│ Kubernetes   │  │ Node         │  │ Application  │
+│ Kubernetes   │  │ 节点         │  │ 应用         │
 │ API Server   │  │ Exporters    │  │ /metrics     │
 │              │  │              │  │              │
-│ - Pod metrics│  │ - CPU stats  │  │ - Custom     │
-│ - Deployment │  │ - Memory     │  │   metrics    │
-│ - HPA        │  │ - Disk I/O   │  │ - Counters   │
+│ - Pod 指标   │  │ - CPU 统计   │  │ - 自定义     │
+│ - Deployment │  │ - 内存       │  │   指标       │
+│ - HPA        │  │ - 磁盘 I/O   │  │ - 计数器     │
 └──────────────┘  └──────────────┘  └──────────────┘
 ```
 
-### Metrics Collection Flow
+### 指标采集流程
 
 ```
-1. Service Discovery
+1. 服务发现
    ┌────────────────────────────────────────┐
-   │ Prometheus queries Kubernetes API      │
-   │ - Finds pods matching ServiceMonitor   │
-   │ - Gets pod IPs and ports               │
-   │ - Updates target list dynamically      │
+   │ Prometheus 查询 Kubernetes API         │
+   │ - 查找匹配 ServiceMonitor 的 Pod       │
+   │ - 获取 Pod IP 和端口                   │
+   │ - 动态更新目标列表                     │
    └────────────────────────────────────────┘
 
-2. Scraping
+2. 抓取
    ┌────────────────────────────────────────┐
-   │ Every 30 seconds:                      │
-   │ - HTTP GET to /metrics endpoint        │
-   │ - Parse Prometheus format              │
-   │ - Add labels (pod, namespace, etc.)    │
-   │ - Store in TSDB                        │
+   │ 每 30 秒：                              │
+   │ - HTTP GET 到 /metrics 端点            │
+   │ - 解析 Prometheus 格式                  │
+   │ - 添加标签 (pod, namespace 等)          │
+   │ - 存储在 TSDB 中                        │
    └────────────────────────────────────────┘
 
-3. Querying
+3. 查询
    ┌────────────────────────────────────────┐
-   │ PromQL queries:                        │
-   │ - rate() for counter rates             │
-   │ - histogram_quantile() for percentiles │
-   │ - aggregations (sum, avg, max)         │
+   │ PromQL 查询：                          │
+   │ - rate() 用于计算计数器速率            │
+   │ - histogram_quantile() 用于百分位数    │
+   │ - 聚合函数 (sum, avg, max)             │
    └────────────────────────────────────────┘
 ```
 
-### Grafana Architecture
+### Grafana 架构
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                     Grafana Server                           │
+│                      Grafana 服务器                          │
 │                                                              │
 │  ┌────────────────────────────────────────────────────┐      │
-│  │                Data Sources                        │      │
-│  │  - Prometheus (primary)                           │      │
-│  │  - Query caching: 5 minutes                       │      │
+│  │                数据源                              │      │
+│  │  - Prometheus（主要）                              │      │
+│  │  - 查询缓存：5 分钟                                │      │
 │  └────────────────────────────────────────────────────┘      │
 │                                                              │
 │  ┌────────────────────────────────────────────────────┐      │
-│  │                Dashboards                          │      │
+│  │                仪表盘                              │      │
 │  │  ┌──────────────────────────────────────────┐      │      │
-│  │  │  Cluster Overview                        │      │      │
-│  │  │  - Node count, CPU, memory               │      │      │
+│  │  │  集群概览                                 │      │      │
+│  │  │  - 节点数、CPU、内存                      │      │      │
 │  │  └──────────────────────────────────────────┘      │      │
 │  │  ┌──────────────────────────────────────────┐      │      │
-│  │  │  Application Metrics                     │      │      │
-│  │  │  - Request rate, latency, errors         │      │      │
+│  │  │  应用指标                                 │      │      │
+│  │  │  - 请求速率、延迟、错误                    │      │      │
 │  │  └──────────────────────────────────────────┘      │      │
 │  │  ┌──────────────────────────────────────────┐      │      │
-│  │  │  Pod Metrics                             │      │      │
-│  │  │  - Pod count, restarts, resources        │      │      │
+│  │  │  Pod 指标                                │      │      │
+│  │  │  - Pod 数、重启次数、资源                 │      │      │
 │  │  └──────────────────────────────────────────┘      │      │
 │  └────────────────────────────────────────────────────┘      │
 │                                                              │
 │  ┌────────────────────────────────────────────────────┐      │
-│  │                Alerting                            │      │
-│  │  - Alert rules                                    │      │
-│  │  - Notification channels (Email, Slack)           │      │
+│  │                告警                                │      │
+│  │  - 告警规则                                       │      │
+│  │  - 通知渠道（邮件、Slack）                         │      │
 │  └────────────────────────────────────────────────────┘      │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Deployment Architecture
+## 部署架构
 
-### Rolling Update Process
+### 滚动更新过程
 
 ```
-Initial State: 3 pods running v1.0
+初始状态：3 个 Pod 运行 v1.0
 ┌──────────┐  ┌──────────┐  ┌──────────┐
 │  Pod 1   │  │  Pod 2   │  │  Pod 3   │
 │  v1.0    │  │  v1.0    │  │  v1.0    │
-│  Ready   │  │  Ready   │  │  Ready   │
+│  就绪    │  │  就绪    │  │  就绪    │
 └──────────┘  └──────────┘  └──────────┘
 
-Step 1: Create new pod (maxSurge=1)
+第 1 步：创建新 Pod（maxSurge=1）
 ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
 │  Pod 1   │  │  Pod 2   │  │  Pod 3   │  │  Pod 4   │
 │  v1.0    │  │  v1.0    │  │  v1.0    │  │  v1.1    │
-│  Ready   │  │  Ready   │  │  Ready   │  │  Starting│
+│  就绪    │  │  就绪    │  │  就绪    │  │  启动中  │
 └──────────┘  └──────────┘  └──────────┘  └──────────┘
 
-Step 2: Wait for readiness, then terminate old pod
+第 2 步：等待就绪，然后终止旧 Pod
 ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
 │  Pod 1   │  │  Pod 2   │  │  Pod 3   │  │  Pod 4   │
 │  v1.0    │  │  v1.0    │  │  v1.0    │  │  v1.1    │
-│  Ready   │  │  Ready   │  │ Terminating│ │  Ready   │
+│  就绪    │  │  就绪    │  │  终止中  │  │  就绪    │
 └──────────┘  └──────────┘  └──────────┘  └──────────┘
 
-Step 3: Repeat until all pods updated
+第 3 步：重复直到所有 Pod 更新完毕
 ┌──────────┐  ┌──────────┐  ┌──────────┐
 │  Pod 5   │  │  Pod 6   │  │  Pod 4   │
 │  v1.1    │  │  v1.1    │  │  v1.1    │
-│  Ready   │  │  Ready   │  │  Ready   │
+│  就绪    │  │  就绪    │  │  就绪    │
 └──────────┘  └──────────┘  └──────────┘
 
-Result: Zero downtime, always 3+ pods ready
+结果：零停机，始终保持 3+ 个 Pod 就绪
 ```
 
-### Update Timeline
+### 更新时间线
 
 ```
-0s    - Update initiated: kubectl set image
-5s    - New pod created (Pod 4 v1.1)
-15s   - Pod 4 passes readiness probe
-15s   - Pod 4 added to Service endpoints
-16s   - Pod 3 (v1.0) marked for termination
-16s   - Pod 3 removed from Service endpoints
-17s   - Pod 3 receives SIGTERM
-27s   - Pod 3 terminated (after graceful shutdown)
-28s   - New pod created (Pod 5 v1.1)
+0 秒   - 启动更新：kubectl set image
+5 秒   - 创建新 Pod（Pod 4 v1.1）
+15 秒  - Pod 4 通过就绪探针
+15 秒  - Pod 4 添加到 Service 端点
+16 秒  - Pod 3 (v1.0) 标记为终止
+16 秒  - Pod 3 从 Service 端点移除
+17 秒  - Pod 3 收到 SIGTERM
+27 秒  - Pod 3 终止（优雅关闭后）
+28 秒  - 创建新 Pod（Pod 5 v1.1）
 ...
-120s  - All pods updated to v1.1
+120 秒 - 所有 Pod 更新为 v1.1
 ```
 
 ---
 
-## Scaling Architecture
+## 伸缩架构
 
-### Auto-Scaling Decision Tree
+### 自动伸缩决策树
 
 ```
 ┌──────────────────────────────────────────────┐
-│    HPA checks metrics (every 15 seconds)     │
+│    HPA 检查指标（每 15 秒）                    │
 └──────────────┬───────────────────────────────┘
                │
                ▼
       ┌────────────────────┐
-      │ Current CPU > 70%? │
+      │ 当前 CPU > 70%?    │
       └────────┬───────────┘
                │
         ┌──────┴──────┐
         │             │
-       Yes            No
+       是            否
         │             │
         ▼             ▼
 ┌────────────────┐  ┌────────────────┐
-│ Scale Up       │  │ Current        │
-│ Decision       │  │ CPU < 70%?     │
+│ 扩容           │  │ 当前           │
+│ 决策           │  │ CPU < 70%?    │
 └───────┬────────┘  └───────┬────────┘
         │                   │
         ▼            ┌──────┴──────┐
 ┌────────────────┐  │             │
-│ At max (10)?   │ Yes            No
+│ 已达最大(10)?  │ 是            否
 └───────┬────────┘  │             │
         │           ▼             ▼
    ┌────┴────┐  ┌────────────┐  ┌────────────┐
-   │         │  │ Wait 5 min │  │ No action  │
-  Yes        No  │ then scale │  └────────────┘
-   │         │  │ down       │
-   ▼         ▼  └────────────┘
+   │         │  │ 等待 5 分钟 │  │ 无操作    │
+  是        否  │ 然后缩容   │  └────────────┘
+   │         │  └────────────┘
+   ▼         ▼
 ┌─────────┐  ┌────────────┐
-│ No action│ │ Add pods   │
+│ 无操作   │  │ 添加 Pod   │
 └─────────┘  └────────────┘
 ```
 
-### Scaling Capacity Planning
+### 伸缩容量规划
 
 ```
-Resource Requirements per Pod:
-- CPU Request: 500m
-- Memory Request: 1Gi
+每个 Pod 的资源需求：
+- CPU Request：500m
+- 内存 Request：1Gi
 
-Cluster Capacity (example 3-node cluster):
-- Node CPU: 4 cores each = 12 cores total
-- Node Memory: 16Gi each = 48Gi total
-- System Reserved: ~1 core, ~4Gi = usable 11 cores, 44Gi
+集群容量（示例 3 节点集群）：
+- 节点 CPU：每节点 4 核 = 总共 12 核
+- 节点内存：每节点 16Gi = 总共 48Gi
+- 系统预留：约 1 核、约 4Gi = 可用 11 核、44Gi
 
-Maximum Pods (CPU limited):
-11 cores / 0.5 cores per pod = 22 pods max
+最大 Pod 数（CPU 受限）：
+11 核 / 每 Pod 0.5 核 = 最多 22 个 Pod
 
-Maximum Pods (Memory limited):
-44Gi / 1Gi per pod = 44 pods max
+最大 Pod 数（内存受限）：
+44Gi / 每 Pod 1Gi = 最多 44 个 Pod
 
-Actual Limit: 22 pods (CPU constrained)
+实际限制：22 个 Pod（受 CPU 约束）
 
-HPA Max: 10 pods (well within cluster capacity)
-```
-
----
-
-## High Availability Design
-
-### Failure Scenarios and Recovery
-
-#### Scenario 1: Single Pod Failure
-```
-Event: Pod crashes due to OOM error
-Detection: Liveness probe fails (30 seconds)
-Action: Kubernetes restarts container
-Recovery Time: 60 seconds (restart + readiness)
-Impact: None (2 other pods still serving)
-```
-
-#### Scenario 2: Node Failure
-```
-Event: Node becomes unresponsive
-Detection: Node marked NotReady (40 seconds)
-Action: Pods rescheduled to healthy nodes
-Recovery Time: 5 minutes (pod eviction timeout)
-Impact: Reduced capacity during recovery
-Mitigation: Over-provision replicas (3 minimum)
-```
-
-#### Scenario 3: Deployment Failure
-```
-Event: New version has bug, fails readiness
-Detection: Readiness probe fails
-Action: Rolling update halts, no old pods terminated
-Recovery Time: Immediate (rollback command)
-Impact: None (old version still running)
-```
-
-### Availability Calculation
-
-```
-Assumptions:
-- 3 pods minimum
-- Each pod: 99% individual availability
-- Independent failures
-
-Availability = 1 - (1 - 0.99)³ = 1 - 0.000001 = 99.9999%
-
-With pod recovery (60s) and node failure (5 min):
-Effective Availability ≈ 99.95%
-
-Far exceeds 99.9% SLA requirement
+HPA 最大值：10 个 Pod（远在集群容量内）
 ```
 
 ---
 
-## Design Decisions and Trade-offs
+## 高可用设计
 
-### 1. Replica Count: 3 minimum
-**Rationale:**
-- Tolerates 1 pod failure without impact
-- Allows rolling updates with zero downtime
-- Balances cost vs. availability
+### 故障场景与恢复
 
-**Trade-off:**
-- Higher cost than 1-2 replicas
-- More resource consumption
-- Benefit: Much higher availability
+#### 场景 1：单个 Pod 故障
+```
+事件：Pod 因 OOM 错误崩溃
+检测：存活探针失败（30 秒）
+操作：Kubernetes 重启容器
+恢复时间：60 秒（重启 + 就绪）
+影响：无影响（其他 2 个 Pod 仍在服务）
+```
 
----
+#### 场景 2：节点故障
+```
+事件：节点无响应
+检测：节点标记为 NotReady（40 秒）
+操作：Pod 重新调度到健康节点
+恢复时间：5 分钟（Pod 驱逐超时）
+影响：恢复期间容量降低
+缓解措施：超额配置副本（最少 3 个）
+```
 
-### 2. HPA Metrics: CPU 70%, Memory 80%
-**Rationale:**
-- 70% CPU allows headroom for spikes
-- 80% memory prevents OOM kills
-- Different thresholds account for metric characteristics
+#### 场景 3：部署故障
+```
+事件：新版本存在 Bug，就绪探针失败
+检测：就绪探针失败
+操作：滚动更新暂停，不终止旧 Pod
+恢复时间：立即（回滚命令）
+影响：无影响（旧版本仍在运行）
+```
 
-**Trade-off:**
-- Lower thresholds = more pods = higher cost
-- Higher thresholds = risk of overload
-- Balance: Responsive without over-provisioning
+### 可用性计算
 
----
+```
+假设条件：
+- 最少 3 个 Pod
+- 每个 Pod：99% 的单独可用性
+- 独立故障
 
-### 3. Rolling Update: maxSurge=1, maxUnavailable=0
-**Rationale:**
-- maxSurge=1: Minimal extra resources during update
-- maxUnavailable=0: Guaranteed zero downtime
+可用性 = 1 - (1 - 0.99)³ = 1 - 0.000001 = 99.9999%
 
-**Trade-off:**
-- Slower updates (one pod at a time)
-- Higher resource usage during update
-- Benefit: Absolute zero downtime guarantee
+考虑 Pod 恢复（60 秒）和节点故障（5 分钟）后：
+有效可用性 ≈ 99.95%
 
----
-
-### 4. Resource Limits: 2x Requests
-**Rationale:**
-- Allows bursting to handle spikes
-- Prevents runaway resource consumption
-- Based on observed usage patterns
-
-**Trade-off:**
-- Could throttle during legitimate spikes
-- May allow some noisy neighbor issues
-- Balance: Protection without over-restriction
+远超 99.9% 的 SLA 要求
+```
 
 ---
 
-## Future Architecture Enhancements
+## 设计决策与权衡
 
-### Short-term (Next Project)
-1. **Vertical Pod Autoscaling (VPA):** Right-size resource requests
-2. **Pod Disruption Budgets (PDB):** Control voluntary disruptions
-3. **Multi-zone Deployment:** Improve availability
-4. **Istio Service Mesh:** Advanced traffic management
+### 1. 副本数量：最少 3 个
+**理由：**
+- 可容忍 1 个 Pod 故障而不影响服务
+- 允许零停机滚动更新
+- 平衡成本与可用性
 
-### Long-term
-1. **Multi-cluster Deployment:** Geographic distribution
-2. **GitOps with ArgoCD:** Declarative deployment pipeline
-3. **Custom Metrics Scaling:** Scale on inference queue depth
-4. **Spot Instance Integration:** Cost optimization
+**权衡：**
+- 比 1-2 个副本成本更高
+- 消耗更多资源
+- 优点：更高的可用性
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** October 2025
-**Architecture Owner:** AI Infrastructure Curriculum Team
+### 2. HPA 指标：CPU 70%，内存 80%
+**理由：**
+- 70% CPU 为突增预留余量
+- 80% 内存可防止 OOM 杀死
+- 不同阈值考虑了指标特性
+
+**权衡：**
+- 较低阈值 = 更多 Pod = 更高成本
+- 较高阈值 = 过载风险
+- 平衡：响应迅速而不过度预配
+
+---
+
+### 3. 滚动更新：maxSurge=1, maxUnavailable=0
+**理由：**
+- maxSurge=1：更新期间最少额外资源
+- maxUnavailable=0：保证零停机
+
+**权衡：**
+- 更新较慢（一次一个 Pod）
+- 更新期间资源使用更高
+- 优点：绝对的零停机保证
+
+---
+
+### 4. 资源限制：2 倍 Requests
+**理由：**
+- 允许突发以应对高峰
+- 防止资源失控消耗
+- 基于观察到的使用模式
+
+**权衡：**
+- 在合理高峰时可能被限流
+- 可能允许一些噪声邻居问题
+- 平衡：保护而不过度限制
+
+---
+
+## 未来架构增强
+
+### 短期（下一个项目）
+1. **Vertical Pod Autoscaling (VPA)：** 合理调整资源 requests
+2. **Pod Disruption Budgets (PDB)：** 控制自愿干扰
+3. **多可用区部署：** 提高可用性
+4. **Istio 服务网格：** 高级流量管理
+
+### 长期
+1. **多集群部署：** 地理分布
+2. **使用 ArgoCD 的 GitOps：** 声明式部署流水线
+3. **自定义指标伸缩：** 按推理队列深度伸缩
+4. **竞价实例集成：** 成本优化
+
+---
+
+**文档版本：** 1.0
+**最后更新：** 2025 年 10 月
+**架构负责人：** AI 基础设施课程团队

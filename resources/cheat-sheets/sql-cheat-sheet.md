@@ -1,18 +1,18 @@
-# SQL Cheat Sheet — PostgreSQL Focus
+# SQL 速查表 — PostgreSQL 侧重
 
-Quick reference for SQL syntax and PostgreSQL-specific features. Assumes you've completed Module 008.
+SQL 语法和 PostgreSQL 特有功能的快速参考。假设你已完成模块 008。
 
-## Reading Data
+## 读取数据
 
 ```sql
--- Basics
+-- 基础
 SELECT * FROM users;
 SELECT id, email, created_at FROM users WHERE created_at > NOW() - INTERVAL '7 days';
 
 -- DISTINCT
 SELECT DISTINCT country FROM users;
 
--- Sorting + paging
+-- 排序 + 分页
 SELECT id, email FROM users
 ORDER BY created_at DESC
 LIMIT 50 OFFSET 100;
@@ -21,11 +21,11 @@ LIMIT 50 OFFSET 100;
 SELECT * FROM events WHERE event_type IN ('signup', 'purchase');
 SELECT * FROM events WHERE amount BETWEEN 10 AND 100;
 SELECT * FROM users WHERE email LIKE '%@example.com';
-SELECT * FROM users WHERE name ILIKE 'jo%';        -- case-insensitive
+SELECT * FROM users WHERE name ILIKE 'jo%';        -- 不区分大小写
 SELECT * FROM users WHERE deleted_at IS NULL;
 ```
 
-## Aggregates
+## 聚合
 
 ```sql
 SELECT
@@ -41,7 +41,7 @@ HAVING COUNT(*) > 100
 ORDER BY user_count DESC;
 ```
 
-## Joins
+## 连接
 
 ```sql
 -- INNER
@@ -49,29 +49,29 @@ SELECT u.id, u.email, o.total
 FROM users u
 JOIN orders o ON o.user_id = u.id;
 
--- LEFT (users without orders included)
+-- LEFT（包含没有订单的用户）
 SELECT u.id, u.email, COALESCE(SUM(o.total), 0) AS lifetime_value
 FROM users u
 LEFT JOIN orders o ON o.user_id = u.id
 GROUP BY u.id, u.email;
 
--- Self-join
+-- 自连接
 SELECT a.id, b.id AS referrer_id
 FROM users a
 JOIN users b ON a.referrer_id = b.id;
 
--- Anti-join (users with no orders)
+-- 反连接（没有订单的用户）
 SELECT u.*
 FROM users u
 LEFT JOIN orders o ON o.user_id = u.id
 WHERE o.id IS NULL;
--- or, often clearer:
+-- 或更清晰的写法：
 SELECT *
 FROM users u
 WHERE NOT EXISTS (SELECT 1 FROM orders WHERE user_id = u.id);
 ```
 
-## CTEs (WITH)
+## CTE（WITH）
 
 ```sql
 WITH recent_orders AS (
@@ -89,16 +89,16 @@ JOIN high_value hv ON hv.user_id = u.id
 JOIN recent_orders ro ON ro.user_id = u.id;
 ```
 
-## Window Functions
+## 窗口函数
 
 ```sql
--- Running total per user
+-- 每个用户的累计总额
 SELECT
     user_id, created_at, total,
     SUM(total) OVER (PARTITION BY user_id ORDER BY created_at) AS running_total
 FROM orders;
 
--- Rank within partition
+-- 分区内排名
 SELECT
     user_id, total,
     ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY total DESC) AS rn,
@@ -114,18 +114,18 @@ SELECT
 FROM orders;
 ```
 
-## Writing Data
+## 写入数据
 
 ```sql
 -- INSERT
 INSERT INTO users (email, name) VALUES ('a@b.com', 'A');
 
--- Multi-row
+-- 多行
 INSERT INTO users (email, name) VALUES
     ('a@b.com', 'A'),
     ('c@d.com', 'C');
 
--- INSERT … ON CONFLICT (upsert)
+-- INSERT … ON CONFLICT（upsert）
 INSERT INTO users (id, email)
 VALUES (1, 'new@example.com')
 ON CONFLICT (id)
@@ -141,7 +141,7 @@ WHERE u.id = subq.user_id;
 -- DELETE
 DELETE FROM users WHERE deleted_at < NOW() - INTERVAL '90 days';
 
--- RETURNING — useful for getting back inserted ids
+-- RETURNING — 用于获取插入的 ID
 INSERT INTO orders (user_id, total) VALUES (1, 50)
 RETURNING id, created_at;
 ```
@@ -170,49 +170,49 @@ ALTER TABLE users RENAME COLUMN old_name TO new_name;
 DROP TABLE IF EXISTS old_users;
 ```
 
-## Indexes — Rules of Thumb
+## 索引 — 经验法则
 
-| Pattern | Index |
+| 模式 | 索引 |
 |---|---|
-| Equality on a column | B-tree (default) |
-| Range or sort | B-tree (column order: equality → range → sort) |
-| Full-text search | GIN with `tsvector` |
-| JSONB containment | GIN |
-| Geographic | GiST or BRIN |
-| Sequential time-series | BRIN |
+| 列等值查询 | B-tree（默认） |
+| 范围或排序 | B-tree（列顺序：等值 → 范围 → 排序） |
+| 全文搜索 | GIN + `tsvector` |
+| JSONB 包含 | GIN |
+| 地理数据 | GiST 或 BRIN |
+| 顺序时间序列 | BRIN |
 
-Cover frequently-paired columns with a single compound index, not one per column. Always run `EXPLAIN ANALYZE` to confirm the planner uses your index.
+对频繁配对的列使用单个复合索引，而不是每列一个索引。始终运行 `EXPLAIN ANALYZE` 来确认规划器使用了你的索引。
 
 ## PostgreSQL JSONB
 
 ```sql
--- Get a field
+-- 获取字段
 SELECT metadata->'name' FROM users;          -- jsonb
 SELECT metadata->>'name' FROM users;         -- text
 
--- Path
+-- 路径
 SELECT metadata#>'{address,city}' FROM users;
 
--- Contains
+-- 包含
 SELECT * FROM users WHERE metadata @> '{"tier": "gold"}';
 
--- Key exists
+-- 键存在
 SELECT * FROM users WHERE metadata ? 'phone';
 
--- Update specific field
+-- 更新特定字段
 UPDATE users SET metadata = jsonb_set(metadata, '{tier}', '"gold"');
 ```
 
-## Transactions
+## 事务
 
 ```sql
 BEGIN;
 UPDATE accounts SET balance = balance - 100 WHERE id = 1;
 UPDATE accounts SET balance = balance + 100 WHERE id = 2;
 COMMIT;
--- or ROLLBACK;
+-- 或 ROLLBACK;
 
--- Savepoints
+-- 保存点
 BEGIN;
 INSERT INTO ...;
 SAVEPOINT sp1;
@@ -221,70 +221,70 @@ ROLLBACK TO SAVEPOINT sp1;
 COMMIT;
 ```
 
-Isolation levels: `READ COMMITTED` (default), `REPEATABLE READ`, `SERIALIZABLE`. Use serializable when correctness matters and you can retry on conflict.
+隔离级别：`READ COMMITTED`（默认）、`REPEATABLE READ`、`SERIALIZABLE`。当正确性很重要且可以在冲突时重试时，使用 SERIALIZABLE。
 
 ## EXPLAIN
 
 ```sql
-EXPLAIN SELECT ...;                  -- plan
-EXPLAIN ANALYZE SELECT ...;          -- plan + actual timings
+EXPLAIN SELECT ...;                  -- 执行计划
+EXPLAIN ANALYZE SELECT ...;          -- 计划 + 实际执行时间
 EXPLAIN (ANALYZE, BUFFERS) SELECT ...;
 EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) SELECT ...;
 ```
 
-Look for:
-- `Seq Scan` on big tables → missing index.
-- Estimated vs actual row counts diverging → bad stats, run `ANALYZE`.
-- Sort operations spilling to disk → `work_mem` too low for the query.
+检查以下情况：
+- 大表上的 `Seq Scan` → 缺少索引。
+- 估算行数与实际行数差异大 → 统计信息过时，运行 `ANALYZE`。
+- 排序操作溢出到磁盘 → `work_mem` 对该查询来说太小。
 
-## Performance Patterns
+## 性能模式
 
 ```sql
--- Pagination by keyset (much faster than OFFSET on large tables)
+-- 基于 keyset 的分页（在大表上比 OFFSET 快得多）
 SELECT * FROM events
-WHERE created_at < $1                -- last seen timestamp
+WHERE created_at < $1                -- 上次看到的时间戳
 ORDER BY created_at DESC
 LIMIT 50;
 
--- Count estimate without scanning
+-- 不扫描表的估算计数
 SELECT reltuples::bigint AS approx_count
 FROM pg_class
 WHERE relname = 'events';
 
--- Top-N per group via DISTINCT ON
+-- 通过 DISTINCT ON 实现每组 Top-N
 SELECT DISTINCT ON (user_id) user_id, created_at, total
 FROM orders
 ORDER BY user_id, created_at DESC;
 ```
 
-## Useful psql
+## 有用的 psql 命令
 
 ```bash
 psql "postgres://user:pass@host:5432/db"
 
-\l               # list databases
-\dt              # list tables
-\d users         # describe table
-\di              # list indexes
-\du              # list roles/users
-\x               # toggle expanded display
-\timing          # show query times
+\l               # 列出数据库
+\dt              # 列出表
+\d users         # 描述表
+\di              # 列出索引
+\du              # 列出角色/用户
+\x               # 切换扩展显示
+\timing          # 显示查询时间
 \copy users TO 'users.csv' CSV HEADER
 \copy events FROM 'events.csv' CSV HEADER
-\watch 5         # re-run last query every 5s
+\watch 5         # 每 5 秒重新运行上次查询
 ```
 
-## Common Gotchas
+## 常见陷阱
 
-- **`NULL` is not equal to anything.** `NULL = NULL` is `NULL`, not `TRUE`. Use `IS NULL`.
-- **`COUNT(*)` vs `COUNT(col)`.** `COUNT(col)` ignores nulls.
-- **String comparison is case-sensitive** in PostgreSQL by default. Use `LOWER()` or `ILIKE`.
-- **Timezones.** Prefer `TIMESTAMPTZ` over `TIMESTAMP`. Internally stored as UTC.
-- **Implicit casts** can defeat indexes. `WHERE int_column = '5'` may or may not use the index; cast explicitly.
-- **OR is often slower than UNION ALL.** Sometimes splitting `WHERE a OR b` into two queries joined by `UNION ALL` lets the planner use indexes on each.
+- **`NULL` 不等于任何东西。** `NULL = NULL` 是 `NULL`，不是 `TRUE`。使用 `IS NULL`。
+- **`COUNT(*)` 与 `COUNT(col)`。** `COUNT(col)` 忽略空值。
+- **PostgreSQL 中字符串比较默认区分大小写。** 使用 `LOWER()` 或 `ILIKE`。
+- **时区。** 优先使用 `TIMESTAMPTZ` 而非 `TIMESTAMP`。内部以 UTC 存储。
+- **隐式类型转换**可能导致索引失效。`WHERE int_column = '5'` 可能使用也可能不使用索引；显式转换。
+- **OR 通常比 UNION ALL 慢。** 有时将 `WHERE a OR b` 拆分为两个通过 `UNION ALL` 连接的查询可以让规划器对每个部分使用索引。
 
-## See Also
+## 另请参阅
 
-- `EXPLAIN` documentation: https://www.postgresql.org/docs/current/using-explain.html
-- pgAdmin, DBeaver, DataGrip for GUI clients
-- pg_stat_statements extension for query profiling in production
+- `EXPLAIN` 文档：https://www.postgresql.org/docs/current/using-explain.html
+- pgAdmin、DBeaver、DataGrip 等 GUI 客户端
+- pg_stat_statements 扩展用于生产环境查询分析

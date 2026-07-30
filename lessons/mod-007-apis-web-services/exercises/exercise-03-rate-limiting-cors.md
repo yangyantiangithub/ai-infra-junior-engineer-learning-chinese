@@ -1,46 +1,46 @@
-# Exercise 03: Rate Limiting and CORS Configuration
+# 练习 03：速率限制和 CORS 配置
 
-## Overview
+## 概述
 
-Enhance your API with production-ready features including rate limiting to prevent abuse, CORS configuration for web applications, and security headers. Learn how to protect your ML API from overuse while allowing legitimate cross-origin requests.
+使用生产就绪的功能增强你的 API，包括防止滥用的速率限制、面向 Web 应用程序的 CORS 配置以及安全头部。学习如何在允许合法跨域请求的同时保护你的 ML API 免受过量使用。
 
-**Difficulty:** Intermediate
-**Estimated Time:** 2-3 hours
-**Prerequisites:**
-- Exercise 01 and 02 completed
-- Lecture 03: Authentication & Security
-- Understanding of HTTP headers
+**难度：** 中级
+**预计时间：** 2-3 小时
+**先决条件：**
+- 已完成练习 01 和 02
+- 讲座 03：认证和安全
+- 理解 HTTP 头部
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
-- Implement rate limiting to prevent API abuse
-- Configure CORS for cross-origin requests
-- Add security headers
-- Create tiered rate limits based on user roles
-- Monitor and log rate limit violations
-- Handle rate limit errors gracefully
+完成此练习后，你将：
+- 实现速率限制以防止 API 滥用
+- 为跨域请求配置 CORS
+- 添加安全头部
+- 基于用户角色创建分层速率限制
+- 监控和记录速率限制违规
+- 优雅地处理速率限制错误
 
-## Scenario
+## 场景
 
-Your ML API is getting popular, and you need to:
-- Prevent abuse by limiting request rates
-- Allow your frontend application to make requests (different domain)
-- Implement different rate limits for free vs premium users
-- Add security headers for production deployment
+你的 ML API 越来越受欢迎，你需要：
+- 通过限制请求速率来防止滥用
+- 允许你的前端应用程序发起请求（不同域）
+- 为免费用户和高级用户实现不同的速率限制
+- 为生产部署添加安全头部
 
-## Project Setup
+## 项目设置
 
-### Install Dependencies
+### 安装依赖
 
 ```bash
 pip install slowapi
-pip install redis  # Optional: for distributed rate limiting
+pip install redis  # 可选：用于分布式速率限制
 ```
 
-## Part 1: Basic Rate Limiting
+## 第一部分：基本速率限制
 
-**File: app/rate_limiter.py**
+**文件：app/rate_limiter.py**
 
 ```python
 from slowapi import Limiter
@@ -48,28 +48,28 @@ from slowapi.util import get_remote_address
 from fastapi import Request
 from typing import Callable
 
-# TODO: Create basic limiter
+# TODO: 创建基本限制器
 # limiter = Limiter(key_func=get_remote_address)
 
-# TODO: Create custom key function that uses user ID from JWT
+# TODO: 创建使用 JWT 中用户 ID 的自定义键函数
 def get_user_identifier(request: Request) -> str:
     """
-    Get user identifier for rate limiting.
-    Uses user ID from JWT if authenticated, otherwise IP address.
+    获取用于速率限制的用户标识符。
+    如果已认证则使用 JWT 中的用户 ID，否则使用 IP 地址。
     """
-    # TODO: Check if Authorization header exists
-    # TODO: If exists, extract user ID from JWT
-    # TODO: Otherwise, return IP address
-    # Hint: Use get_remote_address(request) for IP
+    # TODO: 检查 Authorization 头部是否存在
+    # TODO: 如果存在，从 JWT 中提取用户 ID
+    # TODO: 否则，返回 IP 地址
+    # 提示：使用 get_remote_address(request) 获取 IP
     pass
 
-# TODO: Create limiter with custom key function
+# TODO: 创建带有自定义键函数的限制器
 # user_limiter = Limiter(key_func=get_user_identifier)
 ```
 
-## Part 2: Apply Rate Limits to Endpoints
+## 第二部分：对 Endpoint 应用速率限制
 
-**File: app/main.py** (update)
+**文件：app/main.py**（更新）
 
 ```python
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -82,7 +82,7 @@ from app.rate_limiter import limiter, user_limiter
 
 app = FastAPI(title="ML API with Rate Limiting")
 
-# TODO: Configure rate limiting
+# TODO: 配置速率限制
 # app.state.limiter = limiter
 # app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # app.add_middleware(SlowAPIMiddleware)
@@ -90,44 +90,44 @@ app = FastAPI(title="ML API with Rate Limiting")
 @app.get("/")
 @limiter.limit("100/minute")
 async def root(request: Request):
-    """Root endpoint with rate limit"""
-    # TODO: Return welcome message
+    """带速率限制的根 endpoint"""
+    # TODO: 返回欢迎消息
     pass
 
 @app.post("/api/v1/predict")
-@limiter.limit("10/minute")  # Limit expensive ML predictions
+@limiter.limit("10/minute")  # 限制昂贵的 ML 预测
 async def predict(
     request: Request,
     input_data: PredictionInput,
     current_user: User = Depends(get_current_active_user)
 ):
-    """Prediction endpoint with rate limit"""
-    # TODO: Make prediction
-    # TODO: Return result
+    """带速率限制的预测 endpoint"""
+    # TODO: 进行预测
+    # TODO: 返回结果
     pass
 
 @app.post("/api/v1/predict/batch")
-@limiter.limit("2/minute")  # Stricter limit for batch operations
+@limiter.limit("2/minute")  # 对批量操作更严格的限制
 async def predict_batch(
     request: Request,
     input_data: BatchPredictionInput,
     current_user: User = Depends(get_current_active_user)
 ):
-    """Batch prediction with strict rate limit"""
-    # TODO: Process batch
-    # TODO: Return results
+    """带严格速率限制的批量预测"""
+    # TODO: 处理批量
+    # TODO: 返回结果
     pass
 
-# TODO: Add endpoint without rate limit (health check)
+# TODO: 添加不带速率限制的 endpoint（健康检查）
 @app.get("/health")
 async def health_check():
-    """Health check - no rate limit"""
+    """健康检查 - 无速率限制"""
     pass
 ```
 
-## Part 3: Tiered Rate Limiting
+## 第三部分：分层速率限制
 
-**File: app/models.py** (update)
+**文件：app/models.py**（更新）
 
 ```python
 from enum import Enum
@@ -144,14 +144,14 @@ class User(BaseModel):
     disabled: bool = False
 ```
 
-**File: app/rate_limiter.py** (update)
+**文件：app/rate_limiter.py**（更新）
 
 ```python
 from app.auth import get_current_user
 from app.models import UserTier
 from fastapi import Depends
 
-# TODO: Define rate limits per tier
+# TODO: 定义每层的速率限制
 RATE_LIMITS = {
     UserTier.FREE: "10/minute",
     UserTier.PRO: "100/minute",
@@ -159,13 +159,13 @@ RATE_LIMITS = {
 }
 
 def get_rate_limit_for_user(user: User) -> str:
-    """Get rate limit based on user tier"""
-    # TODO: Return rate limit from RATE_LIMITS dict
+    """根据用户层级获取速率限制"""
+    # TODO: 从 RATE_LIMITS 字典中返回速率限制
     pass
 
-# TODO: Create dynamic rate limiter
+# TODO: 创建动态速率限制器
 class DynamicRateLimiter:
-    """Rate limiter that adjusts based on user tier"""
+    """根据用户层级调整的速率限制器"""
 
     def __init__(self):
         self.limiters = {
@@ -178,37 +178,37 @@ class DynamicRateLimiter:
         request: Request,
         user: User
     ):
-        """Check rate limit for user based on their tier"""
-        # TODO: Get appropriate limiter for user tier
-        # TODO: Check rate limit
-        # TODO: Raise RateLimitExceeded if exceeded
+        """根据用户层级检查速率限制"""
+        # TODO: 获取适用于用户层级的限制器
+        # TODO: 检查速率限制
+        # TODO: 如果超过则抛出 RateLimitExceeded
         pass
 ```
 
-## Part 4: CORS Configuration
+## 第四部分：CORS 配置
 
-**File: app/main.py** (update)
+**文件：app/main.py**（更新）
 
 ```python
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# TODO: Configure CORS
-# Determine allowed origins based on environment
+# TODO: 配置 CORS
+# 根据环境确定允许的来源
 import os
 
 if os.getenv("ENVIRONMENT") == "production":
-    # TODO: Set specific allowed origins for production
+    # TODO: 为生产环境设置特定的允许来源
     allowed_origins = [
         "https://your-frontend.com",
         "https://app.your-frontend.com"
     ]
 else:
-    # TODO: Allow all origins in development (use cautiously!)
+    # TODO: 在开发环境中允许所有来源（谨慎使用！）
     allowed_origins = ["*"]
 
-# TODO: Add CORS middleware
+# TODO: 添加 CORS 中间件
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
@@ -219,44 +219,44 @@ app.add_middleware(
 )
 ```
 
-## Part 5: Security Headers Middleware
+## 第五部分：安全头部中间件
 
-**File: app/security.py**
+**文件：app/security.py**
 
 ```python
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-    """Add security headers to all responses"""
+    """向所有响应添加安全头部"""
 
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
 
-        # TODO: Add security headers
-        # X-Frame-Options: Prevent clickjacking
+        # TODO: 添加安全头部
+        # X-Frame-Options: 防止点击劫持
         # response.headers["X-Frame-Options"] = "DENY"
 
-        # X-Content-Type-Options: Prevent MIME sniffing
+        # X-Content-Type-Options: 防止 MIME 嗅探
         # response.headers["X-Content-Type-Options"] = "nosniff"
 
-        # X-XSS-Protection: Enable XSS filter
+        # X-XSS-Protection: 启用 XSS 过滤器
         # response.headers["X-XSS-Protection"] = "1; mode=block"
 
-        # Referrer-Policy: Control referrer information
+        # Referrer-Policy: 控制 referrer 信息
         # response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
-        # Content-Security-Policy: Restrict resource loading
+        # Content-Security-Policy: 限制资源加载
         # response.headers["Content-Security-Policy"] = "default-src 'self'"
 
-        # Strict-Transport-Security: Force HTTPS (only if using HTTPS)
+        # Strict-Transport-Security: 强制 HTTPS（仅在使用 HTTPS 时）
         # if request.url.scheme == "https":
         #     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
 
         return response
 ```
 
-**Apply middleware in main.py:**
+**在 main.py 中应用中间件：**
 
 ```python
 from app.security import SecurityHeadersMiddleware
@@ -264,9 +264,9 @@ from app.security import SecurityHeadersMiddleware
 app.add_middleware(SecurityHeadersMiddleware)
 ```
 
-## Part 6: Rate Limit Information Headers
+## 第六部分：速率限制信息头部
 
-**File: app/rate_limiter.py** (update)
+**文件：app/rate_limiter.py**（更新）
 
 ```python
 from fastapi import Response
@@ -277,22 +277,22 @@ def add_rate_limit_headers(
     remaining: int,
     reset_time: int
 ):
-    """Add rate limit information to response headers"""
-    # TODO: Add X-RateLimit-Limit header
+    """向响应头部添加速率限制信息"""
+    # TODO: 添加 X-RateLimit-Limit 头部
     # response.headers["X-RateLimit-Limit"] = str(limit)
 
-    # TODO: Add X-RateLimit-Remaining header
+    # TODO: 添加 X-RateLimit-Remaining 头部
     # response.headers["X-RateLimit-Remaining"] = str(remaining)
 
-    # TODO: Add X-RateLimit-Reset header (Unix timestamp)
+    # TODO: 添加 X-RateLimit-Reset 头部（Unix 时间戳）
     # response.headers["X-RateLimit-Reset"] = str(reset_time)
 
     pass
 ```
 
-## Part 7: Custom Rate Limit Error Response
+## 第七部分：自定义速率限制错误响应
 
-**File: app/main.py** (update)
+**文件：app/main.py**（更新）
 
 ```python
 from fastapi import Request, status
@@ -302,12 +302,12 @@ import time
 
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
-    """Custom handler for rate limit exceeded errors"""
+    """速率限制超出错误的自定义处理器"""
 
-    # TODO: Calculate retry after time
-    # retry_after = 60  # seconds
+    # TODO: 计算重试时间
+    # retry_after = 60  # 秒
 
-    # TODO: Create custom error response
+    # TODO: 创建自定义错误响应
     response = JSONResponse(
         status_code=status.HTTP_429_TOO_MANY_REQUESTS,
         content={
@@ -318,15 +318,15 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
         }
     )
 
-    # TODO: Add Retry-After header
+    # TODO: 添加 Retry-After 头部
     # response.headers["Retry-After"] = str(retry_after)
 
     return response
 ```
 
-## Part 8: Testing CORS and Rate Limiting
+## 第八部分：测试 CORS 和速率限制
 
-**File: tests/test_rate_limit.py**
+**文件：tests/test_rate_limit.py**
 
 ```python
 from fastapi.testclient import TestClient
@@ -336,72 +336,72 @@ import time
 client = TestClient(app)
 
 def test_rate_limit_enforced():
-    """Test that rate limit is enforced"""
-    # TODO: Get auth token
-    # TODO: Make requests up to the limit
-    # TODO: Verify all succeed (status 200)
-    # TODO: Make one more request
-    # TODO: Verify it fails with 429
+    """测试速率限制是否生效"""
+    # TODO: 获取认证令牌
+    # TODO: 发起达到限制的请求
+    # TODO: 验证全部成功 (status 200)
+    # TODO: 再发起一个请求
+    # TODO: 验证失败并返回 429
     pass
 
 def test_rate_limit_headers():
-    """Test that rate limit headers are present"""
-    # TODO: Make a request
-    # TODO: Check for X-RateLimit-Limit header
-    # TODO: Check for X-RateLimit-Remaining header
-    # TODO: Verify headers have correct values
+    """测试速率限制头部是否存在"""
+    # TODO: 发起一个请求
+    # TODO: 检查 X-RateLimit-Limit 头部
+    # TODO: 检查 X-RateLimit-Remaining 头部
+    # TODO: 验证头部值正确
     pass
 
 def test_rate_limit_resets():
-    """Test that rate limit resets after time window"""
-    # TODO: Exhaust rate limit
-    # TODO: Wait for reset period
-    # TODO: Verify requests work again
+    """测试速率限制在时间窗口后重置"""
+    # TODO: 耗尽速率限制
+    # TODO: 等待重置周期
+    # TODO: 验证请求再次可用
     pass
 
 def test_different_limits_per_tier():
-    """Test that different user tiers have different limits"""
-    # TODO: Login as free user
-    # TODO: Make 10 requests (free tier limit)
-    # TODO: Verify 11th request fails
+    """测试不同用户层级有不同的限制"""
+    # TODO: 以免费用户身份登录
+    # TODO: 发起 10 个请求（免费层限制）
+    # TODO: 验证第 11 个请求失败
 
-    # TODO: Login as pro user
-    # TODO: Make 100 requests (pro tier limit)
-    # TODO: Verify all succeed
+    # TODO: 以专业用户身份登录
+    # TODO: 发起 100 个请求（专业层限制）
+    # TODO: 验证全部成功
     pass
 
 def test_cors_headers():
-    """Test that CORS headers are present"""
-    # TODO: Make OPTIONS request
-    # TODO: Check for Access-Control-Allow-Origin
-    # TODO: Check for Access-Control-Allow-Methods
-    # TODO: Check for Access-Control-Allow-Headers
+    """测试 CORS 头部是否存在"""
+    # TODO: 发起 OPTIONS 请求
+    # TODO: 检查 Access-Control-Allow-Origin
+    # TODO: 检查 Access-Control-Allow-Methods
+    # TODO: 检查 Access-Control-Allow-Headers
     pass
 
 def test_security_headers():
-    """Test that security headers are present"""
-    # TODO: Make any request
-    # TODO: Check for X-Frame-Options
-    # TODO: Check for X-Content-Type-Options
-    # TODO: Check for X-XSS-Protection
-    # TODO: Check for Content-Security-Policy
+    """测试安全头部是否存在"""
+    # TODO: 发起任意请求
+    # TODO: 检查 X-Frame-Options
+    # TODO: 检查 X-Content-Type-Options
+    # TODO: 检查 X-XSS-Protection
+    # TODO: 检查 Content-Security-Policy
     pass
 
 def test_rate_limit_error_format():
-    """Test rate limit error response format"""
-    # TODO: Exhaust rate limit
-    # TODO: Make request that exceeds limit
-    # TODO: Verify response has error message
-    # TODO: Verify response has retry_after
-    # TODO: Check Retry-After header
+    """测试速率限制错误响应格式"""
+    # TODO: 耗尽速率限制
+    # TODO: 发起超出限制的请求
+    # TODO: 验证响应包含错误消息
+    # TODO: 验证响应包含 retry_after
+    # TODO: 检查 Retry-After 头部
     pass
 ```
 
-## Part 9: Frontend CORS Testing
+## 第九部分：前端 CORS 测试
 
-Create a simple HTML file to test CORS:
+创建一个简单的 HTML 文件来测试 CORS：
 
-**File: test_cors.html**
+**文件：test_cors.html**
 
 ```html
 <!DOCTYPE html>
@@ -419,7 +419,7 @@ Create a simple HTML file to test CORS:
             const resultDiv = document.getElementById('result');
 
             try {
-                // TODO: Make fetch request to your API
+                // TODO: 向你的 API 发起 fetch 请求
                 const response = await fetch('http://localhost:8000/api/v1/predict', {
                     method: 'POST',
                     headers: {
@@ -446,15 +446,15 @@ Create a simple HTML file to test CORS:
 </html>
 ```
 
-**Test CORS:**
-1. Open the HTML file in browser
-2. Click "Test API" button
-3. Check browser console for CORS errors
-4. Verify response is received
+**测试 CORS：**
+1. 在浏览器中打开 HTML 文件
+2. 点击 "Test API" 按钮
+3. 检查浏览器控制台是否有 CORS 错误
+4. 验证是否收到响应
 
-## Part 10: Monitoring Rate Limit Usage
+## 第十部分：监控速率限制使用情况
 
-**File: app/monitoring.py**
+**文件：app/monitoring.py**
 
 ```python
 from collections import defaultdict
@@ -462,15 +462,15 @@ from datetime import datetime
 from typing import Dict
 
 class RateLimitMonitor:
-    """Monitor and log rate limit violations"""
+    """监控和记录速率限制违规"""
 
     def __init__(self):
         self.violations = defaultdict(list)
         self.requests_by_user = defaultdict(int)
 
     def log_violation(self, user_id: str, endpoint: str):
-        """Log a rate limit violation"""
-        # TODO: Add violation to list
+        """记录速率限制违规"""
+        # TODO: 将违规添加到列表
         # self.violations[user_id].append({
         #     "endpoint": endpoint,
         #     "timestamp": datetime.utcnow()
@@ -478,30 +478,30 @@ class RateLimitMonitor:
         pass
 
     def increment_request_count(self, user_id: str):
-        """Increment request count for user"""
-        # TODO: Increment counter
+        """增加用户请求计数"""
+        # TODO: 增加计数器
         pass
 
     def get_user_violations(self, user_id: str) -> list:
-        """Get violations for a specific user"""
-        # TODO: Return violations list
+        """获取特定用户的违规"""
+        # TODO: 返回违规列表
         pass
 
     def get_top_users(self, limit: int = 10) -> Dict:
-        """Get top users by request count"""
-        # TODO: Sort users by request count
-        # TODO: Return top N users
+        """获取请求数最多的用户"""
+        # TODO: 按请求数排序用户
+        # TODO: 返回前 N 名用户
         pass
 
-# Global monitor instance
+# 全局监控实例
 monitor = RateLimitMonitor()
 ```
 
-## Challenges and Extensions
+## 挑战和扩展
 
-### Challenge 1: Redis-Based Rate Limiting
+### 挑战 1：基于 Redis 的速率限制
 
-Implement distributed rate limiting with Redis:
+使用 Redis 实现分布式速率限制：
 
 ```python
 from slowapi.middleware import SlowAPIMiddleware
@@ -517,24 +517,24 @@ limiter = Limiter(
 )
 ```
 
-### Challenge 2: Dynamic Rate Limit Adjustment
+### 挑战 2：动态速率限制调整
 
-Adjust rate limits based on API load:
+根据 API 负载调整速率限制：
 
 ```python
 def get_dynamic_rate_limit() -> str:
     cpu_usage = get_cpu_usage()
     if cpu_usage > 80:
-        return "5/minute"  # Reduce limit under high load
+        return "5/minute"  # 高负载下减少限制
     elif cpu_usage > 50:
         return "20/minute"
     else:
         return "50/minute"
 ```
 
-### Challenge 3: Rate Limit Bypass for Trusted IPs
+### 挑战 3：受信任 IP 的速率限制绕过
 
-Allow unlimited requests from trusted IPs:
+允许来自受信任 IP 的无限制请求：
 
 ```python
 TRUSTED_IPS = ["10.0.0.1", "192.168.1.1"]
@@ -544,9 +544,9 @@ def should_check_rate_limit(request: Request) -> bool:
     return client_ip not in TRUSTED_IPS
 ```
 
-### Challenge 4: Rate Limit Dashboard
+### 挑战 4：速率限制仪表盘
 
-Create an endpoint to view rate limit statistics:
+创建查看速率限制统计信息的 endpoint：
 
 ```python
 @app.get("/admin/rate-limits/stats")
@@ -560,14 +560,14 @@ async def get_rate_limit_stats(
     }
 ```
 
-### Challenge 5: Custom CORS Per Endpoint
+### 挑战 5：每个 Endpoint 的自定义 CORS
 
-Different CORS policies for different endpoints:
+不同 endpoint 的不同 CORS 策略：
 
 ```python
 from fastapi.middleware.cors import CORSMiddleware
 
-# Stricter CORS for admin endpoints
+# 管理 endpoint 更严格的 CORS
 admin_cors = CORSMiddleware(
     app=app,
     allow_origins=["https://admin.example.com"],
@@ -575,7 +575,7 @@ admin_cors = CORSMiddleware(
     allow_methods=["GET", "POST"],
 )
 
-# Permissive CORS for public endpoints
+# 公共 endpoint 宽松的 CORS
 public_cors = CORSMiddleware(
     app=app,
     allow_origins=["*"],
@@ -584,61 +584,61 @@ public_cors = CORSMiddleware(
 )
 ```
 
-## Common Issues and Solutions
+## 常见问题及解决方案
 
-### Issue 1: CORS Preflight Requests Failing
+### 问题 1：CORS 预检请求失败
 
-**Problem:** OPTIONS requests return 405
+**问题：** OPTIONS 请求返回 405
 
-**Solution:**
-- Ensure CORS middleware is added before routes
-- Add OPTIONS to allowed_methods
-- Check that wildcard (*) is used cautiously
+**解决方案：**
+- 确保 CORS 中间件在路由之前添加
+- 将 OPTIONS 添加到 allowed_methods
+- 谨慎使用通配符 (*)
 
-### Issue 2: Rate Limit Not Working
+### 问题 2：速率限制不起作用
 
-**Problem:** Rate limit not enforced
+**问题：** 速率限制未生效
 
-**Solution:**
-- Verify SlowAPIMiddleware is added
-- Check that @limiter.limit() decorator is applied
-- Ensure limiter is added to app.state
+**解决方案：**
+- 验证 SlowAPIMiddleware 已添加
+- 检查 @limiter.limit() 装饰器是否已应用
+- 确保限制器已添加到 app.state
 
-### Issue 3: Rate Limit Headers Missing
+### 问题 3：速率限制头部丢失
 
-**Problem:** X-RateLimit headers not in response
+**问题：** X-RateLimit 头部不在响应中
 
-**Solution:**
-- Manually add headers in endpoint
-- Use custom rate limiter that adds headers
-- Check middleware order
+**解决方案：**
+- 在 endpoint 中手动添加头部
+- 使用添加头部的自定义速率限制器
+- 检查中间件顺序
 
-## Deliverables
+## 交付物
 
-- ✅ Rate limiting implemented
-- ✅ CORS configured correctly
-- ✅ Security headers added
-- ✅ Tiered rate limits based on user roles
-- ✅ Custom error responses for rate limits
-- ✅ Tests for all security features
-- ✅ Documentation of rate limits
+- ✅ 速率限制已实现
+- ✅ CORS 配置正确
+- ✅ 安全头部已添加
+- ✅ 基于用户角色的分层速率限制
+- ✅ 速率限制的自定义错误响应
+- ✅ 所有安全功能的测试
+- ✅ 速率限制文档
 
-## Key Takeaways
+## 关键要点
 
-1. **Rate Limiting:** Essential for preventing abuse and ensuring fair usage
-2. **CORS:** Required for web applications on different domains
-3. **Security Headers:** Add multiple layers of protection
-4. **Tiered Access:** Different limits for different user tiers
-5. **Monitoring:** Track violations and usage patterns
+1. **速率限制：** 对于防止滥用和确保公平使用至关重要
+2. **CORS：** Web 应用程序在不同域时必需
+3. **安全头部：** 添加多层保护
+4. **分层访问：** 不同用户层级的不同限制
+5. **监控：** 跟踪违规和使用模式
 
-## Next Steps
+## 下一步
 
-- Exercise 04: Background tasks and async operations
-- Exercise 05: Deploy API with Docker and NGINX
-- Learn about API gateway patterns
+- 练习 04：后台任务和异步操作
+- 练习 05：使用 Docker 和 NGINX 部署 API
+- 学习 API 网关模式
 
 ---
 
-**Estimated Time:** 2-3 hours
-**Difficulty:** Intermediate
-**Focus:** Rate limiting, CORS, security headers, production hardening
+**预计时间：** 2-3 小时
+**难度：** 中级
+**重点：** 速率限制、CORS、安全头部、生产加固

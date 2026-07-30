@@ -1,65 +1,65 @@
-# Development Tools Guide
+# 开发工具指南
 
-Essential tools and setup recommendations for Junior AI Infrastructure Engineers.
-
----
-
-## Table of Contents
-
-- [Development Environment](#development-environment)
-- [Text Editors and IDEs](#text-editors-and-ides)
-- [Terminal and Shell](#terminal-and-shell)
-- [Container Tools](#container-tools)
-- [Kubernetes Tools](#kubernetes-tools)
-- [Version Control](#version-control)
-- [Python Development](#python-development)
-- [Monitoring and Debugging](#monitoring-and-debugging)
-- [API Development and Testing](#api-development-and-testing)
-- [Database Tools](#database-tools)
-- [Cloud Platforms](#cloud-platforms)
-- [Productivity Tools](#productivity-tools)
+初级 AI 基础设施工程师的必备工具和搭建建议。
 
 ---
 
-## Development Environment
+## 目录
 
-### Operating System
+- [开发环境](#开发环境)
+- [文本编辑器和 IDE](#文本编辑器和-ide)
+- [终端和 Shell](#终端和-shell)
+- [容器工具](#容器工具)
+- [Kubernetes 工具](#kubernetes-工具)
+- [版本控制](#版本控制)
+- [Python 开发](#python-开发)
+- [监控和调试](#监控和调试)
+- [API 开发和测试](#api-开发和测试)
+- [数据库工具](#数据库工具)
+- [云平台](#云平台)
+- [效率工具](#效率工具)
 
-**Recommended**: Linux (Ubuntu 22.04 LTS) or macOS
+---
 
-**Option 1: Linux Native**
-- Best for development
-- Native Docker support
-- Most servers run Linux
-- Recommended distributions:
+## 开发环境
+
+### 操作系统
+
+**推荐**：Linux（Ubuntu 22.04 LTS）或 macOS
+
+**选项 1：Linux 原生**
+- 最适合开发
+- 原生 Docker 支持
+- 大多数服务器运行 Linux
+- 推荐发行版：
   - Ubuntu 22.04 LTS
   - Fedora
   - Pop!_OS
 
-**Option 2: macOS**
-- Good for development
-- Unix-based
-- Install Homebrew package manager
+**选项 2：macOS**
+- 适合开发
+- 基于 Unix
+- 安装 Homebrew 包管理器
 
-**Option 3: Windows + WSL2**
-- Windows Subsystem for Linux 2
-- Near-native Linux performance
-- Install Ubuntu 22.04 from Microsoft Store
-- Configure VSCode for WSL
+**选项 3：Windows + WSL2**
+- 适用于 Linux 的 Windows 子系统 2
+- 接近原生的 Linux 性能
+- 从 Microsoft Store 安装 Ubuntu 22.04
+- 配置 VSCode 以支持 WSL
 
-**Option 4: Virtual Machine**
-- VirtualBox or VMware
-- Install Ubuntu Desktop
-- Minimum 4GB RAM, 25GB storage
+**选项 4：虚拟机**
+- VirtualBox 或 VMware
+- 安装 Ubuntu Desktop
+- 最低 4GB 内存，25GB 存储
 
 ---
 
-## Text Editors and IDEs
+## 文本编辑器和 IDE
 
-### Visual Studio Code (Recommended)
-**Free | Cross-platform**
+### Visual Studio Code（推荐）
+**免费 | 跨平台**
 
-**Installation**:
+**安装**：
 ```bash
 # Ubuntu/Debian
 sudo snap install code --classic
@@ -68,24 +68,24 @@ sudo snap install code --classic
 brew install --cask visual-studio-code
 
 # Windows
-# Download from https://code.visualstudio.com/
+# 从 https://code.visualstudio.com/ 下载
 ```
 
-**Essential Extensions**:
-- Python (Microsoft)
-- Docker (Microsoft)
-- Kubernetes (Microsoft)
-- GitLens (Enhanced Git)
+**必备扩展**：
+- Python（Microsoft）
+- Docker（Microsoft）
+- Kubernetes（Microsoft）
+- GitLens（增强版 Git）
 - Remote - SSH
 - Remote - Containers
-- YAML (Red Hat)
-- Pylance (Python language server)
+- YAML（Red Hat）
+- Pylance（Python 语言服务器）
 - autoDocstring
 - Better Comments
 - Error Lens
 - indent-rainbow
 
-**Recommended Settings**:
+**推荐设置**：
 ```json
 {
   "python.linting.enabled": true,
@@ -98,140 +98,140 @@ brew install --cask visual-studio-code
 ```
 
 ### PyCharm Community Edition
-**Free | Python-focused**
-- Powerful Python IDE
-- Excellent debugging
-- Built-in database tools
-- Download: https://www.jetbrains.com/pycharm/
+**免费 | 专注于 Python**
+- 强大的 Python IDE
+- 出色的调试功能
+- 内置数据库工具
+- 下载：https://www.jetbrains.com/pycharm/
 
-### Vim/Neovim (Advanced)
-**Free | Terminal-based**
-- Ubiquitous on servers
-- Steep learning curve
-- Highly customizable
-- Worth learning basics
+### Vim/Neovim（高级）
+**免费 | 基于终端**
+- 在服务器上无处不在
+- 学习曲线陡峭
+- 高度可定制
+- 值得学习基础知识
 
 ---
 
-## Terminal and Shell
+## 终端和 Shell
 
-### Terminal Emulators
+### 终端模拟器
 
-**Linux**:
-- Default GNOME Terminal (good)
-- Terminator (split panes)
-- Alacritty (GPU-accelerated)
+**Linux**：
+- 默认 GNOME Terminal（还不错）
+- Terminator（分屏功能）
+- Alacritty（GPU 加速）
 
-**macOS**:
-- iTerm2 (highly recommended)
-- Default Terminal (adequate)
+**macOS**：
+- iTerm2（强烈推荐）
+- 默认 Terminal（够用）
 
-**Windows**:
-- Windows Terminal (recommended)
+**Windows**：
+- Windows Terminal（推荐）
 - ConEmu
 - Hyper
 
-### Shell Configuration
+### Shell 配置
 
-**Zsh with Oh My Zsh (Recommended)**:
+**Zsh + Oh My Zsh（推荐）**：
 ```bash
-# Install Zsh
+# 安装 Zsh
 sudo apt install zsh  # Ubuntu
 brew install zsh      # macOS
 
-# Install Oh My Zsh
+# 安装 Oh My Zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-# Recommended plugins in ~/.zshrc:
+# ~/.zshrc 中的推荐插件：
 plugins=(git docker docker-compose kubectl python pip)
 
-# Recommended theme:
-ZSH_THEME="robbyrussell"  # or "agnoster"
+# 推荐主题：
+ZSH_THEME="robbyrussell"  # 或 "agnoster"
 ```
 
-**Useful Zsh Plugins**:
+**有用的 Zsh 插件**：
 - zsh-autosuggestions
 - zsh-syntax-highlighting
 - zsh-completions
 
-### Terminal Multiplexer
+### 终端复用器
 
-**tmux**:
+**tmux**：
 ```bash
-# Install
+# 安装
 sudo apt install tmux  # Ubuntu
 brew install tmux      # macOS
 
-# Basic commands
-tmux                    # start session
-tmux ls                # list sessions
-tmux attach            # reattach
-Ctrl+b d               # detach
-Ctrl+b %               # split vertical
-Ctrl+b "               # split horizontal
+# 基本命令
+tmux                    # 启动会话
+tmux ls                # 列出会话
+tmux attach            # 重新连接
+Ctrl+b d               # 分离
+Ctrl+b %               # 垂直分割
+Ctrl+b "               # 水平分割
 ```
 
 ---
 
-## Container Tools
+## 容器工具
 
 ### Docker Desktop
-**Free for personal use | Cross-platform**
-- Download: https://www.docker.com/products/docker-desktop
-- Includes Docker Engine, Docker Compose, Kubernetes
-- GUI for managing containers
+**个人使用免费 | 跨平台**
+- 下载：https://www.docker.com/products/docker-desktop
+- 包含 Docker Engine、Docker Compose、Kubernetes
+- 管理容器的 GUI
 
-**Installation (Ubuntu)**:
+**Ubuntu 安装**：
 ```bash
-# Remove old versions
+# 卸载旧版本
 sudo apt remove docker docker-engine docker.io containerd runc
 
-# Install dependencies
+# 安装依赖
 sudo apt update
 sudo apt install ca-certificates curl gnupg lsb-release
 
-# Add Docker's official GPG key
+# 添加 Docker 官方 GPG 密钥
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
   sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
-# Set up repository
+# 设置仓库
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
   https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# Install Docker Engine
+# 安装 Docker Engine
 sudo apt update
 sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
-# Add user to docker group
+# 将用户添加到 docker 组
 sudo usermod -aG docker $USER
-# Log out and back in
+# 注销并重新登录
 ```
 
 ### Docker Compose
-**Free**
-- Comes with Docker Desktop
-- Standalone installation:
+**免费**
+- 随 Docker Desktop 自带
+- 独立安装：
 ```bash
 sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
   -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 ```
 
-### Dive - Docker Image Analysis
-**Free**
+### Dive - Docker 镜像分析
+**免费**
 ```bash
-# Install
+# 安装
 brew install dive  # macOS
-# Ubuntu: download from GitHub releases
+# Ubuntu：从 GitHub releases 下载
 
-# Analyze image layers
+# 分析镜像层
 dive myimage:latest
 ```
 
-### Portainer (Docker Management UI)
-**Free**
+### Portainer（Docker 管理 UI）
+**免费**
 ```bash
 docker volume create portainer_data
 docker run -d -p 9000:9000 --name=portainer --restart=always \
@@ -241,92 +241,92 @@ docker run -d -p 9000:9000 --name=portainer --restart=always \
 
 ---
 
-## Kubernetes Tools
+## Kubernetes 工具
 
 ### kubectl
-**Free | Official CLI**
+**免费 | 官方 CLI**
 ```bash
-# Install (Linux)
+# 安装（Linux）
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
-# Install (macOS)
+# 安装（macOS）
 brew install kubectl
 
-# Verify
+# 验证
 kubectl version --client
 ```
 
-### Local Kubernetes Clusters
+### 本地 Kubernetes 集群
 
-**kind (Kubernetes in Docker)**:
+**kind（Kubernetes in Docker）**：
 ```bash
-# Install
+# 安装
 brew install kind  # macOS
-# Linux: download from GitHub
+# Linux：从 GitHub 下载
 
-# Create cluster
+# 创建集群
 kind create cluster --name dev
 kind get clusters
 kind delete cluster --name dev
 ```
 
-**minikube**:
+**minikube**：
 ```bash
-# Install
+# 安装
 brew install minikube  # macOS
-# Ubuntu: download from GitHub
+# Ubuntu：从 GitHub 下载
 
-# Start
+# 启动
 minikube start
 minikube status
 minikube dashboard  # Web UI
 minikube stop
 ```
 
-**Docker Desktop Kubernetes**:
-- Enable in Docker Desktop settings
-- Single-node cluster
-- Easy to use
+**Docker Desktop Kubernetes**：
+- 在 Docker Desktop 设置中启用
+- 单节点集群
+- 易于使用
 
-### kubectx and kubens
-**Free | Context and namespace switching**
+### kubectx 和 kubens
+**免费 | 上下文和命名空间切换**
 ```bash
-# Install
+# 安装
 brew install kubectx  # macOS
 
-# Usage
-kubectx                # list contexts
-kubectx dev            # switch to dev context
-kubens                 # list namespaces
-kubens production      # switch namespace
+# 使用
+kubectx                # 列出上下文
+kubectx dev            # 切换到 dev 上下文
+kubens                 # 列出命名空间
+kubens production      # 切换命名空间
 ```
 
 ### k9s - Kubernetes CLI UI
-**Free**
+**免费**
 ```bash
-# Install
+# 安装
 brew install derailed/k9s/k9s  # macOS
 
-# Run
+# 运行
 k9s
 ```
 
 ### Lens - Kubernetes IDE
-**Free**
-- Download: https://k8slens.dev/
-- Visual Kubernetes management
-- Cluster metrics and logs
-- Multi-cluster support
+**免费**
+- 下载：https://k8slens.dev/
+- 可视化 Kubernetes 管理
+- 集群指标和日志
+- 多集群支持
 
 ### Helm
-**Free | Package manager for Kubernetes**
+**免费 | Kubernetes 包管理器**
 ```bash
-# Install
+# 安装
 brew install helm  # macOS
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash  # Linux
 
-# Usage
+# 使用
 helm repo add stable https://charts.helm.sh/stable
 helm search repo <chart>
 helm install myrelease stable/<chart>
@@ -334,143 +334,143 @@ helm install myrelease stable/<chart>
 
 ---
 
-## Version Control
+## 版本控制
 
 ### Git
-**Free | Included in most OS**
+**免费 | 大多数操作系统内置**
 ```bash
-# Install
+# 安装
 sudo apt install git  # Ubuntu
 brew install git      # macOS
 
-# Configuration
+# 配置
 git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
 git config --global init.defaultBranch main
 ```
 
 ### GitHub CLI (gh)
-**Free**
+**免费**
 ```bash
-# Install
+# 安装
 brew install gh       # macOS
 sudo apt install gh   # Ubuntu
 
-# Authenticate
+# 认证
 gh auth login
 
-# Usage
+# 使用
 gh repo create
 gh pr create
 gh pr list
 gh issue create
 ```
 
-### GitKraken (Git GUI)
-**Free for public repos | Paid for private**
-- Download: https://www.gitkraken.com/
-- Visual Git interface
-- Merge conflict resolution
+### GitKraken（Git GUI）
+**公共仓库免费 | 私有仓库付费**
+- 下载：https://www.gitkraken.com/
+- 可视化 Git 界面
+- 合并冲突解决
 
-### SourceTree (Git GUI)
-**Free**
-- Download: https://www.sourcetreeapp.com/
-- Alternative to GitKraken
+### SourceTree（Git GUI）
+**免费**
+- 下载：https://www.sourcetreeapp.com/
+- GitKraken 的替代品
 
 ---
 
-## Python Development
+## Python 开发
 
-### Python Version Management
+### Python 版本管理
 
-**pyenv**:
+**pyenv**：
 ```bash
-# Install
+# 安装
 curl https://pyenv.run | bash
 
-# Add to shell configuration
+# 添加到 shell 配置
 export PATH="$HOME/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
-# Install Python versions
+# 安装 Python 版本
 pyenv install 3.9.16
 pyenv install 3.11.2
 pyenv global 3.11.2
 ```
 
-### Virtual Environments
+### 虚拟环境
 
-**venv (built-in)**:
+**venv（内置）**：
 ```bash
-# Create
+# 创建
 python -m venv venv
 
-# Activate
+# 激活
 source venv/bin/activate  # Linux/macOS
 venv\Scripts\activate     # Windows
 
-# Deactivate
+# 停用
 deactivate
 ```
 
-**virtualenvwrapper** (recommended):
+**virtualenvwrapper（推荐）**：
 ```bash
-# Install
+# 安装
 pip install virtualenvwrapper
 
-# Add to ~/.bashrc or ~/.zshrc
+# 添加到 ~/.bashrc 或 ~/.zshrc
 export WORKON_HOME=$HOME/.virtualenvs
 source /usr/local/bin/virtualenvwrapper.sh
 
-# Usage
+# 使用
 mkvirtualenv myproject
 workon myproject
 deactivate
 rmvirtualenv myproject
 ```
 
-### Python Tools
+### Python 工具
 
-**Poetry** (dependency management):
+**Poetry（依赖管理）**：
 ```bash
-# Install
+# 安装
 curl -sSL https://install.python-poetry.org | python3 -
 
-# Usage
+# 使用
 poetry new myproject
 poetry add requests
 poetry install
 poetry run python app.py
 ```
 
-**Black** (code formatter):
+**Black（代码格式化）**：
 ```bash
 pip install black
 black myfile.py
 black .
 ```
 
-**Flake8** (linter):
+**Flake8（代码检查）**：
 ```bash
 pip install flake8
 flake8 myfile.py
 ```
 
-**Pylint** (linter):
+**Pylint（代码检查）**：
 ```bash
 pip install pylint
 pylint myfile.py
 ```
 
-**pytest** (testing):
+**pytest（测试）**：
 ```bash
 pip install pytest pytest-cov
 pytest
 pytest --cov=src tests/
 ```
 
-**ipython** (enhanced Python shell):
+**ipython（增强版 Python Shell）**：
 ```bash
 pip install ipython
 ipython
@@ -478,10 +478,10 @@ ipython
 
 ---
 
-## Monitoring and Debugging
+## 监控和调试
 
 ### Prometheus
-**Free | Monitoring system**
+**免费 | 监控系统**
 ```bash
 # Docker
 docker run -d -p 9090:9090 \
@@ -490,21 +490,21 @@ docker run -d -p 9090:9090 \
 ```
 
 ### Grafana
-**Free | Visualization platform**
+**免费 | 可视化平台**
 ```bash
 # Docker
 docker run -d -p 3000:3000 grafana/grafana
 ```
 
 ### htop
-**Free | Process viewer**
+**免费 | 进程查看器**
 ```bash
 sudo apt install htop
 htop
 ```
 
 ### ctop
-**Free | Container monitoring**
+**免费 | 容器监控**
 ```bash
 sudo wget https://github.com/bcicen/ctop/releases/download/v0.7.7/ctop-0.7.7-linux-amd64 \
   -O /usr/local/bin/ctop
@@ -512,44 +512,44 @@ sudo chmod +x /usr/local/bin/ctop
 ctop
 ```
 
-### Sentry (Error Tracking)
-**Free tier available**
-- Sign up: https://sentry.io/
-- Python integration:
+### Sentry（错误跟踪）
+**提供免费套餐**
+- 注册：https://sentry.io/
+- Python 集成：
 ```bash
 pip install sentry-sdk
 ```
 
 ---
 
-## API Development and Testing
+## API 开发和测试
 
 ### Postman
-**Free tier**
-- Download: https://www.postman.com/
-- API testing and development
-- Collection sharing
-- Environment variables
+**免费套餐**
+- 下载：https://www.postman.com/
+- API 测试和开发
+- 集合共享
+- 环境变量
 
 ### Insomnia
-**Free | Open source**
-- Download: https://insomnia.rest/
-- Alternative to Postman
-- GraphQL support
+**免费 | 开源**
+- 下载：https://insomnia.rest/
+- Postman 的替代品
+- GraphQL 支持
 
 ### HTTPie
-**Free | CLI HTTP client**
+**免费 | CLI HTTP 客户端**
 ```bash
-# Install
+# 安装
 pip install httpie
 
-# Usage
+# 使用
 http GET https://api.github.com
 http POST https://httpbin.org/post name=John
 ```
 
 ### curl
-**Free | Built-in**
+**免费 | 内置**
 ```bash
 curl https://api.github.com
 curl -X POST -H "Content-Type: application/json" \
@@ -558,156 +558,156 @@ curl -X POST -H "Content-Type: application/json" \
 
 ---
 
-## Database Tools
+## 数据库工具
 
-### pgAdmin (PostgreSQL)
-**Free**
-- Download: https://www.pgadmin.org/
-- GUI for PostgreSQL
+### pgAdmin（PostgreSQL）
+**免费**
+- 下载：https://www.pgadmin.org/
+- PostgreSQL 的 GUI
 
 ### DBeaver
-**Free | Universal database tool**
-- Download: https://dbeaver.io/
-- Supports multiple databases
-- SQL editor and visualizer
+**免费 | 通用数据库工具**
+- 下载：https://dbeaver.io/
+- 支持多种数据库
+- SQL 编辑器和可视化工具
 
 ### Redis Desktop Manager
-**Free/Paid**
-- Redis GUI client
-- Alternatives: RedisInsight (free)
+**免费/付费**
+- Redis GUI 客户端
+- 替代品：RedisInsight（免费）
 
 ### MongoDB Compass
-**Free**
-- Official MongoDB GUI
-- Download: https://www.mongodb.com/products/compass
+**免费**
+- 官方 MongoDB GUI
+- 下载：https://www.mongodb.com/products/compass
 
 ---
 
-## Cloud Platforms
+## 云平台
 
 ### AWS CLI
-**Free**
+**免费**
 ```bash
-# Install
+# 安装
 pip install awscli
 
-# Configure
+# 配置
 aws configure
 ```
 
 ### Google Cloud SDK
-**Free**
+**免费**
 ```bash
-# Install
+# 安装
 curl https://sdk.cloud.google.com | bash
 
-# Initialize
+# 初始化
 gcloud init
 ```
 
 ### Azure CLI
-**Free**
+**免费**
 ```bash
-# Install
+# 安装
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-# Login
+# 登录
 az login
 ```
 
 ---
 
-## Productivity Tools
+## 效率工具
 
 ### Notion
-**Free for personal**
-- Note-taking and documentation
-- Project management
-- Knowledge base
+**个人使用免费**
+- 笔记和文档管理
+- 项目管理
+- 知识库
 
 ### Obsidian
-**Free**
-- Markdown-based notes
-- Local-first
-- Graph view for connections
+**免费**
+- 基于 Markdown 的笔记
+- 本地优先
+- 图形化知识连接
 
 ### Draw.io (diagrams.net)
-**Free**
-- Architecture diagrams
-- Flowcharts
-- Online or desktop
+**免费**
+- 架构图
+- 流程图
+- 在线或桌面版
 
 ### Excalidraw
-**Free**
-- Sketch-style diagrams
-- Online: https://excalidraw.com/
+**免费**
+- 手绘风格图表
+- 在线：https://excalidraw.com/
 
 ---
 
-## Recommended Setup for Beginners
+## 初学者推荐配置
 
-### Minimal Setup
-1. **OS**: Ubuntu 22.04 or macOS
-2. **IDE**: VSCode with Python and Docker extensions
-3. **Terminal**: Default with Git
-4. **Docker**: Docker Desktop
-5. **K8s**: kind or minikube
-6. **Python**: pyenv + venv
+### 最小配置
+1. **操作系统**：Ubuntu 22.04 或 macOS
+2. **IDE**：VSCode 带 Python 和 Docker 扩展
+3. **终端**：默认终端 + Git
+4. **Docker**：Docker Desktop
+5. **K8s**：kind 或 minikube
+6. **Python**：pyenv + venv
 
-### Full Setup
-All of the above plus:
-- Zsh with Oh My Zsh
+### 完整配置
+以上所有内容加上：
+- Zsh + Oh My Zsh
 - kubectx/kubens
 - k9s
 - Postman
 - DBeaver
-- Prometheus + Grafana (Docker)
+- Prometheus + Grafana（Docker）
 
 ---
 
-## Installation Scripts
+## 安装脚本
 
-### Quick Setup Script (Ubuntu)
+### 快速安装脚本（Ubuntu）
 ```bash
 #!/bin/bash
 
-# Update system
+# 更新系统
 sudo apt update && sudo apt upgrade -y
 
-# Install basics
+# 安装基础工具
 sudo apt install -y git curl wget build-essential
 
-# Install Docker
+# 安装 Docker
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 
-# Install Python
+# 安装 Python
 sudo apt install -y python3 python3-pip python3-venv
 
-# Install kubectl
+# 安装 kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
-# Install VSCode
+# 安装 VSCode
 sudo snap install code --classic
 
-echo "Setup complete! Please log out and back in for Docker group changes."
+echo "安装完成！请注销并重新登录以使 Docker 组权限生效。"
 ```
 
 ---
 
-## Browser Extensions
+## 浏览器扩展
 
-### Chrome/Edge Extensions
-- **JSON Formatter** - Pretty print JSON
-- **Wappalyzer** - Identify technologies
-- **React/Vue DevTools** - For frontend debugging
-- **Lighthouse** - Performance auditing
+### Chrome/Edge 扩展
+- **JSON Formatter** - 美观打印 JSON
+- **Wappalyzer** - 识别所用技术
+- **React/Vue DevTools** - 前端调试
+- **Lighthouse** - 性能审计
 
 ---
 
-## Additional Resources
+## 额外资源
 
 - [VSCode Tips and Tricks](https://code.visualstudio.com/docs/getstarted/tips-and-tricks)
 - [Oh My Zsh Plugins](https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins)
@@ -716,4 +716,4 @@ echo "Setup complete! Please log out and back in for Docker group changes."
 
 ---
 
-**Remember**: Start with the minimal setup and add tools as you need them. Don't get overwhelmed trying to install everything at once!
+**记住**：先从最小配置开始，根据需要逐步添加工具。不要试图一次性安装所有东西！

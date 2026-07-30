@@ -1,59 +1,59 @@
-# Exercise 07: Infrastructure as Code with Terraform Basics
+# Exercise 07：使用 Terraform 的基础设施即代码基础
 
-**Difficulty**: Beginner
-**Duration**: 3-4 hours
-**Prerequisites**: AWS account with CLI configured, basic cloud concepts
+**难度**：入门
+**时长**：3-4 小时
+**前置要求**：已配置 CLI 的 AWS 账户、基础云概念
 
-## Learning Objectives
+## 学习目标
 
-By the end of this exercise, you will:
+到本练习结束时，你将：
 
-1. Understand what Infrastructure as Code (IaC) is and why it's important
-2. Install and configure Terraform
-3. Write basic Terraform configuration files
-4. Create cloud resources using Terraform
-5. Modify and destroy infrastructure with Terraform
-6. Understand Terraform state and best practices
-7. Use variables and outputs in Terraform
+1. 理解什么是基础设施即代码（IaC）以及为什么它很重要
+2. 安装和配置 Terraform
+3. 编写基本的 Terraform 配置文件
+4. 使用 Terraform 创建云资源
+5. 使用 Terraform 修改和销毁基础设施
+6. 理解 Terraform 状态和最佳实践
+7. 在 Terraform 中使用变量和输出
 
-## What You'll Build
+## 你将构建的内容
 
-Using Terraform, you'll create:
-- An AWS S3 bucket for storing ML datasets
-- An EC2 instance for ML workloads
-- Security groups for network access control
-- IAM roles and policies
-- A simple ML infrastructure stack
+使用 Terraform，你将创建：
+- 用于存储 ML 数据集的 AWS S3 存储桶
+- 用于 ML 工作负载的 EC2 实例
+- 用于网络访问控制的安全组
+- IAM 角色和策略
+- 一个简单的 ML 基础设施堆栈
 
-All defined in code that can be versioned, reviewed, and reused!
+全部以代码定义，可以进行版本控制、审查和重用！
 
-## Background: Why Infrastructure as Code?
+## 背景：为什么需要基础设施即代码？
 
-### The Problem: Manual Infrastructure Management
+### 问题：手动基础设施管理
 
-**Before IaC (the old way)**:
+**IaC 之前（旧方式）**：
 ```
-1. Log into AWS Console
-2. Click through 20+ screens to create EC2 instance
-3. Manually configure security groups
-4. Set up networking
-5. Create storage
-6. Document what you did (maybe)
-7. Repeat for dev, staging, prod environments
-8. Hope you clicked the same buttons each time
+1. 登录 AWS 控制台
+2. 点击 20+ 个屏幕来创建 EC2 实例
+3. 手动配置安全组
+4. 设置网络
+5. 创建存储
+6. 记录你做了什么（也许）
+7. 为开发、预发布、生产环境重复
+8. 希望每次点击了相同的按钮
 ```
 
-**Problems**:
-- ❌ Not reproducible
-- ❌ Error-prone (typos, forgotten steps)
-- ❌ No version control
-- ❌ Hard to review changes
-- ❌ Difficult to clone environments
-- ❌ No audit trail
+**问题**：
+- ❌ 不可重现
+- ❌ 容易出错（拼写错误、遗漏步骤）
+- ❌ 无版本控制
+- ❌ 难以审查变更
+- ❌ 难以克隆环境
+- ❌ 无审计跟踪
 
-### The Solution: Infrastructure as Code
+### 解决方案：基础设施即代码
 
-**With IaC**:
+**使用 IaC**：
 ```hcl
 # infrastructure.tf
 resource "aws_instance" "ml_server" {
@@ -66,99 +66,99 @@ resource "aws_instance" "ml_server" {
 }
 ```
 
-**Benefits**:
-- ✅ Reproducible (run same code → get same infrastructure)
-- ✅ Version controlled (Git tracks all changes)
-- ✅ Reviewable (pull requests for infrastructure)
-- ✅ Auditable (who changed what when)
-- ✅ Testable (validate before applying)
-- ✅ Documented (code is documentation)
+**优点**：
+- ✅ 可重现（运行相同代码 → 获得相同基础设施）
+- ✅ 版本控制（Git 跟踪所有变更）
+- ✅ 可审查（基础设施的拉取请求）
+- ✅ 可审计（谁在何时更改了什么）
+- ✅ 可测试（应用前验证）
+- ✅ 有文档（代码即文档）
 
-### Why Terraform?
+### 为什么选择 Terraform？
 
-**Terraform** (by HashiCorp) is the most popular IaC tool:
-- **Multi-cloud**: Works with AWS, GCP, Azure, 100+ providers
-- **Declarative**: Describe what you want, not how to create it
-- **Plan before apply**: Preview changes before making them
-- **State tracking**: Knows what's actually deployed
-- **Modular**: Reusable components
-- **Open source**: Free to use
+**Terraform**（由 HashiCorp 开发）是最流行的 IaC 工具：
+- **多云**：适用于 AWS、GCP、Azure 及 100+ 提供商
+- **声明式**：描述你想要什么，而非如何创建
+- **计划再应用**：在做出更改前预览变更
+- **状态跟踪**：知道实际部署了什么
+- **模块化**：可重用组件
+- **开源**：免费使用
 
-**Alternatives**:
-- AWS CloudFormation (AWS-only)
-- Pulumi (uses real programming languages)
-- Ansible (configuration management + IaC)
+**替代方案**：
+- AWS CloudFormation（仅 AWS）
+- Pulumi（使用真实编程语言）
+- Ansible（配置管理 + IaC）
 
-## Part 1: Terraform Setup
+## 第一部分：Terraform 设置
 
-### Step 1: Install Terraform
+### 第 1 步：安装 Terraform
 
-**macOS**:
+**macOS**：
 ```bash
 brew tap hashicorp/tap
 brew install hashicorp/tap/terraform
 ```
 
-**Linux**:
+**Linux**：
 ```bash
 wget https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_linux_amd64.zip
 unzip terraform_1.6.0_linux_amd64.zip
 sudo mv terraform /usr/local/bin/
 ```
 
-**Windows**:
+**Windows**：
 ```powershell
 choco install terraform
-# Or download from https://www.terraform.io/downloads
+# 或从 https://www.terraform.io/downloads 下载
 ```
 
-**Verify installation**:
+**验证安装**：
 ```bash
 terraform version
 ```
 
-Expected output:
+预期输出：
 ```
 Terraform v1.6.0
 ```
 
-### Step 2: Set Up AWS Credentials
+### 第 2 步：设置 AWS 凭证
 
-Terraform needs AWS credentials to create resources.
+Terraform 需要 AWS 凭证来创建资源。
 
-**Option 1: AWS CLI** (recommended):
+**选项 1：AWS CLI**（推荐）：
 ```bash
 aws configure
-# Enter your AWS Access Key ID, Secret Access Key, and region
+# 输入你的 AWS Access Key ID、Secret Access Key 和区域
 ```
 
-**Option 2: Environment variables**:
+**选项 2：环境变量**：
 ```bash
 export AWS_ACCESS_KEY_ID="your-access-key"
 export AWS_SECRET_ACCESS_KEY="your-secret-key"
 export AWS_DEFAULT_REGION="us-east-1"
 ```
 
-**Verify credentials**:
+**验证凭证**：
 ```bash
 aws sts get-caller-identity
 ```
 
-### Step 3: Create Project Directory
+### 第 3 步：创建项目目录
 
 ```bash
 mkdir terraform-ml-infrastructure
 cd terraform-ml-infrastructure
 ```
 
-## Part 2: Your First Terraform Configuration
+## 第二部分：你的第一个 Terraform 配置
 
-### Step 4: Create a Simple S3 Bucket
+### 第 4 步：创建简单的 S3 存储桶
 
-Create `main.tf`:
+创建 `main.tf`：
 
 ```hcl
-# Configure the AWS Provider
+# 配置 AWS Provider
 terraform {
   required_providers {
     aws = {
@@ -173,7 +173,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# Create an S3 bucket for ML datasets
+# 为 ML 数据集创建 S3 存储桶
 resource "aws_s3_bucket" "ml_datasets" {
   bucket = "my-ml-datasets-bucket-${random_id.bucket_suffix.hex}"
 
@@ -185,15 +185,14 @@ resource "aws_s3_bucket" "ml_datasets" {
   }
 }
 
-# Generate random suffix for unique bucket name
+# 生成唯一存储桶名称的随机后缀
 resource "random_id" "bucket_suffix" {
   byte_length = 4
 }
 
-# Block public access to the bucket
+# 阻止对存储桶的公共访问
 resource "aws_s3_bucket_public_access_block" "ml_datasets" {
   bucket = aws_s3_bucket.ml_datasets.id
-
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -201,105 +200,45 @@ resource "aws_s3_bucket_public_access_block" "ml_datasets" {
 }
 ```
 
-**What's happening here?**
-
-1. **terraform block**: Specifies Terraform and provider versions
-2. **provider block**: Configures AWS provider with region
-3. **resource blocks**: Define infrastructure components
-4. **random_id**: Creates unique bucket name (S3 buckets must be globally unique)
-5. **tags**: Metadata for organization and cost tracking
-
-### Step 5: Initialize Terraform
+### 第 5 步：初始化 Terraform
 
 ```bash
 terraform init
 ```
 
-**What this does**:
-- Downloads AWS provider plugin
-- Initializes backend (where state is stored)
-- Creates `.terraform` directory
+**这会做什么**：
+- 下载 AWS Provider 插件
+- 初始化后端（状态存储位置）
+- 创建 `.terraform` 目录
 
-**Expected output**:
-```
-Initializing the backend...
-Initializing provider plugins...
-- Finding hashicorp/aws versions matching "~> 5.0"...
-- Installing hashicorp/aws v5.25.0...
-- Installed hashicorp/aws v5.25.0
-
-Terraform has been successfully initialized!
-```
-
-### Step 6: Plan the Changes
+### 第 6 步：计划变更
 
 ```bash
 terraform plan
 ```
 
-**What this does**:
-- Shows what Terraform will create/change/destroy
-- Validates configuration syntax
-- Checks state vs desired configuration
+**这会做什么**：
+- 显示 Terraform 将要创建/更改/销毁的内容
+- 验证配置语法
+- 检查状态与期望配置的对比
 
-**Expected output**:
-```
-Terraform will perform the following actions:
-
-  # aws_s3_bucket.ml_datasets will be created
-  + resource "aws_s3_bucket" "ml_datasets" {
-      + bucket                      = "my-ml-datasets-bucket-a1b2c3d4"
-      + bucket_domain_name          = (known after apply)
-      ...
-    }
-
-Plan: 3 to add, 0 to change, 0 to destroy.
-```
-
-**Key points**:
-- `+` means resource will be created
-- `~` means resource will be modified
-- `-` means resource will be destroyed
-- Nothing happens yet! This is just a preview.
-
-### Step 7: Apply the Changes
+### 第 7 步：应用变更
 
 ```bash
 terraform apply
 ```
 
-Terraform will show the plan again and ask for confirmation:
-```
-Do you want to perform these actions?
-  Terraform will perform the actions described above.
-  Only 'yes' will be accepted to approve.
+输入 `yes` 并按 Enter 确认。
 
-  Enter a value: yes
-```
+### 第 8 步：理解 Terraform 状态
 
-Type `yes` and press Enter.
-
-**Expected output**:
-```
-aws_s3_bucket.ml_datasets: Creating...
-aws_s3_bucket.ml_datasets: Creation complete after 2s
-
-Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
-```
-
-**Verify in AWS Console**:
-1. Go to AWS Console → S3
-2. You should see your new bucket!
-
-### Step 8: Understanding Terraform State
-
-After applying, Terraform creates `terraform.tfstate`:
+应用后，Terraform 创建 `terraform.tfstate`：
 
 ```bash
 ls -la
 ```
 
-You'll see:
+你会看到：
 ```
 main.tf
 terraform.tfstate
@@ -307,13 +246,13 @@ terraform.tfstate.backup
 .terraform/
 ```
 
-**What is state?**
-- JSON file tracking actual infrastructure
-- Maps Terraform config to real resources
-- **CRITICAL**: Don't delete or manually edit!
-- **IMPORTANT**: Don't commit to Git (contains sensitive data)
+**什么是状态？**
+- 跟踪实际基础设施的 JSON 文件
+- 将 Terraform 配置映射到真实资源
+- **关键**：不要删除或手动编辑！
+- **重要**：不要提交到 Git（包含敏感数据）
 
-Create `.gitignore`:
+创建 `.gitignore`：
 ```
 # .gitignore
 .terraform/
@@ -323,11 +262,11 @@ terraform.tfstate.backup
 .terraform.lock.hcl
 ```
 
-## Part 3: Adding Variables and Outputs
+## 第三部分：添加变量和输出
 
-### Step 9: Use Variables
+### 第 9 步：使用变量
 
-Create `variables.tf`:
+创建 `variables.tf`：
 
 ```hcl
 variable "aws_region" {
@@ -355,36 +294,9 @@ variable "enable_versioning" {
 }
 ```
 
-Update `main.tf` to use variables:
+### 第 10 步：添加输出
 
-```hcl
-provider "aws" {
-  region = var.aws_region
-}
-
-resource "aws_s3_bucket" "ml_datasets" {
-  bucket = "${var.project_name}-datasets-${var.environment}-${random_id.bucket_suffix.hex}"
-
-  tags = {
-    Name        = "${var.project_name} Datasets"
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-  }
-}
-
-# Enable versioning if configured
-resource "aws_s3_bucket_versioning" "ml_datasets" {
-  bucket = aws_s3_bucket.ml_datasets.id
-
-  versioning_configuration {
-    status = var.enable_versioning ? "Enabled" : "Disabled"
-  }
-}
-```
-
-### Step 10: Add Outputs
-
-Create `outputs.tf`:
+创建 `outputs.tf`：
 
 ```hcl
 output "bucket_name" {
@@ -396,42 +308,16 @@ output "bucket_arn" {
   description = "ARN of the S3 bucket"
   value       = aws_s3_bucket.ml_datasets.arn
 }
-
-output "bucket_region" {
-  description = "Region where bucket is created"
-  value       = aws_s3_bucket.ml_datasets.region
-}
 ```
 
-Apply changes:
+## 第四部分：为 ML 创建 EC2 实例
 
-```bash
-terraform apply
-```
+### 第 11 步：添加 EC2 实例
 
-**After apply, you'll see outputs**:
-```
-Outputs:
-
-bucket_arn = "arn:aws:s3:::ml-infrastructure-datasets-dev-a1b2c3d4"
-bucket_name = "ml-infrastructure-datasets-dev-a1b2c3d4"
-bucket_region = "us-east-1"
-```
-
-**View outputs anytime**:
-```bash
-terraform output
-terraform output bucket_name
-```
-
-## Part 4: Creating EC2 Instance for ML
-
-### Step 11: Add EC2 Instance
-
-Add to `main.tf`:
+添加到 `main.tf`：
 
 ```hcl
-# Data source to get latest Amazon Linux 2 AMI
+# 数据源：获取最新的 Amazon Linux 2 AMI
 data "aws_ami" "amazon_linux_2" {
   most_recent = true
   owners      = ["amazon"]
@@ -442,21 +328,19 @@ data "aws_ami" "amazon_linux_2" {
   }
 }
 
-# Security group for EC2 instance
+# EC2 实例的安全组
 resource "aws_security_group" "ml_instance" {
   name        = "${var.project_name}-ml-instance-sg"
   description = "Security group for ML training instance"
 
-  # SSH access
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # WARNING: Open to internet (for demo only!)
+    cidr_blocks = ["0.0.0.0/0"]
     description = "SSH access"
   }
 
-  # Jupyter notebook access
   ingress {
     from_port   = 8888
     to_port     = 8888
@@ -465,7 +349,6 @@ resource "aws_security_group" "ml_instance" {
     description = "Jupyter Notebook"
   }
 
-  # Outbound internet access
   egress {
     from_port   = 0
     to_port     = 0
@@ -480,32 +363,16 @@ resource "aws_security_group" "ml_instance" {
   }
 }
 
-# EC2 instance for ML training
+# 用于 ML 训练的 EC2 实例
 resource "aws_instance" "ml_training" {
   ami           = data.aws_ami.amazon_linux_2.id
   instance_type = var.instance_type
-
   vpc_security_group_ids = [aws_security_group.ml_instance.id]
 
   root_block_device {
-    volume_size = 50  # GB
+    volume_size = 50
     volume_type = "gp3"
   }
-
-  user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              yum install -y python3 python3-pip git
-              pip3 install jupyter numpy pandas scikit-learn torch
-
-              # Create jupyter config
-              mkdir -p /home/ec2-user/.jupyter
-              echo "c.NotebookApp.ip = '0.0.0.0'" > /home/ec2-user/.jupyter/jupyter_notebook_config.py
-              echo "c.NotebookApp.open_browser = False" >> /home/ec2-user/.jupyter/jupyter_notebook_config.py
-              echo "c.NotebookApp.token = ''" >> /home/ec2-user/.jupyter/jupyter_notebook_config.py
-
-              chown -R ec2-user:ec2-user /home/ec2-user/.jupyter
-              EOF
 
   tags = {
     Name        = "${var.project_name}-ml-training"
@@ -515,406 +382,101 @@ resource "aws_instance" "ml_training" {
 }
 ```
 
-Add variable to `variables.tf`:
+## 第五部分：使用 Terraform Workspaces
 
-```hcl
-variable "instance_type" {
-  description = "EC2 instance type"
-  type        = string
-  default     = "t3.medium"
-}
-```
+### 第 12 步：多环境
 
-Add outputs to `outputs.tf`:
-
-```hcl
-output "instance_id" {
-  description = "ID of the EC2 instance"
-  value       = aws_instance.ml_training.id
-}
-
-output "instance_public_ip" {
-  description = "Public IP of the EC2 instance"
-  value       = aws_instance.ml_training.public_ip
-}
-
-output "jupyter_url" {
-  description = "URL to access Jupyter Notebook"
-  value       = "http://${aws_instance.ml_training.public_ip}:8888"
-}
-```
-
-Apply changes:
+创建独立环境（dev、staging、prod）：
 
 ```bash
-terraform apply
-```
-
-**After creation**:
-```
-Outputs:
-
-instance_id = "i-0123456789abcdef0"
-instance_public_ip = "54.123.45.67"
-jupyter_url = "http://54.123.45.67:8888"
-bucket_arn = "arn:aws:s3:::ml-infrastructure-datasets-dev-a1b2c3d4"
-bucket_name = "ml-infrastructure-datasets-dev-a1b2c3d4"
-```
-
-**Test SSH access**:
-```bash
-# First, create and add SSH key to AWS (manual step for now)
-# Then:
-ssh ec2-user@$(terraform output -raw instance_public_ip)
-```
-
-## Part 5: Using Terraform Workspaces
-
-### Step 12: Multiple Environments
-
-Create separate environments (dev, staging, prod):
-
-```bash
-# List workspaces
-terraform workspace list
-
-# Create dev workspace
+# 创建工作区
 terraform workspace new dev
-
-# Create staging workspace
 terraform workspace new staging
 
-# Switch between workspaces
+# 在工作区之间切换
 terraform workspace select dev
 ```
 
-Update `main.tf` to use workspace:
+## 第六部分：Terraform 命令参考
 
-```hcl
-locals {
-  environment = terraform.workspace
-}
-
-resource "aws_s3_bucket" "ml_datasets" {
-  bucket = "${var.project_name}-datasets-${local.environment}-${random_id.bucket_suffix.hex}"
-
-  tags = {
-    Name        = "${var.project_name} Datasets"
-    Environment = local.environment
-    ManagedBy   = "Terraform"
-  }
-}
-```
-
-Now you can deploy separate infrastructure per environment!
+### 基本命令
 
 ```bash
-# Deploy to dev
-terraform workspace select dev
-terraform apply
-
-# Deploy to staging
-terraform workspace select staging
-terraform apply
-```
-
-## Part 6: Terraform Commands Reference
-
-### Essential Commands
-
-```bash
-# Initialize directory
+# 初始化目录
 terraform init
 
-# Validate configuration
+# 验证配置
 terraform validate
 
-# Format code
+# 格式化代码
 terraform fmt
 
-# Show execution plan
+# 显示执行计划
 terraform plan
 
-# Apply changes
+# 应用变更
 terraform apply
 
-# Apply without confirmation
-terraform apply -auto-approve
-
-# Destroy all resources
+# 销毁所有资源
 terraform destroy
 
-# Show current state
+# 显示当前状态
 terraform show
 
-# List resources in state
+# 列出状态中的资源
 terraform state list
 
-# View outputs
+# 查看输出
 terraform output
-
-# Refresh state
-terraform refresh
 ```
 
-## Part 7: Clean Up
+## 第七部分：清理
 
-### Step 13: Destroy Infrastructure
+### 第 13 步：销毁基础设施
 
-**IMPORTANT**: Always clean up to avoid AWS charges!
+**重要**：始终清理以避免 AWS 费用！
 
 ```bash
 terraform destroy
 ```
 
-Review the plan, type `yes` to confirm.
+审查计划，输入 `yes` 确认。
 
-**Expected output**:
-```
-aws_instance.ml_training: Destroying...
-aws_s3_bucket.ml_datasets: Destroying...
+## 关键要点
 
-Destroy complete! Resources: 5 destroyed.
-```
+1. **IaC 至关重要**：版本控制、可重现的基础设施
+2. **Terraform 是声明式的**：描述期望状态，而非步骤
+3. **计划再应用**：始终预览变更
+4. **状态至关重要**：跟踪真实基础设施，保护好它
+5. **使用变量**：使配置可重用
+6. **给所有资源打标签**：组织和成本跟踪
+7. **工作区用于环境**：管理开发/预发布/生产
+8. **模块用于可重用性**：不要重复自己
 
-**Verify in AWS Console**:
-- S3 bucket should be gone
-- EC2 instance should be terminated
+## 基础设施考量
 
-## Challenges
+### 成本估算
 
-### Challenge 1: Add IAM Role
+应用 `terraform apply` 前估算成本：
+- **t3.medium EC2**：约每月 $30（如果 24/7 运行）
+- **50GB EBS**：约每月 $5
+- **S3 存储**：约 $0.023/GB/月
+- **数据传输**：可变
 
-Create an IAM role for the EC2 instance with S3 access:
+### 生产检查清单
 
-```hcl
-resource "aws_iam_role" "ml_instance_role" {
-  name = "${var.project_name}-ml-instance-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "ec2.amazonaws.com"
-      }
-    }]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "s3_access" {
-  role       = aws_iam_role.ml_instance_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-}
-
-resource "aws_iam_instance_profile" "ml_instance" {
-  name = "${var.project_name}-ml-instance-profile"
-  role = aws_iam_role.ml_instance_role.name
-}
-```
-
-Attach to EC2 instance:
-```hcl
-resource "aws_instance" "ml_training" {
-  # ... other config ...
-  iam_instance_profile = aws_iam_instance_profile.ml_instance.name
-}
-```
-
-### Challenge 2: Create Terraform Module
-
-Organize code into reusable module structure:
-
-```
-modules/
-  ml-infrastructure/
-    main.tf
-    variables.tf
-    outputs.tf
-environments/
-  dev/
-    main.tf
-  staging/
-    main.tf
-  prod/
-    main.tf
-```
-
-### Challenge 3: Remote State Backend
-
-Store state in S3 instead of locally:
-
-```hcl
-terraform {
-  backend "s3" {
-    bucket = "my-terraform-state-bucket"
-    key    = "ml-infrastructure/terraform.tfstate"
-    region = "us-east-1"
-  }
-}
-```
-
-### Challenge 4: Add Monitoring
-
-Add CloudWatch alarms for EC2 instance:
-- CPU utilization > 80%
-- Disk usage > 90%
-- Network errors
-
-## Best Practices
-
-### 1. Version Control
-```bash
-# Always use Git
-git init
-git add *.tf .gitignore
-git commit -m "Initial Terraform configuration"
-```
-
-### 2. Code Organization
-```
-project/
-├── main.tf           # Main resources
-├── variables.tf      # Variable definitions
-├── outputs.tf        # Output definitions
-├── terraform.tfvars  # Variable values (DON'T commit!)
-├── versions.tf       # Provider versions
-└── README.md         # Documentation
-```
-
-### 3. Naming Conventions
-```hcl
-# Use descriptive names
-resource "aws_s3_bucket" "ml_training_datasets" { }  # Good
-resource "aws_s3_bucket" "bucket1" { }               # Bad
-
-# Use consistent prefixes
-var.project_name = "ml-infra"
-
-# Tag everything
-tags = {
-  Name        = "..."
-  Environment = "..."
-  ManagedBy   = "Terraform"
-  Owner       = "..."
-  CostCenter  = "..."
-}
-```
-
-### 4. Security
-```hcl
-# Never commit secrets
-# Use variables or AWS Secrets Manager
-
-# Restrict access
-cidr_blocks = ["YOUR_IP/32"]  # Not 0.0.0.0/0
-
-# Enable encryption
-resource "aws_s3_bucket_server_side_encryption_configuration" "ml_datasets" {
-  bucket = aws_s3_bucket.ml_datasets.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-```
-
-### 5. State Management
-```bash
-# Never manually edit state
-# Use terraform state commands instead
-
-# List resources
-terraform state list
-
-# Show specific resource
-terraform state show aws_instance.ml_training
-
-# Remove resource from state (doesn't delete actual resource)
-terraform state rm aws_instance.ml_training
-```
-
-## Key Takeaways
-
-1. **IaC is essential**: Version-controlled, reproducible infrastructure
-2. **Terraform is declarative**: Describe desired state, not steps
-3. **Plan before apply**: Always preview changes
-4. **State is critical**: Tracks real infrastructure, protect it
-5. **Use variables**: Make configurations reusable
-6. **Tag everything**: Organization and cost tracking
-7. **Workspaces for environments**: Manage dev/staging/prod
-8. **Modules for reusability**: Don't repeat yourself
-
-## Infrastructure Considerations
-
-### Cost Estimation
-
-Before `terraform apply`, estimate costs:
-- **t3.medium EC2**: ~$30/month (if running 24/7)
-- **50GB EBS**: ~$5/month
-- **S3 storage**: ~$0.023/GB/month
-- **Data transfer**: Variable
-
-**Cost optimization**:
-```bash
-# Stop instance when not in use
-aws ec2 stop-instances --instance-ids $(terraform output -raw instance_id)
-
-# Or destroy completely
-terraform destroy
-```
-
-### Production Checklist
-
-Before using in production:
-- [ ] Remote state backend (S3 + DynamoDB for locking)
-- [ ] State encryption enabled
-- [ ] Terraform Cloud/Enterprise for team collaboration
-- [ ] CI/CD integration for automated plans
-- [ ] Code review process for infrastructure changes
-- [ ] Separate AWS accounts for environments
-- [ ] Restricted IAM permissions (least privilege)
-- [ ] Comprehensive tagging strategy
-- [ ] Backup and disaster recovery plan
-- [ ] Monitoring and alerting configured
-
-## Next Steps
-
-1. **Learn advanced Terraform**:
-   - Modules and module composition
-   - Dynamic blocks and for_each
-   - Terraform functions
-   - Provisioners (use sparingly)
-
-2. **Explore other providers**:
-   - Google Cloud (google)
-   - Azure (azurerm)
-   - Kubernetes (kubernetes)
-   - Datadog, PagerDuty, etc.
-
-3. **Study state management**:
-   - Remote backends
-   - State locking
-   - State migration
-   - Workspace strategies
-
-4. **Integration**:
-   - CI/CD pipelines
-   - Terraform Cloud
-   - GitOps workflows
-   - Policy as Code (Sentinel, OPA)
-
-## Resources
-
-- [Terraform Documentation](https://www.terraform.io/docs)
-- [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
-- [Terraform Best Practices](https://www.terraform-best-practices.com/)
-- [HashiCorp Learn](https://learn.hashicorp.com/terraform)
-- [Terraform Registry](https://registry.terraform.io/)
+投入生产前：
+- [ ] 远程状态后端（S3 + DynamoDB 用于锁定）
+- [ ] 已启用状态加密
+- [ ] 团队协作使用 Terraform Cloud/Enterprise
+- [ ] 自动化计划的 CI/CD 集成
+- [ ] 基础设施变更的代码审查流程
+- [ ] 环境使用独立的 AWS 账户
+- [ ] 限制 IAM 权限（最小权限）
+- [ ] 全面的标签策略
+- [ ] 备份和灾难恢复计划
+- [ ] 已配置监控和告警
 
 ---
 
-**Congratulations!** You've learned Infrastructure as Code fundamentals with Terraform. You can now define, version, and manage cloud infrastructure as code - a critical skill for modern infrastructure engineers!
+**恭喜！** 你已经学会了基础设施即代码的基础知识。现在你可以使用代码来定义、版本管理和云基础设施了——这是现代基础设施工程师的关键技能！

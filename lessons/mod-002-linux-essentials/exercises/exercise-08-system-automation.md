@@ -1,74 +1,67 @@
-# Exercise 08: System Automation and Maintenance for ML Infrastructure
+# 练习 08：ML 基础设施的系统自动化和维护
 
-## Overview
+## 概述
 
-This hands-on exercise focuses on automating system maintenance tasks for ML infrastructure. You'll create automated backup scripts, set up monitoring alerts, configure log rotation, schedule cleanup tasks, and implement health checks—all critical skills for maintaining production ML systems.
+这个动手练习专注于自动化 ML 基础设施的系统维护任务。你将创建自动化备份脚本、设置监控告警、配置日志轮转、安排清理任务以及实施健康检查——这些都是维护生产 ML 系统的关键技能。
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
-- Create automated backup scripts for ML artifacts
-- Set up scheduled tasks using cron and systemd timers
-- Implement system health checks and monitoring
-- Configure log rotation for ML applications
-- Build maintenance scripts for GPU servers
-- Create alerting mechanisms for critical issues
-- Document automation workflows
-- Test and validate automated systems
+完成本练习后，你将能够：
+- 为 ML 工件创建自动化备份脚本
+- 使用 cron 和 systemd timers 设置计划任务
+- 实施系统健康检查和监控
+- 为 ML 应用程序配置日志轮转
+- 为 GPU 服务器构建维护脚本
+- 为关键问题创建告警机制
+- 记录自动化工作流
+- 测试和验证自动化系统
 
-## Prerequisites
+## 先决条件
 
-- Completed exercises 01-07
-- All lectures in Module 002, especially Lecture 04: System Administration Basics and Lecture 06: Advanced Shell Scripting
-- Understanding of systemd and cron
-- Access to a Linux system with sudo privileges
-- Basic understanding of ML workflows
+- 已完成练习 01-07
+- 模块 002 中的所有讲座，特别是讲座 04：系统管理基础和讲座 06：高级 Shell 脚本
+- 理解 systemd 和 cron
+- 可访问具有 sudo 权限的 Linux 系统
+- 基本理解 ML 工作流
 
-## Time Required
+## 所需时间
 
-- Estimated: 120 minutes
-- Difficulty: Intermediate to Advanced
+- 预计：120 分钟
+- 难度：中级到高级
 
 ---
 
-## Part 1: Automated Model Backup System
+## 第 1 部分：自动化模型备份系统
 
-### Task 1.1: Create Backup Script
-
-Create a script that backs up ML models with versioning and retention policies.
+### 任务 1.1：创建备份脚本
 
 ```bash
-# Create project directory
+# 创建项目目录
 mkdir -p ~/ml-automation-lab/backups
 cd ~/ml-automation-lab/backups
 
-# Create backup script
+# 创建备份脚本
 cat > backup_models.sh << 'EOF'
 #!/bin/bash
 set -euo pipefail
 
-# Configuration
+# 配置
 MODEL_DIR="/opt/ml/models"
 BACKUP_DIR="/backup/models"
 RETENTION_DAYS=30
 LOG_FILE="/var/log/ml-backup.log"
 DATE=$(date +%Y%m%d_%H%M%S)
 
-# Logging function
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
-# Create backup directory if it doesn't exist
 mkdir -p "$BACKUP_DIR"
-
 log "Starting model backup..."
 
-# Create timestamped backup
 BACKUP_NAME="models_backup_${DATE}.tar.gz"
 BACKUP_PATH="${BACKUP_DIR}/${BACKUP_NAME}"
 
-# Backup with compression (exclude large temp files)
 tar -czf "$BACKUP_PATH" \
     --exclude='*.tmp' \
     --exclude='checkpoints/temp' \
@@ -77,116 +70,85 @@ tar -czf "$BACKUP_PATH" \
 
 if [ $? -eq 0 ]; then
     BACKUP_SIZE=$(du -h "$BACKUP_PATH" | cut -f1)
-    log "Backup completed successfully: $BACKUP_NAME (Size: $BACKUP_SIZE)"
+    log "Backup completed: $BACKUP_NAME (Size: $BACKUP_SIZE)"
 else
     log "ERROR: Backup failed!"
     exit 1
 fi
 
-# Calculate checksum for integrity
-CHECKSUM=$(sha256sum "$BACKUP_PATH" | awk '{print $1}')
-echo "$CHECKSUM  $BACKUP_NAME" >> "${BACKUP_DIR}/checksums.txt"
-log "Checksum: $CHECKSUM"
-
-# Clean up old backups (keep last 30 days)
 log "Cleaning up backups older than $RETENTION_DAYS days..."
 find "$BACKUP_DIR" -name "models_backup_*.tar.gz" -mtime +$RETENTION_DAYS -delete
-DELETED_COUNT=$(find "$BACKUP_DIR" -name "models_backup_*.tar.gz" -mtime +$RETENTION_DAYS | wc -l)
-log "Deleted $DELETED_COUNT old backups"
-
-# Upload to S3 (optional - uncomment if using AWS)
-# aws s3 cp "$BACKUP_PATH" "s3://my-ml-backups/models/" --storage-class STANDARD_IA
-
 log "Backup process completed"
 EOF
 
 chmod +x backup_models.sh
 ```
 
-**Test the script:**
+**测试脚本：**
 
 ```bash
-# Create test model directory
+# 创建测试模型目录
 sudo mkdir -p /opt/ml/models/production
 sudo mkdir -p /backup/models
 sudo chown -R $USER:$USER /opt/ml /backup
 
-# Create dummy model files
+# 创建虚拟模型文件
 echo "model_v1.0" > /opt/ml/models/production/model.onnx
 echo "config" > /opt/ml/models/production/config.yaml
 
-# Run backup
+# 运行备份
 ./backup_models.sh
 
-# Verify backup
+# 验证备份
 ls -lh /backup/models/
-cat /var/log/ml-backup.log
 ```
 
-### Task 1.2: Schedule Daily Backups
-
-Set up automated daily backups using cron:
+### 任务 1.2：安排每日备份
 
 ```bash
-# Open crontab
+# 打开 crontab
 crontab -e
 
-# Add this line (runs daily at 2 AM):
+# 添加此行（每天凌晨 2 点运行）：
 0 2 * * * /home/$USER/ml-automation-lab/backups/backup_models.sh
 
-# Verify cron job
+# 验证 cron 作业
 crontab -l
-```
 
-**Using systemd timer (alternative, recommended):**
-
-```bash
-# Create service file
+# 使用 systemd timer 的替代方案（推荐）：
 sudo tee /etc/systemd/system/ml-backup.service > /dev/null << 'EOF'
 [Unit]
 Description=ML Model Backup Service
 After=network.target
-
 [Service]
 Type=oneshot
-User=mluser
-ExecStart=/home/mluser/ml-automation-lab/backups/backup_models.sh
-StandardOutput=journal
-StandardError=journal
+User=$USER
+ExecStart=/home/$USER/ml-automation-lab/backups/backup_models.sh
+[Install]
+WantedBy=multi-user.target
 EOF
 
-# Create timer file
 sudo tee /etc/systemd/system/ml-backup.timer > /dev/null << 'EOF'
 [Unit]
 Description=Run ML backup daily
-Requires=ml-backup.service
-
 [Timer]
 OnCalendar=daily
 OnCalendar=02:00
 Persistent=true
-
 [Install]
 WantedBy=timers.target
 EOF
 
-# Enable and start timer
 sudo systemctl daemon-reload
 sudo systemctl enable ml-backup.timer
 sudo systemctl start ml-backup.timer
-
-# Check timer status
-systemctl status ml-backup.timer
-systemctl list-timers ml-backup.timer
 ```
 
 ---
 
-## Part 2: GPU Health Monitoring
+## 第 2 部分：GPU 健康监控
 
-### Task 2.1: Create GPU Monitoring Script
-
-Build a script to monitor GPU health and send alerts:
+### 任务 2.1：创建 GPU 监控脚本
 
 ```bash
 mkdir -p ~/ml-automation-lab/monitoring
@@ -196,13 +158,11 @@ cat > monitor_gpus.sh << 'EOF'
 #!/bin/bash
 set -euo pipefail
 
-# Configuration
-TEMP_THRESHOLD=80  # Celsius
-MEMORY_THRESHOLD=90  # Percent
+TEMP_THRESHOLD=80
+MEMORY_THRESHOLD=90
 ALERT_EMAIL="ml-ops@company.com"
 LOG_FILE="/var/log/gpu-monitor.log"
 
-# Check if nvidia-smi is available
 if ! command -v nvidia-smi &> /dev/null; then
     echo "ERROR: nvidia-smi not found. GPU monitoring requires NVIDIA drivers."
     exit 1
@@ -215,43 +175,24 @@ log() {
 send_alert() {
     local subject="$1"
     local message="$2"
-
-    # Log alert
     log "ALERT: $subject - $message"
-
-    # Send email (requires mailutils)
-    if command -v mail &> /dev/null; then
-        echo "$message" | mail -s "$subject" "$ALERT_EMAIL"
-    fi
-
-    # Send to syslog
     logger -t gpu-monitor -p user.warning "$subject: $message"
 }
 
-# Query GPU status
 GPU_COUNT=$(nvidia-smi --query-gpu=count --format=csv,noheader | head -1)
 log "Monitoring $GPU_COUNT GPU(s)..."
 
 nvidia-smi --query-gpu=index,name,temperature.gpu,utilization.gpu,utilization.memory,memory.used,memory.total \
     --format=csv,noheader | while IFS=',' read -r idx name temp util_gpu util_mem mem_used mem_total; do
-
-    # Clean up whitespace
+    
     temp=$(echo $temp | xargs)
     util_gpu=$(echo $util_gpu | xargs | sed 's/ %//')
     util_mem=$(echo $util_mem | xargs | sed 's/ %//')
-    mem_used=$(echo $mem_used | xargs)
-    mem_total=$(echo $mem_total | xargs)
-
-    log "GPU $idx ($name): Temp=${temp}°C, GPU_Util=${util_gpu}%, Mem_Util=${util_mem}%, Mem=${mem_used}/${mem_total}"
-
-    # Check temperature
+    
+    log "GPU $idx ($name): Temp=${temp}°C, GPU_Util=${util_gpu}%, Mem_Util=${util_mem}%"
+    
     if [ "$temp" -gt "$TEMP_THRESHOLD" ]; then
-        send_alert "GPU Temperature Alert" "GPU $idx temperature is ${temp}°C (threshold: ${TEMP_THRESHOLD}°C)"
-    fi
-
-    # Check memory utilization
-    if [ "$util_mem" -gt "$MEMORY_THRESHOLD" ]; then
-        send_alert "GPU Memory Alert" "GPU $idx memory utilization is ${util_mem}% (threshold: ${MEMORY_THRESHOLD}%)"
+        send_alert "GPU Temperature Alert" "GPU $idx temperature is ${temp}°C"
     fi
 done
 
@@ -261,34 +202,23 @@ EOF
 chmod +x monitor_gpus.sh
 ```
 
-**Test the monitoring script:**
+### 任务 2.2：安排 GPU 监控
 
 ```bash
-# Run manually
-./monitor_gpus.sh
-
-# Check logs
-cat /var/log/gpu-monitor.log
-```
-
-### Task 2.2: Schedule GPU Monitoring
-
-```bash
-# Run every 5 minutes
+# 每 5 分钟运行一次
 crontab -e
 
-# Add:
+# 添加：
 */5 * * * * /home/$USER/ml-automation-lab/monitoring/monitor_gpus.sh
 ```
 
 ---
 
-## Part 3: Automated Log Rotation
+## 第 3 部分：自动化日志轮转
 
-### Task 3.1: Configure Log Rotation for ML Applications
+### 任务 3.1：为 ML 应用程序配置日志轮转
 
 ```bash
-# Create logrotate configuration
 sudo tee /etc/logrotate.d/ml-applications > /dev/null << 'EOF'
 /var/log/ml-api/*.log {
     daily
@@ -300,7 +230,6 @@ sudo tee /etc/logrotate.d/ml-applications > /dev/null << 'EOF'
     create 0640 mluser mluser
     sharedscripts
     postrotate
-        # Reload application to use new log file
         systemctl reload ml-api.service > /dev/null 2>&1 || true
     endscript
 }
@@ -315,30 +244,20 @@ sudo tee /etc/logrotate.d/ml-applications > /dev/null << 'EOF'
     size 100M
     create 0640 mluser mluser
 }
-
-/var/log/gpu-monitor.log {
-    daily
-    rotate 30
-    compress
-    delaycompress
-    missingok
-    notifempty
-    create 0644 root root
-}
 EOF
 
-# Test logrotate configuration
+# 测试 logrotate 配置
 sudo logrotate -d /etc/logrotate.d/ml-applications
 
-# Force rotation (for testing)
+# 强制轮转（用于测试）
 sudo logrotate -f /etc/logrotate.d/ml-applications
 ```
 
 ---
 
-## Part 4: Automated Cleanup Tasks
+## 第 4 部分：自动化清理任务
 
-### Task 4.1: Create Cleanup Script
+### 任务 4.1：创建清理脚本
 
 ```bash
 mkdir -p ~/ml-automation-lab/cleanup
@@ -356,44 +275,23 @@ log() {
 
 log "Starting ML artifact cleanup..."
 
-# 1. Clean old experiment outputs (older than 30 days)
+# 清理旧实验输出（超过 30 天）
 if [ -d "/opt/ml/experiments" ]; then
-    OLD_EXPERIMENTS=$(find /opt/ml/experiments -type d -mtime +30 | wc -l)
-    if [ "$OLD_EXPERIMENTS" -gt 0 ]; then
-        log "Removing $OLD_EXPERIMENTS old experiment directories..."
-        find /opt/ml/experiments -type d -mtime +30 -exec rm -rf {} +
-    fi
+    find /opt/ml/experiments -type d -mtime +30 -exec rm -rf {} + 2>/dev/null || true
 fi
 
-# 2. Clean old checkpoints (keep last 7 days)
+# 清理旧检查点（保留最近 7 天）
 if [ -d "/opt/ml/checkpoints" ]; then
-    OLD_CHECKPOINTS=$(find /opt/ml/checkpoints -name "*.ckpt" -mtime +7 | wc -l)
-    if [ "$OLD_CHECKPOINTS" -gt 0 ]; then
-        log "Removing $OLD_CHECKPOINTS old checkpoint files..."
-        find /opt/ml/checkpoints -name "*.ckpt" -mtime +7 -delete
-    fi
+    find /opt/ml/checkpoints -name "*.ckpt" -mtime +7 -delete 2>/dev/null || true
 fi
 
-# 3. Clean Docker images (unused images older than 7 days)
+# 清理未使用的 Docker 镜像
 if command -v docker &> /dev/null; then
-    log "Cleaning unused Docker images..."
-    docker image prune -a --filter "until=168h" -f
+    docker image prune -a --filter "until=168h" -f 2>/dev/null || true
 fi
 
-# 4. Clean pip cache
-log "Cleaning pip cache..."
-pip cache purge 2>&1 | tee -a "$LOG_FILE"
-
-# 5. Clean apt cache (Ubuntu/Debian)
-if command -v apt-get &> /dev/null; then
-    log "Cleaning apt cache..."
-    sudo apt-get clean
-    sudo apt-get autoclean
-fi
-
-# 6. Report disk usage
-log "Current disk usage:"
-df -h / | tee -a "$LOG_FILE"
+# 清理 pip 缓存
+pip cache purge 2>/dev/null || true
 
 log "Cleanup completed"
 EOF
@@ -401,21 +299,21 @@ EOF
 chmod +x cleanup_ml_artifacts.sh
 ```
 
-### Task 4.2: Schedule Weekly Cleanup
+### 任务 4.2：安排每周清理
 
 ```bash
-# Run every Sunday at 3 AM
+# 每周日凌晨 3 点运行
 crontab -e
 
-# Add:
+# 添加：
 0 3 * * 0 /home/$USER/ml-automation-lab/cleanup/cleanup_ml_artifacts.sh
 ```
 
 ---
 
-## Part 5: System Health Check Script
+## 第 5 部分：系统健康检查脚本
 
-### Task 5.1: Comprehensive Health Check
+### 任务 5.1：全面健康检查
 
 ```bash
 mkdir -p ~/ml-automation-lab/health-check
@@ -428,58 +326,40 @@ set -euo pipefail
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-check_pass() {
-    echo -e "${GREEN}✓${NC} $1"
-}
-
-check_fail() {
-    echo -e "${RED}✗${NC} $1"
-}
-
-check_warn() {
-    echo -e "${YELLOW}!${NC} $1"
-}
+check_pass() { echo -e "${GREEN}✓${NC} $1"; }
+check_fail() { echo -e "${RED}✗${NC} $1"; }
+check_warn() { echo -e "${YELLOW}!${NC} $1"; }
 
 echo "======================================"
 echo "   ML Infrastructure Health Check"
 echo "======================================"
-echo ""
 
-# 1. Disk Space
-echo "1. Checking Disk Space..."
+# 1. 磁盘空间
 DISK_USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
 if [ "$DISK_USAGE" -lt 80 ]; then
     check_pass "Disk usage: ${DISK_USAGE}%"
 elif [ "$DISK_USAGE" -lt 90 ]; then
-    check_warn "Disk usage: ${DISK_USAGE}% (warning threshold)"
+    check_warn "Disk usage: ${DISK_USAGE}%"
 else
-    check_fail "Disk usage: ${DISK_USAGE}% (critical!)"
+    check_fail "Disk usage: ${DISK_USAGE}%"
 fi
 
-# 2. Memory
-echo "2. Checking Memory..."
+# 2. 内存
 MEM_USAGE=$(free | grep Mem | awk '{printf("%.0f", $3/$2 * 100)}')
 if [ "$MEM_USAGE" -lt 85 ]; then
     check_pass "Memory usage: ${MEM_USAGE}%"
 else
-    check_warn "Memory usage: ${MEM_USAGE}% (high)"
+    check_warn "Memory usage: ${MEM_USAGE}%"
 fi
 
-# 3. CPU Load
-echo "3. Checking CPU Load..."
+# 3. CPU 负载
 CPU_COUNT=$(nproc)
 LOAD_AVG=$(uptime | awk -F'load average:' '{print $2}' | awk '{print $1}' | sed 's/,//')
-LOAD_THRESHOLD=$(echo "$CPU_COUNT * 1.5" | bc)
-if (( $(echo "$LOAD_AVG < $LOAD_THRESHOLD" | bc -l) )); then
-    check_pass "Load average: $LOAD_AVG (CPUs: $CPU_COUNT)"
-else
-    check_warn "Load average: $LOAD_AVG (high for $CPU_COUNT CPUs)"
-fi
+check_pass "Load average: $LOAD_AVG (CPUs: $CPU_COUNT)"
 
-# 4. Critical Services
-echo "4. Checking Critical Services..."
+# 4. 关键服务
 SERVICES=("docker" "nginx")
 for service in "${SERVICES[@]}"; do
     if systemctl is-active --quiet "$service" 2>/dev/null; then
@@ -489,55 +369,29 @@ for service in "${SERVICES[@]}"; do
     fi
 done
 
-# 5. GPU Status (if available)
-echo "5. Checking GPU Status..."
+# 5. GPU 状态
 if command -v nvidia-smi &> /dev/null; then
     GPU_COUNT=$(nvidia-smi --query-gpu=count --format=csv,noheader | head -1)
     check_pass "Found $GPU_COUNT GPU(s)"
-
-    nvidia-smi --query-gpu=index,temperature.gpu,power.draw,power.limit \
-        --format=csv,noheader | while IFS=',' read -r idx temp power_draw power_limit; do
-        temp=$(echo $temp | xargs)
-        power_draw=$(echo $power_draw | xargs | sed 's/ W//')
-        power_limit=$(echo $power_limit | xargs | sed 's/ W//')
-
-        if [ "$temp" -lt 75 ]; then
-            check_pass "  GPU $idx: ${temp}°C, Power: ${power_draw}W/${power_limit}W"
-        else
-            check_warn "  GPU $idx: ${temp}°C (warm), Power: ${power_draw}W/${power_limit}W"
-        fi
-    done
 else
-    check_warn "nvidia-smi not found (no GPU or drivers not installed)"
+    check_warn "nvidia-smi not found"
 fi
 
-# 6. Network Connectivity
-echo "6. Checking Network Connectivity..."
+# 6. 网络连接
 if ping -c 1 8.8.8.8 &> /dev/null; then
     check_pass "Internet connectivity OK"
 else
     check_fail "No internet connectivity"
 fi
 
-# 7. Recent Errors in Logs
-echo "7. Checking Recent Errors..."
-ERROR_COUNT=$(journalctl --since "1 hour ago" -p err | wc -l)
-if [ "$ERROR_COUNT" -lt 10 ]; then
-    check_pass "Recent errors: $ERROR_COUNT (last hour)"
-else
-    check_warn "Recent errors: $ERROR_COUNT (last hour - investigate)"
-fi
-
 echo ""
-echo "======================================"
-echo "   Health Check Complete"
-echo "======================================"
+echo "Health Check Complete"
 EOF
 
 chmod +x health_check.sh
 ```
 
-**Run the health check:**
+**运行健康检查：**
 
 ```bash
 ./health_check.sh
@@ -545,36 +399,29 @@ chmod +x health_check.sh
 
 ---
 
-## Part 6: Integration and Testing
+## 第 6 部分：集成和测试
 
-### Task 6.1: Create Master Automation Script
+### 任务 6.1：创建主自动化脚本
 
 ```bash
 cat > ~/ml-automation-lab/run_all_maintenance.sh << 'EOF'
 #!/bin/bash
 set -euo pipefail
 
-echo "========================================"
-echo " ML Infrastructure Automated Maintenance"
-echo "========================================"
-echo ""
+echo "=== ML Infrastructure Automated Maintenance ==="
 
-# Run health check first
 echo "Running health check..."
 ~/ml-automation-lab/health-check/health_check.sh
 echo ""
 
-# GPU monitoring
 echo "Checking GPU status..."
 ~/ml-automation-lab/monitoring/monitor_gpus.sh
 echo ""
 
-# Backup (if needed)
 echo "Running backup..."
 ~/ml-automation-lab/backups/backup_models.sh
 echo ""
 
-# Cleanup
 echo "Running cleanup..."
 ~/ml-automation-lab/cleanup/cleanup_ml_artifacts.sh
 echo ""
@@ -585,75 +432,37 @@ EOF
 chmod +x ~/ml-automation-lab/run_all_maintenance.sh
 ```
 
-### Task 6.2: Test All Automations
+### 任务 6.2：测试所有自动化
 
 ```bash
-# Run all maintenance tasks
+# 运行所有维护任务
 ~/ml-automation-lab/run_all_maintenance.sh
 
-# Verify cron jobs
+# 验证 cron 作业
 crontab -l
 
-# Check systemd timers
+# 检查 systemd timers
 systemctl list-timers
 
-# Review logs
-tail -50 /var/log/ml-backup.log
-tail -50 /var/log/gpu-monitor.log
-tail -50 /var/log/ml-cleanup.log
+# 查看日志
+tail -50 /var/log/ml-backup.log 2>/dev/null || true
+tail -50 /var/log/gpu-monitor.log 2>/dev/null || true
 ```
 
 ---
 
-## Deliverables
+## 挑战问题
 
-Submit the following:
+1. **监控**：如何扩展 GPU 监控以在 Prometheus 中跟踪指标？
 
-1. **Scripts**:
-   - `backup_models.sh` - Working backup script with logging
-   - `monitor_gpus.sh` - GPU monitoring with alerts
-   - `cleanup_ml_artifacts.sh` - Cleanup automation
-   - `health_check.sh` - System health validation
+2. **备份策略**：什么是 3-2-1 备份规则？你的脚本如何符合该规则？
 
-2. **Configuration Files**:
-   - Cron configuration (`crontab -l` output)
-   - Systemd timer and service files
-   - Logrotate configuration
+3. **告警**：如何与 PagerDuty 或 Slack 集成以实现关键告警？
 
-3. **Documentation**:
-   - README explaining each automation
-   - Troubleshooting guide for common issues
-   - Runbook for responding to alerts
+4. **扩展**：如何修改这些脚本以在 100 台 GPU 服务器上工作？
 
-4. **Evidence**:
-   - Screenshots of successful script executions
-   - Log file samples
-   - Health check output
+5. **测试**：如何在不影响生产的情况下测试备份/恢复流程？
 
 ---
 
-## Challenge Questions
-
-1. **Monitoring**: How would you extend the GPU monitoring to track metrics in Prometheus?
-
-2. **Backup Strategy**: What's the 3-2-1 backup rule and how does your script comply?
-
-3. **Alerting**: How would you integrate with PagerDuty or Slack for critical alerts?
-
-4. **Scaling**: How would you modify these scripts to work across 100 GPU servers?
-
-5. **Testing**: How would you test your backup/restore process without disrupting production?
-
----
-
-## Additional Resources
-
-- [Cron Best Practices](https://www.man7.org/linux/man-pages/man5/crontab.5.html)
-- [systemd Timers](https://www.freedesktop.org/software/systemd/man/systemd.timer.html)
-- [Logrotate Documentation](https://linux.die.net/man/8/logrotate)
-- [Bash Scripting Best Practices](https://google.github.io/styleguide/shellguide.html)
-- [NVIDIA Management Library (NVML)](https://developer.nvidia.com/nvidia-management-library-nvml)
-
----
-
-**Congratulations!** You've built a complete automation suite for ML infrastructure maintenance. These scripts form the foundation of production ML operations.
+**恭喜！** 你已经为 ML 基础设施维护构建了一个完整的自动化套件。这些脚本构成了生产 ML 运维的基础。

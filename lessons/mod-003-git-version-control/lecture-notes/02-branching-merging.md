@@ -1,87 +1,87 @@
-# Lecture 02: Branching and Merging
+# 讲座 02：分支与合并
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Understanding Branches](#understanding-branches)
-3. [Branch Operations](#branch-operations)
-4. [Merging Strategies](#merging-strategies)
-5. [Resolving Merge Conflicts](#resolving-merge-conflicts)
-6. [Git Workflows](#git-workflows)
-7. [Branch Management Best Practices](#branch-management-best-practices)
-8. [Branches in AI/ML Projects](#branches-in-aiml-projects)
-9. [Common Issues and Troubleshooting](#common-issues-and-troubleshooting)
-10. [Summary and Key Takeaways](#summary-and-key-takeaways)
-
----
-
-## Introduction
-
-### Why Branching Matters for AI Infrastructure
-
-Imagine you're maintaining a production ML inference API serving thousands of requests per second. You need to:
-- Add a new model version for testing (but keep the old one serving traffic)
-- Fix a critical bug in the data preprocessing pipeline
-- Experiment with a new caching layer
-- All simultaneously, without breaking production
-
-Without branching, this is impossible. With branching, it's straightforward.
-
-Branches allow parallel development. They're Git's killer feature—the reason it dominates version control. Understanding branching transforms you from a Git user into a Git master.
-
-### Learning Objectives
-
-By the end of this lecture, you will:
-
-- Understand how Git implements branches (they're cheaper than you think)
-- Create, switch between, and delete branches confidently
-- Merge branches using different strategies (fast-forward, three-way, squash)
-- Resolve merge conflicts systematically
-- Implement common Git workflows (Feature Branch, Git Flow, GitHub Flow)
-- Apply branching strategies to ML experiment tracking
-- Use branches for environment-specific configurations (dev, staging, prod)
-- Troubleshoot common branching issues
-
-### The AI Infrastructure Context
-
-In AI infrastructure, branches serve specific purposes:
-
-**Development branches:**
-- Feature development (new model architectures, API endpoints)
-- Experiment tracking (different hyperparameters, architectures)
-- Bug fixes (urgent production issues)
-- Refactoring (code improvements without changing behavior)
-
-**Environment branches:**
-- `main/master`: Production-ready code
-- `staging`: Pre-production testing
-- `develop`: Integration branch for features
-
-**Use cases:**
-- **A/B testing**: Different model versions on separate branches
-- **Environment configs**: Dev vs. production configurations
-- **Experimentation**: Try new approaches without affecting main codebase
-- **Hotfixes**: Emergency production fixes
+## 目录
+1. [引言](#引言)
+2. [理解分支](#理解分支)
+3. [分支操作](#分支操作)
+4. [合并策略](#合并策略)
+5. [解决合并冲突](#解决合并冲突)
+6. [Git 工作流](#git-工作流)
+7. [分支管理最佳实践](#分支管理最佳实践)
+8. [AI/ML 项目中的分支](#aiml-项目中的分支)
+9. [常见问题与故障排除](#常见问题与故障排除)
+10. [总结与要点](#总结与要点)
 
 ---
 
-## Understanding Branches
+## 引言
 
-### What is a Branch?
+### 为什么分支对 AI 基础设施很重要
 
-In Git, a branch is simply a lightweight movable pointer to a commit. That's it. When you create a branch, Git creates a 40-byte file containing the SHA-1 hash of the commit it points to.
+想象一下，你正在维护一个每秒处理数千请求的生产级 ML 推理 API。你需要：
+- 添加新模型版本进行测试（但保持旧版本提供服务）
+- 修复数据预处理流水线中的关键 bug
+- 尝试新的缓存层
+- 所有这些同时进行，而不影响生产环境
+
+没有分支，这是不可能的。有了分支，这一切就变得简单了。
+
+分支允许并行开发。它们是 Git 的杀手级特性——也是 Git 主导版本控制的原因。理解分支能让你从 Git 用户转变为 Git 大师。
+
+### 学习目标
+
+在本讲座结束时，你将：
+
+- 理解 Git 如何实现分支（它们比你想象的要廉价）
+- 自信地创建、切换和删除分支
+- 使用不同策略合并分支（快进、三方合并、squash）
+- 系统地解决合并冲突
+- 实现常见的 Git 工作流（Feature Branch、Git Flow、GitHub Flow）
+- 将分支策略应用于 ML 实验跟踪
+- 使用分支进行环境特定配置（dev、staging、prod）
+- 排查常见的分支问题
+
+### AI 基础设施背景
+
+在 AI 基础设施中，分支服务于特定目的：
+
+**开发分支：**
+- 功能开发（新模型架构、API 端点）
+- 实验跟踪（不同超参数、架构）
+- Bug 修复（紧急生产问题）
+- 重构（不改变行为的代码改进）
+
+**环境分支：**
+- `main/master`：生产就绪代码
+- `staging`：预生产测试
+- `develop`：功能集成分支
+
+**使用场景：**
+- **A/B 测试**：不同模型版本在单独分支上
+- **环境配置**：开发与生产配置
+- **实验**：尝试新方法而不影响主代码库
+- **热修复**：紧急生产修复
+
+---
+
+## 理解分支
+
+### 什么是分支？
+
+在 Git 中，分支只是一个轻量级、可移动的指向 commit 的指针。就是这样。当你创建一个分支时，Git 创建了一个包含它所指向 commit 的 SHA-1 哈希的 40 字节文件。
 
 ```
-main branch:       E
-                   |
-                   v
+main 分支：       E
+                    |
+                    v
 A ← B ← C ← D ← E
 ```
 
-Each letter is a commit. The `main` branch points to commit E.
+每个字母是一个 commit。`main` 分支指向 commit E。
 
-### How Git Knows Your Current Branch
+### Git 如何知道你的当前分支
 
-Git maintains a special pointer called `HEAD` that points to the current branch:
+Git 维护一个名为 `HEAD` 的特殊指针，指向当前分支：
 
 ```
         HEAD
@@ -93,7 +93,7 @@ Git maintains a special pointer called `HEAD` that points to the current branch:
 A ← B ← C ← D ← E
 ```
 
-When you make a commit, the current branch moves forward:
+当你制作一个 commit 时，当前分支向前移动：
 
 ```
         HEAD
@@ -105,13 +105,13 @@ When you make a commit, the current branch moves forward:
 A ← B ← C ← D ← E ← F
 ```
 
-### Creating a Branch
+### 创建分支
 
 ```bash
-# Create a new branch
+# 创建一个新分支
 git branch feature/new-model
 
-# Branches now:
+# 现在分支：
         HEAD
          |
          v
@@ -124,18 +124,18 @@ A ← B ← C ← D ← E
     feature/new-model
 ```
 
-Both branches point to the same commit. No files were copied. Git just created a pointer.
+两个分支指向同一个 commit。没有文件被复制。Git 只是创建了一个指针。
 
-### Switching Branches
+### 切换分支
 
 ```bash
-# Switch to the new branch (old way)
+# 切换到新分支（旧方式）
 git checkout feature/new-model
 
-# Switch to the new branch (new way, Git 2.23+)
+# 切换到新分支（新方式，Git 2.23+）
 git switch feature/new-model
 
-# After switching:
+# 切换后：
          main
           |
           v
@@ -145,17 +145,17 @@ A ← B ← C ← D ← E
         HEAD ← feature/new-model
 ```
 
-Now `HEAD` points to `feature/new-model`.
+现在 `HEAD` 指向 `feature/new-model`。
 
-### Making Commits on a Branch
+### 在分支上制作 Commit
 
 ```bash
-# Make changes and commit
+# 进行更改并提交
 echo "model = ResNet50()" >> model.py
 git add model.py
 git commit -m "Add ResNet50 model"
 
-# Tree now:
+# 现在的树：
          main
           |
           v
@@ -167,154 +167,154 @@ A ← B ← C ← D ← E
                      HEAD
 ```
 
-The `feature/new-model` branch moved forward. The `main` branch stayed put.
+`feature/new-model` 分支向前移动了。`main` 分支保持不动。
 
-### Branches Are Cheap
+### 分支是廉价的
 
-Creating a branch in Git:
-- **Takes milliseconds**
-- **Uses 41 bytes** (40-byte SHA-1 + newline)
-- **Doesn't copy files**
-- **Doesn't duplicate history**
+在 Git 中创建分支：
+- **只需毫秒**
+- **占用 41 字节**（40 字节 SHA-1 + 换行符）
+- **不复制文件**
+- **不复制历史**
 
-This is why Git encourages branching. Create branches liberally!
+这就是为什么 Git 鼓励使用分支。大胆地创建分支吧！
 
 ---
 
-## Branch Operations
+## 分支操作
 
-### Creating Branches
+### 创建分支
 
 ```bash
-# Create a branch (doesn't switch to it)
+# 创建分支（不切换）
 git branch feature/add-logging
 
-# Create and switch in one command (old way)
+# 一步创建并切换（旧方式）
 git checkout -b feature/add-logging
 
-# Create and switch in one command (new way)
+# 一步创建并切换（新方式）
 git switch -c feature/add-logging
 
-# Create branch from specific commit
+# 从特定 commit 创建分支
 git branch feature/old-code abc123
 
-# Create branch from remote branch
+# 从远程分支创建分支
 git checkout -b local-feature origin/remote-feature
 ```
 
-### Listing Branches
+### 列出分支
 
 ```bash
-# List local branches
+# 列出本地分支
 git branch
 
-# Output:
+# 输出：
 #   feature/add-logging
 # * main
 #   feature/new-model
 
-# The * indicates current branch
+# * 表示当前分支
 
-# List all branches (including remote)
+# 列出所有分支（包括远程）
 git branch -a
 
-# List remote branches only
+# 只列出远程分支
 git branch -r
 
-# Show last commit on each branch
+# 显示每个分支的最新 commit
 git branch -v
 
-# Show merged branches
+# 显示已合并的分支
 git branch --merged
 
-# Show unmerged branches
+# 显示未合并的分支
 git branch --no-merged
 ```
 
-### Switching Branches
+### 切换分支
 
 ```bash
-# Switch to existing branch (new way)
+# 切换到已有分支（新方式）
 git switch main
 
-# Switch to existing branch (old way)
+# 切换到已有分支（旧方式）
 git checkout main
 
-# Create and switch to new branch
+# 创建并切换到新分支
 git switch -c feature/experiment
 
-# Switch to previous branch
+# 切换到上一个分支
 git switch -
 
-# This is like `cd -` in the shell
+# 这类似于 shell 中的 `cd -`
 ```
 
-**Important**: Before switching branches:
-- Commit your changes, or
-- Stash your changes (covered in Lecture 04)
+**重要**：在切换分支之前：
+- 提交你的变更，或者
+- 暂存你的变更（在讲座 04 中介绍）
 
-Otherwise, Git may prevent the switch or carry uncommitted changes to the new branch.
+否则，Git 可能会阻止切换或将未提交的变更带到新分支。
 
-### Renaming Branches
+### 重命名分支
 
 ```bash
-# Rename current branch
+# 重命名当前分支
 git branch -m new-name
 
-# Rename a different branch
+# 重命名其他分支
 git branch -m old-name new-name
 
-# Example: rename master to main
+# 示例：将 master 重命名为 main
 git branch -m master main
 ```
 
-### Deleting Branches
+### 删除分支
 
 ```bash
-# Delete a merged branch (safe)
+# 删除已合并的分支（安全）
 git branch -d feature/completed
 
-# Force delete an unmerged branch (dangerous)
+# 强制删除未合并的分支（危险）
 git branch -D feature/abandoned
 
-# Delete remote branch
+# 删除远程分支
 git push origin --delete feature/old-branch
 ```
 
-Git prevents deleting branches with unmerged changes unless you force it with `-D`.
+除非使用 `-D` 强制，否则 Git 会阻止删除包含未合并变更的分支。
 
-### Viewing Branch Differences
+### 查看分支差异
 
 ```bash
-# Show commits in feature branch not in main
+# 显示 feature 分支中不在 main 中的 commit
 git log main..feature/new-model
 
-# Show commits that differ between branches
+# 显示分支之间不同的 commit
 git log --left-right --oneline main...feature/new-model
 
-# Output:
+# 输出：
 # < abc123 Main branch commit
 # > def456 Feature branch commit
 ```
 
 ---
 
-## Merging Strategies
+## 合并策略
 
-### Types of Merges
+### 合并类型
 
-Git supports three main merge strategies:
+Git 支持三种主要的合并策略：
 
-1. **Fast-forward merge** (simplest)
-2. **Three-way merge** (creates merge commit)
-3. **Squash merge** (combines commits)
+1. **快进合并**（最简单）
+2. **三方合并**（创建合并 commit）
+3. **Squash 合并**（合并 commit）
 
-### Fast-Forward Merge
+### 快进合并
 
-When the target branch hasn't changed since the feature branch was created:
+当目标分支在功能分支创建后没有变化时：
 
 ```
-Before merge:
+合并前：
        main
         |
         v
@@ -325,7 +325,7 @@ A ← B ← C
                    |
                   HEAD
 
-After git merge feature (from main):
+在 main 上执行 git merge feature 后：
                   main
                    |
                    v
@@ -335,15 +335,15 @@ A ← B ← C ← D ← E
           feature
 ```
 
-Git simply moves the `main` pointer forward. No merge commit is created.
+Git 只是将 `main` 指针向前移动。不创建合并 commit。
 
 ```bash
-# Perform fast-forward merge
+# 执行快进合并
 git checkout main
 git merge feature
 ```
 
-Output:
+输出：
 ```
 Updating abc123..def456
 Fast-forward
@@ -351,12 +351,12 @@ Fast-forward
  1 file changed, 10 insertions(+)
 ```
 
-### Three-Way Merge
+### 三方合并
 
-When both branches have diverged:
+当两个分支都发生了分叉时：
 
 ```
-Before merge:
+合并前：
          main
           |
           v
@@ -367,7 +367,7 @@ A ← B ← C ← F ← G
                    |
                   HEAD
 
-After git merge feature (from main):
+在 main 上执行 git merge feature 后：
               main
                |
                v
@@ -376,77 +376,77 @@ A ← B ← C ← F ← G ← M
           D ← E ←-/  feature
 ```
 
-Git creates a new merge commit (M) with two parents.
+Git 创建一个带有两个父 commit 的新合并 commit（M）。
 
 ```bash
-# Perform three-way merge
+# 执行三方合并
 git checkout main
 git merge feature
 ```
 
-Git opens an editor for the merge commit message:
+Git 打开编辑器输入合并 commit 消息：
 ```
 Merge branch 'feature' into main
 
 # Please enter a commit message to explain why this merge is necessary.
 ```
 
-### Preventing Fast-Forward (Always Create Merge Commit)
+### 阻止快进（总是创建合并 commit）
 
 ```bash
-# Force creation of merge commit even if fast-forward is possible
+# 即使可能快进，也强制创建合并 commit
 git merge --no-ff feature
 
-# This creates explicit merge commit showing the feature was merged
+# 这会创建显式的合并 commit，表明该功能已被合并
 ```
 
-**When to use `--no-ff`:**
-- Want to preserve that a feature branch existed
-- Need to revert an entire feature as one operation
-- Following Git Flow workflow
+**何时使用 `--no-ff`：**
+- 想要保留功能分支曾存在的记录
+- 需要一次操作回滚整个功能
+- 遵循 Git Flow 工作流
 
-### Squash Merge
+### Squash 合并
 
-Combines all feature branch commits into a single commit:
+将功能分支的所有 commit 合并为单个 commit：
 
 ```
-Before squash merge:
+squash 合并前：
        main
         |
         v
 A ← B ← C
          \
           D ← E ← F ← feature
-             (3 commits)
+             (3 个 commit)
 
-After git merge --squash feature:
+执行 git merge --squash feature 后：
               main
                |
                v
 A ← B ← C ← D'
-        (all changes in one commit)
+        (所有变更在一个 commit 中)
 ```
 
 ```bash
-# Squash merge
+# Squash 合并
 git checkout main
 git merge --squash feature
 git commit -m "Add new model (squashed from 3 commits)"
 ```
 
-**When to use squash:**
-- Feature branch has messy commit history
-- Want clean, linear history on main branch
-- Following GitHub/GitLab PR workflows
+**何时使用 squash：**
+- 功能分支有凌乱的 commit 历史
+- 希望在 main 分支上有干净、线性的历史
+- 遵循 GitHub/GitLab PR 工作流
 
-**Downside**: Loses commit history from feature branch.
+**缺点**：丢失功能分支的 commit 历史。
 
-### Rebase (Alternative to Merge)
+### Rebase（合并的替代方案）
 
-Instead of merging, you can rebase—replaying commits from one branch onto another:
+除了合并，你也可以 rebase——将 commit 从一个分支重放到另一个分支上：
 
 ```
-Before rebase:
+rebase 前：
          main
           |
           v
@@ -454,62 +454,62 @@ A ← B ← C ← F ← G
          \
           D ← E ← feature
 
-After git rebase main (from feature):
+在 feature 上执行 git rebase main 后：
                       feature
                        |
                        v
 A ← B ← C ← F ← G ← D' ← E'
 
-Note: D and E are replayed as D' and E' (new commits)
+注意：D 和 E 被重放为 D' 和 E'（新 commit）
 ```
 
 ```bash
-# Rebase feature onto main
+# 将 feature 变基到 main
 git checkout feature
 git rebase main
 
-# Alternative: rebase from main
+# 或者：从 main 变基
 git rebase main feature
 ```
 
-**Rebase creates a linear history** (no merge commits), but rewrites commits.
+**Rebase 创建线性历史**（没有合并 commit），但会重写 commit。
 
-**Golden Rule of Rebasing**: Never rebase commits that have been pushed to a shared branch. It rewrites history and causes problems for collaborators.
+**Rebase 的黄金法则**：永远不要对已推送到共享分支的 commit 执行 rebase。它会重写历史并给协作者带来问题。
 
-### Comparison: Merge vs. Rebase
+### 对比：Merge vs. Rebase
 
-| Aspect | Merge | Rebase |
+| 方面 | Merge | Rebase |
 |--------|-------|--------|
-| History | Preserves complete history | Creates linear history |
-| Commits | Creates merge commits | No merge commits |
-| Conflicts | Resolved once | May need multiple resolutions |
-| Safety | Safe for shared branches | Dangerous for shared branches |
-| Traceability | Shows when features merged | Harder to trace feature integration |
-| Use case | Shared branches, releases | Local cleanup, feature branches |
+| 历史 | 保留完整历史 | 创建线性历史 |
+| Commits | 创建合并 commit | 无合并 commit |
+| 冲突 | 解决一次 | 可能需要多次解决 |
+| 安全性 | 对共享分支安全 | 对共享分支危险 |
+| 可追溯性 | 显示功能何时合并 | 更难追踪功能集成 |
+| 使用场景 | 共享分支、发布 | 本地清理、功能分支 |
 
-**For AI/ML projects**: Merge is generally safer and recommended for shared branches. Rebase is useful for cleaning up local commits before pushing.
+**对于 AI/ML 项目**：Merge 通常更安全，推荐用于共享分支。Rebase 适用于推送前清理本地 commit。
 
 ---
 
-## Resolving Merge Conflicts
+## 解决合并冲突
 
-### What Causes Conflicts?
+### 什么导致冲突？
 
-A merge conflict occurs when the same part of a file was changed differently in both branches:
+当同一文件的相同部分在两个分支中被以不同方式修改时，就会发生合并冲突：
 
 ```
-main branch:
+main 分支：
   batch_size = 32
 
-feature branch:
+feature 分支：
   batch_size = 64
 ```
 
-Git can't automatically decide which value to keep, so it asks you.
+Git 无法自动决定保留哪个值，所以它来问你。
 
-### Conflict Markers
+### 冲突标记
 
-When a conflict occurs, Git adds markers to the file:
+当发生冲突时，Git 向文件中添加标记：
 
 ```python
 def train_model():
@@ -522,34 +522,34 @@ def train_model():
     model.train(batch_size=batch_size)
 ```
 
-Breaking down the markers:
-- `<<<<<<< HEAD`: Start of your current branch's version
-- `=======`: Separator between versions
-- `>>>>>>> branch-name`: End of the incoming branch's version
+分解标记：
+- `<<<<<<< HEAD`：你当前分支版本的开始
+- `=======`：两个版本之间的分隔符
+- `>>>>>>> branch-name`：传入分支版本的结束
 
-### Resolving Conflicts: Step-by-Step
+### 解决冲突：分步指南
 
-#### Step 1: Attempt the merge
+#### 步骤 1：尝试合并
 
 ```bash
 git checkout main
 git merge feature/new-config
 ```
 
-Output:
+输出：
 ```
 Auto-merging config.py
 CONFLICT (content): Merge conflict in config.py
 Automatic merge failed; fix conflicts and then commit the result.
 ```
 
-#### Step 2: Identify conflicting files
+#### 步骤 2：识别冲突文件
 
 ```bash
 git status
 ```
 
-Output:
+输出：
 ```
 On branch main
 You have unmerged paths.
@@ -560,10 +560,10 @@ Unmerged paths:
         both modified:   config.py
 ```
 
-#### Step 3: Open the file and resolve
+#### 步骤 3：打开文件并解决
 
 ```python
-# Original conflicted file:
+# 原始冲突文件：
 def train_model():
 <<<<<<< HEAD
     batch_size = 32
@@ -573,28 +573,28 @@ def train_model():
 
     model.train(batch_size=batch_size)
 
-# After resolution (choose one, or create new solution):
+# 解决后（选择一个，或创建新方案）：
 def train_model():
-    batch_size = 64  # Chose feature branch value
+    batch_size = 64  # 选择了 feature 分支的值
 
     model.train(batch_size=batch_size)
 ```
 
-Remove the conflict markers completely.
+完全删除冲突标记。
 
-#### Step 4: Mark as resolved
+#### 步骤 4：标记为已解决
 
 ```bash
 git add config.py
 ```
 
-#### Step 5: Complete the merge
+#### 步骤 5：完成合并
 
 ```bash
 git commit
 ```
 
-Git provides a default merge commit message:
+Git 提供一个默认的合并 commit 消息：
 ```
 Merge branch 'feature/new-config' into main
 
@@ -602,106 +602,106 @@ Merge branch 'feature/new-config' into main
 #   config.py
 ```
 
-### Advanced Conflict Resolution
+### 高级冲突解决
 
-#### See what changed in each branch
+#### 查看每个分支的变化
 
 ```bash
-# See your version (current branch)
+# 查看你的版本（当前分支）
 git show :2:config.py
 
-# See their version (incoming branch)
+# 查看他们的版本（传入分支）
 git show :3:config.py
 
-# See common ancestor version
+# 查看共同祖先版本
 git show :1:config.py
 ```
 
-#### Use merge tools
+#### 使用合并工具
 
 ```bash
-# Configure merge tool (one-time setup)
+# 配置合并工具（一次性设置）
 git config --global merge.tool vimdiff
 
-# Launch merge tool
+# 启动合并工具
 git mergetool
 ```
 
-Popular merge tools:
-- **vimdiff** (terminal-based)
-- **meld** (GUI)
-- **kdiff3** (GUI)
-- **VS Code** (built-in)
+流行的合并工具：
+- **vimdiff**（终端）
+- **meld**（GUI）
+- **kdiff3**（GUI）
+- **VS Code**（内置）
 
-#### Accept all changes from one side
+#### 接受一方的所有变更
 
 ```bash
-# Keep all changes from current branch (ours)
+# 保留当前分支的所有变更（ours）
 git checkout --ours config.py
 git add config.py
 
-# Keep all changes from incoming branch (theirs)
+# 保留传入分支的所有变更（theirs）
 git checkout --theirs config.py
 git add config.py
 ```
 
-#### Abort a problematic merge
+#### 中止有问题的合并
 
 ```bash
-# Undo the merge and return to pre-merge state
+# 撤销合并并返回到合并前状态
 git merge --abort
 ```
 
-### Preventing Conflicts
+### 预防冲突
 
-1. **Pull frequently**: Stay up-to-date with the main branch
-2. **Communicate**: Coordinate who works on which files
-3. **Small commits**: Easier to resolve conflicts in small chunks
-4. **Rebase before merging**: Update feature branch with main before merge
-5. **Use .gitattributes**: Define merge strategies for specific files
+1. **频繁拉取**：与 main 分支保持同步
+2. **沟通**：协调谁在处理哪些文件
+3. **小 commit**：以小单位解决冲突更容易
+4. **合并前 rebase**：在合并前用 main 更新功能分支
+5. **使用 .gitattributes**：为特定文件定义合并策略
 
-Example `.gitattributes`:
+示例 `.gitattributes`：
 ```
-# Never merge these files, always keep ours
+# 永远不合并这些文件，始终保留 ours
 config/local.yaml merge=ours
 
-# Binary files shouldn't be merged
+# 二进制文件不应合并
 *.pkl binary
 *.h5 binary
 ```
 
 ---
 
-## Git Workflows
+## Git 工作流
 
-### Feature Branch Workflow
+### Feature Branch 工作流
 
-The simplest workflow for teams:
+适合团队的最简单工作流：
 
 ```
-main ← always deployable
+main ← 始终可部署
 
-feature/user-auth ← new feature branch
-feature/api-v2    ← another feature branch
+feature/user-auth ← 新功能分支
+feature/api-v2    ← 另一个功能分支
 ```
 
-**Process**:
-1. Create branch from `main` for each feature
-2. Develop and commit on feature branch
-3. Merge back to `main` when complete
-4. Delete feature branch
+**流程**：
+1. 从 `main` 为每个功能创建分支
+2. 在功能分支上开发和提交
+3. 完成后合并回 `main`
+4. 删除功能分支
 
 ```bash
-# Start feature
+# 开始功能
 git checkout main
 git pull origin main
 git checkout -b feature/add-caching
 
-# Develop
+# 开发
 git add .
 git commit -m "Implement Redis caching layer"
 
-# Finish feature
+# 完成功能
 git checkout main
 git pull origin main
 git merge feature/add-caching
@@ -709,57 +709,57 @@ git push origin main
 git branch -d feature/add-caching
 ```
 
-**Best for**: Small teams, simple projects, continuous deployment.
+**最适合**：小团队、简单项目、持续部署。
 
 ### Git Flow
 
-A more structured workflow with multiple branch types:
+一个更结构化的工作流，包含多种分支类型：
 
 ```
-main ← production code, tagged releases
+main ← 生产代码，打标签发布
  |
-develop ← integration branch
+develop ← 集成分支
  |
- ├─ feature/* ← feature branches
- ├─ release/* ← release preparation
- └─ hotfix/*  ← emergency fixes
+ ├─ feature/* ← 功能分支
+ ├─ release/* ← 发布准备
+ └─ hotfix/*  ← 紧急修复
 ```
 
-**Branch types**:
+**分支类型**：
 
-1. **main**: Production-ready code only
-2. **develop**: Integration branch for features
-3. **feature/***: New features (branch from `develop`)
-4. **release/***: Release preparation (branch from `develop`)
-5. **hotfix/***: Emergency production fixes (branch from `main`)
+1. **main**：仅生产就绪代码
+2. **develop**：功能集成分支
+3. **feature/***：新功能（从 `develop` 分支）
+4. **release/***：发布准备（从 `develop` 分支）
+5. **hotfix/***：紧急生产修复（从 `main` 分支）
 
-**Feature workflow**:
+**功能工作流**：
 ```bash
-# Start feature
+# 开始功能
 git checkout develop
 git checkout -b feature/new-model
 
-# Develop and commit
+# 开发和提交
 git add .
 git commit -m "Add transformer model"
 
-# Finish feature
+# 完成功能
 git checkout develop
 git merge --no-ff feature/new-model
 git branch -d feature/new-model
 git push origin develop
 ```
 
-**Release workflow**:
+**发布工作流**：
 ```bash
-# Start release
+# 开始发布
 git checkout develop
 git checkout -b release/1.2.0
 
-# Final testing, bug fixes, version bumps
+# 最终测试、bug 修复、版本更新
 git commit -m "Bump version to 1.2.0"
 
-# Finish release
+# 完成发布
 git checkout main
 git merge --no-ff release/1.2.0
 git tag -a v1.2.0 -m "Release version 1.2.0"
@@ -768,16 +768,16 @@ git merge --no-ff release/1.2.0
 git branch -d release/1.2.0
 ```
 
-**Hotfix workflow**:
+**热修复工作流**：
 ```bash
-# Start hotfix
+# 开始热修复
 git checkout main
 git checkout -b hotfix/critical-bug
 
-# Fix bug
+# 修复 bug
 git commit -m "Fix memory leak in inference"
 
-# Finish hotfix
+# 完成热修复
 git checkout main
 git merge --no-ff hotfix/critical-bug
 git tag -a v1.2.1 -m "Hotfix: memory leak"
@@ -786,170 +786,170 @@ git merge --no-ff hotfix/critical-bug
 git branch -d hotfix/critical-bug
 ```
 
-**Best for**: Scheduled releases, larger teams, versioned software.
+**最适合**：计划发布、较大团队、版本化软件。
 
 ### GitHub Flow
 
-Simpler than Git Flow, optimized for continuous deployment:
+比 Git Flow 更简单，针对持续部署优化：
 
 ```
-main ← always deployable
+main ← 始终可部署
  |
  ├─ feature/branch-1
  ├─ feature/branch-2
  └─ fix/branch-3
 ```
 
-**Process**:
-1. `main` branch is always deployable
-2. Create descriptive branch from `main`
-3. Commit regularly to your branch
-4. Open Pull Request for discussion
-5. Deploy from branch for testing (optional)
-6. Merge to `main` after review
-7. Deploy immediately from `main`
+**流程**：
+1. `main` 分支始终可部署
+2. 从 `main` 创建描述性分支
+3. 定期提交到你的分支
+4. 打开 Pull Request 进行讨论
+5. 从分支部署用于测试（可选）
+6. 审查后合并到 `main`
+7. 立即从 `main` 部署
 
 ```bash
-# Start feature
+# 开始功能
 git checkout main
 git pull origin main
 git checkout -b improve-model-accuracy
 
-# Develop
+# 开发
 git add .
 git commit -m "Implement ensemble model"
 git push origin improve-model-accuracy
 
-# Create Pull Request on GitHub
-# After approval and CI passes:
+# 在 GitHub 上创建 Pull Request
+# 批准和 CI 通过后：
 git checkout main
 git pull origin main
 ```
 
-**Best for**: Web applications, continuous deployment, GitHub/GitLab projects.
+**最适合**：Web 应用、持续部署、GitHub/GitLab 项目。
 
-### Trunk-Based Development
+### 主干开发
 
-Single branch with very short-lived feature branches:
+单分支，功能分支寿命极短：
 
 ```
-main ← trunk (everyone commits here frequently)
+main ← trunk（每个人都频繁提交）
  |
- └─ tiny-feature (lives < 24 hours)
+ └─ tiny-feature（存在不到 24 小时）
 ```
 
-**Key principles**:
-- Commit to `main` frequently (multiple times per day)
-- Feature branches are extremely short-lived (hours, not days)
-- Use feature flags for incomplete features
-- Heavy reliance on automated testing
+**关键原则**：
+- 频繁提交到 `main`（每天多次）
+- 功能分支寿命极短（小时，不是天）
+- 对不完整功能使用功能开关
+- 高度依赖自动化测试
 
-**Best for**: Highly experienced teams, strong CI/CD, feature flag infrastructure.
+**最适合**：经验丰富的团队、强大的 CI/CD、功能开关基础设施。
 
 ---
 
-## Branch Management Best Practices
+## 分支管理最佳实践
 
-### Naming Conventions
+### 命名约定
 
-Use descriptive, hierarchical branch names:
+使用描述性、分层的分支名称：
 
 ```bash
-# Feature branches
+# 功能分支
 feature/add-model-serving
 feature/user-authentication
 feature/ml-monitoring
 
-# Bug fix branches
+# Bug 修复分支
 fix/memory-leak
 fix/api-timeout
 bugfix/training-crash
 
-# Experimental branches
+# 实验分支
 experiment/new-architecture
 exp/hyperparameter-tuning
 
-# Hotfix branches
+# 热修复分支
 hotfix/critical-security-issue
 hotfix/production-crash
 
-# Release branches
+# 发布分支
 release/v1.2.0
 release/2023-10-15
 ```
 
-**Patterns**:
-- Use `/` to create hierarchy
-- Use `-` to separate words
-- Be descriptive but concise
-- Include ticket/issue numbers: `feature/MOD-123-add-caching`
+**模式**：
+- 使用 `/` 创建层次结构
+- 使用 `-` 分隔单词
+- 描述性但简洁
+- 包含工单/问题编号：`feature/MOD-123-add-caching`
 
-### Branch Lifetime
+### 分支生命周期
 
-**Short-lived branches** (hours to days):
-- Feature branches in trunk-based development
-- Bug fixes
-- Small features
+**短寿分支**（小时到天）：
+- 主干开发中的功能分支
+- Bug 修复
+- 小功能
 
-**Medium-lived branches** (days to weeks):
-- Feature branches in feature-branch workflow
-- Experiment branches
+**中寿分支**（天到周）：
+- Feature branch 工作流中的功能分支
+- 实验分支
 
-**Long-lived branches** (permanent):
+**长寿分支**（永久）：
 - `main` / `master`
-- `develop` (in Git Flow)
-- Environment branches (staging, production)
+- `develop`（在 Git Flow 中）
+- 环境分支（staging、production）
 
-**Rule of thumb**: The longer a branch lives, the harder it is to merge. Merge early and often.
+**经验法则**：分支存在时间越长，合并越困难。尽早并经常合并。
 
-### Keeping Branches Up-to-Date
+### 保持分支最新
 
 ```bash
-# Update feature branch with changes from main
+# 用 main 的变更更新功能分支
 git checkout feature/my-feature
 git fetch origin
 git merge origin/main
 
-# Or use rebase for cleaner history (if branch not shared)
+# 或者使用 rebase 以保持更干净的历史（如果分支未共享）
 git checkout feature/my-feature
 git fetch origin
 git rebase origin/main
 ```
 
-Regular updates prevent massive, difficult merges later.
+定期更新可以避免以后出现大规模、困难的合并。
 
-### Cleaning Up Branches
+### 清理分支
 
 ```bash
-# List branches merged into main
+# 列出已合并到 main 的分支
 git branch --merged main
 
-# Delete all merged branches (be careful!)
+# 删除所有已合并的分支（小心！）
 git branch --merged main | grep -v "\*" | xargs -n 1 git branch -d
 
-# Prune remote-tracking branches that no longer exist
+# 修剪不再存在的远程跟踪分支
 git fetch --prune
 
-# Or configure automatic pruning
+# 或者配置自动修剪
 git config --global fetch.prune true
 ```
 
 ---
 
-## Branches in AI/ML Projects
+## AI/ML 项目中的分支
 
-### Experiment Branches
+### 实验分支
 
-Track different ML experiments:
+跟踪不同的 ML 实验：
 
 ```bash
-# Create experiment branches
+# 创建实验分支
 git checkout -b experiment/resnet50-baseline
 git checkout -b experiment/resnet50-dropout-05
 git checkout -b experiment/vit-transformer
 ```
 
-Each branch contains code for a specific experiment. Commit experiment results in the branch:
+每个分支包含特定实验的代码。在分支中提交实验结果：
 
 ```bash
 # experiment/resnet50-baseline
@@ -961,40 +961,40 @@ git add config.yaml results.json
 git commit -m "With dropout=0.5: accuracy=0.89, loss=0.31"
 ```
 
-Compare experiments:
+比较实验：
 ```bash
 git diff experiment/resnet50-baseline experiment/resnet50-dropout-05 -- config.yaml
 ```
 
-Merge winning experiment to main:
+将获胜实验合并到 main：
 ```bash
 git checkout main
 git merge experiment/resnet50-dropout-05
 ```
 
-### Model Version Branches
+### 模型版本分支
 
-Track different model versions in production:
+跟踪生产中的不同模型版本：
 
 ```
-main ← current development
+main ← 当前开发
  |
- ├─ model/v1.0 ← production model version 1.0
- ├─ model/v1.1 ← production model version 1.1
- └─ model/v2.0-beta ← next major version
+ ├─ model/v1.0 ← 生产模型版本 1.0
+ ├─ model/v1.1 ← 生产模型版本 1.1
+ └─ model/v2.0-beta ← 下一个主要版本
 ```
 
-### Environment-Specific Branches
+### 环境特定分支
 
-**Not recommended** but sometimes used:
+**不推荐**但有时会使用：
 
 ```
-production ← production environment config
-staging    ← staging environment config
-develop    ← development environment config
+production ← 生产环境配置
+staging    ← 预发布环境配置
+develop    ← 开发环境配置
 ```
 
-**Better approach**: Use a single branch with environment-specific config files:
+**更好的方法**：使用带环境特定配置文件的单分支：
 ```
 configs/
   ├── dev.yaml
@@ -1002,9 +1002,9 @@ configs/
   └── prod.yaml
 ```
 
-### Data Pipeline Branches
+### 数据流水线分支
 
-For data engineering work:
+用于数据工程工作：
 
 ```bash
 git checkout -b pipeline/add-feature-engineering
@@ -1014,183 +1014,183 @@ git checkout -b pipeline/add-data-validation
 
 ---
 
-## Common Issues and Troubleshooting
+## 常见问题与故障排除
 
-### Issue 1: Accidentally Committed to Wrong Branch
+### 问题 1：意外提交到错误分支
 
-**Symptom**: Made commits on `main` instead of feature branch.
+**症状**：在 `main` 上而不是功能分支上做了 commit。
 
-**Solution**:
+**解决方案**：
 ```bash
-# Create feature branch from current position
+# 从当前位置创建功能分支
 git branch feature/my-feature
 
-# Reset main to origin (removes commits from main)
+# 将 main 重置为 origin（从 main 移除 commit）
 git reset --hard origin/main
 
-# Switch to feature branch (has your commits)
+# 切换到功能分支（包含你的 commit）
 git checkout feature/my-feature
 ```
 
-### Issue 2: Need to Move Uncommitted Changes to Another Branch
+### 问题 2：需要将未提交的变更移到另一个分支
 
-**Symptom**: Started working on wrong branch.
+**症状**：在错误的分支上开始工作。
 
-**Solution**:
+**解决方案**：
 ```bash
-# Stash your changes
+# 暂存你的变更
 git stash
 
-# Switch to correct branch
+# 切换到正确的分支
 git checkout correct-branch
 
-# Apply stashed changes
+# 应用暂存的变更
 git stash pop
 ```
 
-### Issue 3: Merge Conflict Too Complex
+### 问题 3：合并冲突太复杂
 
-**Symptom**: Merge conflict is overwhelming.
+**症状**：合并冲突压倒性的。
 
-**Solution**:
+**解决方案**：
 ```bash
-# Abort the merge
+# 中止合并
 git merge --abort
 
-# Try rebasing one commit at a time
+# 尝试一次变基一个 commit
 git rebase -i origin/main
 
-# Or ask for help from team member
+# 或向团队成员寻求帮助
 ```
 
-### Issue 4: Deleted Branch with Unmerged Work
+### 问题 4：删除了包含未合并工作的分支
 
-**Symptom**: Accidentally deleted a branch.
+**症状**：不小心删除了一个分支。
 
-**Solution**:
+**解决方案**：
 ```bash
-# Find the deleted branch's last commit
+# 找到已删除分支的最后一个 commit
 git reflog
 
-# Output:
+# 输出：
 # abc123 HEAD@{0}: checkout: moving from deleted-branch to main
 # def456 HEAD@{1}: commit: My last commit on deleted-branch
 
-# Recreate the branch
+# 重新创建分支
 git branch recovered-branch def456
 ```
 
-Git keeps deleted branches in reflog for ~30 days.
+Git 在 reflog 中保留已删除分支约 30 天。
 
-### Issue 5: Branch Diverged from Remote
+### 问题 5：分支与远程分叉
 
-**Symptom**: Can't push because branches have diverged.
+**症状**：无法推送，因为分支已分叉。
 
-**Solution**:
+**解决方案**：
 ```bash
-# See what's different
+# 查看不同之处
 git fetch origin
 git log HEAD..origin/main --oneline
 
-# Option 1: Merge remote changes
+# 选项 1：合并远程变更
 git pull origin main
 
-# Option 2: Rebase onto remote
+# 选项 2：变基到远程
 git pull --rebase origin main
 
-# Option 3: Force push (dangerous!)
+# 选项 3：强制推送（危险！）
 git push --force-with-lease origin main
 ```
 
-**Never force push to shared branches** unless team is coordinated.
+**除非团队协调一致，否则永远不要对共享分支强制推送。**
 
 ---
 
-## Summary and Key Takeaways
+## 总结与要点
 
-### Core Concepts
+### 核心概念
 
-1. **Branches are lightweight**: Just 41-byte pointers to commits
-2. **HEAD tracks current branch**: Shows where you are
-3. **Three merge strategies**: Fast-forward, three-way, squash
-4. **Rebase rewrites history**: Useful locally, dangerous remotely
-5. **Conflicts are normal**: Learn to resolve them systematically
+1. **分支是轻量级的**：只是指向 commit 的 41 字节指针
+2. **HEAD 跟踪当前分支**：显示你所在的位置
+3. **三种合并策略**：快进、三方合并、squash
+4. **Rebase 重写历史**：本地有用，远程危险
+5. **冲突是正常的**：学会系统地解决它们
 
-### Essential Commands Cheat Sheet
+### 必备命令速查表
 
 ```bash
-# Branch operations
-git branch                    # List branches
-git branch <name>            # Create branch
-git switch <name>            # Switch to branch (new)
-git switch -c <name>         # Create and switch (new)
-git checkout <name>          # Switch to branch (old)
-git checkout -b <name>       # Create and switch (old)
-git branch -d <name>         # Delete merged branch
-git branch -D <name>         # Force delete branch
+# 分支操作
+git branch                    # 列出分支
+git branch <name>            # 创建分支
+git switch <name>            # 切换到分支（新）
+git switch -c <name>         # 创建并切换（新）
+git checkout <name>          # 切换到分支（旧）
+git checkout -b <name>       # 创建并切换（旧）
+git branch -d <name>         # 删除已合并的分支
+git branch -D <name>         # 强制删除分支
 
-# Merging
-git merge <branch>           # Merge branch into current
-git merge --no-ff <branch>   # Force merge commit
-git merge --squash <branch>  # Squash merge
-git merge --abort            # Abort merge
+# 合并
+git merge <branch>           # 将分支合并到当前分支
+git merge --no-ff <branch>   # 强制合并 commit
+git merge --squash <branch>  # Squash 合并
+git merge --abort            # 中止合并
 
-# Rebasing
-git rebase <branch>          # Rebase onto branch
-git rebase -i <commit>       # Interactive rebase
+# 变基
+git rebase <branch>          # 变基到分支
+git rebase -i <commit>       # 交互式变基
 
-# Conflict resolution
-git status                   # See conflicted files
-git diff                     # See conflict details
-git add <file>              # Mark as resolved
-git merge --abort           # Abort merge
+# 冲突解决
+git status                   # 查看冲突文件
+git diff                     # 查看冲突详情
+git add <file>              # 标记为已解决
+git merge --abort           # 中止合并
 ```
 
-### Workflow Selection Guide
+### 工作流选择指南
 
-| Workflow | Team Size | Release Cadence | Complexity | Best For |
+| 工作流 | 团队规模 | 发布节奏 | 复杂度 | 最适合 |
 |----------|-----------|-----------------|------------|----------|
-| Feature Branch | Small | Continuous | Low | Startups, web apps |
-| Git Flow | Medium-Large | Scheduled | High | Versioned software, mobile apps |
-| GitHub Flow | Any | Continuous | Medium | Web apps, SaaS, APIs |
-| Trunk-Based | Large (experienced) | Continuous | Low | Mature teams, strong CI/CD |
+| Feature Branch | 小 | 持续 | 低 | 初创公司、Web 应用 |
+| Git Flow | 中-大 | 计划 | 高 | 版本化软件、移动应用 |
+| GitHub Flow | 任意 | 持续 | 中 | Web 应用、SaaS、API |
+| 主干开发 | 大（经验丰富） | 持续 | 低 | 成熟团队、强大 CI/CD |
 
-### Best Practices
+### 最佳实践
 
-1. **Branch early, branch often**: Branches are cheap
-2. **Keep branches short-lived**: Merge within days, not weeks
-3. **Name branches descriptively**: `feature/add-user-auth`, not `feature1`
-4. **Update branches regularly**: Merge or rebase from main frequently
-5. **Delete merged branches**: Keep repository clean
-6. **Never force push shared branches**: Coordination required
-7. **Review before merging**: Use Pull Requests
-8. **Write meaningful merge messages**: Explain why features were merged
-9. **Use consistent workflow**: Team should agree on one workflow
-10. **Automate testing**: CI/CD should test all branches
+1. **尽早分支、经常分支**：分支是廉价的
+2. **保持分支短寿**：在几天内合并，而不是几周
+3. **描述性地命名分支**：`feature/add-user-auth`，而不是 `feature1`
+4. **定期更新分支**：经常从 main 合并或变基
+5. **删除已合并的分支**：保持仓库整洁
+6. **永远不要强制推送共享分支**：需要协调
+7. **合并前审查**：使用 Pull Request
+8. **编写有意义的合并消息**：解释为什么合并功能
+9. **使用一致的工作流**：团队应同意一个工作流
+10. **自动化测试**：CI/CD 应测试所有分支
 
-### For AI/ML Projects
+### 对于 AI/ML 项目
 
-- **Experiment tracking**: One branch per experiment, commit results
-- **Model versioning**: Tag releases with model versions
-- **Data pipeline isolation**: Separate branches for data engineering
-- **Reproducibility**: Commit exact configs with code
-- **A/B testing**: Use branches to manage different model versions
+- **实验跟踪**：每个实验一个分支，提交结果
+- **模型版本控制**：用模型版本打标签发布
+- **数据流水线隔离**：数据工程单独分支
+- **可重现性**：将精确配置与代码一起提交
+- **A/B 测试**：使用分支管理不同模型版本
 
-### What's Next
+### 下一步
 
-In the next lecture, we'll cover:
-- Collaboration with Git (remote repositories, GitHub/GitLab)
-- Pull Requests and code review
-- Forking and contributing to open source
-- Issues and project management
-- CI/CD integration
+在下一讲中，我们将介绍：
+- 使用 Git 协作（远程仓库、GitHub/GitLab）
+- Pull Request 和代码审查
+- Fork 和为开源做贡献
+- Issue 和项目管理
+- CI/CD 集成
 
-### Further Reading
+### 扩展阅读
 
-- Git branching model: https://nvie.com/posts/a-successful-git-branching-model/
-- GitHub Flow: https://guides.github.com/introduction/flow/
-- Trunk-Based Development: https://trunkbaseddevelopment.com/
+- Git 分支模型：https://nvie.com/posts/a-successful-git-branching-model/
+- GitHub Flow：https://guides.github.com/introduction/flow/
+- 主干开发：https://trunkbaseddevelopment.com/
 
 ---
 
-**Practice Exercises**: Complete Exercise 03 and 04 to master branching and conflict resolution through hands-on scenarios.
+**练习**：完成练习 03 和 04，通过动手场景掌握分支和冲突解决。

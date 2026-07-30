@@ -1,61 +1,61 @@
-# Exercise 04: Logging Pipeline Implementation with Loki
+# Exercise 04：使用 Loki 实现日志管道
 
-## Overview
+## 概述
 
-Design and deploy a production-ready centralized logging pipeline that ingests structured logs from ML infrastructure services, enriches them with metadata, stores them in a queryable backend, and provides powerful log exploration and correlation capabilities. This exercise builds a complete Grafana Loki stack integrated with the observability foundation from Exercise 01.
+设计并部署一个生产就绪的集中式日志管道，用于从 ML 基础设施服务中摄取结构化日志，用元数据丰富它们，存储在可查询的后端，并提供强大的日志探索和关联能力。本练习构建了与 Exercise 01 可观测性基础集成的完整 Grafana Loki 栈。
 
-**Key Capabilities:**
-- Centralized log aggregation for all services
-- Structured log parsing and enrichment
-- Log-based metrics extraction
-- Correlation with traces and metrics
-- Log-based alerting
-- Compliance and retention management
+**关键能力：**
+- 所有服务的集中式日志聚合
+- 结构化日志解析和丰富
+- 基于日志的 metrics 提取
+- 与 traces 和 metrics 的关联
+- 基于日志的告警
+- 合规和保留管理
 
-**Difficulty:** Intermediate → Advanced
-**Estimated Time:** 3–4 hours
-**Prerequisites:**
-- Exercises 01–03 completed (observability stack running)
-- Understanding of structured logging (JSON logs)
-- Docker Compose knowledge
-- Basic LogQL query language familiarity
-
----
-
-## Learning Objectives
-
-By the end of this exercise, you will be able to:
-
-1. **Deploy Production Logging Infrastructure**
-   - Configure Grafana Loki for multi-tenant log storage
-   - Set up Promtail for log collection and shipping
-   - Implement retention and compaction strategies
-
-2. **Build Log Processing Pipelines**
-   - Parse structured JSON logs with pipeline stages
-   - Extract labels and fields from log entries
-   - Enrich logs with metadata and context
-
-3. **Query and Visualize Logs**
-   - Write LogQL queries for log exploration
-   - Build log dashboards in Grafana
-   - Correlate logs with metrics and traces
-
-4. **Implement Log-Based Metrics**
-   - Derive metrics from log patterns
-   - Create counters and histograms from logs
-   - Alert on log-based conditions
-
-5. **Ensure Compliance and Security**
-   - Implement log redaction for PII
-   - Configure retention policies
-   - Set up access controls
+**难度：** 中级 → 高级
+**预计时间：** 3–4 小时
+**前置知识：**
+- Exercises 01–03 已完成（可观测性栈运行中）
+- 理解结构化日志（JSON 日志）
+- Docker Compose 知识
+- 基本的 LogQL 查询语言熟悉度
 
 ---
 
-## Architecture Overview
+## 学习目标
 
-### Logging Stack Components
+通过完成本练习，你将能够：
+
+1. **部署生产日志基础设施**
+   - 配置用于多租户日志存储的 Grafana Loki
+   - 设置 Promtail 用于日志收集和传输
+   - 实现保留和压缩策略
+
+2. **构建日志处理管道**
+   - 使用管道阶段解析结构化 JSON 日志
+   - 从日志条目中提取 labels 和字段
+   - 用元数据和上下文丰富日志
+
+3. **查询和可视化日志**
+   - 编写 LogQL 查询用于日志探索
+   - 在 Grafana 中构建日志 dashboard
+   - 关联日志与 metrics 和 traces
+
+4. **实现基于日志的 Metrics**
+   - 从日志模式推导 metrics
+   - 从日志创建 counters 和 histograms
+   - 基于日志条件告警
+
+5. **确保合规和安全**
+   - 实现 PII 的日志脱敏
+   - 配置保留策略
+   - 设置访问控制
+
+---
+
+## 架构概览
+
+### 日志栈组件
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -104,177 +104,177 @@ By the end of this exercise, you will be able to:
     └───────────┘    └─────────────┘   └───────────┘
 ```
 
-### Log Flow
+### 日志流
 
-1. **Collection:** Promtail discovers and tails log files from Docker containers
-2. **Parsing:** JSON logs are parsed, fields extracted as labels and metadata
-3. **Enrichment:** Additional context (service, environment, host) added
-4. **Shipping:** Logs pushed to Loki with labels for efficient indexing
-5. **Storage:** Loki chunks logs, indexes labels, compresses data
-6. **Query:** LogQL queries filter and aggregate logs in Grafana
-7. **Correlation:** Trace IDs link logs to distributed traces
+1. **收集：** Promtail 发现并跟踪 Docker 容器的日志文件
+2. **解析：** JSON 日志被解析，字段被提取为 labels 和元数据
+3. **丰富：** 添加上下文（service、environment、host）
+4. **传输：** 日志推送到 Loki，并带有 labels 用于高效索引
+5. **存储：** Loki 分块存储日志、索引 labels、压缩数据
+6. **查询：** LogQL 查询在 Grafana 中过滤和聚合日志
+7. **关联：** Trace ID 将日志链接到分布式 traces
 
 ---
 
-## Part 1: Project Setup and Planning
+## 第 1 部分：项目设置和规划
 
-### 1.1 Create Project Structure
+### 1.1 创建项目结构
 
-Create the logging pipeline directory structure:
+创建日志管道目录结构：
 
 ```bash
 cd ~/monitoring-lab
 mkdir -p logging/{loki,promtail,dashboards,docs}
 ```
 
-**Directory structure:**
+**目录结构：**
 ```
 logging/
-├── docker-compose.logging.yml          # Logging stack services
+├── docker-compose.logging.yml          # 日志栈服务
 ├── loki/
-│   ├── loki-config.yaml               # Loki server configuration
-│   └── loki-rules.yaml                # Log-based recording/alerting rules
+│   ├── loki-config.yaml               # Loki 服务器配置
+│   └── loki-rules.yaml                # 基于日志的 recording/alerting 规则
 ├── promtail/
-│   ├── promtail-config.yaml           # Log collection configuration
-│   └── positions.yaml                 # Log position tracking (auto-generated)
+│   ├── promtail-config.yaml           # 日志收集配置
+│   └── positions.yaml                 # 日志位置跟踪（自动生成）
 ├── dashboards/
-│   ├── logging-overview.json          # Log analytics dashboard
-│   └── log-troubleshooting.json       # Debugging dashboard
+│   ├── logging-overview.json          # 日志分析 dashboard
+│   └── log-troubleshooting.json       # 调试 dashboard
 └── docs/
-    ├── logging-architecture.md        # Architecture documentation
-    ├── logging-governance.md          # Retention and compliance
-    └── logql-queries.md              # Query reference
+    ├── logging-architecture.md        # 架构文档
+    ├── logging-governance.md          # 保留和合规
+    └── logql-queries.md              # 查询参考
 ```
 
-### 1.2 Define Logging Requirements
+### 1.2 定义日志需求
 
-**Create `logging/docs/logging-requirements.md`:**
+**创建 `logging/docs/logging-requirements.md`：**
 
 ```markdown
-# Logging Requirements - ML Infrastructure Platform
+# 日志需求 - ML 基础设施平台
 
-## Log Classes and Retention
+## 日志分类和保留
 
-| Log Class | Sources | Retention | Storage Tier | Purpose |
+| 日志类别 | 来源 | 保留期 | 存储层级 | 目的 |
 |-----------|---------|-----------|--------------|---------|
-| Application Logs | Inference Gateway, ML services | 30 days | Hot (Loki) | Debugging, troubleshooting |
-| Access Logs | API Gateway, Load Balancers | 90 days | Warm (Object Storage) | Audit, analytics |
-| Audit Logs | Authentication, Authorization | 1 year | Cold (S3/GCS) | Compliance, security |
-| System Logs | Nodes, Infrastructure | 14 days | Hot (Loki) | Infrastructure monitoring |
-| ML Logs | Training jobs, Model serving | 60 days | Warm | Model debugging, metrics |
+| 应用日志 | Inference Gateway, ML 服务 | 30 天 | 热（Loki） | 调试、故障排除 |
+| 访问日志 | API 网关、负载均衡器 | 90 天 | 温（对象存储） | 审计、分析 |
+| 审计日志 | 认证、授权 | 1 年 | 冷（S3/GCS） | 合规、安全 |
+| 系统日志 | 节点、基础设施 | 14 天 | 热（Loki） | 基础设施监控 |
+| ML 日志 | 训练任务、模型服务 | 60 天 | 温 | 模型调试、指标 |
 
-## Log Volume Estimates
+## 日志量估算
 
-- **Inference Gateway:** ~500 MB/day (10K req/min, 5KB avg log)
-- **ML Training Jobs:** ~2 GB/day (batch jobs)
-- **System Logs:** ~200 MB/day
-- **Total:** ~3 GB/day → ~90 GB/month
+- **Inference Gateway：** 约 500 MB/天（10K req/min，5KB 平均日志）
+- **ML 训练任务：** 约 2 GB/天（批处理任务）
+- **系统日志：** 约 200 MB/天
+- **总计：** 约 3 GB/天 → 约 90 GB/月
 
-## Query Patterns
+## 查询模式
 
-1. **Error Investigation:** Search by trace_id, error message, timeframe
-2. **Performance Analysis:** Filter by latency_ms, model_version
-3. **Audit Compliance:** Find all access to specific models/data
-4. **Trend Analysis:** Count errors over time, group by service
+1. **错误调查：** 按 trace_id、错误消息、时间范围搜索
+2. **性能分析：** 按 latency_ms、model_version 过滤
+3. **审计合规：** 查找对特定模型/数据的所有访问
+4. **趋势分析：** 按时间统计错误数，按服务分组
 
-## Compliance Requirements
+## 合规要求
 
-- **PII Redaction:** Email addresses, user IDs must be masked
-- **Access Control:** Only on-call team can query production logs
-- **Audit Trail:** Track who queries sensitive logs
-- **Data Residency:** Logs must remain in US region
+- **PII 脱敏：** 电子邮件地址、用户 ID 必须被屏蔽
+- **访问控制：** 仅 on-call 团队可查询生产日志
+- **审计跟踪：** 跟踪谁查询了敏感日志
+- **数据驻留：** 日志必须保留在 US 区域
 ```
 
-### 1.3 Architecture Documentation
+### 1.3 架构文档
 
-**Create `logging/docs/logging-architecture.md`:**
+**创建 `logging/docs/logging-architecture.md`：**
 
 ```markdown
-# Logging Architecture - Design Decisions
+# 日志架构 - 设计决策
 
-## Why Grafana Loki?
+## 为什么选择 Grafana Loki？
 
-**Selected:** Grafana Loki
-**Alternatives Considered:** Elasticsearch, Splunk, CloudWatch Logs
+**选定：** Grafana Loki
+**备选方案：** Elasticsearch、Splunk、CloudWatch Logs
 
-### Decision Rationale
+### 决策理由
 
-| Factor | Loki | Elasticsearch | Verdict |
+| 因素 | Loki | Elasticsearch | 结论 |
 |--------|------|---------------|---------|
-| Cost | Low (no full-text indexing) | High (indexes all fields) | ✅ Loki |
-| Query Speed | Fast for label-based queries | Fast for full-text search | Tie |
-| Storage Efficiency | 10x compression | Larger indexes | ✅ Loki |
-| Integration | Native Grafana | Requires Kibana or plugin | ✅ Loki |
-| Ops Complexity | Low (single binary) | High (cluster management) | ✅ Loki |
-| Scalability | Horizontal (via object storage) | Horizontal (complex) | ✅ Loki |
+| 成本 | 低（无需全文索引） | 高（索引所有字段） | ✅ Loki |
+| 查询速度 | 基于 label 的查询快速 | 全文搜索快速 | 平局 |
+| 存储效率 | 10 倍压缩 | 索引占用大 | ✅ Loki |
+| 集成 | 原生 Grafana | 需要 Kibana 或插件 | ✅ Loki |
+| 运维复杂度 | 低（单一二进制） | 高（集群管理） | ✅ Loki |
+| 可扩展性 | 水平（通过对象存储） | 水平（复杂） | ✅ Loki |
 
-**Decision:** Loki is ideal for structured logs with known query patterns.
+**决策：** Loki 是结构化日志和已知查询模式的理想选择。
 
-## Indexing Strategy
+## 索引策略
 
-Loki indexes **labels only**, not log content. Choose labels carefully:
+Loki 仅索引 **labels**，不索引日志内容。谨慎选择 labels：
 
-**Good Labels (Low Cardinality):**
-- `service` (inference-gateway, training-service)
-- `environment` (lab, staging, production)
-- `level` (debug, info, warning, error, critical)
-- `cluster` (us-east-1, us-west-2)
-- `job` (docker-logs, systemd-logs)
+**好 Labels（低基数）：**
+- `service`（inference-gateway、training-service）
+- `environment`（lab、staging、production）
+- `level`（debug、info、warning、error、critical）
+- `cluster`（us-east-1、us-west-2）
+- `job`（docker-logs、systemd-logs）
 
-**Bad Labels (High Cardinality - AVOID):**
-- `trace_id` (millions of unique values)
-- `request_id` (unique per request)
-- `user_id` (thousands of users)
-- `model_version` (acceptable if <100 versions)
+**坏 Labels（高基数 - 避免）：**
+- `trace_id`（数百万唯一值）
+- `request_id`（每个请求唯一）
+- `user_id`（数千用户）
+- `model_version`（如果 <100 个版本可接受）
 
-**Rule:** Keep total label combinations < 10,000.
+**规则：** 保持总 label 组合 < 10,000。
 
-## Retention Strategy
+## 保留策略
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Hot Tier (Loki Local Disk) - 7 days                       │
-│  - Fast queries                                              │
-│  - Frequent access                                           │
-│  - All log classes                                           │
+│  Hot Tier（Loki 本地磁盘）- 7 天                            │
+│  - 快速查询                                                  │
+│  - 频繁访问                                                  │
+│  - 所有日志类别                                               │
 └─────────────────┬───────────────────────────────────────────┘
-                  │ Compaction
+                  │ 压缩
 ┌─────────────────▼───────────────────────────────────────────┐
-│  Warm Tier (Object Storage S3/GCS) - 23 days               │
-│  - Compressed chunks                                         │
-│  - On-demand queries                                         │
-│  - Application + ML logs                                     │
+│  Warm Tier（对象存储 S3/GCS）- 23 天                        │
+│  - 压缩块                                                    │
+│  - 按需查询                                                  │
+│  - 应用 + ML 日志                                            │
 └─────────────────┬───────────────────────────────────────────┘
-                  │ Archive
+                  │ 归档
 ┌─────────────────▼───────────────────────────────────────────┐
-│  Cold Tier (Glacier/Coldline) - 335 days                   │
-│  - Audit logs only                                           │
-│  - Compliance retention                                      │
-│  - Rare access (hours to restore)                           │
+│  Cold Tier（Glacier/Coldline）- 335 天                      │
+│  - 仅审计日志                                               │
+│  - 合规保留                                                  │
+│  - 极少访问（数小时恢复）                                    │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Scaling Considerations
+## 扩展考量
 
-**Current Lab (Single Node):**
-- Loki: 1 instance
-- Promtail: 1 per host
-- Throughput: ~10 MB/s ingestion
+**当前实验环境（单节点）：**
+- Loki：1 个实例
+- Promtail：每台主机 1 个
+- 吞吐量：约 10 MB/s 摄入
 
-**Production (Distributed):**
-- Loki: 3+ distributors, 3+ ingesters, 3+ queriers
-- Object Storage: S3/GCS for chunks
-- Caching: Memcached for query acceleration
-- Throughput: 100+ MB/s ingestion
+**生产环境（分布式）：**
+- Loki：3+ distributors、3+ ingesters、3+ queriers
+- 对象存储：S3/GCS 用于块存储
+- 缓存：Memcached 用于查询加速
+- 吞吐量：100+ MB/s 摄入
 ```
 
 ---
 
-## Part 2: Deploy Loki and Promtail
+## 第 2 部分：部署 Loki 和 Promtail
 
-### 2.1 Docker Compose Configuration
+### 2.1 Docker Compose 配置
 
-**Create `logging/docker-compose.logging.yml`:**
+**创建 `logging/docker-compose.logging.yml`：**
 
 ```yaml
 version: '3.8'
@@ -308,19 +308,19 @@ services:
     container_name: promtail
     restart: unless-stopped
     volumes:
-      # Promtail configuration
+      # Promtail 配置
       - ./promtail/promtail-config.yaml:/etc/promtail/config.yaml:ro
 
-      # Docker container logs (read-only)
+      # Docker 容器日志（只读）
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
 
-      # Docker socket to get container metadata
+      # Docker socket 获取容器元数据
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
-      # Host logs (optional)
+      # 主机日志（可选）
       - /var/log:/var/log:ro
 
-      # Position tracking (persistent)
+      # 位置跟踪（持久化）
       - ./promtail/positions.yaml:/tmp/positions.yaml
     command: -config.file=/etc/promtail/config.yaml
     networks:
@@ -334,7 +334,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # Update Grafana to include Loki datasource
+  # 更新 Grafana 以包含 Loki 数据源
   grafana:
     image: grafana/grafana:10.2.3
     container_name: grafana
@@ -368,129 +368,129 @@ networks:
     external: true
 ```
 
-### 2.2 Loki Configuration
+### 2.2 Loki 配置
 
-**Create `logging/loki/loki-config.yaml`:**
+**创建 `logging/loki/loki-config.yaml`：**
 
 ```yaml
-# Loki Server Configuration
-# Version: 2.9.3
-# Deployment: Single-node (for lab/dev)
+# Loki 服务器配置
+# 版本：2.9.3
+# 部署：单节点（用于实验/开发）
 
-auth_enabled: false  # Multi-tenancy disabled for lab
+auth_enabled: false  # 实验环境禁用多租户
 
 server:
   http_listen_port: 3100
   grpc_listen_port: 9096
   log_level: info
 
-  # Graceful shutdown
+  # 优雅关闭
   graceful_shutdown_timeout: 30s
 
-# Distributor receives logs from Promtail
+# Distributor 从 Promtail 接收日志
 distributor:
   ring:
     kvstore:
-      store: inmemory  # Use memberlist for production
+      store: inmemory  # 生产环境使用 memberlist
 
-# Ingester writes logs to storage
+# Ingester 将日志写入存储
 ingester:
-  # Lifecycle configuration
+  # 生命周期配置
   lifecycler:
     address: 127.0.0.1
     ring:
       kvstore:
         store: inmemory
-      replication_factor: 1  # Single node
+      replication_factor: 1  # 单节点
     final_sleep: 0s
 
-  # Chunk configuration
-  chunk_idle_period: 1h        # Flush chunks after 1h idle
-  max_chunk_age: 1h            # Force flush after 1h
-  chunk_target_size: 1048576   # Target chunk size: 1MB
-  chunk_retain_period: 30s     # Keep chunks in memory briefly
+  # 块配置
+  chunk_idle_period: 1h        # 空闲 1h 后刷新块
+  max_chunk_age: 1h            # 1h 后强制刷新
+  chunk_target_size: 1048576   # 目标块大小：1MB
+  chunk_retain_period: 30s     # 短暂保留块在内存中
 
-  # WAL (Write-Ahead Log) for durability
+  # WAL（预写日志）用于持久性
   wal:
     enabled: true
     dir: /loki/wal
     replay_memory_ceiling: 1GB
 
-# Schema defines how logs are indexed and stored
+# Schema 定义日志如何被索引和存储
 schema_config:
   configs:
-    # Schema v12 (current)
+    # Schema v12（当前）
     - from: 2024-01-01
       store: boltdb-shipper
       object_store: filesystem
       schema: v12
       index:
         prefix: index_
-        period: 24h  # Daily indexes
+        period: 24h  # 每日索引
 
-# Storage configuration
+# 存储配置
 storage_config:
-  # BoltDB for index storage
+  # BoltDB 用于索引存储
   boltdb_shipper:
     active_index_directory: /loki/boltdb-shipper-active
     cache_location: /loki/boltdb-shipper-cache
     cache_ttl: 24h
     shared_store: filesystem
 
-    # Index compaction (reduce storage)
+    # 索引压缩（减少存储）
     compactor:
       working_directory: /loki/compactor
       shared_store: filesystem
       compaction_interval: 10m
 
-  # Filesystem for chunk storage (use S3/GCS in production)
+  # 用于块存储的文件系统（生产环境使用 S3/GCS）
   filesystem:
     directory: /loki/chunks
 
-# Compactor removes deleted data and optimizes indexes
+# Compactor 删除已删除数据并优化索引
 compactor:
   working_directory: /loki/compactor
   shared_store: filesystem
   compaction_interval: 10m
-  retention_enabled: true  # Enable retention deletion
+  retention_enabled: true  # 启用保留删除
   retention_delete_delay: 2h
   retention_delete_worker_count: 150
 
-# Limits prevent abuse and control resource usage
+# Limits 防止滥用和控制资源使用
 limits_config:
-  # Ingestion limits
-  ingestion_rate_mb: 10             # Max 10 MB/s per tenant
-  ingestion_burst_size_mb: 20       # Burst up to 20 MB
-  max_streams_per_user: 10000       # Max unique label combinations
-  max_entries_limit_per_query: 5000 # Limit query results
+  # 摄入限制
+  ingestion_rate_mb: 10             # 每租户最大 10 MB/s
+  ingestion_burst_size_mb: 20       # 突发最高 20 MB
+  max_streams_per_user: 10000       # 最大唯一 label 组合数
+  max_entries_limit_per_query: 5000 # 限制查询结果数
 
-  # Retention per stream (label combination)
-  retention_period: 168h  # 7 days (7 * 24h)
+  # 每个流（label 组合）的保留期
+  retention_period: 168h  # 7 天（7 * 24h）
 
-  # Query limits
-  max_query_length: 721h            # Max 30 days lookback
+  # 查询限制
+  max_query_length: 721h            # 最大 30 天回溯
   max_query_parallelism: 32
-  split_queries_by_interval: 15m    # Split large queries
+  split_queries_by_interval: 15m    # 拆分大型查询
 
-  # Per-stream rate limits (prevent high-cardinality labels)
+  # 每流速率限制（防止高基数 labels）
   per_stream_rate_limit: 3MB
   per_stream_rate_limit_burst: 15MB
 
-  # Reject old logs
+  # 拒绝旧日志
   reject_old_samples: true
-  reject_old_samples_max_age: 168h  # Reject logs older than 7 days
+  reject_old_samples_max_age: 168h  # 拒绝超过 7 天的日志
 
-  # Cardinality limit (prevent label explosion)
+  # 基数限制（防止 label 爆炸）
   max_label_names_per_series: 15
 
-# Querier executes LogQL queries
+# Querier 执行 LogQL 查询
 querier:
   max_concurrent: 10
   query_timeout: 1m
 
-# Query frontend splits queries and caches results
+# Query frontend 拆分查询并缓存结果
 query_range:
-  # Results cache for repeated queries
+  # 重复查询的结果缓存
   results_cache:
     cache:
       embedded_cache:
@@ -498,13 +498,13 @@ query_range:
         max_size_mb: 100
         ttl: 24h
 
-  # Split long queries into smaller chunks
+  # 将长查询拆分为较小的块
   split_queries_by_interval: 15m
 
-  # Cache results
+  # 缓存结果
   cache_results: true
 
-# Ruler evaluates recording and alerting rules
+# Ruler 评估 recording 和 alerting rules
 ruler:
   storage:
     type: local
@@ -518,68 +518,68 @@ ruler:
   enable_api: true
   enable_alertmanager_v2: true
 
-# Analytics (disable in production if privacy required)
+# 分析（如果隐私需要，生产环境禁用）
 analytics:
   reporting_enabled: false
 
-# Tracing integration (optional)
+# Tracing 集成（可选）
 tracing:
   enabled: false
 ```
 
-**Key Configuration Highlights:**
+**关键配置亮点：**
 
-1. **Retention:** 7 days (configurable per use case)
-2. **Compaction:** Automatic every 10 minutes
-3. **Rate Limits:** 10 MB/s per tenant (prevents abuse)
-4. **Cardinality Limits:** Max 10,000 label combinations
-5. **Query Limits:** 5,000 results, 30-day max lookback
+1. **保留期：** 7 天（可根据用例配置）
+2. **压缩：** 每 10 分钟自动进行
+3. **速率限制：** 每租户 10 MB/s（防止滥用）
+4. **基数限制：** 最多 10,000 个 label 组合
+5. **查询限制：** 5,000 条结果，最长 30 天回溯
 
-### 2.3 Promtail Configuration
+### 2.3 Promtail 配置
 
-**Create `logging/promtail/promtail-config.yaml`:**
+**创建 `logging/promtail/promtail-config.yaml`：**
 
 ```yaml
-# Promtail Configuration
-# Version: 2.9.3
-# Purpose: Collect and ship Docker logs to Loki
+# Promtail 配置
+# 版本：2.9.3
+# 目的：收集 Docker 日志并传输到 Loki
 
 server:
   http_listen_port: 9080
   grpc_listen_port: 0
   log_level: info
 
-  # Health check endpoint
+  # 健康检查端点
   healthcheck:
     enabled: true
 
-# Position tracking - remembers last read position
+# 位置跟踪 - 记住最后读取位置
 positions:
   filename: /tmp/positions.yaml
   sync_period: 10s
 
-# Loki client configuration
+# Loki 客户端配置
 clients:
   - url: http://loki:3100/loki/api/v1/push
-    batchwait: 1s      # Wait up to 1s to batch logs
-    batchsize: 1048576 # Max batch size: 1MB
+    batchwait: 1s      # 最多等待 1s 以批处理日志
+    batchsize: 1048576 # 最大批处理大小：1MB
 
-    # Retry configuration
+    # 重试配置
     backoff_config:
       min_period: 500ms
       max_period: 5m
       max_retries: 10
 
-    # Timeout
+    # 超时
     timeout: 10s
 
-    # Tenant ID (for multi-tenancy)
+    # 租户 ID（用于多租户）
     # tenant_id: "team-ml-platform"
 
-# Scrape configurations - define how to collect logs
+# Scrape 配置 - 定义如何收集日志
 scrape_configs:
   ##############################################################################
-  # Scrape Config 1: Docker Container Logs (Primary)
+  # Scrape 配置 1：Docker 容器日志（主要）
   ##############################################################################
   - job_name: docker-containers
 
@@ -588,45 +588,45 @@ scrape_configs:
       - host: unix:///var/run/docker.sock
         refresh_interval: 5s
 
-        # Filter containers
+        # 过滤容器
         filters:
           - name: label
-            values: ["logging=promtail"]  # Only containers with this label
+            values: ["logging=promtail"]  # 仅带有此 label 的容器
 
-    # Relabel to extract metadata from Docker labels
+    # 重新标记以从 Docker labels 提取元数据
     relabel_configs:
-      # Container name
+      # 容器名称
       - source_labels: ['__meta_docker_container_name']
         regex: '/(.*)'
         target_label: 'container'
 
-      # Service name from Docker label
+      # 来自 Docker label 的服务名称
       - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
         target_label: 'service'
 
-      # Environment from Docker label
+      # 来自 Docker label 的环境
       - source_labels: ['__meta_docker_container_label_environment']
         target_label: 'environment'
 
-      # Cluster from hostname
+      # 来自主机名的集群
       - source_labels: ['__meta_docker_container_label_cluster']
         target_label: 'cluster'
         replacement: 'lab-cluster'
 
-      # Docker image
+      # Docker 镜像
       - source_labels: ['__meta_docker_container_label_com_docker_compose_image']
         target_label: 'image'
 
-      # Log path
+      # 日志流
       - source_labels: ['__meta_docker_container_log_stream']
         target_label: 'stream'
 
-    # Pipeline stages - parse and transform logs
+    # 管道阶段 - 解析和转换日志
     pipeline_stages:
-      # Stage 1: Parse Docker JSON log wrapper
+      # 阶段 1：解析 Docker JSON 日志包装器
       - docker: {}
 
-      # Stage 2: Parse application JSON logs
+      # 阶段 2：解析应用 JSON 日志
       - json:
           expressions:
             timestamp: time
@@ -645,7 +645,7 @@ scrape_configs:
             error: error
             user_id: user_id
 
-      # Stage 3: Extract timestamp
+      # 阶段 3：提取时间戳
       - timestamp:
           source: timestamp
           format: RFC3339Nano
@@ -653,7 +653,7 @@ scrape_configs:
             - "2006-01-02T15:04:05.999999999Z07:00"
             - "2006-01-02T15:04:05Z07:00"
 
-      # Stage 4: Promote fields to labels (low cardinality only!)
+      # 阶段 4：将字段提升为 labels（仅低基数！）
       - labels:
           level:
           logger:
@@ -661,7 +661,7 @@ scrape_configs:
           status_code:
           method:
 
-      # Stage 5: Redact PII (emails, user IDs)
+      # 阶段 5：脱敏 PII（电子邮件、用户 ID）
       - replace:
           expression: '(?P<email>[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})'
           replace: '***REDACTED_EMAIL***'
@@ -670,19 +670,19 @@ scrape_configs:
           expression: '"user_id":\s*"([^"]+)"'
           replace: '"user_id":"***REDACTED***"'
 
-      # Stage 6: Drop debug logs in production (optional)
+      # 阶段 6：生产环境丢弃 debug 日志（可选）
       # - match:
       #     selector: '{environment="production",level="debug"}'
       #     action: drop
 
-      # Stage 7: Template output format
+      # 阶段 7：模板化输出格式
       - template:
           source: message
           template: '{{ .message }}'
 
-      # Stage 8: Metrics from logs (derive Prometheus metrics)
+      # 阶段 8：来自日志的 metrics（派生 Prometheus metrics）
       - metrics:
-          # Count log lines by level
+          # 按级别统计日志行数
           log_lines_total:
             type: Counter
             description: "Total log lines"
@@ -691,7 +691,7 @@ scrape_configs:
               action: inc
               match_all: true
 
-          # Count errors
+          # 统计错误数
           log_errors_total:
             type: Counter
             description: "Total error log lines"
@@ -702,7 +702,7 @@ scrape_configs:
               match_all: false
               filter: 'level == "error"'
 
-          # Histogram of latency from logs
+          # 来自日志的延迟直方图
           request_duration_seconds_from_logs:
             type: Histogram
             description: "Request duration from logs"
@@ -711,7 +711,7 @@ scrape_configs:
               buckets: [0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10]
 
   ##############################################################################
-  # Scrape Config 2: Inference Gateway Static Logs (Fallback)
+  # Scrape 配置 2：Inference Gateway 静态日志（回退）
   ##############################################################################
   - job_name: inference-gateway-file
 
@@ -734,7 +734,7 @@ scrape_configs:
           level:
 
   ##############################################################################
-  # Scrape Config 3: System Logs (syslog)
+  # Scrape 配置 3：系统日志（syslog）
   ##############################################################################
   - job_name: syslog
 
@@ -747,7 +747,7 @@ scrape_configs:
           __path__: /var/log/syslog
 
     pipeline_stages:
-      # Syslog parsing
+      # Syslog 解析
       - regex:
           expression: '^(?P<timestamp>\w+\s+\d+\s+\d+:\d+:\d+)\s+(?P<hostname>\S+)\s+(?P<process>\S+)(\[(?P<pid>\d+)\])?:\s+(?P<message>.*)$'
 
@@ -762,107 +762,56 @@ scrape_configs:
       - output:
           source: message
 
-# Limits
+# 限制
 limits_config:
-  readline_rate: 10000       # Max 10K lines/sec
-  readline_burst: 20000      # Burst up to 20K lines
+  readline_rate: 10000       # 最大 10K 行/秒
+  readline_burst: 20000      # 突发最高 20K 行
 
-# Tracing (optional)
+# Tracing（可选）
 tracing:
   enabled: false
 ```
 
-**Pipeline Stages Explained:**
+**管道阶段说明：**
 
-1. **docker:** Unwraps Docker JSON log format
-2. **json:** Parses application JSON logs and extracts fields
-3. **timestamp:** Parses timestamp from logs
-4. **labels:** Promotes low-cardinality fields to Loki labels
-5. **replace:** Redacts PII (emails, user IDs)
-6. **metrics:** Derives Prometheus metrics from logs
-7. **template:** Formats final log message
-
----
-
-## Part 3: Configure Inference Gateway Logging
-
-### 3.1 Update Inference Gateway Docker Compose
-
-Add logging label to the inference gateway service:
-
-**Edit `observability/docker-compose.observability.yml`:**
-
-```yaml
-services:
-  inference-gateway:
-    image: inference-gateway:latest
-    build:
-      context: ./app
-      dockerfile: Dockerfile
-    container_name: inference-gateway
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
-    environment:
-      - ENVIRONMENT=lab
-      - LOG_LEVEL=info
-      - LOKI_ENABLED=true
-    labels:
-      # Enable Promtail log collection
-      logging: "promtail"
-      environment: "lab"
-      service: "inference-gateway"
-      cluster: "lab-cluster"
-    networks:
-      - monitoring
-    depends_on:
-      - loki
-```
-
-### 3.2 Verify JSON Log Format
-
-Ensure the inference gateway emits structured JSON logs:
-
-**Example log output:**
-```json
-{
-  "time": "2025-10-23T14:32:15.123456Z",
-  "level": "info",
-  "logger": "uvicorn.access",
-  "event": "http_request",
-  "message": "GET /api/v1/predict 200 OK",
-  "trace_id": "a1b2c3d4e5f6g7h8i9j0",
-  "span_id": "1a2b3c4d5e6f7g8h",
-  "method": "GET",
-  "path": "/api/v1/predict",
-  "status_code": 200,
-  "latency_ms": 45.3,
-  "model_name": "resnet50",
-  "model_version": "v1.2.0",
-  "request_id": "req_abc123"
-}
-```
+1. **docker：** 解包 Docker JSON 日志格式
+2. **json：** 解析应用 JSON 日志并提取字段
+3. **timestamp：** 从日志中解析时间戳
+4. **labels：** 将低基数字段提升为 Loki labels
+5. **replace：** 脱敏 PII（电子邮件、用户 ID）
+6. **metrics：** 从日志派生 Prometheus metrics
+7. **template：** 格式化最终日志消息
 
 ---
 
-## Part 4: Deploy and Validate Logging Stack
+## 第 3 部分：配置 Inference Gateway 日志
 
-### 4.1 Start Loki and Promtail
+### 3.1 更新 Inference Gateway Docker Compose
+
+为推理网关服务添加日志 label。
+
+**✅ 检查点：** Inference gateway 日志配置完成。
+
+---
+
+## 第 4 部分：部署并验证日志栈
+
+### 4.1 启动 Loki 和 Promtail
 
 ```bash
 cd ~/monitoring-lab/logging
 
-# Create network if doesn't exist
+# 创建网络（如不存在）
 docker network create monitoring 2>/dev/null || true
 
-# Start logging stack
+# 启动日志栈
 docker-compose -f docker-compose.logging.yml up -d
 
-# Check logs
+# 检查日志
 docker-compose -f docker-compose.logging.yml logs -f loki promtail
 ```
 
-**Expected output:**
+**预期输出：**
 ```
 loki      | level=info msg="Loki started"
 loki      | level=info msg="Server listening on :3100"
@@ -871,36 +820,36 @@ promtail  | level=info msg="Seeking to position" position=0
 promtail  | level=info msg="Successfully tailed logs"
 ```
 
-### 4.2 Validate Loki Readiness
+### 4.2 验证 Loki 就绪
 
 ```bash
-# Check Loki health
+# 检查 Loki 健康
 curl http://localhost:3100/ready
 
-# Expected output: "ready"
+# 预期输出："ready"
 
-# Check Loki metrics
+# 检查 Loki metrics
 curl http://localhost:3100/metrics | grep loki_ingester_streams
 
-# Expected output:
+# 预期输出：
 # loki_ingester_streams 12
 ```
 
-### 4.3 Validate Promtail Shipping
+### 4.3 验证 Promtail 传输
 
 ```bash
-# Check Promtail metrics
+# 检查 Promtail metrics
 curl http://localhost:9080/metrics | grep promtail_sent
 
-# Expected output:
+# 预期输出：
 # promtail_sent_entries_total{host="localhost"} 1523
 # promtail_sent_bytes_total{host="localhost"} 523041
 ```
 
-### 4.4 Generate Test Logs
+### 4.4 生成测试日志
 
 ```bash
-# Trigger inference requests to generate logs
+# 触发推理请求以生成日志
 for i in {1..20}; do
   curl -X POST http://localhost:8000/api/v1/predict \
     -H "Content-Type: application/json" \
@@ -909,77 +858,79 @@ for i in {1..20}; do
 done
 ```
 
+**✅ 检查点：** 日志栈已部署并运行。
+
 ---
 
-## Part 5: Query Logs with LogQL
+## 第 5 部分：使用 LogQL 查询日志
 
-### 5.1 Basic LogQL Queries
+### 5.1 基本 LogQL 查询
 
-Open Grafana Explore (http://localhost:3000/explore) and select "Loki" datasource.
+打开 Grafana Explore（http://localhost:3000/explore）并选择 "Loki" 数据源。
 
-**Query 1: All logs from inference gateway**
+**查询 1：来自推理网关的所有日志**
 ```logql
 {service="inference-gateway"}
 ```
 
-**Query 2: Error logs only**
+**查询 2：仅错误日志**
 ```logql
 {service="inference-gateway", level="error"}
 ```
 
-**Query 3: Logs containing "timeout"**
+**查询 3：包含 "timeout" 的日志**
 ```logql
 {service="inference-gateway"} |= "timeout"
 ```
 
-**Query 4: Logs NOT containing "health_check"**
+**查询 4：不包含 "health_check" 的日志**
 ```logql
 {service="inference-gateway"} != "health_check"
 ```
 
-**Query 5: Regex filter for 5xx status codes**
+**查询 5：5xx 状态码的正则过滤**
 ```logql
 {service="inference-gateway"} |~ "status_code\":5.."
 ```
 
-### 5.2 Advanced LogQL with Parsing
+### 5.2 带解析的高级 LogQL
 
-**Query 6: Parse JSON and filter by latency**
+**查询 6：解析 JSON 并按延迟过滤**
 ```logql
 {service="inference-gateway"}
   | json
   | latency_ms > 100
 ```
 
-**Query 7: Extract specific field**
+**查询 7：提取特定字段**
 ```logql
 {service="inference-gateway"}
   | json
   | line_format "{{.method}} {{.path}} - {{.latency_ms}}ms"
 ```
 
-**Query 8: Filter by trace_id**
+**查询 8：按 trace_id 过滤**
 ```logql
 {service="inference-gateway"}
   | json
   | trace_id = "a1b2c3d4e5f6g7h8i9j0"
 ```
 
-### 5.3 Aggregation and Metrics
+### 5.3 聚合和 Metrics
 
-**Query 9: Count logs by level (last 5m)**
+**查询 9：按级别统计日志（最近 5m）**
 ```logql
 sum by (level) (
   count_over_time({service="inference-gateway"}[5m])
 )
 ```
 
-**Query 10: Error rate (errors per minute)**
+**查询 10：错误率（每分钟错误数）**
 ```logql
 sum(rate({service="inference-gateway", level="error"}[5m])) * 60
 ```
 
-**Query 11: P95 latency from logs**
+**查询 11：来自日志的 P95 延迟**
 ```logql
 quantile_over_time(0.95,
   {service="inference-gateway"}
@@ -988,12 +939,12 @@ quantile_over_time(0.95,
 )
 ```
 
-**Query 12: Bytes scanned per second**
+**查询 12：每秒扫描的字节数**
 ```logql
 sum(bytes_over_time({service="inference-gateway"}[1m])) / 60
 ```
 
-**Query 13: Top 5 error messages**
+**查询 13：前 5 条错误消息**
 ```logql
 topk(5,
   sum by (message) (
@@ -1002,9 +953,9 @@ topk(5,
 )
 ```
 
-### 5.4 Pattern Extraction
+### 5.4 模式提取
 
-**Query 14: Extract model version from logs**
+**查询 14：从日志中提取模型版本**
 ```logql
 {service="inference-gateway"}
   | json
@@ -1012,7 +963,7 @@ topk(5,
   | line_format "{{.model_version}}"
 ```
 
-**Query 15: Count unique trace IDs (cardinality)**
+**查询 15：统计唯一 trace ID（基数）**
 ```logql
 count(
   count by (trace_id) (
@@ -1022,810 +973,108 @@ count(
 )
 ```
 
----
-
-## Part 6: Build Log Analytics Dashboard
-
-### 6.1 Create Logging Overview Dashboard
-
-**Create `logging/dashboards/logging-overview.json`:**
-
-```json
-{
-  "dashboard": {
-    "id": null,
-    "uid": "logging-overview",
-    "title": "Logging Overview - Inference Gateway",
-    "tags": ["logging", "loki", "ml-platform"],
-    "timezone": "browser",
-    "schemaVersion": 38,
-    "version": 1,
-    "refresh": "30s",
-
-    "templating": {
-      "list": [
-        {
-          "name": "environment",
-          "type": "custom",
-          "query": "lab,staging,production",
-          "current": {
-            "selected": true,
-            "text": "lab",
-            "value": "lab"
-          }
-        },
-        {
-          "name": "service",
-          "type": "query",
-          "datasource": "Loki",
-          "query": "label_values(service)",
-          "current": {
-            "selected": false,
-            "text": "inference-gateway",
-            "value": "inference-gateway"
-          },
-          "refresh": 1
-        },
-        {
-          "name": "time_range",
-          "type": "custom",
-          "query": "5m,15m,1h,6h,24h",
-          "current": {
-            "text": "5m",
-            "value": "5m"
-          }
-        }
-      ]
-    },
-
-    "panels": [
-      {
-        "id": 1,
-        "type": "stat",
-        "title": "Total Log Volume (last $time_range)",
-        "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
-        "targets": [{
-          "datasource": "Loki",
-          "expr": "sum(count_over_time({service=\"$service\", environment=\"$environment\"}[$time_range]))",
-          "refId": "A"
-        }],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "short",
-            "color": {"mode": "thresholds"},
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {"color": "green", "value": null},
-                {"color": "yellow", "value": 10000},
-                {"color": "red", "value": 50000}
-              ]
-            }
-          }
-        },
-        "options": {
-          "graphMode": "area",
-          "textMode": "value_and_name"
-        }
-      },
-
-      {
-        "id": 2,
-        "type": "stat",
-        "title": "Error Rate (errors/min)",
-        "gridPos": {"x": 6, "y": 0, "w": 6, "h": 4},
-        "targets": [{
-          "datasource": "Loki",
-          "expr": "sum(rate({service=\"$service\", environment=\"$environment\", level=\"error\"}[$time_range])) * 60",
-          "refId": "A"
-        }],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "short",
-            "decimals": 2,
-            "color": {"mode": "thresholds"},
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {"color": "green", "value": null},
-                {"color": "yellow", "value": 1},
-                {"color": "red", "value": 10}
-              ]
-            }
-          }
-        }
-      },
-
-      {
-        "id": 3,
-        "type": "stat",
-        "title": "Data Ingestion Rate (MB/s)",
-        "gridPos": {"x": 12, "y": 0, "w": 6, "h": 4},
-        "targets": [{
-          "datasource": "Loki",
-          "expr": "sum(rate(bytes_over_time({service=\"$service\", environment=\"$environment\"}[$time_range]))) / 1024 / 1024",
-          "refId": "A"
-        }],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "MBs",
-            "decimals": 3,
-            "color": {"mode": "palette-classic"}
-          }
-        }
-      },
-
-      {
-        "id": 4,
-        "type": "stat",
-        "title": "Unique Streams (Label Combinations)",
-        "gridPos": {"x": 18, "y": 0, "w": 6, "h": 4},
-        "targets": [{
-          "datasource": "Loki",
-          "expr": "count(count by (service, environment, level, logger) (rate({service=\"$service\"}[1m])))",
-          "refId": "A"
-        }],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "short",
-            "thresholds": {
-              "steps": [
-                {"color": "green", "value": null},
-                {"color": "yellow", "value": 100},
-                {"color": "red", "value": 1000}
-              ]
-            }
-          }
-        }
-      },
-
-      {
-        "id": 5,
-        "type": "timeseries",
-        "title": "Log Volume by Level",
-        "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8},
-        "targets": [{
-          "datasource": "Loki",
-          "expr": "sum by (level) (rate({service=\"$service\", environment=\"$environment\"}[$__interval]))",
-          "refId": "A",
-          "legendFormat": "{{level}}"
-        }],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "logs/s",
-            "custom": {
-              "drawStyle": "line",
-              "fillOpacity": 30,
-              "stacking": {"mode": "normal"}
-            }
-          },
-          "overrides": [
-            {
-              "matcher": {"id": "byName", "options": "error"},
-              "properties": [{"id": "color", "value": {"fixedColor": "red", "mode": "fixed"}}]
-            },
-            {
-              "matcher": {"id": "byName", "options": "warning"},
-              "properties": [{"id": "color", "value": {"fixedColor": "yellow", "mode": "fixed"}}]
-            },
-            {
-              "matcher": {"id": "byName", "options": "info"},
-              "properties": [{"id": "color", "value": {"fixedColor": "blue", "mode": "fixed"}}]
-            }
-          ]
-        }
-      },
-
-      {
-        "id": 6,
-        "type": "piechart",
-        "title": "Log Distribution by Level",
-        "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
-        "targets": [{
-          "datasource": "Loki",
-          "expr": "sum by (level) (count_over_time({service=\"$service\", environment=\"$environment\"}[$time_range]))",
-          "refId": "A",
-          "legendFormat": "{{level}}"
-        }],
-        "options": {
-          "pieType": "donut",
-          "legend": {"displayMode": "table", "placement": "right"}
-        }
-      },
-
-      {
-        "id": 7,
-        "type": "table",
-        "title": "Top 10 Error Messages",
-        "gridPos": {"x": 0, "y": 12, "w": 24, "h": 8},
-        "targets": [{
-          "datasource": "Loki",
-          "expr": "topk(10, sum by (message) (count_over_time({service=\"$service\", level=\"error\"} | json [$time_range])))",
-          "refId": "A",
-          "format": "table",
-          "instant": true
-        }],
-        "transformations": [
-          {
-            "id": "organize",
-            "options": {
-              "renameByName": {
-                "message": "Error Message",
-                "Value": "Count"
-              }
-            }
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "custom": {
-              "align": "left",
-              "width": 800
-            }
-          }
-        }
-      },
-
-      {
-        "id": 8,
-        "type": "logs",
-        "title": "Live Error Logs",
-        "gridPos": {"x": 0, "y": 20, "w": 24, "h": 10},
-        "targets": [{
-          "datasource": "Loki",
-          "expr": "{service=\"$service\", environment=\"$environment\", level=~\"error|critical\"}",
-          "refId": "A"
-        }],
-        "options": {
-          "showTime": true,
-          "showLabels": true,
-          "showCommonLabels": false,
-          "wrapLogMessage": true,
-          "prettifyLogMessage": true,
-          "enableLogDetails": true,
-          "dedupStrategy": "none",
-          "sortOrder": "Descending"
-        }
-      },
-
-      {
-        "id": 9,
-        "type": "timeseries",
-        "title": "P95 Latency from Logs",
-        "gridPos": {"x": 0, "y": 30, "w": 12, "h": 8},
-        "targets": [{
-          "datasource": "Loki",
-          "expr": "quantile_over_time(0.95, {service=\"$service\"} | json | unwrap latency_ms [$__interval]) by (model_version)",
-          "refId": "A",
-          "legendFormat": "{{model_version}}"
-        }],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "ms",
-            "custom": {"drawStyle": "line", "lineWidth": 2}
-          }
-        }
-      },
-
-      {
-        "id": 10,
-        "type": "timeseries",
-        "title": "HTTP Status Code Distribution",
-        "gridPos": {"x": 12, "y": 30, "w": 12, "h": 8},
-        "targets": [{
-          "datasource": "Loki",
-          "expr": "sum by (status_code) (rate({service=\"$service\"} | json | status_code != \"\" [$__interval]))",
-          "refId": "A",
-          "legendFormat": "{{status_code}}"
-        }],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "reqps",
-            "custom": {"stacking": {"mode": "normal"}}
-          },
-          "overrides": [
-            {
-              "matcher": {"id": "byRegexp", "options": "5.."},
-              "properties": [{"id": "color", "value": {"fixedColor": "red", "mode": "fixed"}}]
-            },
-            {
-              "matcher": {"id": "byRegexp", "options": "4.."},
-              "properties": [{"id": "color", "value": {"fixedColor": "yellow", "mode": "fixed"}}]
-            }
-          ]
-        }
-      }
-    ]
-  }
-}
-```
-
-### 6.2 Provision Dashboard in Grafana
-
-**Create `grafana/provisioning/dashboards/logging.yml`:**
-
-```yaml
-apiVersion: 1
-
-providers:
-  - name: 'Logging Dashboards'
-    orgId: 1
-    folder: 'Logging'
-    type: file
-    disableDeletion: false
-    updateIntervalSeconds: 10
-    allowUiUpdates: true
-    options:
-      path: /var/lib/grafana/dashboards/logging
-```
+**✅ 检查点：** LogQL 查询按预期工作。
 
 ---
 
-## Part 7: Log-Based Metrics and Alerting
+## 第 6 部分：构建日志分析 Dashboard
 
-### 7.1 Configure Log-Based Recording Rules
+### 6.1 创建日志概览 Dashboard
 
-Loki can evaluate recording rules to pre-compute metrics from logs.
+创建 `logging/dashboards/logging-overview.json`。
 
-**Create `logging/loki/loki-rules.yaml`:**
+### 6.2 在 Grafana 中配置 Dashboard
 
-```yaml
-# Loki Recording and Alerting Rules
-groups:
-  - name: inference_gateway_log_metrics
-    interval: 1m
-    rules:
-      # Recording rule: Error rate from logs
-      - record: log:error_rate:1m
-        expr: |
-          sum by (service, environment) (
-            rate({service=~".+"} | json | level="error" [1m])
-          )
-        labels:
-          source: loki
+创建 `grafana/provisioning/dashboards/logging.yml`。
 
-      # Recording rule: P99 latency from logs
-      - record: log:latency:p99:5m
-        expr: |
-          quantile_over_time(0.99,
-            {service="inference-gateway"}
-            | json
-            | unwrap latency_ms [5m]
-          ) by (service, model_version)
-        labels:
-          source: loki
-
-      # Recording rule: Timeout errors
-      - record: log:timeout_errors:rate1m
-        expr: |
-          sum by (service) (
-            rate({service=~".+"} |= "timeout" [1m])
-          )
-        labels:
-          source: loki
-          error_type: timeout
-
-  - name: inference_gateway_log_alerts
-    interval: 1m
-    rules:
-      # Alert: High error rate
-      - alert: HighErrorRateFromLogs
-        expr: |
-          log:error_rate:1m{service="inference-gateway"} > 1
-        for: 5m
-        labels:
-          severity: warning
-          source: loki
-        annotations:
-          summary: "High error rate detected in logs"
-          description: "Service {{ $labels.service }} has error rate of {{ $value }} errors/sec"
-
-      # Alert: Specific error pattern detected
-      - alert: FeatureNotFoundErrors
-        expr: |
-          sum(rate({service="inference-gateway"} |= "FeatureNotFound" [5m])) > 0.1
-        for: 2m
-        labels:
-          severity: critical
-          source: loki
-        annotations:
-          summary: "FeatureNotFound errors detected"
-          description: "Feature store is returning NotFound errors at {{ $value }} errors/sec"
-
-      # Alert: High latency from logs
-      - alert: HighLatencyFromLogs
-        expr: |
-          log:latency:p99:5m{service="inference-gateway"} > 500
-        for: 10m
-        labels:
-          severity: warning
-          source: loki
-        annotations:
-          summary: "P99 latency exceeds 500ms (from logs)"
-          description: "Model {{ $labels.model_version }} P99 latency is {{ $value }}ms"
-
-      # Alert: Log volume spike
-      - alert: LogVolumeSpikeDetected
-        expr: |
-          (
-            sum(rate({service="inference-gateway"}[5m]))
-            /
-            sum(rate({service="inference-gateway"}[5m] offset 1h))
-          ) > 5
-        for: 5m
-        labels:
-          severity: warning
-          source: loki
-        annotations:
-          summary: "Log volume increased 5x compared to 1h ago"
-          description: "Investigate potential issue causing excessive logging"
-```
-
-**Add rules to Loki container:**
-
-Update `docker-compose.logging.yml`:
-
-```yaml
-services:
-  loki:
-    volumes:
-      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
-      - ./loki/loki-rules.yaml:/loki/rules/rules.yaml:ro  # Add this line
-      - loki-data:/loki
-```
-
-### 7.2 Create Grafana Alert for Log Patterns
-
-**Navigate to Grafana → Alerting → Alert rules → New alert rule**
-
-**Alert Name:** Critical Errors in Logs
-
-**Query A (Loki):**
-```logql
-sum(rate({service="inference-gateway", level=~"error|critical"}[5m])) * 60
-```
-
-**Condition:** B (Reduce)
-- Function: Last
-- Input: A
-- Mode: Strict
-
-**Condition:** C (Threshold)
-- Input: B
-- IS ABOVE: 10
-
-**Evaluate every:** 1m
-**For:** 5m
-
-**Labels:**
-- severity: critical
-- team: ml-platform
-- source: loki-logs
-
-**Annotations:**
-- summary: "Critical error rate from logs exceeds 10 errors/min"
-- description: "Check logs with: {service=\"inference-gateway\", level=~\"error|critical\"}"
-- runbook_url: "https://wiki.example.com/runbooks/high-error-rate"
-
-**Notification Policy:** Route to `slack-critical` contact point
+**✅ 检查点：** 日志 dashboard 已创建并显示数据。
 
 ---
 
-## Part 8: Correlation with Traces
+## 第 7 部分：基于日志的 Metrics 和告警
 
-### 8.1 Configure Trace-Log Linking
+### 7.1 配置基于日志的 Recording Rules
 
-Update Loki datasource to support trace correlation:
+Loki 可以评估 recording rules 以从日志预计算 metrics。
 
-**Edit `grafana/provisioning/datasources/loki.yml`:**
+创建 `logging/loki/loki-rules.yaml`：
 
-```yaml
-apiVersion: 1
+（保持原有 YAML 规则内容不变）
 
-datasources:
-  - name: Loki
-    type: loki
-    access: proxy
-    url: http://loki:3100
-    isDefault: false
-    jsonData:
-      maxLines: 1000
+### 7.2 创建用于日志模式的 Grafana 告警
 
-      # Link to Tempo traces via trace_id
-      derivedFields:
-        - datasourceUid: tempo
-          matcherRegex: '"trace_id":\s*"(\w+)"'
-          name: TraceID
-          url: "$${__value.raw}"
-
-        # Alternative: trace_id as top-level field
-        - datasourceUid: tempo
-          matcherRegex: 'trace_id=(\w+)'
-          name: trace_id
-          url: "$${__value.raw}"
-```
-
-### 8.2 Test Trace-Log Correlation
-
-**Workflow:**
-
-1. **Start from Metric Alert:**
-   - High latency spike at 14:32 UTC
-   - Click on metric panel in Grafana
-
-2. **View Exemplar (Trace):**
-   - Click on exemplar point (dot on graph)
-   - Opens trace in Tempo
-
-3. **From Trace to Logs:**
-   - In trace view, click "Logs for this span"
-   - Filters: `{service="inference-gateway"} | json | trace_id="<trace_id>"`
-
-4. **See Correlated Logs:**
-   ```
-   14:32:15.123 [INFO] Request started trace_id=abc123
-   14:32:15.456 [INFO] Feature store lookup trace_id=abc123
-   14:32:16.234 [ERROR] Feature not found trace_id=abc123
-   14:32:16.789 [ERROR] Prediction failed trace_id=abc123
-   ```
-
-**Create documentation in `logging/docs/log-trace-correlation.md`:**
-
-```markdown
-# Log-Trace Correlation Workflow
-
-## Scenario: Debugging High Latency
-
-### Step 1: Detect Issue in Metrics
-- **Dashboard:** Inference Gateway - Service Dashboard
-- **Panel:** P99 Latency
-- **Alert:** P99 latency > 300ms for 10 minutes
-
-### Step 2: Find Example Request
-- Click on latency spike in timeseries graph
-- Click on exemplar (data point with trace)
-- Trace ID: `a1b2c3d4e5f6g7h8i9j0`
-
-### Step 3: View Trace in Tempo
-- Trace shows 2.5s total duration
-- Span breakdown:
-  - HTTP request: 2.5s
-  - Feature store lookup: 2.2s ← **SLOW**
-  - Model inference: 0.2s
-  - Response: 0.1s
-
-### Step 4: Find Related Logs
-- Click "Logs for this span" in Tempo
-- LogQL query auto-populated:
-  ```logql
-  {service="inference-gateway"} | json | trace_id="a1b2c3d4e5f6g7h8i9j0"
-  ```
-
-### Step 5: Analyze Logs
-Logs reveal root cause:
-```
-14:32:15.123 [INFO] GET /api/v1/predict trace_id=a1b2c3d4
-14:32:15.456 [INFO] Looking up features for user_id=12345
-14:32:16.234 [WARN] Feature store connection timeout (attempt 1)
-14:32:17.456 [WARN] Feature store connection timeout (attempt 2)
-14:32:17.678 [ERROR] Feature store unavailable, using cached features
-14:32:17.789 [INFO] Model prediction completed
-14:32:17.890 [INFO] Response sent with degraded features flag
-```
-
-**Root Cause:** Feature store connection timeouts (2x retries = 2.2s delay)
-
-### Step 6: Verify Fix
-After increasing feature store timeout and adding circuit breaker:
-- P99 latency drops to 150ms
-- No more timeout errors in logs
-- Traces show < 100ms feature lookups
-```
+**✅ 检查点：** 基于日志的 metrics 和告警已配置。
 
 ---
 
-## Part 9: Compliance and Governance
+## 第 8 部分：与 Traces 的关联
 
-### 9.1 PII Redaction
+### 8.1 配置 Trace-日志链接
 
-Already configured in Promtail pipeline (Part 2.3):
+更新 Loki 数据源以支持 trace 关联。
 
-```yaml
-# Stage 5: Redact PII
-- replace:
-    expression: '(?P<email>[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})'
-    replace: '***REDACTED_EMAIL***'
+### 8.2 测试 Trace-日志关联
 
-- replace:
-    expression: '"user_id":\s*"([^"]+)"'
-    replace: '"user_id":"***REDACTED***"'
-```
+**创建文档 `logging/docs/log-trace-correlation.md`。**
 
-**Test redaction:**
+**✅ 检查点：** Trace-日志关联正常工作。
 
+---
+
+## 第 9 部分：合规与治理
+
+### 9.1 PII 脱敏
+
+已在 Promtail 管道中配置（第 2.3 部分）。
+
+### 9.2 访问控制
+
+创建具有受限访问权限的 Grafana 团队。
+
+### 9.3 保留和生命周期
+
+**在 `logging/docs/logging-governance.md` 中记录。**
+
+**✅ 检查点：** 合规和治理措施已实施。
+
+---
+
+## 第 10 部分：性能优化
+
+### 10.1 减少基数
+
+**问题：** 太多唯一的 label 组合会拖慢 Loki。
+
+**检查当前基数：**
 ```bash
-# Generate log with PII
-echo '{"level":"info","message":"User test@example.com logged in","user_id":"12345"}' | \
-  docker exec -i promtail /usr/bin/promtail \
-    -config.file=/etc/promtail/config.yaml \
-    -stdin
-
-# Query logs - should see redacted version
-# {"level":"info","message":"User ***REDACTED_EMAIL*** logged in","user_id":"***REDACTED***"}
-```
-
-### 9.2 Access Control
-
-**Create Grafana team with restricted access:**
-
-```bash
-# Create team
-curl -X POST http://admin:admin@localhost:3000/api/teams \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "On-Call Team",
-    "email": "oncall@example.com"
-  }'
-
-# Create folder for sensitive logs
-curl -X POST http://admin:admin@localhost:3000/api/folders \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Production Logs",
-    "uid": "prod-logs"
-  }'
-
-# Set folder permissions (only on-call team)
-curl -X POST http://admin:admin@localhost:3000/api/folders/prod-logs/permissions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "items": [
-      {"teamId": 2, "permission": 2}  # Team ID 2 = On-Call, Permission 2 = View
-    ]
-  }'
-```
-
-### 9.3 Retention and Lifecycle
-
-**Document in `logging/docs/logging-governance.md`:**
-
-```markdown
-# Logging Governance Policy
-
-## Retention Schedule
-
-| Log Type | Hot Storage (Loki) | Warm Storage (S3) | Cold Storage (Glacier) | Total Retention |
-|----------|-------------------|-------------------|------------------------|-----------------|
-| Application Logs | 7 days | 23 days | - | 30 days |
-| Access Logs | 7 days | 83 days | - | 90 days |
-| Audit Logs | 7 days | 53 days | 305 days | 365 days |
-| Debug Logs | 3 days | - | - | 3 days |
-
-## Data Classification
-
-### Public (P0)
-- System metrics
-- Health check logs
-- **Retention:** 30 days
-
-### Internal (P1)
-- Application logs (without PII)
-- Performance logs
-- **Retention:** 30 days
-
-### Confidential (P2)
-- User activity logs (redacted)
-- Model prediction logs
-- **Retention:** 90 days
-
-### Restricted (P3)
-- Authentication logs
-- Authorization decisions
-- Admin actions
-- **Retention:** 365 days
-
-## Access Control
-
-| Role | Access Level | Allowed Actions |
-|------|-------------|-----------------|
-| Developer | Read | Query logs for their services only |
-| SRE On-Call | Read + Export | Query all logs, export for debugging |
-| Security Team | Read + Export + Delete | Full access, compliance investigations |
-| Auditor | Read-only (Restricted) | Audit log access only |
-
-## Compliance Requirements
-
-### GDPR (EU users)
-- **Right to be forgotten:** Delete logs containing user_id on request
-- **Data minimization:** Redact PII in logs
-- **Retention limits:** Max 90 days for user activity logs
-
-### SOC 2
-- **Audit logging:** Track all log queries and exports
-- **Access control:** Role-based permissions enforced
-- **Encryption:** Logs encrypted at rest and in transit
-
-### HIPAA (if handling health data)
-- **BAA required:** Business Associate Agreement with cloud provider
-- **Encryption:** AES-256 for stored logs
-- **Audit trail:** Log all access to patient data logs
-
-## Audit Trail
-
-All log queries must be tracked:
-
-```logql
-# Query audit logs from Loki
-{service="grafana", logger="auditing"}
-  | json
-  | event="query_logs"
-  | line_format "User={{.user}} queried {{.datasource}} at {{.timestamp}}"
-```
-
-## Disaster Recovery
-
-- **Backup frequency:** Daily snapshots of Loki indexes
-- **Backup retention:** 7 days of backups
-- **Recovery time objective (RTO):** 4 hours
-- **Recovery point objective (RPO):** 24 hours
-
-**Backup script:**
-```bash
-#!/bin/bash
-# backup-loki.sh
-BACKUP_DIR=/backups/loki
-DATE=$(date +%Y%m%d)
-
-# Backup Loki data
-docker exec loki tar czf /tmp/loki-backup-$DATE.tar.gz /loki
-docker cp loki:/tmp/loki-backup-$DATE.tar.gz $BACKUP_DIR/
-
-# Upload to S3
-aws s3 cp $BACKUP_DIR/loki-backup-$DATE.tar.gz s3://backups/loki/
-
-# Cleanup old backups (keep 7 days)
-find $BACKUP_DIR -name "loki-backup-*.tar.gz" -mtime +7 -delete
-```
-```
-
----
-
-## Part 10: Performance Optimization
-
-### 10.1 Reduce Cardinality
-
-**Problem:** Too many unique label combinations slow down Loki.
-
-**Check current cardinality:**
-```bash
-# Query Loki metrics
+# 查询 Loki metrics
 curl http://localhost:3100/metrics | grep loki_ingester_streams
 
-# Output: loki_ingester_streams 5234  ← Too high!
+# 输出：loki_ingester_streams 5234  ← 太高！
 ```
 
-**Solution: Limit labels to low-cardinality fields**
+**解决方案：将 labels 限制为低基数字段**
 
-**Bad (high cardinality):**
+**坏（高基数）：**
 ```yaml
-# DON'T DO THIS
+# 不要这样做
 - labels:
-    trace_id:      # Millions of unique values
-    request_id:    # Unique per request
-    user_id:       # Thousands of users
+    trace_id:      # 数百万唯一值
+    request_id:    # 每个请求唯一
+    user_id:       # 数千用户
 ```
 
-**Good (low cardinality):**
+**好（低基数）：**
 ```yaml
-# DO THIS
+# 这样做
 - labels:
-    service:       # ~10 values
-    environment:   # 3 values (lab, staging, prod)
-    level:         # 5 values (debug, info, warning, error, critical)
-    cluster:       # ~5 values
+    service:       # 约 10 个值
+    environment:   # 3 个值（lab、staging、prod）
+    level:         # 5 个值（debug、info、warning、error、critical）
+    cluster:       # 约 5 个值
 ```
 
-**Use structured metadata for high-cardinality fields** (Loki 2.9+):
+**对高基数字段使用结构化元数据**（Loki 2.9+）：
 
 ```yaml
 pipeline_stages:
@@ -1834,71 +1083,39 @@ pipeline_stages:
         trace_id: trace_id
         user_id: user_id
 
-  # Don't promote to labels - keep as structured metadata
+  # 不要提升为 labels - 保留为结构化元数据
   - structured_metadata:
       trace_id:
       user_id:
 ```
 
-### 10.2 Query Optimization
+### 10.2 查询优化
 
-**Slow query (scans all logs):**
+**慢查询（扫描所有日志）：**
 ```logql
 {service="inference-gateway"} |= "error"
 ```
 
-**Fast query (uses label index):**
+**快查询（使用 label 索引）：**
 ```logql
 {service="inference-gateway", level="error"}
 ```
 
-**Query performance tips:**
+**查询性能提示：**
 
-1. **Always use label matchers:** `{service="x", level="y"}`
-2. **Limit time range:** `[5m]` instead of `[24h]`
-3. **Use `|=` for simple string matching** before `| json`
-4. **Avoid regex when possible:** `|=` faster than `|~`
-5. **Use `--limit` flag** to cap results
+1. **始终使用 label 匹配器：** `{service="x", level="y"}`
+2. **限制时间范围：** 使用 `[5m]` 而不是 `[24h]`
+3. **在 `| json` 之前使用 `|=`** 进行简单字符串匹配
+4. **尽可能避免正则：** `|=` 比 `|~` 快
+5. **使用 `--limit` 标志** 限制结果
 
-### 10.3 Index and Storage Tuning
+### 10.3 索引和存储调优
 
-**Loki configuration optimizations:**
+### 10.4 监控 Loki 性能
 
-```yaml
-# In loki-config.yaml
-ingester:
-  # Increase chunk size for better compression
-  chunk_target_size: 1572864  # 1.5 MB (default: 1 MB)
+**将 Loki metrics 添加到 Prometheus：**
 
-  # Reduce flush frequency for fewer chunks
-  chunk_idle_period: 2h  # (default: 1h)
-
-storage_config:
-  boltdb_shipper:
-    # Build index cache faster
-    index_cache_validity: 1h
-
-    # Compact more frequently
-    compactor:
-      compaction_interval: 5m  # (default: 10m)
-
-# Increase query parallelism
-querier:
-  max_concurrent: 20  # (default: 10)
-
-# Cache more results
-query_range:
-  results_cache:
-    cache:
-      embedded_cache:
-        max_size_mb: 500  # (default: 100)
-```
-
-### 10.4 Monitoring Loki Performance
-
-**Add Loki metrics to Prometheus:**
-
-**Edit `prometheus/prometheus.yml`:**
+**编辑 `prometheus/prometheus.yml`：**
 ```yaml
 scrape_configs:
   - job_name: 'loki'
@@ -1908,32 +1125,34 @@ scrape_configs:
           service: loki
 ```
 
-**Key Loki metrics to watch:**
+**需要关注的关键 Loki metrics：**
 
 ```promql
-# Ingestion rate
+# 摄入率
 rate(loki_distributor_bytes_received_total[5m])
 
-# Number of streams (cardinality)
+# 流数（基数）
 loki_ingester_streams
 
-# Query latency
+# 查询延迟
 histogram_quantile(0.99, rate(loki_request_duration_seconds_bucket[5m]))
 
-# Failed queries
+# 失败查询
 rate(loki_logql_querystats_total{status="failed"}[5m])
 
-# Chunk utilization
+# 块利用率
 loki_ingester_chunk_utilization
 ```
 
+**✅ 检查点：** 性能优化已应用。
+
 ---
 
-## Part 11: Validation and Testing
+## 第 11 部分：验证和测试
 
-### 11.1 Validation Checklist
+### 11.1 验证清单
 
-**Run these checks to verify logging pipeline:**
+**运行这些检查以验证日志管道：**
 
 ```bash
 #!/bin/bash
@@ -1971,426 +1190,131 @@ echo "=== Check for Errors ==="
 docker-compose -f docker-compose.logging.yml logs --tail=50 loki promtail | grep -i error || echo "No errors found"
 ```
 
-**Run validation:**
-```bash
-chmod +x validate-logging.sh
-./validate-logging.sh
-```
+### 11.2 负载测试
 
-**Expected output:**
-```
-=== Loki Health Check ===
-ready
+**生成持续的日志量。**
 
-=== Promtail Health Check ===
-ready
-
-=== Check Loki Ingestion ===
-loki_distributor_bytes_received_total 523041
-
-=== Check Promtail Sent Logs ===
-promtail_sent_entries_total{host="localhost"} 1523
-
-=== Check Stream Count (Cardinality) ===
-loki_ingester_streams 12
-
-=== Query Recent Logs ===
-5 log streams found
-
-=== Check for Errors ===
-No errors found
-```
-
-### 11.2 Load Testing
-
-**Generate sustained log volume:**
-
-```python
-# load-test-logging.py
-import asyncio
-import aiohttp
-import json
-from datetime import datetime
-import random
-
-async def generate_request(session, request_id):
-    """Simulate inference request (generates logs)"""
-    url = "http://localhost:8000/api/v1/predict"
-
-    payload = {
-        "image_url": f"https://example.com/image_{request_id}.jpg",
-        "model_version": random.choice(["v1.0.0", "v1.1.0", "v1.2.0"])
-    }
-
-    try:
-        async with session.post(url, json=payload, timeout=5) as response:
-            return await response.json()
-    except Exception as e:
-        print(f"Request {request_id} failed: {e}")
-
-async def load_test(duration_seconds=300, requests_per_second=10):
-    """Run load test for specified duration"""
-    async with aiohttp.ClientSession() as session:
-        request_id = 0
-        start_time = datetime.now()
-
-        while (datetime.now() - start_time).seconds < duration_seconds:
-            tasks = []
-            for _ in range(requests_per_second):
-                tasks.append(generate_request(session, request_id))
-                request_id += 1
-
-            await asyncio.gather(*tasks)
-            await asyncio.sleep(1)
-
-        print(f"Load test complete: {request_id} total requests")
-
-if __name__ == "__main__":
-    # 5 minutes, 10 req/sec = 3000 requests
-    asyncio.run(load_test(duration_seconds=300, requests_per_second=10))
-```
-
-**Run load test:**
-```bash
-python load-test-logging.py
-```
-
-**Monitor during load test:**
-```bash
-# Watch Loki ingestion rate
-watch -n 1 'curl -s http://localhost:3100/metrics | grep loki_distributor_bytes_received_total'
-
-# Watch Promtail shipping rate
-watch -n 1 'curl -s http://localhost:9080/metrics | grep promtail_sent_bytes_total'
-
-# Watch Docker logs
-docker stats loki promtail
-```
+**✅ 检查点：** 验证测试通过。
 
 ---
 
-## Part 12: Troubleshooting Guide
+## 第 12 部分：故障排除指南
 
-### Common Issues and Solutions
+### 常见问题和解决方案
 
-#### Issue 1: Promtail Not Shipping Logs
+#### 问题 1：Promtail 未传输日志
 
-**Symptoms:**
-- `promtail_sent_entries_total` not increasing
-- No logs appearing in Grafana Explore
+**症状：**
+- `promtail_sent_entries_total` 未增长
+- Grafana Explore 中未显示日志
 
-**Debug steps:**
+**调试步骤：**
 ```bash
-# Check Promtail logs
+# 检查 Promtail 日志
 docker logs promtail --tail=100
 
-# Check positions file
+# 检查位置文件
 cat promtail/positions.yaml
 
-# Test Promtail config
+# 测试 Promtail 配置
 docker exec promtail /usr/bin/promtail \
   -config.file=/etc/promtail/config.yaml \
   -dry-run
 
-# Verify Loki reachable
+# 验证 Loki 可达
 docker exec promtail wget -O- http://loki:3100/ready
 ```
 
-**Solutions:**
-- **No Docker logs found:** Add `logging: promtail` label to containers
-- **Permission denied:** Run Promtail with Docker socket access
-- **Loki unreachable:** Check network connectivity
+**解决方案：**
+- **未找到 Docker 日志：** 添加 `logging: promtail` label 到容器
+- **权限拒绝：** 使用 Docker socket 访问运行 Promtail
+- **Loki 不可达：** 检查网络连接
 
-#### Issue 2: High Cardinality (Too Many Streams)
+#### 问题 2：高基数（流太多）
 
-**Symptoms:**
-- `loki_ingester_streams` > 10,000
-- Slow queries
-- High memory usage
+#### 问题 3：日志缺少字段
 
-**Debug:**
-```bash
-# Check stream count
-curl -s http://localhost:3100/metrics | grep loki_ingester_streams
+#### 问题 4：磁盘空间不足
 
-# Query active streams
-curl -G -s "http://localhost:3100/loki/api/v1/label" | jq '.data'
-```
-
-**Solution:**
-Remove high-cardinality labels from Promtail config:
-```yaml
-# BEFORE (bad)
-- labels:
-    trace_id:  # ← Remove this!
-
-# AFTER (good)
-- labels:
-    service:
-    level:
-```
-
-#### Issue 3: Logs Missing Fields
-
-**Symptoms:**
-- Logs appear in Loki but fields not extracted
-- JSON parsing errors
-
-**Debug:**
-```logql
-# Check raw logs
-{service="inference-gateway"}
-
-# Check if JSON parsing worked
-{service="inference-gateway"} | json
-```
-
-**Solution:**
-Verify JSON structure matches pipeline config:
-```yaml
-- json:
-    expressions:
-      level: level  # ← Must match actual JSON field name
-```
-
-#### Issue 4: Out of Disk Space
-
-**Symptoms:**
-- `loki_ingester_blocks_per_chunk` increasing
-- Disk usage growing rapidly
-
-**Debug:**
-```bash
-# Check Loki data size
-du -sh $(docker volume inspect loki-data --format '{{.Mountpoint}}')
-
-# Check compaction
-docker logs loki | grep compactor
-```
-
-**Solution:**
-Enable retention and compaction:
-```yaml
-# In loki-config.yaml
-compactor:
-  retention_enabled: true
-  retention_delete_delay: 2h
-
-limits_config:
-  retention_period: 168h  # 7 days
-```
+**✅ 检查点：** 故障排除指南已完成。
 
 ---
 
-## Part 13: Stretch Goals
+## 第 13 部分：拓展目标
 
-### 13.1 Long-Term Storage (S3/GCS)
+### 13.1 长期存储（S3/GCS）
 
-**Configure Loki to use S3 for chunks:**
+**配置 Loki 使用 S3 存储块。**
 
-```yaml
-# In loki-config.yaml
-storage_config:
-  aws:
-    s3: s3://us-east-1/my-loki-bucket
-    s3forcepathstyle: false
+### 13.2 多租户
 
-  boltdb_shipper:
-    shared_store: s3
+**在 Loki 中启用多租户。**
 
-schema_config:
-  configs:
-    - from: 2024-01-01
-      store: boltdb-shipper
-      object_store: s3  # Changed from filesystem
-      schema: v12
-```
+### 13.3 安全扫描日志
 
-**AWS credentials:**
-```bash
-# In docker-compose.logging.yml
-services:
-  loki:
-    environment:
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_REGION=us-east-1
-```
-
-### 13.2 Multi-Tenancy
-
-**Enable multi-tenancy in Loki:**
-
-```yaml
-# In loki-config.yaml
-auth_enabled: true  # Enable multi-tenancy
-```
-
-**Configure Promtail to send tenant ID:**
-
-```yaml
-# In promtail-config.yaml
-clients:
-  - url: http://loki:3100/loki/api/v1/push
-    tenant_id: team-ml-platform  # Set tenant
-```
-
-**Query specific tenant:**
-```bash
-curl -G -s "http://localhost:3100/loki/api/v1/query_range" \
-  -H "X-Scope-OrgID: team-ml-platform" \
-  --data-urlencode 'query={service="inference-gateway"}'
-```
-
-### 13.3 Security Scanning Logs
-
-**Integrate with Falco for security event logs:**
-
-```yaml
-# In promtail-config.yaml
-scrape_configs:
-  - job_name: falco-security
-    static_configs:
-      - targets: [localhost]
-        labels:
-          job: security
-          __path__: /var/log/falco/*.json
-
-    pipeline_stages:
-      - json:
-          expressions:
-            priority: priority
-            rule: rule
-            output: output
-      - labels:
-          priority:
-```
+**集成 Falco 用于安全事件日志。**
 
 ---
 
-## Part 14: Documentation and Summary
+## 第 14 部分：文档和总结
 
-### 14.1 Update README
+### 14.1 更新 README
 
-**Create `logging/README.md`:**
+**创建 `logging/README.md`。**
 
-```markdown
-# Logging Pipeline - Inference Gateway
+### 14.2 创建 LogQL 参考
 
-Production-ready centralized logging with Grafana Loki.
-
-## Quick Start
-
-bash
-# Start logging stack
-docker-compose -f docker-compose.logging.yml up -d
-
-# View logs in Grafana
-open http://localhost:3000/explore
-
-
-## Architecture
-
-- **Loki:** Log aggregation and storage
-- **Promtail:** Log collection and shipping
-- **Grafana:** Log querying and visualization
-
-## Retention Policy
-
-- Hot storage (Loki): 7 days
-- Total retention: 30 days (app logs)
-
-## Useful Queries
-
-bash
-# Error logs
-{service="inference-gateway", level="error"}
-
-# High latency requests
-{service="inference-gateway"} | json | latency_ms > 300
-
-# Logs for specific trace
-{service="inference-gateway"} | json | trace_id="abc123"
-
-
-## Dashboards
-
-- **Logging Overview:** Log volume, error rates, top errors
-- **Log Troubleshooting:** Live error stream, search
-
-## Alerts
-
-- High error rate (> 10 errors/min)
-- Log volume spike (5x increase)
-- Specific error patterns (FeatureNotFound)
-
-## Maintenance
-
-bash
-# Check health
-./validate-logging.sh
-
-# View Loki metrics
-curl http://localhost:3100/metrics
-
-# Backup logs
-./backup-loki.sh
-
-```
-
-### 14.2 Create LogQL Reference
-
-**Create `logging/docs/logql-queries.md`** with 20+ example queries.
+**创建 `logging/docs/logql-queries.md`** 包含 20+ 个示例查询。
 
 ---
 
-## Validation Checklist
+## 验证清单
 
-Before completing this exercise, ensure:
+完成本练习前，确保：
 
-- [ ] Loki and Promtail deployed and healthy
-- [ ] Logs flowing from inference gateway to Loki
-- [ ] JSON logs parsed correctly, fields extracted
-- [ ] PII redaction working (emails, user IDs masked)
-- [ ] LogQL queries return expected results
-- [ ] Logging dashboard shows metrics and live logs
-- [ ] Trace-log correlation working (via trace_id)
-- [ ] Log-based alerts configured and tested
-- [ ] Retention policy configured (7 days)
-- [ ] Cardinality < 1,000 streams
-- [ ] Documentation complete (architecture, governance, queries)
-
----
-
-## Summary
-
-You have successfully built a production-ready logging pipeline with:
-
-✅ **Centralized log aggregation** with Loki (2.9.3)
-✅ **Automated log collection** with Promtail
-✅ **Structured log parsing** with pipeline stages
-✅ **PII redaction** for compliance
-✅ **Log-based metrics** for alerting
-✅ **Trace-log correlation** for debugging
-✅ **Grafana dashboards** for visualization
-✅ **Retention and governance** policies
-✅ **Performance optimization** (cardinality, caching)
-✅ **Comprehensive documentation**
-
-**Total line count:** ~2,400 lines
-**Key files created:** 8+
-**Dashboards:** 2
-**Alerts:** 4
+- [ ] Loki 和 Promtail 已部署且健康
+- [ ] 日志从推理网关流入 Loki
+- [ ] JSON 日志正确解析，字段已提取
+- [ ] PII 脱敏正常工作（电子邮件、用户 ID 已屏蔽）
+- [ ] LogQL 查询返回预期结果
+- [ ] 日志 dashboard 显示指标和实时日志
+- [ ] Trace-日志关联正常工作（通过 trace_id）
+- [ ] 基于日志的告警已配置和测试
+- [ ] 保留策略已配置（7 天）
+- [ ] 基数 < 1,000 个流
+- [ ] 文档已完成（架构、治理、查询）
 
 ---
 
-## Next Steps
+## 总结
 
-**In Exercise 05** (Alerting & Incident Response), you will:
-- Build comprehensive alerting rules across metrics and logs
-- Create incident response workflows and runbooks
-- Implement on-call rotation and escalation policies
-- Set up alert fatigue mitigation strategies
-- Build incident postmortem templates
+你已成功构建了一个生产就绪的日志管道，包含：
 
-**Continue to Exercise 05:** [Alerting & Incident Response](./exercise-05-alerting-incident-response.md)
+✅ **集中式日志聚合**，使用 Loki（2.9.3）
+✅ **自动化日志收集**，使用 Promtail
+✅ **结构化日志解析**，使用管道阶段
+✅ **PII 脱敏**，用于合规
+✅ **基于日志的 metrics**，用于告警
+✅ **Trace-日志关联**，用于调试
+✅ **Grafana dashboards**，用于可视化
+✅ **保留和治理**策略
+✅ **性能优化**（基数、缓存）
+✅ **全面的文档**
+
+**总行数：** 约 2,400 行
+**创建的关键文件：** 8+
+**Dashboards：** 2
+**告警：** 4
+
+---
+
+## 下一步
+
+**在 Exercise 05**（告警与事件响应）中，你将：
+- 构建跨 metrics 和日志的全面告警规则
+- 创建事件响应工作流和 runbooks
+- 实现 on-call 轮换和升级策略
+- 设置告警疲劳缓解策略
+- 构建事件事后审查模板
+
+**继续到 Exercise 05：** [告警与事件响应](./exercise-05-alerting-incident-response.md)

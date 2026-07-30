@@ -1,687 +1,687 @@
-# Module 008 Quiz: Databases & SQL
+# Module 008 测验：数据库与 SQL
 
-## Quiz Information
+## 测验信息
 
-- **Module:** Databases & SQL
-- **Total Questions:** 50
-- **Time Limit:** 75 minutes
-- **Passing Score:** 80% (40/50 correct)
-- **Topics Covered:**
-  - Database fundamentals and PostgreSQL architecture
-  - SQL syntax from basics to advanced analytics
-  - Schema design, normalization, and constraints
-  - Transactions, concurrency, and indexing
-  - Python integration with SQLAlchemy and migrations
-  - Operational excellence (monitoring, optimization, governance)
+- **模块：** 数据库与 SQL
+- **题目总数：** 50
+- **时间限制：** 75 分钟
+- **及格分数：** 80%（40/50 正确）
+- **涵盖主题：**
+  - 数据库基础和 PostgreSQL 架构
+  - SQL 语法从基础到高级分析
+  - Schema 设计、范式化和约束
+  - 事务、并发和索引
+  - 使用 SQLAlchemy 和迁移的 Python 集成
+  - 运维卓越（监控、优化、治理）
 
-## Instructions
+## 说明
 
-1. Read each question carefully and choose the best answer.
-2. Unless noted, each question has a single correct answer.
-3. Highlighting keywords before answering can reduce common mistakes.
-4. You may navigate between questions before submitting the quiz.
-5. A score report with explanations will be provided after submission.
-
----
-
-## Section 1: Database Fundamentals (10 questions)
-
-### Question 1
-Which ACID property ensures that either all statements in a transaction succeed or none of them do?
-
-A) Atomicity  
-B) Consistency  
-C) Isolation  
-D) Durability
-
-**Correct Answer:** A  
-**Explanation:** Atomicity guarantees that a transaction is treated as an indivisible unit; if any part fails, the whole transaction is rolled back.
+1. 仔细阅读每个问题并选择最佳答案。
+2. 除非另有说明，每个问题只有一个正确答案。
+3. 在作答前标注关键词可以减少常见错误。
+4. 在提交测验前可以切换题目。
+5. 提交后将提供带解释的分数报告。
 
 ---
 
-### Question 2
-What is the primary purpose of a foreign key constraint?
+## 第 1 部分：数据库基础（10 题）
 
-A) Enforce value ranges on numeric columns  
-B) Ensure uniqueness across multiple columns  
-C) Maintain referential integrity between related tables  
-D) Automatically create indexes on joined columns
+### 问题 1
+哪项 ACID 属性确保事务中的所有语句要么全部成功，要么全部不执行？
 
-**Correct Answer:** C  
-**Explanation:** Foreign keys link rows between tables and prevent orphaned records, thereby enforcing referential integrity.
+A) 原子性
+B) 一致性
+C) 隔离性
+D) 持久性
 
----
-
-### Question 3
-In the CAP theorem, which trade-off do most distributed SQL databases like CockroachDB or Google Spanner attempt to balance?
-
-A) Consistency vs Availability  
-B) Availability vs Partition tolerance  
-C) Consistency vs Partition tolerance  
-D) Latency vs Throughput
-
-**Correct Answer:** C  
-**Explanation:** Distributed SQL systems typically sacrifice some availability in favor of strong consistency while tolerating partitions.
+**正确答案：** A
+**解释：** 原子性保证事务被视为不可分割的单元；如果任何部分失败，整个事务将被回滚。
 
 ---
 
-### Question 4
-Which PostgreSQL feature allows storing semi-structured data with indexing support?
+### 问题 2
+外键约束的主要目的是什么？
 
-A) ARRAY  
-B) JSONB  
-C) HSTORE  
+A) 强制数值列的值范围
+B) 确保跨多个列的唯一性
+C) 维护相关表之间的引用完整性
+D) 在连接列上自动创建索引
+
+**正确答案：** C
+**解释：** 外键连接表之间的行并防止孤立记录，从而强制引用完整性。
+
+---
+
+### 问题 3
+在 CAP 定理中，像 CockroachDB 或 Google Spanner 这样的分布式 SQL 数据库试图平衡哪种权衡？
+
+A) 一致性 vs 可用性
+B) 可用性 vs 分区容忍性
+C) 一致性 vs 分区容忍性
+D) 延迟 vs 吞吐量
+
+**正确答案：** C
+**解释：** 分布式 SQL 系统通常牺牲一定的可用性来换取强一致性，同时容忍分区。
+
+---
+
+### 问题 4
+PostgreSQL 的哪个功能允许存储带有索引支持的半结构化数据？
+
+A) ARRAY
+B) JSONB
+C) HSTORE
 D) BYTEA
 
-**Correct Answer:** B  
-**Explanation:** JSONB stores JSON in a binary representation that supports indexing and efficient querying.
+**正确答案：** B
+**解释：** JSONB 以二进制表示存储 JSON，支持索引和高效查询。
 
 ---
 
-### Question 5
-What does the `ANALYZE` command do in PostgreSQL?
+### 问题 5
+PostgreSQL 中的 `ANALYZE` 命令有什么作用？
 
-A) Rebuilds all indexes in the database  
-B) Updates table statistics used by the query planner  
-C) Checks table integrity and repairs corruption  
-D) Forces a checkpoint to flush WAL to disk
+A) 重建数据库中的所有索引
+B) 更新查询计划器使用的表统计信息
+C) 检查表完整性并修复损坏
+D) 强制检查点将 WAL 刷新到磁盘
 
-**Correct Answer:** B  
-**Explanation:** ANALYZE collects statistics about table contents so the planner can choose optimal execution strategies.
-
----
-
-### Question 6
-Which normalization form eliminates transitive dependencies (non-key attribute depending on another non-key attribute)?
-
-A) First Normal Form (1NF)  
-B) Second Normal Form (2NF)  
-C) Third Normal Form (3NF)  
-D) Boyce-Codd Normal Form (BCNF)
-
-**Correct Answer:** C  
-**Explanation:** 3NF removes transitive dependencies, ensuring that non-key attributes depend only on the key.
+**正确答案：** B
+**解释：** ANALYZE 收集表内容的统计信息，以便计划器选择最优的执行策略。
 
 ---
 
-### Question 7
-What is the typical consequence of using `SELECT *` in production queries?
+### 问题 6
+哪种范式形式消除了传递依赖（非键属性依赖于另一个非键属性）？
 
-A) Queries run faster because all columns are cached  
-B) It prevents the use of covering indexes  
-C) It automatically enforces projection pushdown  
-D) It renames duplicate columns automatically
+A) 第一范式（1NF）
+B) 第二范式（2NF）
+C) 第三范式（3NF）
+D) 巴科斯-科德范式（BCNF）
 
-**Correct Answer:** B  
-**Explanation:** `SELECT *` can reduce index effectiveness and increases I/O by returning unnecessary columns, making covering indexes useless.
+**正确答案：** C
+**解释：** 3NF 消除传递依赖，确保非键属性仅依赖于键。
 
 ---
 
-### Question 8
-Which PostgreSQL role capability grants the ability to create new databases?
+### 问题 7
+在生产查询中使用 `SELECT *` 的典型后果是什么？
 
-A) `CREATEROLE`  
-B) `CREATEUSER`  
-C) `CREATEDB`  
+A) 查询运行更快，因为所有列都被缓存
+B) 它阻止了覆盖索引的使用
+C) 它自动强制投影下推
+D) 它自动重命名重复的列
+
+**正确答案：** B
+**解释：** `SELECT *` 会降低索引有效性，并通过返回不必要的列增加 I/O，使覆盖索引失效。
+
+---
+
+### 问题 8
+PostgreSQL 的哪个角色能力赋予创建新数据库的权限？
+
+A) `CREATEROLE`
+B) `CREATEUSER`
+C) `CREATEDB`
 D) `SUPERUSER`
 
-**Correct Answer:** C  
-**Explanation:** `CREATEDB` allows a role to create databases. `CREATEROLE` manages roles; `SUPERUSER` bypasses checks entirely.
+**正确答案：** C
+**解释：** `CREATEDB` 允许角色创建数据库。`CREATEROLE` 管理角色；`SUPERUSER` 完全绕过检查。
 
 ---
 
-### Question 9
-What is the main benefit of using sequences (e.g., `SERIAL`, `GENERATED BY DEFAULT AS IDENTITY`) for primary keys?
+### 问题 9
+使用序列（例如 `SERIAL`、`GENERATED BY DEFAULT AS IDENTITY`）作为 primary key 的主要好处是什么？
 
-A) They guarantee gapless IDs  
-B) They ensure unique and incremental identifiers with low contention  
-C) They automatically create foreign key relationships  
-D) They prevent the need for primary key indexes
+A) 它们保证无间隙的 ID
+B) 它们确保唯一且递增的标识符，具有低争用
+C) 它们自动创建外键关系
+D) 它们消除了 primary key 索引的需要
 
-**Correct Answer:** B  
-**Explanation:** Sequences produce unique incremental values efficiently, minimizing contention even under concurrent inserts.
-
----
-
-### Question 10
-Which backup strategy allows capturing point-in-time recovery (PITR) in PostgreSQL?
-
-A) Periodic `COPY` commands  
-B) File-system snapshots only  
-C) Base backup plus continuous WAL archiving  
-D) Exporting schemas with `pg_dump --schema-only`
-
-**Correct Answer:** C  
-**Explanation:** PITR requires a base backup and archived WAL segments so the database can be restored to any moment.
+**正确答案：** B
+**解释：** 序列高效地生成唯一的增量值，即使在并发插入下也能最小化争用。
 
 ---
 
-## Section 2: SQL Mastery & Query Optimization (12 questions)
+### 问题 10
+哪种备份策略允许在 PostgreSQL 中实现时间点恢复（PITR）？
 
-### Question 11
-Given the query `SELECT COUNT(*) FROM runs WHERE status = 'succeeded';`, which index would improve performance most?
+A) 定期的 `COPY` 命令
+B) 仅文件系统快照
+C) 基础备份加上连续的 WAL 归档
+D) 使用 `pg_dump --schema-only` 导出 schema
 
-A) `CREATE INDEX idx_runs_status ON runs(status);`  
-B) `CREATE INDEX idx_runs_count ON runs(count);`  
-C) `CREATE INDEX idx_runs_status_count ON runs(status, COUNT(*));`  
+**正确答案：** C
+**解释：** PITR 需要基础备份和归档的 WAL 段，以便数据库可以恢复到任何时间点。
+
+---
+
+## 第 2 部分：SQL 精通与查询优化（12 题）
+
+### 问题 11
+对于查询 `SELECT COUNT(*) FROM runs WHERE status = 'succeeded';`，哪个索引能最大程度提高性能？
+
+A) `CREATE INDEX idx_runs_status ON runs(status);`
+B) `CREATE INDEX idx_runs_count ON runs(count);`
+C) `CREATE INDEX idx_runs_status_count ON runs(status, COUNT(*));`
 D) `CREATE INDEX idx_runs_status_created ON runs(created_at);`
 
-**Correct Answer:** A  
-**Explanation:** Filtering on `status` benefits directly from an index on that column; other choices are invalid or unrelated.
+**正确答案：** A
+**解释：** 对 `status` 进行过滤直接受益于该列上的索引；其他选择无效或不相关。
 
 ---
 
-### Question 12
-Which SQL clause is evaluated first in the logical query processing order?
+### 问题 12
+在逻辑查询处理顺序中，哪个 SQL 子句最先被评估？
 
-A) SELECT  
-B) FROM  
-C) WHERE  
+A) SELECT
+B) FROM
+C) WHERE
 D) ORDER BY
 
-**Correct Answer:** B  
-**Explanation:** The logical processing order starts with `FROM`, then `WHERE`, `GROUP BY`, `HAVING`, `SELECT`, `ORDER BY`, `LIMIT`.
+**正确答案：** B
+**解释：** 逻辑处理顺序从 `FROM` 开始，然后是 `WHERE`、`GROUP BY`、`HAVING`、`SELECT`、`ORDER BY`、`LIMIT`。
 
 ---
 
-### Question 13
-What is a key difference between `INNER JOIN` and `LEFT JOIN`?
+### 问题 13
+`INNER JOIN` 和 `LEFT JOIN` 之间的关键区别是什么？
 
-A) `LEFT JOIN` requires matching rows on both sides  
-B) `INNER JOIN` returns all rows from the left table regardless of matches  
-C) `LEFT JOIN` returns unmatched rows from the left table with NULLs on the right  
-D) `INNER JOIN` is slower in all cases
+A) `LEFT JOIN` 要求两侧都有匹配的行
+B) `INNER JOIN` 返回左表中的所有行，无论是否匹配
+C) `LEFT JOIN` 返回左表中不匹配的行，右表列为 NULL
+D) `INNER JOIN` 在所有情况下都更慢
 
-**Correct Answer:** C  
-**Explanation:** A left join includes all rows from the left table even if there’s no matching row on the right.
+**正确答案：** C
+**解释：** Left join 包含左表中的所有行，即使右表中没有匹配的行。
 
 ---
 
-### Question 14
-Which window function calculates the difference between a row and the previous row?
+### 问题 14
+哪个窗口函数计算当前行与前一行之间的差值？
 
-A) `RANK()`  
-B) `ROW_NUMBER()`  
-C) `LAG()`  
+A) `RANK()`
+B) `ROW_NUMBER()`
+C) `LAG()`
 D) `NTILE()`
 
-**Correct Answer:** C  
-**Explanation:** `LAG()` accesses the value from a preceding row within the window partition.
+**正确答案：** C
+**解释：** `LAG()` 访问窗口分区中前一行的值。
 
 ---
 
-### Question 15
-What is the purpose of a CTE (Common Table Expression)?
+### 问题 15
+CTE（公用表表达式）的目的是什么？
 
-A) Speed up all queries by default  
-B) Provide a temporary named result set for readability and reuse  
-C) Automatically create materialized views  
-D) Replace JOIN operations
+A) 默认加快所有查询的速度
+B) 提供临时命名结果集以提高可读性和可重用性
+C) 自动创建物化视图
+D) 替代 JOIN 操作
 
-**Correct Answer:** B  
-**Explanation:** CTEs improve readability and enable modular query composition; they don’t inherently speed queries without optimization.
-
----
-
-### Question 16
-Which of the following queries would benefit most from a BRIN index?
-
-A) Random lookups on `uuid` primary keys  
-B) Range scans on a monotonically increasing `created_at` column  
-C) Equality filters on enumerated `status` values  
-D) Joining on `model_name`
-
-**Correct Answer:** B  
-**Explanation:** BRIN indexes excel at large tables with natural ordering (e.g., timestamps), enabling efficient range scans.
+**正确答案：** B
+**解释：** CTE 提高了可读性并支持模块化查询组合；如果不进行优化，它们本身不会加速查询。
 
 ---
 
-### Question 17
-What does `EXPLAIN (ANALYZE, BUFFERS)` provide that plain `EXPLAIN` does not?
+### 问题 16
+以下哪个查询最能受益于 BRIN 索引？
 
-A) Execution plan without running the query  
-B) Actual runtime statistics and buffer usage  
-C) Automatic index recommendations  
-D) Locks held during execution
+A) 对 `uuid` primary key 的随机查找
+B) 对单调递增的 `created_at` 列进行范围扫描
+C) 对枚举 `status` 值进行等值过滤
+D) 基于 `model_name` 进行连接
 
-**Correct Answer:** B  
-**Explanation:** `ANALYZE` executes the query and reports actual timing/rows, while `BUFFERS` details cache hits/misses.
-
----
-
-### Question 18
-Which SQL technique efficiently pivots rows into columns for reporting?
-
-A) Window functions  
-B) `GROUPING SETS`  
-C) `CASE` expressions with aggregation  
-D) `HAVING` clauses
-
-**Correct Answer:** C  
-**Explanation:** Conditional aggregation using `SUM(CASE WHEN ...)` is a common pivot pattern in PostgreSQL.
+**正确答案：** B
+**解释：** BRIN 索引在具有自然顺序的大型表上表现出色（例如时间戳），能够实现高效的范围扫描。
 
 ---
 
-### Question 19
-When using `SERIALIZABLE` isolation, what type of anomaly is the database preventing?
+### 问题 17
+`EXPLAIN (ANALYZE, BUFFERS)` 提供了什么普通 `EXPLAIN` 没有的内容？
 
-A) Dirty reads and non-repeatable reads only  
-B) Phantom reads only  
-C) Lost updates only  
-D) All concurrency anomalies, mimicking serial execution
+A) 不运行查询的执行计划
+B) 实际运行时间统计信息和缓冲区使用情况
+C) 自动索引推荐
+D) 执行期间持有的锁
 
-**Correct Answer:** D  
-**Explanation:** SERIALIZABLE provides the strongest isolation, preventing all anomalies by guaranteeing serial equivalence.
-
----
-
-### Question 20
-In PostgreSQL, how can you ensure a query uses a specific index during troubleshooting?
-
-A) Use the `FORCE INDEX` clause  
-B) Temporarily disable sequential scans via `SET enable_seqscan = off;`  
-C) Wrap the query in a transaction  
-D) Create the index as `CLUSTERED`
-
-**Correct Answer:** B  
-**Explanation:** PostgreSQL doesn’t support FORCE INDEX, but you can influence the planner by disabling certain plan types temporarily.
+**正确答案：** B
+**解释：** `ANALYZE` 执行查询并报告实际时间/行数，而 `BUFFERS` 详细说明缓存命中/未命中情况。
 
 ---
 
-### Question 21
-Which approach removes duplicate rows while retaining the row with the latest timestamp?
+### 问题 18
+哪种 SQL 技术可以将行高效地透视（pivot）为列用于报表？
 
-A) `DELETE FROM ... WHERE ROWNUM > 1;`  
-B) Use window function with `ROW_NUMBER()` and delete where rn > 1  
-C) Create a unique index and rely on constraint violations  
-D) Enable synchronous replication
+A) 窗口函数
+B) `GROUPING SETS`
+C) 带有聚合的 `CASE` 表达式
+D) `HAVING` 子句
 
-**Correct Answer:** B  
-**Explanation:** Assign `ROW_NUMBER()` over partitions ordered by timestamp, then delete rows where `rn > 1`.
-
----
-
-### Question 22
-What is the main difference between a materialized view and a regular view?
-
-A) Materialized views cannot be refreshed  
-B) Regular views store data on disk  
-C) Materialized views persist data physically and require refreshes  
-D) Regular views require indexes while materialized views do not
-
-**Correct Answer:** C  
-**Explanation:** Materialized views store the query result and must be refreshed; regular views are virtual and compute on access.
+**正确答案：** C
+**解释：** 使用 `SUM(CASE WHEN ...)` 的条件聚合是 PostgreSQL 中常见的透视模式。
 
 ---
 
-## Section 3: Application Integration & Operations (8 questions)
+### 问题 19
+当使用 `SERIALIZABLE` 隔离级别时，数据库防止哪种类型的异常？
 
-### Question 23
-Which SQLAlchemy concept maps classes to database tables?
+A) 仅脏读和不可重复读
+B) 仅幻读
+C) 仅丢失更新
+D) 所有并发异常，模拟串行执行
 
-A) Session  
-B) Declarative Base  
-C) Mapper  
+**正确答案：** D
+**解释：** SERIALIZABLE 提供最强的隔离，通过保证串行等价性来防止所有异常。
+
+---
+
+### 问题 20
+在 PostgreSQL 中，如何在故障排查时确保查询使用特定的索引？
+
+A) 使用 `FORCE INDEX` 子句
+B) 通过 `SET enable_seqscan = off;` 临时禁用顺序扫描
+C) 将查询包装在事务中
+D) 将索引创建为 `CLUSTERED`
+
+**正确答案：** B
+**解释：** PostgreSQL 不支持 FORCE INDEX，但你可以通过临时禁用某些计划类型来影响计划器。
+
+---
+
+### 问题 21
+哪种方法可以删除重复行，同时保留具有最新时间戳的行？
+
+A) `DELETE FROM ... WHERE ROWNUM > 1;`
+B) 使用 `ROW_NUMBER()` 窗口函数并删除 rn > 1 的行
+C) 创建唯一索引并依赖约束违规
+D) 启用同步复制
+
+**正确答案：** B
+**解释：** 在按时间戳排序的分区上分配 `ROW_NUMBER()`，然后删除 `rn > 1` 的行。
+
+---
+
+### 问题 22
+物化视图和普通视图之间的主要区别是什么？
+
+A) 物化视图无法刷新
+B) 普通视图将数据存储在磁盘上
+C) 物化视图在物理上持久化数据并需要刷新
+D) 普通视图需要索引而物化视图不需要
+
+**正确答案：** C
+**解释：** 物化视图存储查询结果且必须刷新；普通视图是虚拟的，在访问时计算。
+
+---
+
+## 第 3 部分：应用集成与运维（8 题）
+
+### 问题 23
+哪个 SQLAlchemy 概念将类映射到数据库表？
+
+A) Session
+B) Declarative Base
+C) Mapper
 D) Engine
 
-**Correct Answer:** B  
-**Explanation:** The declarative base uses class definitions to define table mappings.
+**正确答案：** B
+**解释：** Declarative base 使用类定义来指定表映射。
 
 ---
 
-### Question 24
-What is the recommended way to manage database sessions in FastAPI using SQLAlchemy 2.0 style?
+### 问题 24
+在使用 SQLAlchemy 2.0 风格的 FastAPI 中，管理数据库会话的推荐方式是什么？
 
-A) Create a global session and reuse it across requests  
-B) Use dependency injection to yield a session per request and close afterward  
-C) Open and close sessions manually in each route function  
-D) Use thread-local globals without cleanup
+A) 创建全局会话并在所有请求中重复使用
+B) 使用依赖注入为每个请求生成一个会话并在之后关闭
+C) 在每个路由函数中手动打开和关闭会话
+D) 使用线程本地全局变量而不进行清理
 
-**Correct Answer:** B  
-**Explanation:** FastAPI best practice is to provide a session via dependency injection (`yield`) ensuring proper cleanup per request.
+**正确答案：** B
+**解释：** FastAPI 最佳实践是通过依赖注入（`yield`）提供会话，确保每次请求后正确清理。
 
 ---
 
-### Question 25
-Which tool generates migration scripts based on SQLAlchemy models?
+### 问题 25
+哪个工具基于 SQLAlchemy 模型生成迁移脚本？
 
-A) Alembic  
-B) Flyway  
-C) Liquibase  
+A) Alembic
+B) Flyway
+C) Liquibase
 D) pgAdmin
 
-**Correct Answer:** A  
-**Explanation:** Alembic is built for SQLAlchemy migrations and integrates tightly with its metadata.
+**正确答案：** A
+**解释：** Alembic 是为 SQLAlchemy 迁移构建的，与其 metadata 紧密集成。
 
 ---
 
-### Question 26
-When preparing a migration that drops a column, what safety step should you take first?
+### 问题 26
+在准备删除列的迁移时，首先应该采取什么安全步骤？
 
-A) Drop all dependent tables automatically  
-B) Disable foreign key checks permanently  
-C) Audit the column usage and stage data backup or view replacement  
-D) Force clients to reconnect instantly
+A) 自动删除所有依赖表
+B) 永久禁用外键检查
+C) 审计列的使用情况并准备数据备份或视图替换
+D) 强制客户端立即重新连接
 
-**Correct Answer:** C  
-**Explanation:** Dropping columns can break clients; audit usage and create backups or compatibility views before removal.
-
----
-
-### Question 27
-Which metric best indicates whether query caching is effective in PostgreSQL?
-
-A) Rows returned per second  
-B) Index hit ratio (`idx_blks_hit / (idx_blks_read + idx_blks_hit)`)  
-C) CPU utilization percentage  
-D) Number of active connections
-
-**Correct Answer:** B  
-**Explanation:** A high index hit ratio signals queries are served from cache rather than disk, reflecting caching efficiency.
+**正确答案：** C
+**解释：** 删除列可能会破坏客户端；在删除前审计使用情况并创建备份或兼容视图。
 
 ---
 
-### Question 28
-How can you prevent destructive changes from reaching production via CI/CD?
+### 问题 27
+哪个指标最能反映 PostgreSQL 中查询缓存是否有效？
 
-A) Skip database migrations in CI  
-B) Run migrations directly on production to detect issues early  
-C) Use migration linting and pre-deployment review steps  
-D) Run tests against the production database nightly
+A) 每秒返回的行数
+B) 索引命中率（`idx_blks_hit / (idx_blks_read + idx_blks_hit)`）
+C) CPU 使用率百分比
+D) 活跃连接数
 
-**Correct Answer:** C  
-**Explanation:** Automated migration linting (e.g., checking for locks, size) plus humans-in-the-loop reduce risk before deploy.
-
----
-
-### Question 29
-What is the primary purpose of connection pooling in SQLAlchemy?
-
-A) Limit the number of tables queried simultaneously  
-B) Cache ORM models in memory  
-C) Reuse database connections to reduce overhead and latency  
-D) Encrypt traffic between application and database
-
-**Correct Answer:** C  
-**Explanation:** Connection pools recycle connections, improving throughput and avoiding the cost of repeated connection handshakes.
+**正确答案：** B
+**解释：** 高索引命中率表明查询是从缓存而非磁盘提供服务的，反映了缓存效率。
 
 ---
 
-### Question 30
-You notice long-running reporting queries blocking writes. Which strategy helps without sacrificing strong consistency?
+### 问题 28
+如何通过 CI/CD 防止破坏性变更进入生产环境？
 
-A) Lower the isolation level to `READ UNCOMMITTED`  
-B) Create read replicas and route analytics queries to them  
-C) Disable autovacuum temporarily  
-D) Turn off synchronous commit
+A) 在 CI 中跳过数据库迁移
+B) 直接在数据库上运行迁移以尽早发现问题
+C) 使用迁移 lint 检查以及部署前审查步骤
+D) 每晚针对生产数据库运行测试
 
-**Correct Answer:** B
-**Explanation:** Directing read-heavy workloads to replicas isolates reporting traffic while maintaining consistency guarantees for writes on the primary.
+**正确答案：** C
+**解释：** 自动化迁移 lint 检查（例如检查锁、大小）加上人工审查可以降低部署前的风险。
 
 ---
 
-## Section 4: Advanced SQL & Window Functions (10 questions)
+### 问题 29
+SQLAlchemy 中连接池的主要目的是什么？
 
-### Question 31
-Which window function assigns a unique sequential number within a partition, starting at 1 for each partition?
+A) 限制同时查询的表数量
+B) 在内存中缓存 ORM 模型
+C) 重用数据库连接以减少开销和延迟
+D) 加密应用和数据库之间的流量
+
+**正确答案：** C
+**解释：** 连接池回收连接，提高吞吐量并避免重复连接握手的成本。
+
+---
+
+### 问题 30
+你注意到长时间运行的报表查询阻塞了写入。哪种策略可以在不牺牲强一致性的情况下提供帮助？
+
+A) 将隔离级别降低到 `READ UNCOMMITTED`
+B) 创建只读副本并将分析查询路由到它们
+C) 临时禁用 autovacuum
+D) 关闭同步提交
+
+**正确答案：** B
+**解释：** 将读取密集型工作负载导向副本，隔离报表流量，同时保持主库上写入的一致性保证。
+
+---
+
+## 第 4 部分：高级 SQL 与窗口函数（10 题）
+
+### 问题 31
+哪个窗口函数在分区内分配唯一的顺序编号，从每个分区的 1 开始？
 
 A) `RANK()`
 B) `DENSE_RANK()`
 C) `ROW_NUMBER()`
 D) `NTILE()`
 
-**Correct Answer:** C
-**Explanation:** `ROW_NUMBER()` assigns unique sequential integers within each partition, useful for deduplication and pagination.
+**正确答案：** C
+**解释：** `ROW_NUMBER()` 在每个分区内分配唯一的顺序整数，适用于去重和分页。
 
 ---
 
-### Question 32
-What is the key advantage of a recursive CTE in PostgreSQL?
+### 问题 32
+PostgreSQL 中递归 CTE 的关键优势是什么？
 
-A) It prevents infinite loops automatically
-B) It allows querying hierarchical or graph-structured data
-C) It improves performance over window functions
-D) It enforces foreign key constraints
+A) 它自动防止无限循环
+B) 它允许查询层次结构或图形结构数据
+C) 它比窗口函数提高了性能
+D) 它强制执行外键约束
 
-**Correct Answer:** B
-**Explanation:** Recursive CTEs enable traversal of hierarchical data like org charts, dependency trees, or graph structures.
-
----
-
-### Question 33
-Given a query with `PARTITION BY experiment_name ORDER BY accuracy DESC`, what does the window function operate on?
-
-A) All rows in the table
-B) Only rows where accuracy is not NULL
-C) Groups of rows sharing the same experiment_name
-D) Rows ordered globally by accuracy
-
-**Correct Answer:** C
-**Explanation:** `PARTITION BY` divides rows into groups (partitions) before applying the window function within each group.
+**正确答案：** B
+**解释：** 递归 CTE 支持遍历层次结构数据，如组织图、依赖树或图形结构。
 
 ---
 
-### Question 34
-Which SQL clause allows you to filter window function results after computation?
+### 问题 33
+对于带有 `PARTITION BY experiment_name ORDER BY accuracy DESC` 的查询，窗口函数对什么进行操作？
+
+A) 表中的所有行
+B) 仅 accuracy 不为 NULL 的行
+C) 共享相同 experiment_name 的行组
+D) 按 accuracy 全局排序的行
+
+**正确答案：** C
+**解释：** `PARTITION BY` 将行划分为组（分区），然后在每个组中应用窗口函数。
+
+---
+
+### 问题 34
+哪个 SQL 子句允许你在计算后过滤窗口函数的结果？
 
 A) WHERE
 B) HAVING
-C) Subquery or CTE wrapping the window function
+C) 包装窗口函数的子查询或 CTE
 D) PARTITION BY
 
-**Correct Answer:** C
-**Explanation:** Window functions cannot be used in WHERE or HAVING; wrap them in a subquery/CTE to filter results.
+**正确答案：** C
+**解释：** 窗口函数不能用于 WHERE 或 HAVING；将它们包装在子查询/CTE 中以过滤结果。
 
 ---
 
-### Question 35
-What does `LAG(accuracy, 2)` return in a window function?
+### 问题 35
+窗口函数中 `LAG(accuracy, 2)` 返回什么？
 
-A) The accuracy value from 2 rows ahead
-B) The accuracy value from 2 rows behind
-C) The second-highest accuracy value
-D) The average of the current row and 2 previous rows
+A) 2 行后的 accuracy 值
+B) 2 行前的 accuracy 值
+C) 第二高的 accuracy 值
+D) 当前行和前 2 行的平均值
 
-**Correct Answer:** B
-**Explanation:** `LAG(column, offset)` accesses a value from `offset` rows before the current row.
+**正确答案：** B
+**解释：** `LAG(column, offset)` 访问当前行之前 `offset` 行的值。
 
 ---
 
-### Question 36
-Which index type is best for JSONB containment queries (`@>` operator) in PostgreSQL?
+### 问题 36
+在 PostgreSQL 中，哪种索引类型最适合 JSONB 包含查询（`@>` 运算符）？
 
 A) B-tree
 B) Hash
-C) GIN (Generalized Inverted Index)
+C) GIN（通用倒排索引）
 D) BRIN
 
-**Correct Answer:** C
-**Explanation:** GIN indexes efficiently handle JSONB containment, existence, and path queries.
+**正确答案：** C
+**解释：** GIN 索引高效处理 JSONB 的包含、存在和路径查询。
 
 ---
 
-### Question 37
-What is the primary benefit of a `LATERAL` join in PostgreSQL?
+### 问题 37
+PostgreSQL 中 `LATERAL` 连接的主要好处是什么？
 
-A) It eliminates NULL values automatically
-B) It allows a subquery to reference columns from preceding tables in the FROM clause
-C) It creates temporary tables
-D) It enforces referential integrity
+A) 它自动消除 NULL 值
+B) 它允许子查询引用 FROM 子句中前面表的列
+C) 它创建临时表
+D) 它强制引用完整性
 
-**Correct Answer:** B
-**Explanation:** LATERAL enables correlated subqueries in the FROM clause, allowing cross-references between tables.
-
----
-
-### Question 38
-In a window function with `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`, what does the frame include?
-
-A) Only the current row
-B) All rows from the start of the partition to the current row
-C) Only the previous row
-D) All rows in the entire table
-
-**Correct Answer:** B
-**Explanation:** `UNBOUNDED PRECEDING` starts at the first row of the partition, and `CURRENT ROW` ends at the current position.
+**正确答案：** B
+**解释：** LATERAL 允许在 FROM 子句中使用相关子查询，实现表之间的交叉引用。
 
 ---
 
-### Question 39
-Which aggregate function can be used as a window function to calculate running totals?
+### 问题 38
+在带有 `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` 的窗口函数中，窗口帧包含什么？
+
+A) 仅当前行
+B) 从分区开始到当前行的所有行
+C) 仅前一行
+D) 整个表中的所有行
+
+**正确答案：** B
+**解释：** `UNBOUNDED PRECEDING` 从分区的第一行开始，`CURRENT ROW` 在当前行结束。
+
+---
+
+### 问题 39
+哪个聚合函数可以用作窗口函数来计算运行总计？
 
 A) `COUNT()`
 B) `SUM()`
 C) `AVG()`
-D) All of the above
+D) 以上所有
 
-**Correct Answer:** D
-**Explanation:** Most aggregate functions can be used as window functions with OVER() to calculate running totals, averages, etc.
-
----
-
-### Question 40
-What distinguishes `RANK()` from `DENSE_RANK()` in handling ties?
-
-A) `RANK()` skips numbers after ties, `DENSE_RANK()` does not
-B) `DENSE_RANK()` skips numbers after ties, `RANK()` does not
-C) Both skip numbers identically
-D) Neither handles ties
-
-**Correct Answer:** A
-**Explanation:** If two rows tie for rank 2, `RANK()` gives the next rank as 4 (skipping 3), while `DENSE_RANK()` gives 3.
+**正确答案：** D
+**解释：** 大多数聚合函数可以与 OVER() 一起用作窗口函数，来计算运行总计、平均值等。
 
 ---
 
-## Section 5: SQLAlchemy ORM & Performance (10 questions)
+### 问题 40
+在处理并列时，`RANK()` 和 `DENSE_RANK()` 有何区别？
 
-### Question 41
-What is the N+1 query problem in ORM usage?
+A) `RANK()` 在并列后跳过数字，`DENSE_RANK()` 不跳过
+B) `DENSE_RANK()` 在并列后跳过数字，`RANK()` 不跳过
+C) 两者都相同地跳过数字
+D) 两者都不处理并列
 
-A) Executing N queries when 1 would suffice due to lazy loading
-B) Creating N+1 database connections
-C) N+1 indexes on a single table
-D) Using N+1 transactions for a single operation
-
-**Correct Answer:** A
-**Explanation:** Lazy loading relationships causes separate queries for each related object, leading to N+1 queries.
+**正确答案：** A
+**解释：** 如果两行并列第 2 名，`RANK()` 给下一个名次为 4（跳过 3），而 `DENSE_RANK()` 给 3。
 
 ---
 
-### Question 42
-Which SQLAlchemy loading strategy fetches related objects in a single query using JOIN?
+## 第 5 部分：SQLAlchemy ORM 与性能（10 题）
+
+### 问题 41
+ORM 使用中的 N+1 查询问题是什么？
+
+A) 由于懒加载，执行 N 个查询而只需 1 个查询
+B) 创建 N+1 个数据库连接
+C) 在单个表上创建 N+1 个索引
+D) 为单个操作使用 N+1 个事务
+
+**正确答案：** A
+**解释：** 懒加载关系导致为每个相关对象执行单独的查询，导致 N+1 个查询。
+
+---
+
+### 问题 42
+哪个 SQLAlchemy 加载策略使用 JOIN 在单个查询中获取相关对象？
 
 A) `lazyload()`
 B) `selectinload()`
 C) `joinedload()`
 D) `noload()`
 
-**Correct Answer:** C
-**Explanation:** `joinedload()` uses SQL JOIN to fetch related objects eagerly in one query, avoiding N+1.
+**正确答案：** C
+**解释：** `joinedload()` 使用 SQL JOIN 在一个查询中即时获取相关对象，避免 N+1。
 
 ---
 
-### Question 43
-In SQLAlchemy, what does `session.flush()` do?
+### 问题 43
+在 SQLAlchemy 中，`session.flush()` 做什么？
 
-A) Commits the transaction and closes the session
-B) Sends pending changes to the database but doesn't commit
-C) Clears all cached objects from memory
-D) Refreshes objects from the database
+A) 提交事务并关闭会话
+B) 将待定更改发送到数据库但不提交
+C) 从内存中清除所有缓存的对象
+D) 从数据库刷新对象
 
-**Correct Answer:** B
-**Explanation:** `flush()` synchronizes in-memory state with the database within a transaction, but doesn't commit.
+**正确答案：** B
+**解释：** `flush()` 在事务内将内存状态与数据库同步，但不提交。
 
 ---
 
-### Question 44
-Which SQLAlchemy feature allows executing multiple INSERT operations in a single round-trip?
+### 问题 44
+哪个 SQLAlchemy 功能允许在单次往返中执行多个 INSERT 操作？
 
 A) `bulk_insert_mappings()`
 B) `session.add_all()`
 C) `executemany()`
-D) All of the above
+D) 以上所有
 
-**Correct Answer:** D
-**Explanation:** All three methods optimize bulk operations, reducing round-trips to the database.
-
----
-
-### Question 45
-What is the purpose of SQLAlchemy's `expire_on_commit` session setting?
-
-A) Automatically close sessions after commit
-B) Expire objects so they're refreshed on next access
-C) Delete uncommitted objects
-D) Prevent concurrent transactions
-
-**Correct Answer:** B
-**Explanation:** `expire_on_commit=True` marks objects as expired after commit, ensuring fresh data on next access.
+**正确答案：** D
+**解释：** 这三种方法都优化了批量操作，减少与数据库的往返次数。
 
 ---
 
-### Question 46
-Which Alembic command generates a migration script based on model changes?
+### 问题 45
+SQLAlchemy 的 `expire_on_commit` 会话设置的目的是什么？
+
+A) 提交后自动关闭会话
+B) 使对象过期，以便在下次访问时刷新
+C) 删除未提交的对象
+D) 阻止并发事务
+
+**正确答案：** B
+**解释：** `expire_on_commit=True` 在提交后将对象标记为过期，确保下次访问时获取最新数据。
+
+---
+
+### 问题 46
+哪个 Alembic 命令基于模型变化生成迁移脚本？
 
 A) `alembic upgrade head`
 B) `alembic revision --autogenerate`
 C) `alembic init`
 D) `alembic current`
 
-**Correct Answer:** B
-**Explanation:** `alembic revision --autogenerate` compares models to the database and generates migration code.
+**正确答案：** B
+**解释：** `alembic revision --autogenerate` 将模型与数据库进行比较并生成迁移代码。
 
 ---
 
-### Question 47
-What does the `pool_pre_ping` parameter do in SQLAlchemy's create_engine()?
+### 问题 47
+SQLAlchemy 的 create_engine() 中的 `pool_pre_ping` 参数做什么？
 
-A) Tests connections before checkout to detect dropped connections
-B) Pings the database every minute
-C) Warms up the connection pool at startup
-D) Disables connection pooling
+A) 在 checkout 前测试连接以检测断开的连接
+B) 每分钟 ping 数据库
+C) 在启动时预热连接池
+D) 禁用连接池
 
-**Correct Answer:** A
-**Explanation:** `pool_pre_ping=True` verifies connection health before use, detecting network issues or database restarts.
-
----
-
-### Question 48
-In SQLAlchemy relationships, what does `cascade="all, delete-orphan"` accomplish?
-
-A) Prevents deletion of related objects
-B) Automatically deletes related objects when the parent is deleted
-C) Creates database-level CASCADE constraints
-D) Disables foreign key checks
-
-**Correct Answer:** B
-**Explanation:** This cascade option ensures that when a parent is deleted, all related children are also deleted.
+**正确答案：** A
+**解释：** `pool_pre_ping=True` 在使用前验证连接健康，检测网络问题或数据库重启。
 
 ---
 
-### Question 49
-Which SQLAlchemy pattern is recommended for FastAPI dependency injection?
+### 问题 48
+在 SQLAlchemy 的关系中，`cascade="all, delete-orphan"` 实现了什么？
 
-A) Global session object
-B) Thread-local session
-C) Generator function yielding a session
-D) Singleton session per application
+A) 阻止删除相关对象
+B) 在父对象被删除时自动删除相关对象
+C) 创建数据库级别的 CASCADE 约束
+D) 禁用外键检查
 
-**Correct Answer:** C
-**Explanation:** FastAPI's `Depends()` works best with generator functions that yield a session and clean up afterward.
-
----
-
-### Question 50
-What is the trade-off of using SQLAlchemy's `autoflush=False`?
-
-A) Better control over when changes are sent to the database, but requires manual flushing
-B) Faster queries but no transaction support
-C) Automatic rollback on errors
-D) Prevents all database writes
-
-**Correct Answer:** A
-**Explanation:** `autoflush=False` gives explicit control over flush timing but requires developers to call `flush()` manually.
+**正确答案：** B
+**解释：** 此级联选项确保当父对象被删除时，所有相关的子对象也被删除。
 
 ---
 
-**End of Quiz** – Review your answers and submit when ready. Good luck!
+### 问题 49
+推荐用于 FastAPI 依赖注入的 SQLAlchemy 模式是哪种？
+
+A) 全局 session 对象
+B) 线程本地 session
+C) 生成 session 的生成器函数
+D) 每个应用的单例 session
+
+**正确答案：** C
+**解释：** FastAPI 的 `Depends()` 与生成器函数配合最佳，这些函数生成 session 并在之后进行清理。
+
+---
+
+### 问题 50
+使用 SQLAlchemy 的 `autoflush=False` 的权衡是什么？
+
+A) 更好地控制何时将更改发送到数据库，但需要手动 flush
+B) 查询更快但没有事务支持
+C) 出错时自动回滚
+D) 阻止所有数据库写入
+
+**正确答案：** A
+**解释：** `autoflush=False` 提供对 flush 时机的显式控制，但要求开发者手动调用 `flush()`。
+
+---
+
+**测验结束** – 检查你的答案并在准备就绪时提交。祝你好运！

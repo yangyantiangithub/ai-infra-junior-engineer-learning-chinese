@@ -1,55 +1,55 @@
-# Project 04: Monitoring & Alerting System
+# 项目 04：监控与告警系统
 
-**Difficulty:** Intermediate
-**Duration:** 80 hours (2 weeks full-time, 3-4 weeks part-time)
-**Prerequisites:** Projects 1-3 (API Deployment, Kubernetes, ML Pipeline)
-
----
-
-## Overview
-
-Build a comprehensive monitoring and alerting system for ML infrastructure covering application metrics, infrastructure health, model performance, and business KPIs. This project introduces production observability: logs, metrics, traces, alerting, and incident response.
-
-### What You'll Build
-
-A complete observability stack that monitors:
-- **Infrastructure**: CPU, memory, disk, network usage
-- **Applications**: Request rates, latency, error rates
-- **ML Models**: Predictions/sec, inference latency, accuracy, drift
-- **Business Metrics**: SLAs, user requests, success rates
-
-### Real-World Context
-
-Your ML systems are now in production (Projects 1-3), but you're flying blind without proper monitoring. When things break at 3 AM, you need to know immediately. When models drift, you need alerts. When infrastructure is stressed, you need visibility. This project simulates building a production-grade observability stack.
-
-### Learning Outcomes
-
-By completing this project, you will:
-
-1. Deploy monitoring infrastructure (Prometheus, Grafana, ELK Stack)
-2. Instrument applications with metrics, logs, and traces
-3. Create operational dashboards for different stakeholders
-4. Implement alerting rules for proactive incident detection
-5. Set up log aggregation and analysis pipelines
-6. Monitor ML-specific metrics (drift, data quality, model performance)
-7. Build on-call runbooks for incident response
-8. Integrate with incident management (PagerDuty, Opsgenie)
+**难度：** 中级
+**时长：** 80 小时（全日制 2 周，非全日制 3-4 周）
+**前置条件：** 项目 1-3（API 部署、Kubernetes、ML 流水线）
 
 ---
 
-## Technology Stack
+## 概述
 
-| Component | Technology | Purpose |
+为 ML 基础设施构建一个全面的监控与告警系统，涵盖应用指标、基础设施健康、模型性能和业务 KPI。本项目介绍生产可观测性：日志、指标、链路追踪、告警和事件响应。
+
+### 你将构建的内容
+
+一个完整的可观测性栈，监控以下内容：
+- **基础设施**：CPU、内存、磁盘、网络使用率
+- **应用**：请求速率、延迟、错误率
+- **ML 模型**：每秒预测数、推理延迟、准确率、漂移
+- **业务指标**：SLA、用户请求、成功率
+
+### 真实场景背景
+
+你的 ML 系统已上线（项目 1-3），但缺少适当的监控，如同盲飞。当凌晨 3 点出现问题时，你需要立即知晓。当模型发生漂移时，你需要告警。当基础设施压力过大时，你需要可见性。本项目模拟构建生产级可观测性栈。
+
+### 学习成果
+
+完成本项目后，你将能够：
+
+1. 部署监控基础设施（Prometheus、Grafana、ELK Stack）
+2. 为应用添加指标、日志和链路追踪的仪表化
+3. 为不同利益相关者创建运维仪表盘
+4. 实现告警规则以实现主动事件检测
+5. 设置日志聚合和分析流水线
+6. 监控 ML 特定指标（漂移、数据质量、模型性能）
+7. 构建值班事件响应手册
+8. 与事件管理工具集成（PagerDuty、Opsgenie）
+
+---
+
+## 技术栈
+
+| 组件 | 技术 | 用途 |
 |-----------|------------|---------|
-| **Metrics Collection** | Prometheus 2.47+ | Time-series metrics storage |
-| **Alerting** | Alertmanager 0.26+ | Alert routing and notification |
-| **Visualization** | Grafana 10.2+ | Dashboards and visualization |
-| **Log Storage** | Elasticsearch 8.11+ | Log aggregation and search |
-| **Log Processing** | Logstash 8.11+ | Log parsing and forwarding |
-| **Log Visualization** | Kibana 8.11+ | Log search and visualization |
-| **Log Shipping** | Filebeat 8.11+ | Log collection from nodes |
-| **Metrics Exporter** | Node Exporter | Infrastructure metrics |
-| **Application Instrumentation** | prometheus-client (Python) | Application metrics |
+| **指标采集** | Prometheus 2.47+ | 时序指标存储 |
+| **告警** | Alertmanager 0.26+ | 告警路由与通知 |
+| **可视化** | Grafana 10.2+ | 仪表盘与可视化 |
+| **日志存储** | Elasticsearch 8.11+ | 日志聚合与搜索 |
+| **日志处理** | Logstash 8.11+ | 日志解析与转发 |
+| **日志可视化** | Kibana 8.11+ | 日志搜索与可视化 |
+| **日志采集** | Filebeat 8.11+ | 从节点采集日志 |
+| **指标导出器** | Node Exporter | 基础设施指标 |
+| **应用仪表化** | prometheus-client (Python) | 应用指标 |
 
 ---
 
@@ -57,371 +57,371 @@ By completing this project, you will:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Monitoring Architecture                      │
+│                      监控架构                                    │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌──────────────────────────────────────────────────────────────────┐
-│                      Data Sources                                │
+│                      数据源                                       │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐             │
-│  │ Kubernetes  │  │ Applications│  │ ML Models   │             │
-│  │ Cluster     │  │ (API/Web)   │  │ (Inference) │             │
+│  │ Kubernetes  │  │   应用      │  │  ML 模型    │             │
+│  │   集群      │  │ (API/Web)   │  │  (推理)     │             │
 │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘             │
-│         │ Metrics         │ Metrics + Logs  │ Metrics + Logs    │
+│         │ 指标            │ 指标 + 日志     │ 指标 + 日志         │
 └─────────┼─────────────────┼─────────────────┼────────────────────┘
           │                 │                 │
           ▼                 ▼                 ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│                    Collection Layer                              │
+│                      采集层                                       │
 │  ┌──────────────────────────┐    ┌─────────────────────────┐    │
 │  │      Prometheus          │    │   Filebeat/Fluentd      │    │
-│  │  - Scrape metrics        │    │   - Collect logs        │    │
-│  │  - Store time-series     │    │   - Ship to Logstash    │    │
-│  │  - Evaluate alerts       │    │                         │    │
+│  │  - 采集指标              │    │   - 收集日志            │    │
+│  │  - 存储时序数据          │    │   - 发送到 Logstash     │    │
+│  │  - 评估告警             │    │                         │    │
 │  └────────┬─────────────────┘    └───────────┬─────────────┘    │
 └───────────┼───────────────────────────────────┼──────────────────┘
             │                                   │
             ▼                                   ▼
 ┌──────────────────────────┐      ┌────────────────────────────┐
 │     Alertmanager         │      │      Logstash              │
-│  - Route alerts          │      │  - Parse logs              │
-│  - De-duplicate          │      │  - Transform & enrich      │
-│  - Send notifications    │      │  - Forward to ES           │
+│  - 路由告警              │      │  - 解析日志                │
+│  - 去重                  │      │  - 转换与丰富              │
+│  - 发送通知              │      │  - 转发到 ES              │
 └────────┬─────────────────┘      └──────────┬─────────────────┘
          │                                   │
          │                                   ▼
          │                        ┌────────────────────────────┐
          │                        │    Elasticsearch           │
-         │                        │  - Store logs              │
-         │                        │  - Index & search          │
+         │                        │  - 存储日志                │
+         │                        │  - 索引与搜索              │
          │                        └──────────┬─────────────────┘
          │                                   │
          ▼                                   ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│                   Visualization Layer                            │
+│                     可视化层                                      │
 │  ┌──────────────────────┐         ┌──────────────────────┐      │
 │  │      Grafana         │         │       Kibana         │      │
-│  │  - Dashboards        │         │  - Log search        │      │
-│  │  - Metrics viz       │         │  - Log analysis      │      │
+│  │  - 仪表盘            │         │  - 日志搜索          │      │
+│  │  - 指标可视化        │         │  - 日志分析          │      │
 │  └──────────────────────┘         └──────────────────────┘      │
 └──────────────────────────────────────────────────────────────────┘
             │                                   │
             ▼                                   ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│                   Notification Layer                             │
+│                     通知层                                       │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐        │
-│  │  Email   │  │  Slack   │  │PagerDuty │  │ Webhook  │        │
+│  │  邮件    │  │  Slack   │  │PagerDuty │  │ Webhook  │        │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘        │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Project Structure
+## 项目结构
 
 ```
 project-04-monitoring-alerting/
-├── README.md                          # This file
-├── requirements.md                    # Detailed requirements and SLIs/SLOs
-├── architecture.md                    # Observability stack architecture
+├── README.md                          # 本文件
+├── requirements.md                    # 详细需求和 SLIs/SLOs
+├── architecture.md                    # 可观测性栈架构
 ├── src/
-│   ├── instrumentation.py            # Prometheus metrics instrumentation (STUB)
-│   └── custom_metrics.py             # Custom ML metrics (STUB)
+│   ├── instrumentation.py            # Prometheus 指标仪表化 (STUB)
+│   └── custom_metrics.py             # 自定义 ML 指标 (STUB)
 ├── prometheus/
-│   ├── prometheus.yml                # Prometheus config (STUB)
-│   └── alerts.yml                    # Alerting rules (STUB)
+│   ├── prometheus.yml                # Prometheus 配置 (STUB)
+│   └── alerts.yml                    # 告警规则 (STUB)
 ├── grafana/
 │   ├── dashboards/
-│   │   └── ml-overview.json         # ML dashboard template
-│   └── datasources.yml              # Grafana datasource config
+│   │   └── ml-overview.json         # ML 仪表盘模板
+│   └── datasources.yml              # Grafana 数据源配置
 ├── elasticsearch/
-│   ├── logstash.conf                # Logstash pipeline (STUB)
-│   └── kibana-dashboard.ndjson      # Kibana dashboard export
+│   ├── logstash.conf                # Logstash 流水线 (STUB)
+│   └── kibana-dashboard.ndjson      # Kibana 仪表盘导出
 ├── tests/
-│   └── test_metrics.py              # Metrics tests (STUB)
-├── docker-compose.yml               # Full monitoring stack
-├── .env.example                     # Monitoring configuration
+│   └── test_metrics.py              # 指标测试 (STUB)
+├── docker-compose.yml               # 完整监控栈
+├── .env.example                     # 监控配置
 └── docs/
-    ├── SETUP.md                     # Setup instructions
-    ├── RUNBOOK.md                   # On-call runbook
-    └── TROUBLESHOOTING.md           # Common issues
+    ├── SETUP.md                     # 设置说明
+    ├── RUNBOOK.md                   # 值班手册
+    └── TROUBLESHOOTING.md           # 常见问题
 ```
 
 ---
 
-## Getting Started
+## 快速开始
 
-### Step 1: Review Requirements
+### 第一步：审阅需求
 
-Start by reading `requirements.md` to understand:
-- Functional requirements (metrics, dashboards, alerts, logging)
-- Non-functional requirements (performance, reliability, scalability)
-- Success criteria
+阅读 `requirements.md` 以了解：
+- 功能需求（指标、仪表盘、告警、日志）
+- 非功能需求（性能、可靠性、可扩展性）
+- 成功标准
 
-### Step 2: Study Architecture
+### 第二步：学习架构
 
-Review `architecture.md` to understand:
-- Monitoring stack components
-- Data flow (metrics, logs, alerts)
-- Integration points
+阅读 `architecture.md` 以了解：
+- 监控栈组件
+- 数据流（指标、日志、告警）
+- 集成点
 
-### Step 3: Set Up Infrastructure
+### 第三步：搭建基础设施
 
-1. Copy `.env.example` to `.env` and configure
-2. Start the monitoring stack with Docker Compose:
+1. 将 `.env.example` 复制为 `.env` 并进行配置
+2. 使用 Docker Compose 启动监控栈：
    ```bash
    docker-compose up -d
    ```
-3. Verify all services are running:
+3. 验证所有服务正在运行：
    ```bash
    docker-compose ps
    ```
 
-### Step 4: Complete Code Stubs
+### 第四步：完成代码桩
 
-Work through the TODO comments in each stub file:
+处理每个桩文件中的 TODO 注释：
 
-1. **src/instrumentation.py**: Implement Prometheus metrics
-2. **src/custom_metrics.py**: Add ML-specific metrics
-3. **prometheus/prometheus.yml**: Configure scrape targets
-4. **prometheus/alerts.yml**: Define alert rules
-5. **elasticsearch/logstash.conf**: Set up log processing
-6. **tests/test_metrics.py**: Write metric tests
+1. **src/instrumentation.py**：实现 Prometheus 指标
+2. **src/custom_metrics.py**：添加 ML 特定指标
+3. **prometheus/prometheus.yml**：配置采集目标
+4. **prometheus/alerts.yml**：定义告警规则
+5. **elasticsearch/logstash.conf**：设置日志处理
+6. **tests/test_metrics.py**：编写指标测试
 
-### Step 5: Create Dashboards
+### 第五步：创建仪表盘
 
-1. Access Grafana at `http://localhost:3000` (admin/admin123)
-2. Import or create dashboards:
-   - Infrastructure Dashboard
-   - Application Dashboard
-   - ML Model Dashboard
-   - Business Dashboard
-3. Save dashboard JSON to `grafana/dashboards/`
+1. 访问 Grafana `http://localhost:3000`（admin/admin123）
+2. 导入或创建仪表盘：
+   - 基础设施仪表盘
+   - 应用仪表盘
+   - ML 模型仪表盘
+   - 业务仪表盘
+3. 将仪表盘 JSON 保存到 `grafana/dashboards/`
 
-### Step 6: Test Alerting
+### 第六步：测试告警
 
-1. Trigger test alerts (simulate high CPU, errors, drift)
-2. Verify alerts fire correctly
-3. Check alert routing to different channels
-4. Document alert response in runbooks
+1. 触发测试告警（模拟高 CPU、错误、漂移）
+2. 验证告警正确触发
+3. 检查告警路由到不同渠道
+4. 在手册中记录告警响应
 
-### Step 7: Documentation
+### 第七步：文档
 
-Complete the documentation:
-- `docs/SETUP.md`: Setup and deployment guide
-- `docs/RUNBOOK.md`: On-call incident response procedures
-- `docs/TROUBLESHOOTING.md`: Common issues and solutions
-
----
-
-## Key Concepts
-
-### Metrics Types
-
-1. **Counter**: Monotonically increasing value (total requests, errors)
-2. **Gauge**: Current value (CPU usage, memory, active connections)
-3. **Histogram**: Distribution of values (request duration, response size)
-4. **Summary**: Quantiles over sliding time window (P50, P95, P99 latency)
-
-### The Four Golden Signals
-
-Monitor these for every service:
-
-1. **Latency**: How long requests take
-2. **Traffic**: How much demand on the system
-3. **Errors**: Rate of failed requests
-4. **Saturation**: How "full" the service is
-
-### Alert Design Principles
-
-- **Actionable**: Every alert should require human action
-- **Meaningful**: Alert on symptoms, not causes
-- **Contextual**: Include enough information to triage
-- **Severity-based**: Critical vs Warning vs Info
-- **De-duplicated**: Avoid alert storms
-
-### SLIs, SLOs, SLAs
-
-- **SLI (Service Level Indicator)**: Measurement (e.g., 99% of requests < 200ms)
-- **SLO (Service Level Objective)**: Target (e.g., maintain 99.9% uptime)
-- **SLA (Service Level Agreement)**: Contract with consequences if broken
+完成文档：
+- `docs/SETUP.md`：设置和部署指南
+- `docs/RUNBOOK.md`：值班事件响应流程
+- `docs/TROUBLESHOOTING.md`：常见问题与解决方案
 
 ---
 
-## Deliverables Checklist
+## 核心概念
 
-### Infrastructure (Required)
+### 指标类型
 
-- [ ] Prometheus deployed and scraping metrics
-- [ ] Alertmanager configured with routing rules
-- [ ] Grafana with all datasources configured
-- [ ] Elasticsearch cluster running
-- [ ] Logstash processing logs
-- [ ] Kibana with index patterns configured
-- [ ] Filebeat shipping logs
+1. **Counter（计数器）**：单调递增的值（总请求数、错误数）
+2. **Gauge（仪表盘）**：当前值（CPU 使用率、内存、活跃连接数）
+3. **Histogram（直方图）**：值的分布（请求时长、响应大小）
+4. **Summary（摘要）**：滑动时间窗口内的分位数（P50、P95、P99 延迟）
 
-### Instrumentation (Required)
+### 四大黄金信号
 
-- [ ] Application metrics instrumented (HTTP requests, latency, errors)
-- [ ] ML metrics instrumented (predictions, inference time, accuracy)
-- [ ] Structured JSON logging implemented
-- [ ] Data drift detection integrated
-- [ ] Model performance monitoring active
+为每个服务监控以下指标：
 
-### Dashboards (Minimum 4)
+1. **延迟（Latency）**：请求耗时
+2. **流量（Traffic）**：系统承受的需求量
+3. **错误（Errors）**：失败请求的比率
+4. **饱和度（Saturation）**：服务的"满载"程度
 
-- [ ] Infrastructure Dashboard (CPU, memory, disk, network)
-- [ ] Application Dashboard (requests, errors, latency)
-- [ ] ML Model Dashboard (predictions, drift, accuracy)
-- [ ] Business Dashboard (SLAs, success rates)
+### 告警设计原则
 
-### Alerts (Minimum 12)
+- **可操作**：每个告警都应需要人工处理
+- **有意义**：针对症状告警，而非原因
+- **上下文丰富**：包含足够的信息以便排查
+- **基于严重级别**：严重 vs 警告 vs 信息
+- **去重**：避免告警风暴
 
-Infrastructure:
-- [ ] High CPU usage
-- [ ] High memory usage
-- [ ] Low disk space
-- [ ] Service down
+### SLI、SLO、SLA
 
-Application:
-- [ ] High error rate
-- [ ] High latency
-- [ ] Low throughput
-- [ ] High response time
-
-ML Model:
-- [ ] Model accuracy drop
-- [ ] Data drift detected
-- [ ] High inference latency
-- [ ] Low prediction confidence
-
-### Documentation (Required)
-
-- [ ] Setup instructions (SETUP.md)
-- [ ] On-call runbook (RUNBOOK.md)
-- [ ] Troubleshooting guide (TROUBLESHOOTING.md)
-- [ ] Architecture diagram
-- [ ] Alert response procedures
+- **SLI（服务级别指标）**：度量指标（例如，99% 的请求 < 200ms）
+- **SLO（服务级别目标）**：目标值（例如，保持 99.9% 可用性）
+- **SLA（服务级别协议）**：合同，违反时有相应后果
 
 ---
 
-## Testing Your Implementation
+## 交付物检查清单
 
-### Metrics Testing
+### 基础设施（必选）
+
+- [ ] Prometheus 已部署并正在采集指标
+- [ ] Alertmanager 已配置路由规则
+- [ ] Grafana 已配置所有数据源
+- [ ] Elasticsearch 集群正在运行
+- [ ] Logstash 正在处理日志
+- [ ] Kibana 已配置索引模式
+- [ ] Filebeat 正在采集日志
+
+### 仪表化（必选）
+
+- [ ] 应用指标已仪表化（HTTP 请求、延迟、错误）
+- [ ] ML 指标已仪表化（预测数、推理时间、准确率）
+- [ ] 结构化 JSON 日志已实现
+- [ ] 数据漂移检测已集成
+- [ ] 模型性能监控已启用
+
+### 仪表盘（至少 4 个）
+
+- [ ] 基础设施仪表盘（CPU、内存、磁盘、网络）
+- [ ] 应用仪表盘（请求、错误、延迟）
+- [ ] ML 模型仪表盘（预测、漂移、准确率）
+- [ ] 业务仪表盘（SLA、成功率）
+
+### 告警（至少 12 条）
+
+基础设施：
+- [ ] CPU 使用率过高
+- [ ] 内存使用率过高
+- [ ] 磁盘空间不足
+- [ ] 服务宕机
+
+应用：
+- [ ] 错误率过高
+- [ ] 延迟过高
+- [ ] 吞吐量过低
+- [ ] 响应时间过长
+
+ML 模型：
+- [ ] 模型准确率下降
+- [ ] 检测到数据漂移
+- [ ] 推理延迟过高
+- [ ] 预测置信度过低
+
+### 文档（必选）
+
+- [ ] 设置说明（SETUP.md）
+- [ ] 值班手册（RUNBOOK.md）
+- [ ] 故障排除指南（TROUBLESHOOTING.md）
+- [ ] 架构图
+- [ ] 告警响应流程
+
+---
+
+## 测试你的实现
+
+### 指标测试
 
 ```bash
-# Check Prometheus is scraping targets
+# 检查 Prometheus 是否正在采集目标
 curl http://localhost:9090/api/v1/targets
 
-# Query a metric
+# 查询一个指标
 curl http://localhost:9090/api/v1/query?query=up
 
-# Test application metrics endpoint
+# 测试应用指标端点
 curl http://localhost:5000/metrics
 ```
 
-### Alert Testing
+### 告警测试
 
 ```bash
-# Simulate high CPU
+# 模拟高 CPU
 stress-ng --cpu 8 --timeout 60s
 
-# Trigger error rate alert
+# 触发错误率告警
 for i in {1..100}; do curl http://localhost:5000/error; done
 
-# Check active alerts
+# 检查活跃告警
 curl http://localhost:9090/api/v1/alerts
 ```
 
-### Log Testing
+### 日志测试
 
 ```bash
-# Send test logs
+# 发送测试日志
 echo '{"level": "error", "message": "Test error"}' | \
   curl -X POST -H "Content-Type: application/json" \
   -d @- http://localhost:5000/
 
-# Search logs in Elasticsearch
+# 在 Elasticsearch 中搜索日志
 curl http://localhost:9200/_search?q=level:error
 ```
 
 ---
 
-## Common Pitfalls
+## 常见陷阱
 
-1. **Alert Fatigue**: Too many noisy alerts → Team ignores them
-   - **Solution**: Start with critical alerts only, tune thresholds
+1. **告警疲劳**：太多噪音告警 → 团队忽略
+   - **解决方案**：只从严重告警开始，调整阈值
 
-2. **No Alert Testing**: Alerts don't fire when needed
-   - **Solution**: Test alerts before production, simulate failures
+2. **未测试告警**：需要时告警不触发
+   - **解决方案**：上线前测试告警，模拟故障
 
-3. **Poor Dashboard Design**: Too much information, unclear visualizations
-   - **Solution**: One dashboard per audience, clear purpose
+3. **仪表盘设计不佳**：信息过多，可视化不清晰
+   - **解决方案**：每个受众一个仪表盘，目的明确
 
-4. **Missing Context**: Alerts without enough info to triage
-   - **Solution**: Include relevant labels, annotations, runbook links
+4. **缺少上下文**：告警信息不足难以排查
+   - **解决方案**：包含相关标签、注释、手册链接
 
-5. **No Retention Policy**: Running out of storage
-   - **Solution**: Configure retention (30 days metrics, 90 days logs)
+5. **没有保留策略**：存储空间耗尽
+   - **解决方案**：配置保留期限（指标 30 天，日志 90 天）
 
-6. **Ignoring ML Metrics**: Only monitoring infrastructure
-   - **Solution**: Monitor model performance, drift, data quality
-
----
-
-## Assessment Criteria
-
-Your project will be evaluated on:
-
-1. **Metrics Collection (20%)**: Comprehensive instrumentation
-2. **Visualization (20%)**: Professional, useful dashboards
-3. **Alerting (20%)**: Well-tuned, actionable alerts
-4. **Logging (15%)**: Structured logs, searchable, useful
-5. **ML Monitoring (15%)**: Drift detection, performance tracking
-6. **Documentation (10%)**: Complete runbooks and guides
-
-**Passing Score**: 70/100
+6. **忽略 ML 指标**：只监控基础设施
+   - **解决方案**：监控模型性能、漂移、数据质量
 
 ---
 
-## Resources
+## 评估标准
 
-### Official Documentation
+你的项目将按以下标准评估：
 
-- [Prometheus Documentation](https://prometheus.io/docs/)
-- [Grafana Documentation](https://grafana.com/docs/)
-- [Elasticsearch Documentation](https://www.elastic.co/guide/)
-- [Alertmanager Documentation](https://prometheus.io/docs/alerting/latest/alertmanager/)
+1. **指标采集（20%）**：全面的仪表化
+2. **可视化（20%）**：专业、有用的仪表盘
+3. **告警（20%）**：调整良好的可操作告警
+4. **日志（15%）**：结构化日志、可搜索、有用
+5. **ML 监控（15%）**：漂移检测、性能跟踪
+6. **文档（10%）**：完整的手册和指南
 
-### Tutorials
-
-- [Prometheus Getting Started](https://prometheus.io/docs/prometheus/latest/getting_started/)
-- [Grafana Fundamentals](https://grafana.com/tutorials/grafana-fundamentals/)
-- [ELK Stack Tutorial](https://www.elastic.co/guide/en/elastic-stack-get-started/current/get-started-elastic-stack.html)
-
-### Best Practices
-
-- [Google SRE Book - Monitoring](https://sre.google/sre-book/monitoring-distributed-systems/)
-- [Prometheus Best Practices](https://prometheus.io/docs/practices/)
-- [Grafana Best Practices](https://grafana.com/docs/grafana/latest/best-practices/)
+**及格分数**：70/100
 
 ---
 
-## Next Steps
+## 资源
 
-After completing this project:
+### 官方文档
 
-1. **Portfolio**: Create a demo video showing live monitoring and alerting
-2. **Resume**: Add "Production Monitoring & Observability" to skills
-3. **Continue Learning**: Move to Project 5 (Production-Ready ML System - Capstone)
-4. **Explore Advanced Topics**:
-   - Distributed tracing (Jaeger, Tempo)
-   - APM (Application Performance Monitoring)
-   - Cost monitoring and optimization
-   - Automated remediation
+- [Prometheus 文档](https://prometheus.io/docs/)
+- [Grafana 文档](https://grafana.com/docs/)
+- [Elasticsearch 文档](https://www.elastic.co/guide/)
+- [Alertmanager 文档](https://prometheus.io/docs/alerting/latest/alertmanager/)
+
+### 教程
+
+- [Prometheus 入门](https://prometheus.io/docs/prometheus/latest/getting_started/)
+- [Grafana 基础](https://grafana.com/tutorials/grafana-fundamentals/)
+- [ELK Stack 教程](https://www.elastic.co/guide/en/elastic-stack-get-started/current/get-started-elastic-stack.html)
+
+### 最佳实践
+
+- [Google SRE 书籍 - 监控](https://sre.google/sre-book/monitoring-distributed-systems/)
+- [Prometheus 最佳实践](https://prometheus.io/docs/practices/)
+- [Grafana 最佳实践](https://grafana.com/docs/grafana/latest/best-practices/)
 
 ---
 
-**Project Version**: 1.0
-**Last Updated**: October 2025
-**Maintainer**: AI Infrastructure Curriculum Team
-**Contact**: ai-infra-curriculum@joshua-ferguson.com
+## 下一步
+
+完成本项目后：
+
+1. **作品集**：制作一个展示实时监控和告警的演示视频
+2. **简历**：将"生产监控与可观测性"添加到技能中
+3. **继续学习**：进入项目 5（生产就绪的 ML 系统 - 毕业项目）
+4. **探索高级主题**：
+   - 分布式链路追踪（Jaeger、Tempo）
+   - APM（应用性能监控）
+   - 成本监控与优化
+   - 自动化修复
+
+---
+
+**项目版本**：1.0
+**最后更新**：2025 年 10 月
+**维护者**：AI 基础设施课程团队
+**联系方式**：ai-infra-curriculum@joshua-ferguson.com

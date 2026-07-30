@@ -1,894 +1,894 @@
-# Lecture 01: Cloud Computing Fundamentals
+# Lecture 01：云计算基础
 
-## Lecture Overview
+## 讲座概述
 
-Cloud computing has revolutionized how organizations build, deploy, and scale applications—particularly critical for AI/ML infrastructure where compute demands are massive and variable. This lecture establishes foundational cloud concepts: service and deployment models, the economic drivers behind cloud adoption, major cloud providers and their ecosystems, and how cloud architecture principles enable the flexibility and scale required for modern AI workloads.
+云计算已经彻底改变了组织构建、部署和扩展应用的方式——对于 AI/ML 基础设施尤其关键，因为其计算需求巨大且波动频繁。本讲座将建立基础的云概念：服务和部署模型、云采用背后的经济驱动力、主要云服务商及其生态系统，以及云架构原则如何实现现代 AI 工作负载所需的灵活性和规模。
 
-You'll learn to distinguish between IaaS, PaaS, and SaaS; understand the benefits and challenges of cloud adoption; navigate the service offerings of AWS, Google Cloud, and Azure; and grasp key cloud design patterns. By the end, you'll have the conceptual framework needed to architect cloud infrastructure for AI/ML systems and make informed decisions about when and how to leverage cloud services.
+你将学习区分 IaaS、PaaS 和 SaaS；理解云采用的优势和挑战；熟悉 AWS、Google Cloud 和 Azure 的服务；掌握关键的云设计模式。到本讲座结束时，你将拥有为 AI/ML 系统设计云基础设施所需的概念框架，并能就何时以及如何利用云服务做出明智的决策。
 
-**Estimated Reading Time:** 60-75 minutes
-**Hands-on Companion Lab:** Exercise 01 – AWS Account & IAM Bootstrap
-**Prerequisites:** Basic understanding of networking (IP addresses, ports), Linux command line, familiarity with virtualization concepts
-
----
-
-## 1. What is Cloud Computing?
-
-### 1.1 Definition and Core Characteristics
-
-**Cloud computing** is the on-demand delivery of compute, storage, databases, networking, software, and other IT resources over the internet with pay-as-you-go pricing.
-
-**Five Essential Characteristics** (per NIST definition):
-
-1. **On-Demand Self-Service**: Provision resources automatically without human intervention from the provider
-2. **Broad Network Access**: Services accessible over the network via standard mechanisms (web, API, CLI)
-3. **Resource Pooling**: Provider's resources serve multiple customers using multi-tenant models
-4. **Rapid Elasticity**: Scale resources up or down quickly, often automatically
-5. **Measured Service**: Usage is monitored, controlled, and reported (pay for what you use)
-
-**Example:** Instead of buying physical servers, you click a button (or run a CLI command) to launch a virtual machine in AWS that's billed by the hour. If you need 100 servers for a training job, you can spin them up in minutes and terminate them when done.
-
-### 1.2 The Evolution of Cloud Computing
-
-**Timeline:**
-
-- **Pre-2000s**: On-premises data centers, capital expenditure (CapEx) heavy, slow provisioning
-- **2006**: AWS launches EC2 (Elastic Compute Cloud), democratizing access to compute
-- **2008**: Google App Engine (PaaS), Microsoft Azure announced
-- **2010s**: Explosion of cloud services (storage, databases, ML platforms, IoT, serverless)
-- **2020s**: Multi-cloud, hybrid cloud, edge computing, cloud-native AI/ML platforms
-
-**Key Drivers:**
-- **Virtualization technology** matured (VMware, KVM, Xen) enabling efficient multi-tenancy
-- **High-speed networking** made remote data centers viable
-- **APIs and automation** enabled self-service provisioning
-- **Open-source software** lowered costs and increased flexibility
-
-### 1.3 Why Cloud Computing Matters for AI/ML
-
-AI/ML workloads have unique characteristics that make cloud computing particularly valuable:
-
-**1. Variable Compute Demands**
-- Training: Massive compute for hours/days, then nothing
-- Inference: Spiky traffic patterns based on user demand
-- **Cloud solution**: Scale up for training, scale down to zero, auto-scale inference based on traffic
-
-**2. Specialized Hardware Requirements**
-- GPUs, TPUs, custom accelerators (AWS Inferentia, Google TPU)
-- Expensive to purchase and maintain
-- **Cloud solution**: Rent GPUs only when needed, access latest hardware without CapEx
-
-**3. Experimentation and Iteration**
-- Data scientists need to try different models, hyperparameters, datasets
-- **Cloud solution**: Spin up multiple environments, run parallel experiments, pay only for usage
-
-**4. Global Scale**
-- ML models may serve users worldwide
-- **Cloud solution**: Deploy to multiple regions, use CDNs, low-latency edge inference
-
-**5. Managed ML Services**
-- Cloud providers offer SageMaker (AWS), Vertex AI (GCP), Azure ML
-- **Cloud solution**: Focus on modeling, not infrastructure plumbing
-
-**Real-World Example:**
-> OpenAI trained GPT-3 on thousands of GPUs in Azure for months. The cost would have been prohibitive with on-premises infrastructure, and the GPUs would sit idle post-training. Cloud enabled:
-> - Burst to massive scale for training
-> - Release GPUs after training
-> - Global inference deployment via Azure regions
-> - Managed infrastructure (Azure handles hardware failures, networking, security)
+**预计阅读时间：** 60-75 分钟
+**动手实验：** 练习 01 – AWS 账户与 IAM 引导
+**前置要求：** 基础网络知识（IP 地址、端口）、Linux 命令行、熟悉虚拟化概念
 
 ---
 
-## 2. Cloud Service Models
+## 1. 什么是云计算？
 
-Cloud services are categorized by the level of abstraction and control they provide.
+### 1.1 定义与核心特征
 
-### 2.1 Infrastructure as a Service (IaaS)
+**云计算**是按需提供计算、存储、数据库、网络、软件和其他 IT 资源并通过互联网以按需付费模式交付的范式。
 
-**Definition:** Rent virtualized compute, storage, and networking resources. You manage the OS, runtime, data, and applications.
+**五个基本特征**（依据 NIST 定义）：
 
-**What You Control:**
-- Operating system (Linux, Windows)
-- Applications and middleware
-- Runtime (Python, Node.js, Java)
-- Data
+1. **按需自助服务**：无需人工干预即可自动配置资源
+2. **广泛网络访问**：通过标准机制（Web、API、CLI）通过网络访问服务
+3. **资源池化**：提供商的资源使用多租户模型服务于多个客户
+4. **快速弹性**：可快速（通常自动）上下调整资源
+5. **可计量服务**：使用情况被监控、控制和报告（按使用量付费）
 
-**What Provider Controls:**
-- Virtualization layer
-- Physical servers, storage, networking
-- Data center facilities
+**示例：** 无需购买物理服务器，只需点击按钮（或运行 CLI 命令）即可在 AWS 中启动按小时计费的虚拟机。如果你需要 100 台服务器进行训练作业，可以在几分钟内启动它们，并在完成后终止。
 
-**Examples:**
-- **AWS EC2**: Virtual machines in the cloud
-- **Google Compute Engine**: VMs on Google infrastructure
-- **Azure Virtual Machines**: Microsoft's VM offering
+### 1.2 云计算的演进
 
-**Use Cases:**
-- Lift-and-shift migrations (move existing apps to cloud)
-- Custom configurations requiring OS-level control
-- Legacy applications not designed for PaaS/SaaS
+**时间线：**
 
-**Pros:**
-- Maximum flexibility and control
-- Can replicate on-premises environments
-- Supports any software stack
+- **2000 年代前**：本地数据中心，资本支出（CapEx）重，配置缓慢
+- **2006 年**：AWS 推出 EC2（Elastic Compute Cloud），民主化计算访问
+- **2008 年**：Google App Engine（PaaS），Microsoft Azure 发布
+- **2010 年代**：云服务爆发（存储、数据库、ML 平台、IoT、无服务器）
+- **2020 年代**：多云、混合云、边缘计算、云原生 AI/ML 平台
 
-**Cons:**
-- You manage OS patches, security hardening, scaling
-- More operational overhead than PaaS/SaaS
+**关键驱动因素：**
+- **虚拟化技术**成熟（VMware、KVM、Xen）实现高效多租户
+- **高速网络**使远程数据中心成为可行
+- **API 和自动化**实现自助配置
+- **开源软件**降低成本并提高灵活性
 
-**Example Architecture:**
+### 1.3 为什么云计算对 AI/ML 很重要
+
+AI/ML 工作负载具有独特的特征，使云计算特别有价值：
+
+**1. 变化计算需求**
+- 训练：需要大量计算持续数小时/天，然后不需要
+- 推理：基于用户需求的尖峰流量模式
+- **云解决方案**：训练时扩展，完成后缩到零，根据流量自动扩展推理
+
+**2. 特殊硬件需求**
+- GPU、TPU、自定义加速器（AWS Inferentia、Google TPU）
+- 购买和维护成本高昂
+- **云解决方案**：仅在需要时租用 GPU，无需 CapEx 即可使用最新硬件
+
+**3. 实验与迭代**
+- 数据科学家需要尝试不同的模型、超参数、数据集
+- **云解决方案**：启动多个环境，运行并行实验，仅按使用付费
+
+**4. 全球规模**
+- ML 模型可能服务全球用户
+- **云解决方案**：部署到多个区域，使用 CDN，低延迟边缘推理
+
+**5. 托管 ML 服务**
+- 云提供商提供 SageMaker（AWS）、Vertex AI（GCP）、Azure ML
+- **云解决方案**：专注于建模，而非基础设施搭建
+
+**真实案例：**
+> OpenAI 在 Azure 上使用数千个 GPU 训练 GPT-3 数月。使用本地基础设施成本将高得令人望而却步，且训练后 GPU 将闲置。云实现了：
+> - 训练时爆发到大规模
+> - 训练后释放 GPU
+> - 通过 Azure 区域进行全球推理部署
+> - 托管基础设施（Azure 处理硬件故障、网络、安全）
+
+---
+
+## 2. 云服务模型
+
+云服务按抽象级别和控制权进行分类。
+
+### 2.1 基础设施即服务（IaaS）
+
+**定义：** 租用虚拟化计算、存储和网络资源。你管理操作系统、运行时、数据和应用程序。
+
+**你控制的内容：**
+- 操作系统（Linux、Windows）
+- 应用程序和中间件
+- 运行时（Python、Node.js、Java）
+- 数据
+
+**提供商控制的内容：**
+- 虚拟化层
+- 物理服务器、存储、网络
+- 数据中心设施
+
+**示例：**
+- **AWS EC2**：云中的虚拟机
+- **Google Compute Engine**：Google 基础设施上的虚拟机
+- **Azure Virtual Machines**：微软的虚拟机产品
+
+**用例：**
+- 直接迁移（将现有应用迁移到云）
+- 需要 OS 级控制的自定义配置
+- 非为 PaaS/SaaS 设计的传统应用
+
+**优点：**
+- 最大的灵活性和控制权
+- 可以复制本地环境
+- 支持任何软件栈
+
+**缺点：**
+- 你需要管理 OS 补丁、安全加固、扩展
+- 比 PaaS/SaaS 更多的运维开销
+
+**示例架构：**
 ```
-[Your Application]
+[你的应用程序]
     ↓
-[Your Runtime (Python, CUDA)]
+[你的运行时（Python、CUDA）]
     ↓
-[Your OS (Ubuntu 22.04)]
+[你的 OS（Ubuntu 22.04）]
     ↓
-[IaaS - AWS EC2 Instance]
+[IaaS - AWS EC2 实例]
     ↓
 [AWS Hypervisor]
     ↓
-[AWS Physical Hardware]
+[AWS 物理硬件]
 ```
 
-### 2.2 Platform as a Service (PaaS)
+### 2.2 平台即服务（PaaS）
 
-**Definition:** Provide a managed platform where you deploy applications without managing the underlying infrastructure.
+**定义：** 提供一个托管平台，你可以在其中部署应用程序而无需管理底层基础设施。
 
-**What You Control:**
-- Application code
-- Data
-- Configuration
+**你控制的内容：**
+- 应用程序代码
+- 数据
+- 配置
 
-**What Provider Controls:**
-- Operating system
-- Runtime and frameworks
-- Middleware, databases
-- Servers, storage, networking
+**提供商控制的内容：**
+- 操作系统
+- 运行时和框架
+- 中间件、数据库
+- 服务器、存储、网络
 
-**Examples:**
-- **Google App Engine**: Deploy apps, Google handles scaling
-- **AWS Elastic Beanstalk**: Deploy web apps, AWS manages servers
-- **Heroku**: Git push to deploy, fully managed
-- **Azure App Service**: Managed web app hosting
+**示例：**
+- **Google App Engine**：部署应用，Google 处理扩展
+- **AWS Elastic Beanstalk**：部署 Web 应用，AWS 管理服务器
+- **Heroku**：Git push 部署，完全托管
+- **Azure App Service**：托管 Web 应用托管
 
-**Use Cases:**
-- Web applications, APIs, microservices
-- Focus on code, not infrastructure
-- Rapid development and deployment
+**用例：**
+- Web 应用、API、微服务
+- 专注代码，而非基础设施
+- 快速开发和部署
 
-**Pros:**
-- Faster development (no server management)
-- Auto-scaling, load balancing built-in
-- Reduced operational complexity
+**优点：**
+- 更快的开发（无需服务器管理）
+- 内置自动扩缩容、负载均衡
+- 降低操作复杂性
 
-**Cons:**
-- Less control (can't customize OS)
-- Vendor lock-in (tied to platform APIs)
-- May not support all frameworks/languages
+**缺点：**
+- 控制较少（无法自定义 OS）
+- 供应商锁定（与平台 API 绑定）
+- 可能不支持所有框架/语言
 
-**Example Workflow:**
+**示例工作流：**
 ```bash
-# Deploy to Google App Engine
+# 部署到 Google App Engine
 gcloud app deploy app.yaml
 
-# Google automatically:
-# - Provisions servers
-# - Configures load balancer
-# - Auto-scales based on traffic
-# - Manages OS updates
+# Google 自动：
+# - 配置服务器
+# - 配置负载均衡器
+# - 根据流量自动扩缩容
+# - 管理 OS 更新
 ```
 
-### 2.3 Software as a Service (SaaS)
+### 2.3 软件即服务（SaaS）
 
-**Definition:** Fully managed applications accessed over the internet. You consume the software; provider manages everything.
+**定义：** 通过互联网访问的完全托管应用。你使用软件；提供商管理一切。
 
-**What You Control:**
-- User data
-- Configuration settings
+**你控制的内容：**
+- 用户数据
+- 配置设置
 
-**What Provider Controls:**
-- Everything else (application, runtime, OS, infrastructure)
+**提供商控制的内容：**
+- 其他所有内容（应用、运行时、OS、基础设施）
 
-**Examples:**
-- **Google Workspace** (Gmail, Docs, Sheets): Productivity suite
-- **Salesforce**: CRM platform
-- **Slack**: Team collaboration
-- **Snowflake**: Data warehouse (SaaS model for databases)
+**示例：**
+- **Google Workspace**（Gmail、Docs、Sheets）：生产力套件
+- **Salesforce**：CRM 平台
+- **Slack**：团队协作
+- **Snowflake**：数据仓库（数据库的 SaaS 模式）
 
-**Use Cases:**
-- Standard business applications
-- No desire to manage infrastructure
-- Pay per user/seat
+**用例：**
+- 标准业务应用
+- 不想管理基础设施
+- 按用户/席位付费
 
-**Pros:**
-- Zero infrastructure management
-- Accessible from anywhere
-- Automatic updates and patches
+**优点：**
+- 零基础设施管理
+- 从任何地方访问
+- 自动更新和补丁
 
-**Cons:**
-- Minimal customization
-- Data residency concerns
-- Vendor lock-in
+**缺点：**
+- 自定义能力极小
+- 数据驻留问题
+- 供应商锁定
 
-**Example:** Instead of hosting your own email server (Exchange), use Gmail. Google manages servers, spam filtering, backups, security patches.
+**示例：** 与其托管自己的邮件服务器（Exchange），不如使用 Gmail。Google 管理服务器、垃圾邮件过滤、备份、安全补丁。
 
-### 2.4 Function as a Service (FaaS) / Serverless
+### 2.4 函数即服务（FaaS）/ 无服务器
 
-**Definition:** Execute code in response to events without provisioning servers. Pay only for execution time.
+**定义：** 响应事件执行代码，无需配置服务器。仅按执行时间付费。
 
-**What You Control:**
-- Function code (Python, Node.js, Go, etc.)
-- Triggers and event sources
+**你控制的内容：**
+- 函数代码（Python、Node.js、Go 等）
+- 触发器和事件源
 
-**What Provider Controls:**
-- Runtime environment
-- Scaling, availability, infrastructure
+**提供商控制的内容：**
+- 运行时环境
+- 扩展、可用性、基础设施
 
-**Examples:**
-- **AWS Lambda**: Run code in response to events (S3 uploads, API Gateway requests)
-- **Google Cloud Functions**: Event-driven functions
-- **Azure Functions**: Serverless compute
+**示例：**
+- **AWS Lambda**：响应事件（S3 上传、API Gateway 请求）运行代码
+- **Google Cloud Functions**：事件驱动函数
+- **Azure Functions**：无服务器计算
 
-**Use Cases:**
-- Event-driven workflows (process uploaded images, trigger on database changes)
-- Batch processing (transform data files)
-- Inference serving (lightweight models)
-- Backend APIs (REST endpoints)
+**用例：**
+- 事件驱动工作流（处理上传的图片、在数据库变更时触发）
+- 批处理（转换数据文件）
+- 推理服务（轻量级模型）
+- 后端 API（REST 端点）
 
-**Pros:**
-- Extreme cost efficiency (pay per invocation, down to millisecond granularity)
-- Auto-scaling to zero (no cost when idle)
-- No server management
+**优点：**
+- 极致的成本效率（按调用付费，精确到毫秒）
+- 自动缩放到零（空闲时无成本）
+- 无需服务器管理
 
-**Cons:**
-- Cold starts (initial invocation delay)
-- Execution time limits (AWS Lambda: 15 minutes max)
-- State management challenges (functions are stateless)
+**缺点：**
+- 冷启动（首次调用延迟）
+- 执行时间限制（AWS Lambda：最长 15 分钟）
+- 状态管理挑战（函数是无状态的）
 
-**Example Lambda Function:**
+**示例 Lambda 函数：**
 ```python
-# AWS Lambda function to resize images uploaded to S3
+# 用于调整上传到 S3 的图片大小的 AWS Lambda 函数
 import boto3
 from PIL import Image
 
 def lambda_handler(event, context):
-    # Event triggered when image uploaded to S3
+    # 当图片上传到 S3 时触发事件
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
 
-    # Download image, resize, upload to new bucket
+    # 下载图片、调整大小、上传到新存储桶
     s3 = boto3.client('s3')
     img = Image.open(s3.get_object(Bucket=bucket, Key=key)['Body'])
     img.thumbnail((200, 200))
-    # Upload resized image...
+    # 上传调整后的图片...
 
     return {'statusCode': 200, 'body': 'Image resized'}
 ```
 
-**When Lambda is invoked:**
-- AWS provisions a container, runs your code, returns result
-- You're billed for execution time (rounded to nearest 1ms)
-- Container may be reused for subsequent invocations (warm start)
+**当 Lambda 被调用时：**
+- AWS 配置容器、运行你的代码、返回结果
+- 你按执行时间计费（四舍五入到最接近的 1 毫秒）
+- 容器可能被后续调用重用（热启动）
 
-### 2.5 Choosing the Right Service Model
+### 2.5 选择合适的服务模型
 
-| Criterion | IaaS | PaaS | SaaS | FaaS |
+| 标准 | IaaS | PaaS | SaaS | FaaS |
 |-----------|------|------|------|------|
-| **Control** | High | Medium | Low | Medium |
-| **Flexibility** | High | Medium | Low | High (for code) |
-| **Management Overhead** | High | Low | None | Very Low |
-| **Time to Deploy** | Days-Weeks | Hours-Days | Minutes | Minutes |
-| **Scalability** | Manual/Auto (you configure) | Auto (platform handles) | Auto (provider handles) | Auto (infinite scale) |
-| **Cost Model** | Pay for instances (hourly) | Pay for apps/usage | Pay per user/seat | Pay per invocation |
-| **Best For** | Custom stacks, legacy apps | Web apps, APIs | Business apps | Event-driven, batch |
+| **控制** | 高 | 中 | 低 | 中 |
+| **灵活性** | 高 | 中 | 低 | 高（代码方面） |
+| **管理开销** | 高 | 低 | 无 | 非常低 |
+| **部署时间** | 数天-数周 | 数小时-数天 | 分钟 | 分钟 |
+| **可扩展性** | 手动/自动（你配置） | 自动（平台处理） | 自动（提供商处理） | 自动（无限扩展） |
+| **成本模型** | 按实例付费（按小时） | 按应用/使用付费 | 按用户/席位付费 | 按调用付费 |
+| **最适合** | 自定义栈、传统应用 | Web 应用、API | 业务应用 | 事件驱动、批处理 |
 
-**Decision Tree:**
-- **Need OS-level control?** → IaaS
-- **Building web app/API, want less ops?** → PaaS
-- **Using standard business software?** → SaaS
-- **Event-driven, unpredictable traffic?** → FaaS
+**决策树：**
+- **需要 OS 级控制？** → IaaS
+- **构建 Web 应用/API，希望减少运维？** → PaaS
+- **使用标准业务软件？** → SaaS
+- **事件驱动、不可预测的流量？** → FaaS
 
-**For AI/ML:**
-- **Training large models:** IaaS (EC2 with GPUs) or managed services (SageMaker)
-- **Model serving (high throughput):** IaaS (ECS/EKS with GPUs)
-- **Model serving (light, event-driven):** FaaS (Lambda with container support)
-- **End-to-end ML platform:** PaaS/SaaS (SageMaker, Vertex AI)
-
----
-
-## 3. Cloud Deployment Models
-
-How and where cloud infrastructure is deployed affects cost, control, compliance, and performance.
-
-### 3.1 Public Cloud
-
-**Definition:** Cloud infrastructure owned and operated by a third-party provider, shared among multiple customers (multi-tenancy).
-
-**Examples:** AWS, Google Cloud, Microsoft Azure, IBM Cloud, Oracle Cloud
-
-**Characteristics:**
-- **Shared Infrastructure**: Resources are pooled and dynamically allocated
-- **Internet Access**: Accessed over public internet (or dedicated connections like AWS Direct Connect)
-- **Pay-as-you-go**: No upfront CapEx, operational expense (OpEx) model
-
-**Pros:**
-- **No CapEx**: No hardware to buy
-- **Elasticity**: Scale to thousands of servers instantly
-- **Global Reach**: Regions worldwide
-- **Innovation**: Access latest services (ML, serverless, databases)
-
-**Cons:**
-- **Data Residency**: Data stored in provider's data centers (compliance concerns)
-- **Vendor Lock-In**: Tight integration with provider services
-- **Internet Dependency**: Requires network connectivity
-
-**Use Cases:**
-- Startups and SMBs (no upfront investment)
-- Variable workloads (ML training, web apps)
-- Global applications
-
-### 3.2 Private Cloud
-
-**Definition:** Cloud infrastructure dedicated to a single organization, hosted on-premises or by a third party.
-
-**Examples:**
-- **OpenStack**: Open-source private cloud platform
-- **VMware vSphere**: Virtualization platform for private clouds
-- **AWS Outposts**: AWS infrastructure in your data center
-
-**Characteristics:**
-- **Dedicated Resources**: Not shared with other organizations
-- **On-Premises or Hosted**: Can be in your data center or provider's facility
-- **Custom Security**: Full control over security policies
-
-**Pros:**
-- **Control**: Complete control over infrastructure
-- **Compliance**: Easier to meet regulatory requirements (data never leaves your premises)
-- **Performance**: Predictable performance (no noisy neighbors)
-
-**Cons:**
-- **High CapEx**: Must purchase hardware
-- **Limited Elasticity**: Scaling constrained by owned capacity
-- **Operational Overhead**: Manage infrastructure team
-
-**Use Cases:**
-- Financial services, healthcare (strict compliance)
-- Government agencies
-- Organizations with sensitive data
-
-### 3.3 Hybrid Cloud
-
-**Definition:** Combination of public and private clouds, interconnected to allow data and application portability.
-
-**Example Architectures:**
-- **Sensitive data in private cloud**, general workloads in public cloud
-- **Development/test in public cloud**, production in private cloud
-- **Bursting**: Run on-premises normally, burst to public cloud for spikes
-
-**Technologies:**
-- **AWS Outposts**: Extends AWS services into your data center
-- **Azure Arc**: Manage Azure services across on-premises, multi-cloud
-- **Google Anthos**: Kubernetes-based multi-cloud platform
-- **VPN/Direct Connect**: Secure connectivity between environments
-
-**Pros:**
-- **Flexibility**: Best of both worlds
-- **Cost Optimization**: Use public cloud for variable workloads, private for steady-state
-- **Compliance**: Keep sensitive data on-premises
-
-**Cons:**
-- **Complexity**: Managing two environments
-- **Integration Challenges**: Data synchronization, networking
-- **Cost**: May pay for both environments
-
-**Use Case Example (Healthcare):**
-- **Private Cloud**: Patient health records (HIPAA compliance, sensitive data)
-- **Public Cloud (AWS)**: ML model training on anonymized data, inference APIs
-- **Hybrid Connectivity**: VPN tunnel, data sync for model updates
-
-### 3.4 Multi-Cloud
-
-**Definition:** Using services from multiple public cloud providers (AWS + GCP + Azure).
-
-**Motivations:**
-- **Avoid Vendor Lock-In**: Reduce dependency on single provider
-- **Best-of-Breed Services**: Use AWS for EC2, GCP for BigQuery, Azure for Active Directory
-- **Geographic Coverage**: Some providers have better presence in certain regions
-- **Negotiating Power**: Leverage competition for pricing
-
-**Challenges:**
-- **Complexity**: Different APIs, tools, billing systems
-- **Data Transfer Costs**: Moving data between clouds is expensive
-- **Skills Gap**: Team must know multiple platforms
-- **Operational Overhead**: Manage multiple consoles, CLIs, IAM systems
-
-**Mitigation Strategies:**
-- **Abstraction Layers**: Use Kubernetes (runs anywhere), Terraform (IaC for all clouds)
-- **Service Mesh**: Istio, Linkerd for cross-cloud networking
-- **Centralized Observability**: Datadog, New Relic work across clouds
-
-**Example Multi-Cloud Architecture:**
-```
-AWS:
-  - EC2 for compute
-  - S3 for data lake
-  - SageMaker for model training
-
-GCP:
-  - BigQuery for analytics
-  - Vertex AI for AutoML
-
-Azure:
-  - Active Directory for identity
-  - Azure Functions for event processing
-
-Connection: VPN/Peering between VPCs
-Orchestration: Terraform manages all three
-Monitoring: Datadog aggregates metrics from all providers
-```
-
-### 3.5 Edge and Fog Computing
-
-**Edge Computing:** Processing data near the source (e.g., IoT devices, factories) rather than in central cloud data centers.
-
-**Why?**
-- **Latency**: Autonomous vehicles can't wait for round-trip to AWS (milliseconds matter)
-- **Bandwidth**: Sending terabytes of video to cloud is expensive
-- **Privacy**: Process sensitive data locally
-- **Reliability**: Work offline if internet fails
-
-**Examples:**
-- **AWS Greengrass**: Run Lambda functions on edge devices
-- **Azure IoT Edge**: Deploy containers to edge
-- **Google Cloud IoT Edge**: ML inference on edge devices
-
-**AI/ML Use Case:** Deploy trained model to edge device (smartphone, camera) for real-time inference, send only aggregated data or model updates to cloud.
+**对于 AI/ML：**
+- **训练大型模型：** IaaS（带 GPU 的 EC2）或托管服务（SageMaker）
+- **模型服务（高吞吐量）：** IaaS（带 GPU 的 ECS/EKS）
+- **模型服务（轻量、事件驱动）：** FaaS（带容器支持的 Lambda）
+- **端到端 ML 平台：** PaaS/SaaS（SageMaker、Vertex AI）
 
 ---
 
-## 4. Major Cloud Providers Overview
+## 3. 云部署模型
 
-### 4.1 Amazon Web Services (AWS)
+云基础设施的部署方式和位置影响成本、控制、合规性和性能。
 
-**Market Position:** Market leader (~32% global market share as of 2024), launched 2006.
+### 3.1 公有云
 
-**Strengths:**
-- **Breadth of Services**: 200+ services covering every conceivable need
-- **Global Infrastructure**: 33 regions, 105 availability zones (most extensive)
-- **Maturity**: Longest track record, extensive documentation and community
-- **ML Services**: SageMaker (end-to-end ML platform), Rekognition (computer vision), Comprehend (NLP)
+**定义：** 由第三方提供商拥有和运营的云基础设施，在多个客户之间共享（多租户）。
 
-**Core Services for AI/ML:**
-- **Compute**: EC2 (VMs), ECS/EKS (containers), Lambda (serverless)
-- **Storage**: S3 (object storage), EBS (block storage), EFS (file storage)
-- **Database**: RDS (relational), DynamoDB (NoSQL), Redshift (data warehouse)
-- **ML**: SageMaker, Bedrock (foundation models), Trainium/Inferentia (custom chips)
-- **Networking**: VPC, CloudFront (CDN), Route 53 (DNS)
-- **Security**: IAM, KMS (encryption), Secrets Manager
+**示例：** AWS、Google Cloud、Microsoft Azure、IBM Cloud、Oracle Cloud
 
-**Pricing Model:**
-- **On-Demand**: Pay per hour/second (most expensive, no commitment)
-- **Reserved Instances**: 1-3 year commitment (up to 72% savings)
-- **Spot Instances**: Bid on spare capacity (up to 90% savings, can be terminated)
-- **Savings Plans**: Flexible commitment to $ amount (similar savings to reserved)
+**特征：**
+- **共享基础设施**：资源被池化并动态分配
+- **互联网访问**：通过公共互联网（或专用连接如 AWS Direct Connect）访问
+- **按需付费**：无前期 CapEx，运营支出（OpEx）模式
 
-**When to Choose AWS:**
-- Most mature ecosystem
-- Need broadest service catalog
-- Already invested in AWS (avoid multi-cloud complexity)
-- Leveraging AWS-specific services (SageMaker, Bedrock)
+**优点：**
+- **无 CapEx**：无需购买硬件
+- **弹性**：即时扩展到数千台服务器
+- **全球覆盖**：全球各地的区域
+- **创新**：访问最新服务（ML、无服务器、数据库）
 
-### 4.2 Google Cloud Platform (GCP)
+**缺点：**
+- **数据驻留**：数据存储在提供商的数据中心（合规问题）
+- **供应商锁定**：与提供商服务紧密集成
+- **互联网依赖**：需要网络连接
 
-**Market Position:** Third (~10% market share), launched 2008.
+**用例：**
+- 初创公司和中小企业（无需前期投资）
+- 变化工作负载（ML 训练、Web 应用）
+- 全球应用
 
-**Strengths:**
-- **Data and Analytics**: BigQuery (best-in-class data warehouse), Dataflow (stream processing)
-- **AI/ML Leadership**: Vertex AI, TPUs (Tensor Processing Units), TensorFlow integration
-- **Kubernetes**: GKE (Google Kubernetes Engine) - Google invented Kubernetes
-- **Networking**: Premium global network, low-latency inter-region connectivity
-- **Innovation**: Often first to market with new technologies
+### 3.2 私有云
 
-**Core Services for AI/ML:**
-- **Compute**: Compute Engine (VMs), GKE (Kubernetes), Cloud Run (serverless containers)
-- **Storage**: Cloud Storage (object), Persistent Disk (block), Filestore (file)
-- **Database**: Cloud SQL (relational), Firestore (NoSQL), BigQuery (analytics)
-- **ML**: Vertex AI (unified ML platform), TPUs, AutoML, pre-trained APIs
-- **Data**: BigQuery, Dataflow, Pub/Sub (messaging)
+**定义：** 专用于单个组织的云基础设施，在本地或由第三方托管。
 
-**Pricing Model:**
-- **Per-second Billing**: More granular than AWS (EC2 bills per hour on older instances)
-- **Sustained Use Discounts**: Automatic discounts for running instances all month (up to 30%)
-- **Committed Use Discounts**: 1-3 year commitments
-- **Preemptible VMs**: Like AWS Spot (up to 80% savings)
+**示例：**
+- **OpenStack**：开源私有云平台
+- **VMware vSphere**：用于私有云的虚拟化平台
+- **AWS Outposts**：你数据中心中的 AWS 基础设施
 
-**When to Choose GCP:**
-- Data-heavy workloads (BigQuery is exceptional)
-- TensorFlow/Kubernetes-centric workflows
-- Want Google's AI expertise (TPUs, Vertex AI)
-- Prefer simpler, cleaner UI (GCP console is often praised)
+**特征：**
+- **专用资源**：不与其他组织共享
+- **本地或托管**：可以在你的数据中心或提供商的设施中
+- **自定义安全**：完全控制安全策略
+
+**优点：**
+- **控制**：对基础设施的完全控制
+- **合规**：更容易满足监管要求（数据永不离开你的场所）
+- **性能**：可预测的性能（无吵闹邻居）
+
+**缺点：**
+- **高 CapEx**：必须购买硬件
+- **弹性有限**：扩展受限于自有容量
+- **运维开销**：管理基础设施团队
+
+**用例：**
+- 金融服务、医疗保健（严格合规）
+- 政府机构
+- 拥有敏感数据的组织
+
+### 3.3 混合云
+
+**定义：** 公有云和私有云的组合，相互连接以允许数据和应用的迁移性。
+
+**示例架构：**
+- **敏感数据在私有云**，常规工作负载在公有云
+- **开发/测试在公有云**，生产在私有云
+- **突发扩展**：通常运行在本地，高峰时扩展到公有云
+
+**技术：**
+- **AWS Outposts**：将 AWS 服务扩展到你的数据中心
+- **Azure Arc**：在本地、多云间管理 Azure 服务
+- **Google Anthos**：基于 Kubernetes 的多云平台
+- **VPN/Direct Connect**：环境之间的安全连接
+
+**优点：**
+- **灵活性**：两全其美
+- **成本优化**：变化工作负载使用公有云，稳态使用私有云
+- **合规**：将敏感数据保留在本地
+
+**缺点：**
+- **复杂性**：管理两个环境
+- **集成挑战**：数据同步、网络
+- **成本**：可能需要为两个环境付费
+
+**用例示例（医疗保健）：**
+- **私有云**：患者健康记录（HIPAA 合规、敏感数据）
+- **公有云（AWS）**：使用匿名化数据进行 ML 模型训练、推理 API
+- **混合连接**：VPN 隧道、用于模型更新的数据同步
+
+### 3.4 多云
+
+**定义：** 使用多个公有云提供商的服务（AWS + GCP + Azure）。
+
+**动机：**
+- **避免供应商锁定**：减少对单一提供商的依赖
+- **最佳服务组合**：使用 AWS 的 EC2、GCP 的 BigQuery、Azure 的 Active Directory
+- **地理覆盖**：某些提供商在某些地区有更好的存在
+- **谈判筹码**：利用竞争获得定价
+
+**挑战：**
+- **复杂性**：不同的 API、工具、计费系统
+- **数据传输成本**：在云之间移动数据很昂贵
+- **技能差距**：团队必须了解多个平台
+- **运维开销**：管理多个控制台、CLI、IAM 系统
+
+**缓解策略：**
+- **抽象层**：使用 Kubernetes（随处运行）、Terraform（所有云的 IaC）
+- **服务网格**：Istio、Linkerd 用于跨云网络
+- **集中式可观测性**：Datadog、New Relic 可跨云工作
+
+**示例多云架构：**
+```
+AWS：
+  - EC2 用于计算
+  - S3 用于数据湖
+  - SageMaker 用于模型训练
+
+GCP：
+  - BigQuery 用于分析
+  - Vertex AI 用于 AutoML
+
+Azure：
+  - Active Directory 用于身份
+  - Azure Functions 用于事件处理
+
+连接：VPC 之间的 VPN/Peering
+编排：Terraform 管理所有三个
+监控：Datadog 聚合所有提供商指标
+```
+
+### 3.5 边缘计算与雾计算
+
+**边缘计算：** 在数据源附近（如 IoT 设备、工厂）处理数据，而非在中央云数据中心。
+
+**为什么？**
+- **延迟**：自动驾驶汽车不能等待到 AWS 的往返（毫秒级至关重要）
+- **带宽**：将数 TB 视频发送到云端成本高昂
+- **隐私**：在本地处理敏感数据
+- **可靠性**：互联网故障时离线工作
+
+**示例：**
+- **AWS Greengrass**：在边缘设备上运行 Lambda 函数
+- **Azure IoT Edge**：将容器部署到边缘
+- **Google Cloud IoT Edge**：在边缘设备上进行 ML 推理
+
+**AI/ML 用例：** 将训练好的模型部署到边缘设备（智能手机、摄像头）进行实时推理，仅将聚合数据或模型更新发送到云端。
+
+---
+
+## 4. 主要云服务商概览
+
+### 4.1 Amazon Web Services（AWS）
+
+**市场地位：** 市场领导者（截至 2024 年约 32% 全球市场份额），2006 年推出。
+
+**优势：**
+- **服务广度**：200+ 服务覆盖所有可能的需求
+- **全球基础设施**：33 个区域、105 个可用区（最广泛）
+- **成熟度**：最长的运营记录、丰富的文档和社区
+- **ML 服务**：SageMaker（端到端 ML 平台）、Rekognition（计算机视觉）、Comprehend（NLP）
+
+**AI/ML 核心服务：**
+- **计算**：EC2（虚拟机）、ECS/EKS（容器）、Lambda（无服务器）
+- **存储**：S3（对象存储）、EBS（块存储）、EFS（文件存储）
+- **数据库**：RDS（关系型）、DynamoDB（NoSQL）、Redshift（数据仓库）
+- **ML**：SageMaker、Bedrock（基础模型）、Trainium/Inferentia（定制芯片）
+- **网络**：VPC、CloudFront（CDN）、Route 53（DNS）
+- **安全**：IAM、KMS（加密）、Secrets Manager
+
+**定价模型：**
+- **按需**：按小时/秒付费（最贵、无承诺）
+- **预留实例**：1-3 年承诺（最高节省 72%）
+- **Spot 实例**：竞标备用容量（最高节省 90%、可能被终止）
+- **Savings Plans**：灵活承诺到金额（节省类似于预留）
+
+**何时选择 AWS：**
+- 最成熟的生态系统
+- 需要最广泛的服务目录
+- 已投资 AWS（避免多云复杂性）
+- 利用 AWS 特定服务（SageMaker、Bedrock）
+
+### 4.2 Google Cloud Platform（GCP）
+
+**市场地位：** 第三（约 10% 市场份额），2008 年推出。
+
+**优势：**
+- **数据和分析**：BigQuery（一流的数据仓库）、Dataflow（流处理）
+- **AI/ML 领导力**：Vertex AI、TPU（Tensor Processing Units）、TensorFlow 集成
+- **Kubernetes**：GKE（Google Kubernetes Engine）— Google 发明了 Kubernetes
+- **网络**：优质全球网络、低延迟跨区域连接
+- **创新**：通常率先推出新技术
+
+**AI/ML 核心服务：**
+- **计算**：Compute Engine（虚拟机）、GKE（Kubernetes）、Cloud Run（无服务器容器）
+- **存储**：Cloud Storage（对象）、Persistent Disk（块）、Filestore（文件）
+- **数据库**：Cloud SQL（关系型）、Firestore（NoSQL）、BigQuery（分析）
+- **ML**：Vertex AI（统一 ML 平台）、TPU、AutoML、预训练 API
+- **数据**：BigQuery、Dataflow、Pub/Sub（消息）
+
+**定价模型：**
+- **按秒计费**：比 AWS 更精细（旧实例按小时计费）
+- **持续使用折扣**：整月运行实例自动折扣（最高 30%）
+- **承诺使用折扣**：1-3 年承诺
+- **抢占式 VM**：类似 AWS Spot（最高节省 80%）
+
+**何时选择 GCP：**
+- 数据密集型工作负载（BigQuery 非常出色）
+- TensorFlow/Kubernetes 中心化工作流
+- 想要 Google 的 AI 专长（TPU、Vertex AI）
+- 偏好更简单、更清晰的 UI（GCP 控制台常受好评）
 
 ### 4.3 Microsoft Azure
 
-**Market Position:** Second (~23% market share), launched 2010.
+**市场地位：** 第二（约 23% 市场份额），2010 年推出。
 
-**Strengths:**
-- **Enterprise Integration**: Seamless with Microsoft ecosystem (Windows Server, Active Directory, Office 365)
-- **Hybrid Cloud**: Azure Arc for on-premises integration
-- **Developer Tools**: Visual Studio, GitHub (owned by Microsoft), Azure DevOps
-- **AI Services**: Azure OpenAI Service (access to GPT models), Cognitive Services
+**优势：**
+- **企业集成**：与 Microsoft 生态系统无缝集成（Windows Server、Active Directory、Office 365）
+- **混合云**：Azure Arc 用于本地集成
+- **开发者工具**：Visual Studio、GitHub（微软拥有）、Azure DevOps
+- **AI 服务**：Azure OpenAI Service（访问 GPT 模型）、Cognitive Services
 
-**Core Services for AI/ML:**
-- **Compute**: Virtual Machines, AKS (Kubernetes), Azure Functions (serverless)
-- **Storage**: Blob Storage (object), Disk Storage (block), Azure Files (file)
-- **Database**: Azure SQL, Cosmos DB (NoSQL), Synapse Analytics (data warehouse)
-- **ML**: Azure ML, Cognitive Services, Azure OpenAI, Azure Databricks
-- **Integration**: Logic Apps, Service Bus, Event Grid
+**AI/ML 核心服务：**
+- **计算**：Virtual Machines、AKS（Kubernetes）、Azure Functions（无服务器）
+- **存储**：Blob Storage（对象）、Disk Storage（块）、Azure Files（文件）
+- **数据库**：Azure SQL、Cosmos DB（NoSQL）、Synapse Analytics（数据仓库）
+- **ML**：Azure ML、Cognitive Services、Azure OpenAI、Azure Databricks
+- **集成**：Logic Apps、Service Bus、Event Grid
 
-**Pricing Model:**
-- **Pay-as-you-go**: Standard billing
-- **Reserved Instances**: 1-3 year commitments
-- **Azure Hybrid Benefit**: Bring your Windows Server licenses (cost savings)
-- **Spot VMs**: Like AWS Spot
+**定价模型：**
+- **按需付费**：标准计费
+- **预留实例**：1-3 年承诺
+- **Azure Hybrid Benefit**：自带 Windows Server 许可证（节省成本）
+- **Spot VM**：类似 AWS Spot
 
-**When to Choose Azure:**
-- Microsoft shop (Windows, .NET, SQL Server)
-- Need Azure AD integration
-- Hybrid cloud requirements
-- Using Azure OpenAI Service (GPT-4 access)
+**何时选择 Azure：**
+- Microsoft 技术环境（Windows、.NET、SQL Server）
+- 需要 Azure AD 集成
+- 混合云需求
+- 使用 Azure OpenAI Service（GPT-4 访问）
 
-### 4.4 Other Providers (Brief Mentions)
+### 4.4 其他提供商（简要提及）
 
-- **Oracle Cloud**: Strong for Oracle databases, Autonomous Database
-- **IBM Cloud**: Watson AI services, mainframe integration
-- **Alibaba Cloud**: Dominant in China
-- **DigitalOcean, Linode**: Simple, developer-friendly, lower-cost alternatives (no ML services)
+- **Oracle Cloud**：在 Oracle 数据库、Autonomous Database 方面很强
+- **IBM Cloud**：Watson AI 服务、大型机集成
+- **Alibaba Cloud**：在中国占主导地位
+- **DigitalOcean、Linode**：简单、开发者友好、低成本替代方案（无 ML 服务）
 
-### 4.5 Service Comparison Matrix
+### 4.5 服务对比矩阵
 
-| Category | AWS | GCP | Azure |
+| 类别 | AWS | GCP | Azure |
 |----------|-----|-----|-------|
-| **VMs** | EC2 | Compute Engine | Virtual Machines |
-| **Containers** | ECS, EKS | GKE, Cloud Run | AKS, Container Instances |
-| **Serverless** | Lambda | Cloud Functions, Cloud Run | Azure Functions |
-| **Object Storage** | S3 | Cloud Storage | Blob Storage |
-| **Data Warehouse** | Redshift | BigQuery | Synapse Analytics |
-| **ML Platform** | SageMaker | Vertex AI | Azure ML |
+| **虚拟机** | EC2 | Compute Engine | Virtual Machines |
+| **容器** | ECS、EKS | GKE、Cloud Run | AKS、Container Instances |
+| **无服务器** | Lambda | Cloud Functions、Cloud Run | Azure Functions |
+| **对象存储** | S3 | Cloud Storage | Blob Storage |
+| **数据仓库** | Redshift | BigQuery | Synapse Analytics |
+| **ML 平台** | SageMaker | Vertex AI | Azure ML |
 | **Kubernetes** | EKS | GKE | AKS |
-| **Regions (2024)** | 33 | 39 | 60+ |
+| **区域（2024）** | 33 | 39 | 60+ |
 
 ---
 
-## 5. Cloud Economics and FinOps
+## 5. 云经济学与 FinOps
 
-### 5.1 Why Cloud is Cost-Effective (When Done Right)
+### 5.1 为什么云具有成本效益（做对了的话）
 
-**Traditional On-Premises Costs:**
-- **Hardware CapEx**: Servers, storage, networking gear ($50K-$500K+ upfront)
-- **Data Center**: Power, cooling, physical security, rent
-- **Staff**: Admins, network engineers, security team
-- **Overprovisioning**: Must buy for peak capacity (sits idle 80% of time)
-- **Depreciation**: Hardware loses value, needs replacement every 3-5 years
+**传统本地成本：**
+- **硬件 CapEx**：服务器、存储、网络设备（前期 5 万-50 万+ 美元）
+- **数据中心**：电力、制冷、物理安全、租金
+- **人员**：管理员、网络工程师、安全团队
+- **过度配置**：必须按峰值容量购买（80% 时间闲置）
+- **折旧**：硬件贬值，每 3-5 年需要更换
 
-**Cloud Costs (OpEx Model):**
-- **Pay-as-you-go**: Pay only for what you use
-- **Elasticity**: Scale down when idle (ML training: scale to zero after job completes)
-- **No Data Center**: Provider handles facilities, power, cooling
-- **Shared Staff**: Provider's team manages hardware, you focus on apps
+**云成本（OpEx 模式）：**
+- **按需付费**：仅为使用付费
+- **弹性**：空闲时缩减（ML 训练：作业完成后缩到零）
+- **无数据中心**：提供商处理设施、电力、制冷
+- **共享人员**：提供商的团队管理硬件，你专注于应用
 
-**Break-Even Example:**
-- **On-Prem**: $100K servers + $20K/year operations = $100K + $100K over 5 years = $200K
-- **Cloud**: $3K/month for equivalent capacity = $180K over 5 years
-- **But**: Cloud scales down to $500/month when idle = $90K over 5 years (55% savings)
+**盈亏平衡示例：**
+- **本地**：10 万美元服务器 + 每年 2 万美元运维 = 10 万 + 5 年 10 万 = 20 万美元
+- **云**：每月 3000 美元获取同等容量 = 5 年 18 万美元
+- **但是**：云在空闲时缩减到每月 500 美元 = 5 年 9 万美元（节省 55%）
 
-**Key Insight:** Cloud wins when workloads are **variable**. For steady-state 24/7 workloads, on-prem may be cheaper.
+**关键洞察：** 当工作负载**可变**时，云获胜。对于稳态 24/7 工作负载，本地可能更便宜。
 
-### 5.2 Cloud Pricing Models Explained
+### 5.2 云定价模型说明
 
-**1. On-Demand Pricing**
-- **Pay per hour/second** for resources
-- **No commitment**, start/stop anytime
-- **Most expensive**, but most flexible
-- **Use case**: Development, testing, unpredictable workloads
+**1. 按需定价**
+- **按小时/秒**为资源付费
+- **无承诺**，随时启动/停止
+- **最贵**，但最灵活
+- **用例**：开发、测试、不可预测的工作负载
 
-**2. Reserved Instances / Committed Use**
-- **1-3 year commitment** to specific instance type/region
-- **Up to 72% discount** vs on-demand
-- **Payment options**: All upfront (max discount), partial upfront, no upfront
-- **Use case**: Predictable baseline workload (database server running 24/7)
+**2. 预留实例 / 承诺使用**
+- **1-3 年承诺**到特定实例类型/区域
+- **相比按需最高 72% 折扣**
+- **付款选项**：全预付（最大折扣）、部分预付、无预付
+- **用例**：可预测的基础工作负载（24/7 运行的数据库服务器）
 
-**3. Spot / Preemptible Instances**
-- **Bid on spare capacity**, up to 90% discount
-- **Can be terminated** with 2-minute notice (AWS) or 30 seconds (GCP)
-- **Use case**: Fault-tolerant workloads (batch processing, ML training with checkpointing)
+**3. Spot / 抢占式实例**
+- **竞标备用容量**，最高 90% 折扣
+- **可能被终止**，提前 2 分钟通知（AWS）或 30 秒（GCP）
+- **用例**：容错工作负载（批处理、带 checkpointing 的 ML 训练）
 
-**4. Savings Plans (AWS)**
-- **Commit to $/hour** of usage (e.g., $100/hour) for 1-3 years
-- **Flexible**: Can change instance types, regions
-- **Up to 72% discount**
-- **Use case**: Broad commitment without locking to specific instances
+**4. Savings Plans（AWS）**
+- **承诺到 $/小时**的使用量（例如 $100/小时）持续 1-3 年
+- **灵活**：可以更改实例类型、区域
+- **最高 72% 折扣**
+- **用例**：广泛承诺，不锁定到特定实例
 
-**Example Pricing (AWS EC2 p3.2xlarge, 1 GPU):**
-- **On-Demand**: $3.06/hour = $2,200/month if run 24/7
-- **1-Year Reserved**: $1.40/hour = $1,008/month (54% savings)
-- **3-Year Reserved**: $0.93/hour = $670/month (70% savings)
-- **Spot**: $0.92/hour = $662/month (70% savings, interruptible)
+**示例定价（AWS EC2 p3.2xlarge，1 GPU）：**
+- **按需**：$3.06/小时 = 24/7 运行每月 $2,200
+- **1 年预留**：$1.40/小时 = 每月 $1,008（节省 54%）
+- **3 年预留**：$0.93/小时 = 每月 $670（节省 70%）
+- **Spot**：$0.92/小时 = 每月 $662（节省 70%、可中断）
 
-### 5.3 Common Cost Pitfalls
+### 5.3 常见成本陷阱
 
-**1. Idle Resources**
-- **Problem**: Developers launch instances for testing, forget to terminate
-- **Solution**: Tagging policies, auto-shutdown schedules, cost alerts
+**1. 闲置资源**
+- **问题**：开发人员启动实例进行测试后忘记终止
+- **解决方案**：标签策略、自动关机计划、成本告警
 
-**2. Data Transfer (Egress Fees)**
-- **Problem**: Data OUT of cloud is expensive ($0.09/GB in AWS)
-- **Scenario**: Training on 10TB dataset, pulling results to on-prem = $900 egress fee
-- **Solution**: Process data in cloud, only transfer results; use AWS S3 Transfer Acceleration
+**2. 数据传输（出站费用）**
+- **问题**：数据从云传出很贵（AWS 中 $0.09/GB）
+- **场景**：在 10TB 数据集上训练，将结果拉到本地 = $900 出站费用
+- **解决方案**：在云端处理数据，仅传输结果；使用 S3 Transfer Acceleration
 
-**3. Over-Provisioning**
-- **Problem**: Launch largest instance "to be safe"
-- **Solution**: Start small, monitor, right-size based on metrics
+**3. 过度配置**
+- **问题**：启动最大实例"以确保安全"
+- **解决方案**：从小开始、监控、根据指标合理调整规格
 
-**4. Wrong Pricing Model**
-- **Problem**: Running 24/7 database on on-demand pricing
-- **Solution**: Buy reserved instances for baseline, use spot for variable load
+**4. 错误的定价模型**
+- **问题**：在按需定价上运行 24/7 数据库
+- **解决方案**：为基础负载购买预留实例，为可变负载使用 Spot
 
-**5. Lack of Visibility**
-- **Problem**: No one knows where costs come from
-- **Solution**: Cost allocation tags, AWS Cost Explorer, Billing alerts
+**5. 缺乏可见性**
+- **问题**：无人知道成本来自何处
+- **解决方案**：成本分配标签、AWS Cost Explorer、账单告警
 
-### 5.4 FinOps Best Practices
+### 5.4 FinOps 最佳实践
 
-**FinOps** = Financial Operations for Cloud. Brings finance, engineering, and business together to optimize cloud spending.
+**FinOps** = 云财务运营。将财务、工程和业务结合在一起，优化云支出。
 
-**Core Practices:**
+**核心实践：**
 
-**1. Visibility**
-- **Tag everything**: Owner, project, environment, cost center
-- **Use Cost Explorer**: Drill down by service, region, tag
-- **Set up billing dashboards**: Real-time cost visibility
+**1. 可见性**
+- **给所有资源打标签**：所有者、项目、环境、成本中心
+- **使用 Cost Explorer**：按服务、区域、标签深入分析
+- **设置计费仪表盘**：实时成本可见性
 
-**2. Optimization**
-- **Right-sizing**: Match instance size to actual usage (downsize over-provisioned)
-- **Reserved/Spot instances**: For predictable/flexible workloads
-- **Auto-scaling**: Scale down during off-hours
-- **S3 storage classes**: Move infrequent data to Glacier (99% cost reduction)
+**2. 优化**
+- **合理调整规格**：将实例大小与实际使用匹配（缩小过度配置的）
+- **预留/Spot 实例**：用于可预测/灵活的工作负载
+- **自动扩缩容**：在非工作时间缩减
+- **S3 存储类**：将不频繁访问的数据移到 Glacier（节省 99% 成本）
 
-**3. Governance**
-- **Budgets and alerts**: Alert when spending exceeds threshold
-- **Spending limits**: Prevent runaway costs (set budget caps)
-- **Approval workflows**: Require approval for large instance types
+**3. 治理**
+- **预算和告警**：支出超过阈值时告警
+- **支出限制**：防止失控成本（设置预算上限）
+- **审批工作流**：对大型实例类型需要审批
 
-**4. Accountability**
-- **Chargeback**: Allocate costs back to teams based on tags
-- **Cost reviews**: Monthly reviews with teams
-- **Cost KPIs**: Track cost per user, cost per request, cost per model training run
+**4. 问责**
+- **成本分摊**：根据标签将成本分摊回团队
+- **成本审查**：每月与团队进行成本审查
+- **成本 KPI**：跟踪每用户成本、每请求成本、每次模型训练运行的成本
 
-**Example Cost Optimization:**
+**成本优化示例：**
 ```
-Initial State:
-  - 10 x EC2 m5.large instances (on-demand, 24/7)
-  - Cost: $700/month
+初始状态：
+  - 10 个 EC2 m5.large 实例（按需、24/7）
+  - 成本：每月 $700
 
-After Optimization:
-  - 3 x Reserved instances (baseline, 24/7): $210/month
-  - 7 x Auto-scaling group (scale down at night): $350/month average
-  - Savings: $140/month (20%)
+优化后：
+  - 3 个预留实例（基线、24/7）：每月 $210
+  - 7 个自动扩缩组（晚上缩减）：平均每月 $350
+  - 节省：每月 $140（20%）
 
-After Further Optimization:
-  - Move dev/test to spot instances: -$100/month
-  - Right-size (some workloads only need m5.small): -$80/month
-  - Final cost: $380/month (46% savings)
+进一步优化后：
+  - 将开发/测试移到 Spot 实例：- 每月 $100
+  - 合理调整规格（某些工作负载只需要 m5.small）：- 每月 $80
+  - 最终成本：每月 $380（节省 46%）
 ```
 
 ---
 
-## 6. Cloud Architecture Principles
+## 6. 云架构原则
 
-### 6.1 Design for Failure
+### 6.1 为故障而设计
 
-**Traditional Mindset:** Build resilient servers, hope they don't fail.
-**Cloud Mindset:** Assume everything fails, design for resilience.
+**传统思维：** 构建可靠的服务器，希望它们不会失败。
+**云思维：** 假设一切都会失败，为弹性而设计。
 
-**Principles:**
+**原则：**
 
-**1. Redundancy**
-- **Multiple Availability Zones**: Deploy across 2-3 AZs in a region
-- **Load Balancing**: Distribute traffic, auto-detect failures
-- **Database Replication**: Multi-AZ RDS, read replicas
+**1. 冗余**
+- **多个可用区**：跨区域的 2-3 个可用区部署
+- **负载均衡**：分发流量、自动检测故障
+- **数据库复制**：Multi-AZ RDS、只读副本
 
-**2. Health Checks and Auto-Recovery**
-- **EC2 Auto Recovery**: Automatically restart failed instances
-- **ECS/Kubernetes**: Replace failed containers
-- **Route 53 Health Checks**: Failover DNS to healthy region
+**2. 健康检查和自动恢复**
+- **EC2 自动恢复**：自动重启故障实例
+- **ECS/Kubernetes**：替换失败的容器
+- **Route 53 健康检查**：将 DNS 故障转移到健康区域
 
-**3. Graceful Degradation**
-- **Circuit Breakers**: Stop calling failed service, return cached/default response
-- **Fallback**: If recommendation API fails, show popular items
+**3. 优雅降级**
+- **断路器**：停止调用失败的服务，返回缓存/默认响应
+- **回退**：如果推荐 API 失败，显示热门项目
 
-**Example:**
+**示例：**
 ```
-User Request → Load Balancer
-                  ├─> App Server 1 (AZ-A) ✓
-                  ├─> App Server 2 (AZ-B) ✗ (failed, LB stops routing here)
-                  └─> App Server 3 (AZ-C) ✓
+用户请求 → 负载均衡器
+             ├─> 应用服务器 1（AZ-A）✓
+             ├─> 应用服务器 2（AZ-B）✗（失败，LB 停止路由）
+             └─> 应用服务器 3（AZ-C）✓
 
-Auto-Scaling Group detects failure → Launches replacement in AZ-B
+Auto-Scaling Group 检测失败 → 在 AZ-B 启动替换
 ```
 
-### 6.2 Scalability and Elasticity
+### 6.2 可扩展性与弹性
 
-**Scalability:** Ability to handle increased load.
-**Elasticity:** Ability to scale up AND down automatically.
+**可扩展性：** 处理增加负载的能力。
+**弹性：** 自动上下扩展的能力。
 
-**Vertical Scaling (Scale Up):** Increase instance size (t2.micro → t2.large)
-- **Pros**: Simple, no code changes
-- **Cons**: Downtime to resize, limited by largest instance size
+**垂直扩展（Scale Up）：** 增加实例大小（t2.micro → t2.large）
+- **优点**：简单、无需代码修改
+- **缺点**：调整大小时需要停机、受限于最大实例大小
 
-**Horizontal Scaling (Scale Out):** Add more instances
-- **Pros**: No downtime, near-infinite scale
-- **Cons**: Requires stateless design, load balancing
+**水平扩展（Scale Out）：** 增加更多实例
+- **优点**：无需停机、近乎无限的扩展
+- **缺点**：需要无状态设计、负载均衡
 
-**Auto-Scaling:**
-- **Metric-based**: Scale when CPU > 70% for 5 minutes
-- **Schedule-based**: Scale up at 9am, down at 6pm
-- **Predictive**: ML-based prediction of traffic patterns
+**自动扩缩容：**
+- **基于指标**：当 CPU > 70% 持续 5 分钟时扩展
+- **基于计划**：早上 9 点扩展，下午 6 点缩减
+- **预测性**：基于 ML 的流量模式预测
 
-**Example Auto-Scaling Policy:**
+**示例自动扩缩策略：**
 ```yaml
 # AWS Auto-Scaling Group
 ScalingPolicy:
   TargetTrackingScaling:
-    TargetValue: 70  # Keep CPU at 70%
-    ScaleInCooldown: 300  # Wait 5min before scaling down
-    ScaleOutCooldown: 60  # Wait 1min before scaling up
+    TargetValue: 70  # 保持 CPU 在 70%
+    ScaleInCooldown: 300  # 缩减前等待 5 分钟
+    ScaleOutCooldown: 60  # 扩展前等待 1 分钟
 ```
 
-### 6.3 Loose Coupling and Microservices
+### 6.3 松耦合与微服务
 
-**Tight Coupling (Monolith):**
+**紧耦合（单体）：**
 ```
-[Web UI] ← → [Business Logic] ← → [Database]
-(Single application, one failure crashes everything)
+[Web UI] ← → [业务逻辑] ← → [数据库]
+（单一应用，一个故障瘫痪所有）
 ```
 
-**Loose Coupling (Microservices):**
+**松耦合（微服务）：**
 ```
 [Web UI] → [API Gateway]
-              ├─> [User Service] → [User DB]
-              ├─> [Inference Service] → [Model Storage]
-              └─> [Analytics Service] → [Data Warehouse]
+             ├─> [用户服务] → [用户数据库]
+             ├─> [推理服务] → [模型存储]
+             └─> [分析服务] → [数据仓库]
 
-(Independent services, communicate via APIs, failures isolated)
+（独立服务，通过 API 通信，故障隔离）
 ```
 
-**Benefits:**
-- **Independent Scaling**: Scale inference service independently
-- **Independent Deployment**: Deploy new model without touching user service
-- **Fault Isolation**: Inference failure doesn't crash analytics
+**优点：**
+- **独立扩展**：独立扩展推理服务
+- **独立部署**：部署新模型无需触及用户服务
+- **故障隔离**：推理故障不会导致分析崩溃
 
-**Technologies:**
-- **API Gateway**: AWS API Gateway, Kong, Nginx
-- **Service Mesh**: Istio, Linkerd (for service-to-service communication)
-- **Message Queues**: SQS, Pub/Sub (async communication)
+**技术：**
+- **API Gateway**：AWS API Gateway、Kong、Nginx
+- **服务网格**：Istio、Linkerd（用于服务间通信）
+- **消息队列**：SQS、Pub/Sub（异步通信）
 
-### 6.4 Statelessness
+### 6.4 无状态
 
-**Stateful Server (Bad):**
+**有状态服务器（糟糕）：**
 ```python
-# Server stores session in memory
+# 服务器将会话存储在内存中
 sessions = {}
 
 @app.route('/login')
 def login():
-    sessions[user_id] = session_data  # Problem: only on this server!
+    sessions[user_id] = session_data  # 问题：仅在此服务器上！
 ```
 
-**Problem**: User's next request may hit different server, session lost.
+**问题**：用户的下一个请求可能命中不同的服务器，会话丢失。
 
-**Stateless Server (Good):**
+**无状态服务器（好）：**
 ```python
-# Store session in external store (Redis, DynamoDB)
+# 将会话存储在外部存储中（Redis、DynamoDB）
 @app.route('/login')
 def login():
-    redis.set(user_id, session_data)  # All servers access same Redis
+    redis.set(user_id, session_data)  # 所有服务器访问相同的 Redis
 ```
 
-**Benefits:**
-- **Any server can handle any request**
-- **Easy to scale horizontally**
-- **Servers disposable** (can be replaced anytime)
+**优点：**
+- **任何服务器可以处理任何请求**
+- **容易水平扩展**
+- **服务器是可丢弃的**（随时可以替换）
 
-**For ML Inference:**
-- **Model loaded from S3/EFS**, not bundled in image (allows quick updates)
-- **Request state in database**, not in-memory
-- **GPUs stateless**: Any inference request can run on any GPU instance
+**用于 ML 推理：**
+- **模型从 S3/EFS 加载**，而非捆绑在镜像中（允许快速更新）
+- **请求状态在数据库中**，而非内存中
+- **GPU 无状态**：任何推理请求可以在任何 GPU 实例上运行
 
-### 6.5 Security Best Practices
+### 6.5 安全最佳实践
 
-**1. Least Privilege (IAM)**
-- Grant minimum permissions required
-- Use IAM roles (not access keys)
-- Enable MFA for sensitive operations
+**1. 最小权限（IAM）**
+- 授予最低必要权限
+- 使用 IAM 角色（而非访问密钥）
+- 对敏感操作启用 MFA
 
-**2. Defense in Depth**
-- **Multiple layers**: Firewall, security groups, application auth, encryption
-- **WAF (Web Application Firewall)**: Block SQL injection, XSS attacks
+**2. 纵深防御**
+- **多层**：防火墙、安全组、应用认证、加密
+- **WAF（Web 应用防火墙）**：阻止 SQL 注入、XSS 攻击
 
-**3. Encryption**
-- **At Rest**: Encrypt S3 buckets, EBS volumes, RDS databases
-- **In Transit**: HTTPS/TLS for all communications
-- **Key Management**: Use KMS (Key Management Service), rotate keys
+**3. 加密**
+- **静态**：加密 S3 存储桶、EBS 卷、RDS 数据库
+- **传输中**：所有通信使用 HTTPS/TLS
+- **密钥管理**：使用 KMS（Key Management Service）、轮换密钥
 
-**4. Network Segmentation**
-- **Public Subnet**: Load balancers, bastions (internet-facing)
-- **Private Subnet**: Application servers (no direct internet access)
-- **Data Subnet**: Databases (no internet, only accessible from app subnet)
+**4. 网络分段**
+- **公有子网**：负载均衡器、堡垒机（面向互联网）
+- **私有子网**：应用服务器（无直接互联网访问）
+- **数据子网**：数据库（无互联网、仅应用子网可访问）
 
-**5. Monitoring and Logging**
-- **CloudTrail**: Log all API calls (who did what, when)
-- **GuardDuty**: Threat detection (suspicious activity)
-- **Config**: Track resource configuration changes
+**5. 监控与日志**
+- **CloudTrail**：记录所有 API 调用（谁在何时做了什么）
+- **GuardDuty**：威胁检测（可疑活动）
+- **Config**：跟踪资源配置变更
 
-**Example Secure Architecture:**
+**示例安全架构：**
 ```
-Internet
+互联网
   ↓
-[WAF] → [ALB in Public Subnet]
+[WAF] → [公有子网中的 ALB]
            ↓
-       [App Servers in Private Subnet]
+       [私有子网中的应用服务器]
            ↓
-       [RDS in Data Subnet (no internet)]
+       [数据子网中的 RDS（无互联网）]
 
-Security Groups:
-  - ALB: Allow 443 from internet
-  - App: Allow traffic only from ALB security group
-  - RDS: Allow traffic only from App security group
+安全组：
+  - ALB：允许来自互联网的 443 端口
+  - 应用：仅允许来自 ALB 安全组的流量
+  - RDS：仅允许来自应用安全组的流量
 ```
 
 ---
 
-## 7. Cloud-Native Technologies
+## 7. 云原生技术
 
-### 7.1 Containers and Kubernetes
+### 7.1 容器与 Kubernetes
 
-**Containers (Docker):** Package application + dependencies in isolated runtime environment.
+**容器（Docker）：** 将应用 + 依赖打包在隔离的运行时环境中。
 
-**Why Containers in Cloud?**
-- **Consistent environments**: Dev = Staging = Production
-- **Fast startup**: Seconds vs minutes for VMs
-- **Efficient resource usage**: Share OS kernel, lighter than VMs
+**为什么在云中使用容器？**
+- **一致的环境**：开发 = 预发布 = 生产
+- **快速启动**：秒级 vs 虚拟机分钟级
+- **高效资源使用**：共享 OS 内核，比虚拟机更轻量
 
-**Kubernetes:** Container orchestration platform for deploying, scaling, and managing containerized applications.
+**Kubernetes：** 用于部署、扩展和管理容器化应用的容器编排平台。
 
-**Cloud Kubernetes Services:**
-- **AWS EKS** (Elastic Kubernetes Service): Managed Kubernetes on AWS
-- **GCP GKE** (Google Kubernetes Engine): Google's managed Kubernetes
-- **Azure AKS** (Azure Kubernetes Service): Microsoft's managed Kubernetes
+**云 Kubernetes 服务：**
+- **AWS EKS**（Elastic Kubernetes Service）：AWS 上的托管 Kubernetes
+- **GCP GKE**（Google Kubernetes Engine）：Google 的托管 Kubernetes
+- **Azure AKS**（Azure Kubernetes Service）：微软的托管 Kubernetes
 
-**Benefits for AI/ML:**
-- **GPU Sharing**: Multiple containers share GPU
-- **Model Serving**: Deploy models as containers, Kubernetes handles scaling
-- **Workflow Orchestration**: Kubeflow for ML pipelines on Kubernetes
+**AI/ML 的好处：**
+- **GPU 共享**：多个容器共享 GPU
+- **模型服务**：将模型部署为容器，Kubernetes 处理扩展
+- **工作流编排**：Kubeflow 用于 Kubernetes 上的 ML 流水线
 
-### 7.2 Infrastructure as Code (IaC)
+### 7.2 基础设施即代码（IaC）
 
-**Problem:** Clicking in console is error-prone, not repeatable.
-**Solution:** Define infrastructure in code, version control it, review changes.
+**问题：** 在控制台中点击操作容易出错、不可重复。
+**解决方案：** 用代码定义基础设施、版本控制、审查变更。
 
-**Tools:**
-- **Terraform**: Multi-cloud IaC (works with AWS, GCP, Azure)
-- **AWS CloudFormation**: AWS-specific IaC
-- **Pulumi**: IaC in Python, TypeScript, Go
+**工具：**
+- **Terraform**：多云 IaC（适用于 AWS、GCP、Azure）
+- **AWS CloudFormation**：AWS 特定 IaC
+- **Pulumi**：在 Python、TypeScript、Go 中的 IaC
 
-**Example Terraform:**
+**示例 Terraform：**
 ```hcl
-# Define EC2 instance
+# 定义 EC2 实例
 resource "aws_instance" "ml_server" {
   ami           = "ami-0c55b159cbfafe1f0"
-  instance_type = "p3.2xlarge"  # GPU instance
+  instance_type = "p3.2xlarge"  # GPU 实例
 
   tags = {
     Name = "ml-training-server"
@@ -896,95 +896,95 @@ resource "aws_instance" "ml_server" {
   }
 }
 
-# Apply: terraform apply
-# Infrastructure is created from code, can be reviewed in Git
+# 应用：terraform apply
+# 从代码创建基础设施，可以在 Git 中审查
 ```
 
-**Benefits:**
-- **Version Control**: Track infrastructure changes in Git
-- **Peer Review**: Code review before deploying infrastructure
-- **Repeatability**: Deploy identical environments (dev, staging, prod)
-- **Documentation**: Code IS the documentation
+**优点：**
+- **版本控制**：在 Git 中跟踪基础设施变更
+- **同行评审**：部署基础设施前进行代码审查
+- **可重复性**：部署相同的环境（开发、预发布、生产）
+- **文档**：代码即文档
 
-### 7.3 Serverless Architectures
+### 7.3 无服务器架构
 
-**Serverless = No server management** (not literally no servers).
+**无服务器 = 无需管理服务器**（并非真的没有服务器）。
 
-**Components:**
-- **Functions**: AWS Lambda, Google Cloud Functions
-- **Storage**: S3, DynamoDB
-- **API Gateway**: Expose functions as REST APIs
-- **Event Sources**: S3 uploads, database changes, schedules
+**组件：**
+- **函数**：AWS Lambda、Google Cloud Functions
+- **存储**：S3、DynamoDB
+- **API Gateway**：将函数暴露为 REST API
+- **事件源**：S3 上传、数据库变更、计划任务
 
-**Example Serverless ML Inference:**
+**示例无服务器 ML 推理：**
 ```
-User Request → API Gateway
-                 ↓
-              Lambda Function
-                 ↓ (loads model from S3)
-              [Model Inference]
-                 ↓
-              Return Prediction
+用户请求 → API Gateway
+             ↓
+          Lambda 函数
+             ↓（从 S3 加载模型）
+          [模型推理]
+             ↓
+          返回预测
 
-Cost: $0.20 per 1M requests + compute time
-      (vs $100/month for always-on EC2)
+成本：每 100 万次请求 $0.20 + 计算时间
+      （vs 始终在线的 EC2 每月 $100）
 ```
 
-**When Serverless Works:**
-- **Low/Variable Traffic**: Cost-effective for sporadic usage
-- **Event-Driven**: Respond to events (file uploads, webhooks)
-- **Lightweight Models**: Fits in memory, runs in < 15 minutes
+**无服务器适用场景：**
+- **低/变化流量**：对零星使用具有成本效益
+- **事件驱动**：响应事件（文件上传、webhook）
+- **轻量模型**：适合内存、运行时间 < 15 分钟
 
-**When Serverless Doesn't Work:**
-- **Large Models**: > 10GB doesn't fit in Lambda
-- **Long-Running**: Training jobs > 15 minutes
-- **High Throughput**: Cold starts hurt latency
+**无服务器不适用场景：**
+- **大型模型**：> 10GB 不适合 Lambda
+- **长时间运行**：训练作业 > 15 分钟
+- **高吞吐量**：冷启动影响延迟
 
 ---
 
-## 8. Key Takeaways
+## 8. 关键要点
 
-1. **Cloud computing** provides on-demand, scalable infrastructure with pay-as-you-go pricing—ideal for variable AI/ML workloads.
+1. **云计算**提供按需、可扩展的基础设施，按需付费定价——非常适合变化的 AI/ML 工作负载。
 
-2. **Service models** (IaaS, PaaS, SaaS, FaaS) offer different trade-offs between control and convenience. Choose based on your needs.
+2. **服务模型**（IaaS、PaaS、SaaS、FaaS）在控制与便利之间提供不同的权衡。根据需求选择。
 
-3. **AWS** has the broadest service catalog, **GCP** excels at data/ML, **Azure** integrates with Microsoft ecosystem. Multi-cloud is complex but reduces lock-in.
+3. **AWS**拥有最广泛的服务目录，**GCP**在数据/ML 方面表现出色，**Azure**与 Microsoft 生态系统集成。多云很复杂但减少锁定。
 
-4. **FinOps** is critical: Tag resources, use reserved/spot instances, right-size, monitor costs continuously.
+4. **FinOps**至关重要：给资源打标签、使用预留/Spot 实例、合理调整规格、持续监控成本。
 
-5. **Design for failure**: Use multiple AZs, load balancers, auto-scaling. Cloud infrastructure is ephemeral and resilient.
+5. **为故障而设计**：使用多个可用区、负载均衡器、自动扩缩容。云基础设施是短暂且弹性的。
 
-6. **Cloud-native technologies** (containers, Kubernetes, serverless, IaC) maximize cloud benefits and enable DevOps/MLOps practices.
+6. **云原生技术**（容器、Kubernetes、无服务器、IaC）最大化云优势并启用 DevOps/MLOps 实践。
 
-7. For **AI/ML**, cloud enables:
-   - Elastic compute for training (scale to 1000s of GPUs, pay only for training time)
-   - Global inference deployment (low-latency serving in multiple regions)
-   - Managed ML platforms (SageMaker, Vertex AI) reducing operational overhead
-   - Cost efficiency (pay for what you use, no idle GPUs)
-
----
-
-## What's Next?
-
-**Lecture 02** dives deep into **AWS Core Services**—EC2, S3, RDS, IAM—with hands-on CLI walkthroughs and real-world examples. You'll learn to provision infrastructure, manage storage, and secure resources.
-
-**Exercise 01** guides you through setting up your AWS account, configuring IAM users and roles, installing the AWS CLI, and implementing best practices for security and cost management.
-
-**Preparation:**
-1. Sign up for AWS Free Tier account
-2. Install AWS CLI and configure credentials
-3. Review VPC and networking basics (we'll cover in detail in Lecture 03)
+7. 对于 **AI/ML**，云实现了：
+   - 用于训练的弹性计算（扩展到数千个 GPU，仅按训练时间付费）
+   - 全球推理部署（在多个区域进行低延迟服务）
+   - 托管 ML 平台（SageMaker、Vertex AI）减少运维开销
+   - 成本效率（按使用付费，无闲置 GPU）
 
 ---
 
-## Further Reading
+## 下一步是什么？
 
-- **AWS Well-Architected Framework**: https://aws.amazon.com/architecture/well-architected/
-- **Google Cloud Architecture Framework**: https://cloud.google.com/architecture/framework
-- **Cloud FinOps Foundation**: https://www.finops.org/
-- **NIST Cloud Computing Definition**: https://csrc.nist.gov/publications/detail/sp/800-145/final
-- **The Phoenix Project** (Book): DevOps principles applicable to cloud
-- **Cloud Computing: Concepts, Technology & Architecture** (Book): Comprehensive cloud fundamentals
+**Lecture 02** 深入介绍 **AWS 核心服务**——EC2、S3、RDS、IAM——包含动手 CLI 演练和真实案例。你将学习配置基础设施、管理存储和保护资源。
+
+**练习 01** 指导你设置 AWS 账户、配置 IAM 用户和角色、安装 AWS CLI 以及实施安全和成本管理的最佳实践。
+
+**准备工作：**
+1. 注册 AWS 免费套餐账户
+2. 安装 AWS CLI 并配置凭证
+3. 复习 VPC 和网络基础知识（我们将在 Lecture 03 中详细介绍）
+
+---
+
+## 延伸阅读
+
+- **AWS Well-Architected Framework**：https://aws.amazon.com/architecture/well-architected/
+- **Google Cloud Architecture Framework**：https://cloud.google.com/architecture/framework
+- **Cloud FinOps Foundation**：https://www.finops.org/
+- **NIST Cloud Computing Definition**：https://csrc.nist.gov/publications/detail/sp/800-145/final
+- **《凤凰项目》**（书籍）：适用于云的 DevOps 原则
+- **《云计算：概念、技术与架构》**（书籍）：全面的云基础
 
 ---
 

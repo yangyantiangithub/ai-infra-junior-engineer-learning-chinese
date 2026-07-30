@@ -1,82 +1,82 @@
-# Lecture 03: Authentication & Security for APIs
+# 讲座 03：API 的认证和安全
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Security Fundamentals](#security-fundamentals)
-3. [Authentication vs Authorization](#authentication-vs-authorization)
-4. [API Key Authentication](#api-key-authentication)
+## 目录
+1. [介绍](#介绍)
+2. [安全基础](#安全基础)
+3. [认证 vs 授权](#认证-vs-授权)
+4. [API Key 认证](#api-key-认证)
 5. [JWT (JSON Web Tokens)](#jwt-json-web-tokens)
-6. [OAuth2 and OpenID Connect](#oauth2-and-openid-connect)
-7. [Implementing Authentication in FastAPI](#implementing-authentication-in-fastapi)
-8. [Password Security](#password-security)
-9. [HTTPS and Transport Security](#https-and-transport-security)
-10. [CORS (Cross-Origin Resource Sharing)](#cors-cross-origin-resource-sharing)
-11. [Rate Limiting and Throttling](#rate-limiting-and-throttling)
-12. [Input Validation and Sanitization](#input-validation-and-sanitization)
-13. [Security Headers](#security-headers)
-14. [Security for ML APIs](#security-for-ml-apis)
-15. [Best Practices and Checklists](#best-practices-and-checklists)
-16. [Summary and Key Takeaways](#summary-and-key-takeaways)
+6. [OAuth2 和 OpenID Connect](#oauth2-和-openid-connect)
+7. [在 FastAPI 中实现认证](#在-fastapi-中实现认证)
+8. [密码安全](#密码安全)
+9. [HTTPS 和传输安全](#https-和传输安全)
+10. [CORS (跨域资源共享)](#cors-跨域资源共享)
+11. [速率限制和节流](#速率限制和节流)
+12. [输入验证和清理](#输入验证和清理)
+13. [安全头部](#安全头部)
+14. [ML API 的安全](#ml-api-的安全)
+15. [最佳实践和清单](#最佳实践和清单)
+16. [总结和关键要点](#总结和关键要点)
 
-## Introduction
+## 介绍
 
-Security is not optional—it's a fundamental requirement for any production API. A single security vulnerability can lead to data breaches, unauthorized access, service disruption, or worse. This is especially critical for ML APIs, which often handle sensitive data and expensive computational resources.
+安全不是可选项——它是任何生产 API 的基本要求。一个安全漏洞可能导致数据泄露、未授权访问、服务中断或更严重的后果。这对于经常处理敏感数据和昂贵计算资源的 ML API 尤其重要。
 
-This lecture covers essential security concepts and practical implementation strategies for building secure APIs.
+本讲座涵盖基本的安全概念和构建安全 API 的实用实现策略。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Understand the difference between authentication and authorization
-- Implement various authentication methods (API keys, JWT, OAuth2)
-- Secure passwords using proper hashing techniques
-- Configure HTTPS and transport layer security
-- Implement CORS policies correctly
-- Add rate limiting to prevent abuse
-- Validate and sanitize user inputs
-- Apply security headers
-- Understand ML-specific security concerns
-- Follow security best practices
+在本讲座结束时，你将：
+- 理解认证和授权的区别
+- 实现各种认证方法（API key、JWT、OAuth2）
+- 使用适当的哈希技术确保密码安全
+- 配置 HTTPS 和传输层安全
+- 正确配置 CORS 策略
+- 添加速率限制以防止滥用
+- 验证和清理用户输入
+- 应用安全头部
+- 理解 ML 特定的安全问题
+- 遵循安全最佳实践
 
-### Prerequisites
-- Module 007 - Lecture 01: API Fundamentals
-- Module 007 - Lecture 02: FastAPI Framework
-- Basic understanding of cryptography concepts
-- HTTP protocol knowledge
+### 先决条件
+- 模块 007 - 讲座 01：API 基础
+- 模块 007 - 讲座 02：FastAPI 框架
+- 对密码学概念的基本理解
+- HTTP 协议知识
 
-### Estimated Time
-4-5 hours (including hands-on implementation)
+### 预计时间
+4-5 小时（包括动手实现）
 
-## Security Fundamentals
+## 安全基础
 
-### The CIA Triad
+### CIA 三元组
 
-The foundation of information security:
+信息安全的基础：
 
-1. **Confidentiality**: Data is accessible only to authorized users
-   - Encryption (data at rest and in transit)
-   - Access controls
-   - Authentication
+1. **机密性**：只有授权用户可以访问数据
+   - 加密（静态数据和传输中的数据）
+   - 访问控制
+   - 认证
 
-2. **Integrity**: Data is accurate and hasn't been tampered with
-   - Checksums and hashes
-   - Digital signatures
-   - Validation
+2. **完整性**：数据是准确的且未被篡改
+   - 校验和和哈希
+   - 数字签名
+   - 验证
 
-3. **Availability**: Systems are accessible when needed
-   - Load balancing
-   - DDoS protection
-   - Rate limiting
+3. **可用性**：系统在需要时可访问
+   - 负载均衡
+   - DDoS 防护
+   - 速率限制
 
-### Principle of Least Privilege
+### 最小权限原则
 
-Grant only the minimum permissions necessary:
+只授予必要的最低权限：
 
 ```python
-# Bad: Give admin access to everyone
+# 不良：给每个人管理员权限
 user_permissions = "admin"
 
-# Good: Granular permissions
+# 良好：细粒度权限
 user_permissions = {
     "read_models": True,
     "create_models": False,
@@ -85,85 +85,85 @@ user_permissions = {
 }
 ```
 
-### Defense in Depth
+### 纵深防御
 
-Multiple layers of security:
+多层安全：
 
 ```
 ┌─────────────────────────────┐
-│ Application Layer           │ ← Input validation
+│ 应用层                      │ ← 输入验证
 ├─────────────────────────────┤
-│ Authentication Layer        │ ← JWT/OAuth2
+│ 认证层                      │ ← JWT/OAuth2
 ├─────────────────────────────┤
-│ Network Layer               │ ← Firewall, VPN
+│ 网络层                      │ ← 防火墙、VPN
 ├─────────────────────────────┤
-│ Transport Layer             │ ← HTTPS/TLS
+│ 传输层                      │ ← HTTPS/TLS
 ├─────────────────────────────┤
-│ Infrastructure Layer        │ ← Security groups
+│ 基础设施层                  │ ← 安全组
 └─────────────────────────────┘
 ```
 
-### Security by Design
+### 安全设计
 
-Build security in from the start, not as an afterthought:
+从一开始就构建安全，而不是事后添加：
 
-- Use secure frameworks (FastAPI, Django)
-- Follow security guidelines (OWASP Top 10)
-- Regular security audits
-- Automated security testing
-- Keep dependencies updated
+- 使用安全的框架（FastAPI、Django）
+- 遵循安全指南（OWASP Top 10）
+- 定期安全审计
+- 自动化安全测试
+- 保持依赖更新
 
-## Authentication vs Authorization
+## 认证 vs 授权
 
-These terms are often confused, but they serve different purposes:
+这些术语经常混淆，但它们服务于不同的目的：
 
-### Authentication
+### 认证
 
-**"Who are you?"**
+**"你是谁？"**
 
-Verifying the identity of a user or system.
+验证用户或系统的身份。
 
 ```python
-# User provides credentials
+# 用户提供凭证
 username = "alice"
 password = "secret123"
 
-# System verifies identity
+# 系统验证身份
 if verify_credentials(username, password):
-    # User is authenticated
+    # 用户已认证
     issue_token(username)
 ```
 
-**Methods:**
-- Username/password
-- API keys
-- Tokens (JWT)
-- Certificates
-- Biometrics
+**方法：**
+- 用户名/密码
+- API key
+- 令牌 (JWT)
+- 证书
+- 生物识别
 
-### Authorization
+### 授权
 
-**"What can you do?"**
+**"你能做什么？"**
 
-Determining what an authenticated user is allowed to do.
+确定已认证用户被允许做什么。
 
 ```python
-# User is authenticated as "alice"
+# 用户已认证为 "alice"
 user = get_current_user()  # alice
 
-# Check authorization
+# 检查授权
 if user.has_permission("delete_models"):
     delete_model(model_id)
 else:
     raise PermissionDeniedError()
 ```
 
-**Methods:**
-- Role-Based Access Control (RBAC)
-- Attribute-Based Access Control (ABAC)
-- Access Control Lists (ACL)
+**方法：**
+- 基于角色的访问控制 (RBAC)
+- 基于属性的访问控制 (ABAC)
+- 访问控制列表 (ACL)
 
-### Example Flow
+### 示例流程
 
 ```python
 from fastapi import FastAPI, Depends, HTTPException
@@ -171,14 +171,14 @@ from typing import Optional
 
 app = FastAPI()
 
-# Authentication: Verify who they are
+# 认证：验证他们是谁
 def authenticate_user(api_key: str) -> Optional[User]:
     user = db.get_user_by_api_key(api_key)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid API key")
     return user
 
-# Authorization: Check what they can do
+# 授权：检查他们能做什么
 def authorize_action(user: User, action: str) -> bool:
     return action in user.permissions
 
@@ -187,75 +187,75 @@ def delete_model(
     model_id: str,
     user: User = Depends(authenticate_user)
 ):
-    # Authorization check
+    # 授权检查
     if not authorize_action(user, "delete_models"):
         raise HTTPException(status_code=403, detail="Insufficient permissions")
 
-    # Perform action
+    # 执行操作
     db.delete_model(model_id)
     return {"message": "Model deleted"}
 ```
 
-**Key Differences:**
+**关键区别：**
 
-| Aspect | Authentication | Authorization |
+| 方面 | 认证 | 授权 |
 |--------|---------------|---------------|
-| Question | Who are you? | What can you do? |
-| Process | Verify identity | Check permissions |
-| Status Code | 401 Unauthorized | 403 Forbidden |
-| Order | First | Second (after auth) |
-| Example | Login with password | Access admin panel |
+| 问题 | 你是谁？ | 你能做什么？ |
+| 过程 | 验证身份 | 检查权限 |
+| 状态码 | 401 Unauthorized | 403 Forbidden |
+| 顺序 | 先 | 后（认证之后） |
+| 示例 | 用密码登录 | 访问管理面板 |
 
-## API Key Authentication
+## API Key 认证
 
-The simplest form of authentication for APIs.
+API 最简单形式的认证。
 
-### What is an API Key?
+### 什么是 API Key？
 
-A unique identifier used to authenticate requests:
+用于认证请求的唯一标识符：
 
 ```
 API-Key: sk_live_51H8K2jLkJ...
 ```
 
-### Advantages
+### 优点
 
-- Simple to implement
-- Easy for users to understand
-- No session management needed
-- Stateless
+- 实现简单
+- 用户易于理解
+- 不需要会话管理
+- 无状态
 
-### Disadvantages
+### 缺点
 
-- If leaked, anyone can use it
-- No built-in expiration
-- Hard to rotate safely
-- Limited information about the user
+- 如果泄露，任何人都可以使用
+- 没有内置过期机制
+- 难以安全轮换
+- 关于用户的信息有限
 
-### Implementation
+### 实现
 
-**Generate API Keys:**
+**生成 API Key：**
 
 ```python
 import secrets
 import hashlib
 
 def generate_api_key() -> str:
-    """Generate a secure random API key"""
+    """生成安全的随机 API key"""
     return secrets.token_urlsafe(32)
 
 def hash_api_key(api_key: str) -> str:
-    """Hash API key for storage"""
+    """哈希 API key 以便存储"""
     return hashlib.sha256(api_key.encode()).hexdigest()
 
-# Usage
+# 用法
 api_key = generate_api_key()
 print(f"API Key: {api_key}")
-# Store hash in database
+# 在数据库中存储哈希值
 hashed = hash_api_key(api_key)
 ```
 
-**Verify API Keys:**
+**验证 API Key：**
 
 ```python
 from fastapi import FastAPI, HTTPException, Security
@@ -266,7 +266,7 @@ app = FastAPI()
 API_KEY_NAME = "X-API-Key"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
-# Simulated database
+# 模拟数据库
 API_KEYS = {
     "hashed_key_1": {"username": "alice", "permissions": ["read", "write"]},
     "hashed_key_2": {"username": "bob", "permissions": ["read"]}
@@ -287,7 +287,7 @@ def protected_route(user_info: dict = Depends(verify_api_key)):
     return {"message": f"Hello {user_info['username']}"}
 ```
 
-**Using API Keys (Client Side):**
+**使用 API Key（客户端）：**
 
 ```python
 import requests
@@ -296,35 +296,35 @@ headers = {"X-API-Key": "your-api-key-here"}
 response = requests.get("http://api.example.com/protected", headers=headers)
 ```
 
-### Best Practices
+### 最佳实践
 
-1. **Use HTTPS**: API keys in plain HTTP can be intercepted
-2. **Hash keys**: Store hashed versions in database
-3. **Prefix keys**: Use prefixes to identify key types (`sk_live_`, `pk_test_`)
-4. **Rotation**: Provide mechanism to rotate keys
-5. **Scopes**: Limit key permissions
-6. **Monitoring**: Log API key usage and detect abuse
-7. **Rate limiting**: Prevent brute force attacks
+1. **使用 HTTPS**：明文 HTTP 中的 API key 可能被截获
+2. **哈希 key**：在数据库中存储哈希版本
+3. **前缀 key**：使用前缀标识 key 类型（`sk_live_`、`pk_test_`）
+4. **轮换**：提供轮换 key 的机制
+5. **作用域**：限制 key 的权限
+6. **监控**：记录 API key 使用并检测滥用
+7. **速率限制**：防止暴力破解攻击
 
 ## JWT (JSON Web Tokens)
 
-JWT is a compact, URL-safe means of representing claims between two parties.
+JWT 是一种紧凑的、URL 安全的方式，用于在双方之间表示声明。
 
-### What is JWT?
+### 什么是 JWT？
 
-A JWT consists of three parts:
+JWT 由三部分组成：
 ```
 header.payload.signature
 ```
 
-Example:
+示例：
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 ```
 
-**Parts:**
+**组成部分：**
 
-1. **Header**: Algorithm and token type
+1. **Header**：算法和令牌类型
    ```json
    {
      "alg": "HS256",
@@ -332,7 +332,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4
    }
    ```
 
-2. **Payload**: Claims (data)
+2. **Payload**：声明（数据）
    ```json
    {
      "sub": "1234567890",
@@ -342,7 +342,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4
    }
    ```
 
-3. **Signature**: Verifies integrity
+3. **Signature**：验证完整性
    ```
    HMACSHA256(
      base64UrlEncode(header) + "." +
@@ -351,39 +351,39 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4
    )
    ```
 
-### Advantages
+### 优点
 
-- **Stateless**: No server-side session storage
-- **Compact**: Easily transmitted in URLs, headers
-- **Self-contained**: Contains all user information
-- **Secure**: Cryptographically signed
-- **Scalable**: Works across multiple servers
+- **无状态**：不需要服务器端会话存储
+- **紧凑**：易于在 URL、头部中传输
+- **自包含**：包含所有用户信息
+- **安全**：经过加密签名
+- **可扩展**：跨多个服务器工作
 
-### Disadvantages
+### 缺点
 
-- **Cannot revoke**: Valid until expiration
-- **Size**: Larger than simple API keys
-- **Secret management**: Must protect signing key
+- **无法撤销**：在过期前一直有效
+- **大小**：比简单的 API key 大
+- **密钥管理**：必须保护签名密钥
 
-### Standard Claims
+### 标准声明
 
-- **iss** (issuer): Who created the token
-- **sub** (subject): User ID
-- **aud** (audience): Who token is intended for
-- **exp** (expiration): When token expires
-- **iat** (issued at): When token was created
-- **nbf** (not before): Token not valid before this time
+- **iss** (issuer)：谁创建了令牌
+- **sub** (subject)：用户 ID
+- **aud** (audience)：令牌面向谁
+- **exp** (expiration)：令牌何时过期
+- **iat** (issued at)：令牌何时创建
+- **nbf** (not before)：令牌在此时间之前无效
 
-### Implementation with FastAPI
+### 在 FastAPI 中的实现
 
-**Install dependencies:**
+**安装依赖：**
 ```bash
 pip install python-jose[cryptography]
 pip install passlib[bcrypt]
 pip install python-multipart
 ```
 
-**Create JWT utilities:**
+**创建 JWT 工具函数：**
 
 ```python
 from datetime import datetime, timedelta
@@ -391,15 +391,15 @@ from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-# Configuration
-SECRET_KEY = "your-secret-key-keep-it-secret"  # Use environment variable!
+# 配置
+SECRET_KEY = "your-secret-key-keep-it-secret"  # 使用环境变量！
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    """Create a JWT access token"""
+    """创建 JWT 访问令牌"""
     to_encode = data.copy()
 
     if expires_delta:
@@ -412,7 +412,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 def verify_token(token: str) -> dict:
-    """Verify and decode JWT token"""
+    """验证并解码 JWT 令牌"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
@@ -424,7 +424,7 @@ def verify_token(token: str) -> dict:
         )
 ```
 
-**Login endpoint:**
+**登录 endpoint：**
 
 ```python
 from fastapi import FastAPI, Depends, HTTPException, status
@@ -444,18 +444,18 @@ class User(BaseModel):
     email: str
     disabled: bool = False
 
-# Simulated user database
+# 模拟用户数据库
 fake_users_db = {
     "alice": {
         "username": "alice",
         "email": "alice@example.com",
-        "hashed_password": "$2b$12$...",  # bcrypt hash
+        "hashed_password": "$2b$12$...",  # bcrypt 哈希
         "disabled": False
     }
 }
 
 def authenticate_user(username: str, password: str):
-    """Verify username and password"""
+    """验证用户名和密码"""
     user = fake_users_db.get(username)
     if not user:
         return False
@@ -465,7 +465,7 @@ def authenticate_user(username: str, password: str):
 
 @app.post("/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    """Login and get access token"""
+    """登录并获取访问令牌"""
     user = authenticate_user(form_data.username, form_data.password)
 
     if not user:
@@ -475,7 +475,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             headers={"WWW-Authenticate": "Bearer"}
         )
 
-    # Create token
+    # 创建令牌
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user["username"]},
@@ -485,11 +485,11 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": access_token, "token_type": "bearer"}
 ```
 
-**Protected endpoints:**
+**受保护的 endpoint：**
 
 ```python
 async def get_current_user(token: str = Depends(oauth2_scheme)):
-    """Get current user from token"""
+    """从令牌获取当前用户"""
     payload = verify_token(token)
     username: str = payload.get("sub")
 
@@ -504,7 +504,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 @app.get("/users/me", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_user)):
-    """Get current user profile"""
+    """获取当前用户资料"""
     return current_user
 
 @app.get("/protected")
@@ -512,31 +512,31 @@ async def protected_route(current_user: User = Depends(get_current_user)):
     return {"message": f"Hello {current_user.username}"}
 ```
 
-**Client usage:**
+**客户端用法：**
 
 ```python
 import requests
 
-# 1. Login to get token
+# 1. 登录获取令牌
 response = requests.post(
     "http://localhost:8000/token",
     data={"username": "alice", "password": "secret"}
 )
 token = response.json()["access_token"]
 
-# 2. Use token for authenticated requests
+# 2. 使用令牌进行认证请求
 headers = {"Authorization": f"Bearer {token}"}
 response = requests.get("http://localhost:8000/users/me", headers=headers)
 print(response.json())
 ```
 
-### Refresh Tokens
+### 刷新令牌
 
-Access tokens should be short-lived. Use refresh tokens for long-term access:
+访问令牌应该短命。使用刷新令牌进行长期访问：
 
 ```python
 def create_refresh_token(data: dict):
-    """Create long-lived refresh token"""
+    """创建长寿命刷新令牌"""
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(days=7)
     to_encode.update({"exp": expire, "type": "refresh"})
@@ -544,35 +544,35 @@ def create_refresh_token(data: dict):
 
 @app.post("/token/refresh")
 async def refresh_access_token(refresh_token: str):
-    """Get new access token using refresh token"""
+    """使用刷新令牌获取新的访问令牌"""
     payload = verify_token(refresh_token)
 
     if payload.get("type") != "refresh":
         raise HTTPException(status_code=401, detail="Invalid refresh token")
 
-    # Create new access token
+    # 创建新的访问令牌
     access_token = create_access_token(data={"sub": payload.get("sub")})
     return {"access_token": access_token, "token_type": "bearer"}
 ```
 
-## OAuth2 and OpenID Connect
+## OAuth2 和 OpenID Connect
 
-### OAuth2 Overview
+### OAuth2 概述
 
-OAuth2 is an authorization framework that enables third-party applications to obtain limited access to a service.
+OAuth2 是一个授权框架，使第三方应用程序能够获得对服务的有限访问权限。
 
-**Use Cases:**
-- "Login with Google"
-- "Login with GitHub"
-- Third-party app access
+**使用场景：**
+- "使用 Google 登录"
+- "使用 GitHub 登录"
+- 第三方应用程序访问
 
-**Roles:**
-1. **Resource Owner**: User
-2. **Client**: Application requesting access
-3. **Authorization Server**: Issues tokens
-4. **Resource Server**: Hosts protected resources
+**角色：**
+1. **资源所有者**：用户
+2. **客户端**：请求访问的应用程序
+3. **授权服务器**：颁发令牌
+4. **资源服务器**：托管受保护的资源
 
-**Flow:**
+**流程：**
 
 ```
 ┌──────────┐                               ┌─────────────┐
@@ -600,7 +600,7 @@ OAuth2 is an authorization framework that enables third-party applications to ob
      │                             └──────────────────┘
 ```
 
-### FastAPI OAuth2 Implementation
+### FastAPI OAuth2 实现
 
 ```python
 from fastapi import FastAPI, Depends, HTTPException
@@ -615,14 +615,14 @@ oauth2_scheme = OAuth2AuthorizationCodeBearer(
 
 @app.get("/protected")
 async def protected_route(token: str = Depends(oauth2_scheme)):
-    # Verify token with provider
+    # 使用提供商验证令牌
     user_info = verify_with_provider(token)
     return {"user": user_info}
 ```
 
 ### OpenID Connect
 
-Extension of OAuth2 for authentication:
+OAuth2 的扩展，用于认证：
 
 ```python
 from authlib.integrations.starlette_client import OAuth
@@ -651,47 +651,47 @@ async def auth_google(request: Request):
     return {"user": user}
 ```
 
-## Password Security
+## 密码安全
 
-### Never Store Plain Text Passwords
+### 永远不要存储明文密码
 
-**Bad:**
+**不良：**
 ```python
 users = {
-    "alice": {"password": "secret123"}  # NEVER DO THIS!
+    "alice": {"password": "secret123"}  # 永远不要这样做！
 }
 ```
 
-**Good:**
+**良好：**
 ```python
 users = {
-    "alice": {"password_hash": "$2b$12$KIX..."}  # Hashed password
+    "alice": {"password_hash": "$2b$12$KIX..."}  # 哈希后的密码
 }
 ```
 
-### Hashing vs Encryption
+### 哈希 vs 加密
 
-| Aspect | Hashing | Encryption |
+| 方面 | 哈希 | 加密 |
 |--------|---------|------------|
-| Reversible | No | Yes |
-| Purpose | Verify integrity | Protect data |
-| Use Case | Passwords | Sensitive data |
-| Algorithms | bcrypt, argon2 | AES, RSA |
+| 可逆 | 否 | 是 |
+| 目的 | 验证完整性 | 保护数据 |
+| 用例 | 密码 | 敏感数据 |
+| 算法 | bcrypt、argon2 | AES、RSA |
 
-### Using bcrypt
+### 使用 bcrypt
 
 ```python
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Hash password
+# 哈希密码
 password = "user_password_123"
 hashed = pwd_context.hash(password)
 print(hashed)
 # $2b$12$KIXl.W9T8qI9GqN3z2GKsOzp8qjZ6q...
 
-# Verify password
+# 验证密码
 is_correct = pwd_context.verify("user_password_123", hashed)
 print(is_correct)  # True
 
@@ -699,7 +699,7 @@ is_correct = pwd_context.verify("wrong_password", hashed)
 print(is_correct)  # False
 ```
 
-### Password Requirements
+### 密码要求
 
 ```python
 from pydantic import BaseModel, validator
@@ -724,17 +724,17 @@ class UserCreate(BaseModel):
         return v
 ```
 
-### Secure Password Reset
+### 安全密码重置
 
 ```python
 import secrets
 from datetime import datetime, timedelta
 
 def create_password_reset_token(email: str) -> str:
-    """Create secure password reset token"""
+    """创建安全的密码重置令牌"""
     token = secrets.token_urlsafe(32)
 
-    # Store token with expiration
+    # 存储令牌及过期时间
     reset_tokens[token] = {
         "email": email,
         "expires": datetime.utcnow() + timedelta(hours=1)
@@ -744,10 +744,10 @@ def create_password_reset_token(email: str) -> str:
 
 @app.post("/password-reset/request")
 async def request_password_reset(email: str):
-    """Request password reset"""
+    """请求密码重置"""
     user = get_user_by_email(email)
     if not user:
-        # Don't reveal if user exists
+        # 不要透露用户是否存在
         return {"message": "If email exists, reset link will be sent"}
 
     token = create_password_reset_token(email)
@@ -757,7 +757,7 @@ async def request_password_reset(email: str):
 
 @app.post("/password-reset/confirm")
 async def confirm_password_reset(token: str, new_password: str):
-    """Reset password using token"""
+    """使用令牌重置密码"""
     if token not in reset_tokens:
         raise HTTPException(status_code=400, detail="Invalid token")
 
@@ -766,47 +766,47 @@ async def confirm_password_reset(token: str, new_password: str):
     if datetime.utcnow() > reset_info["expires"]:
         raise HTTPException(status_code=400, detail="Token expired")
 
-    # Update password
+    # 更新密码
     update_user_password(reset_info["email"], new_password)
 
-    # Invalidate token
+    # 使令牌失效
     del reset_tokens[token]
 
     return {"message": "Password reset successful"}
 ```
 
-## HTTPS and Transport Security
+## HTTPS 和传输安全
 
-### Why HTTPS?
+### 为什么需要 HTTPS？
 
-Without HTTPS:
-- Passwords sent in plain text
-- API keys visible to attackers
-- Data can be modified in transit
-- No server authentication
+没有 HTTPS：
+- 密码以明文发送
+- API key 对攻击者可见
+- 数据可能在传输中被修改
+- 没有服务器认证
 
-With HTTPS:
-- Encrypted communication
-- Data integrity
-- Server authentication
-- Client trust
+有了 HTTPS：
+- 通信加密
+- 数据完整性
+- 服务器认证
+- 客户端信任
 
-### TLS/SSL Certificates
+### TLS/SSL 证书
 
-**Development (self-signed):**
+**开发环境（自签名）：**
 ```bash
-# Generate self-signed certificate
+# 生成自签名证书
 openssl req -x509 -newkey rsa:4096 -nodes \
   -out cert.pem -keyout key.pem -days 365
 ```
 
-**Production:**
-Use Let's Encrypt (free) or commercial CA.
+**生产环境：**
+使用 Let's Encrypt（免费）或商业 CA。
 
-### Running FastAPI with HTTPS
+### 使用 HTTPS 运行 FastAPI
 
 ```python
-# Using uvicorn with SSL
+# 使用 uvicorn 配合 SSL
 import uvicorn
 
 if __name__ == "__main__":
@@ -819,12 +819,12 @@ if __name__ == "__main__":
     )
 ```
 
-Or via command line:
+或通过命令行：
 ```bash
 uvicorn main:app --ssl-keyfile=./key.pem --ssl-certfile=./cert.pem
 ```
 
-### Force HTTPS
+### 强制 HTTPS
 
 ```python
 from fastapi import FastAPI, Request
@@ -840,36 +840,36 @@ async def force_https(request: Request, call_next):
     return await call_next(request)
 ```
 
-### Security Headers
+### 安全头部
 
 ```python
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 
-# Enforce HTTPS
+# 强制 HTTPS
 app.add_middleware(HTTPSRedirectMiddleware)
 
-# Limit allowed hosts
+# 限制允许的主机
 app.add_middleware(
     TrustedHostMiddleware,
     allowed_hosts=["example.com", "*.example.com"]
 )
 ```
 
-## CORS (Cross-Origin Resource Sharing)
+## CORS (跨域资源共享)
 
-### What is CORS?
+### 什么是 CORS？
 
-Security feature that restricts which origins can access your API.
+限制哪些来源可以访问你的 API 的安全功能。
 
-**Scenario:**
-- Your API: `https://api.example.com`
-- Frontend: `https://app.example.com`
-- Different origin (different subdomain)
+**场景：**
+- 你的 API：`https://api.example.com`
+- 前端：`https://app.example.com`
+- 不同的来源（不同的子域名）
 
-Without CORS configuration, the browser blocks the request.
+没有 CORS 配置，浏览器会阻止请求。
 
-### CORS Headers
+### CORS 头部
 
 ```http
 Access-Control-Allow-Origin: https://app.example.com
@@ -878,7 +878,7 @@ Access-Control-Allow-Headers: Content-Type, Authorization
 Access-Control-Max-Age: 3600
 ```
 
-### Implementing CORS in FastAPI
+### 在 FastAPI 中实现 CORS
 
 ```python
 from fastapi import FastAPI
@@ -886,7 +886,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Configure CORS
+# 配置 CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -899,25 +899,25 @@ app.add_middleware(
 )
 ```
 
-### Development Configuration
+### 开发环境配置
 
 ```python
-# WARNING: Only for development!
+# 警告：仅用于开发环境！
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
+    allow_origins=["*"],  # 允许所有来源
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 ```
 
-### Production Configuration
+### 生产环境配置
 
 ```python
 import os
 
-# Load allowed origins from environment
+# 从环境加载允许的来源
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "").split(",")
 
 app.add_middleware(
@@ -930,23 +930,23 @@ app.add_middleware(
 )
 ```
 
-## Rate Limiting and Throttling
+## 速率限制和节流
 
-### Why Rate Limiting?
+### 为什么需要速率限制？
 
-- Prevent abuse and DoS attacks
-- Ensure fair resource allocation
-- Protect infrastructure from overload
-- Monetization (tier-based limits)
+- 防止滥用和 DoS 攻击
+- 确保公平的资源分配
+- 保护基础设施免受过载
+- 盈利（基于层级的限制）
 
-### Strategies
+### 策略
 
-1. **Fixed Window**: X requests per time window
-2. **Sliding Window**: More precise than fixed
-3. **Token Bucket**: Allows bursts
-4. **Leaky Bucket**: Smooths traffic
+1. **固定窗口**：每个时间窗口 X 个请求
+2. **滑动窗口**：比固定窗口更精确
+3. **令牌桶**：允许突发流量
+4. **漏桶**：平滑流量
 
-### Implementation with SlowAPI
+### 使用 SlowAPI 实现
 
 ```bash
 pip install slowapi
@@ -960,24 +960,24 @@ from fastapi import FastAPI, Request
 
 app = FastAPI()
 
-# Initialize limiter
+# 初始化限制器
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Apply rate limit to endpoint
+# 对 endpoint 应用速率限制
 @app.post("/predict")
 @limiter.limit("10/minute")
 async def predict(request: Request, input_data: PredictionInput):
     return {"prediction": "result"}
 
-# Different limits for different endpoints
+# 不同 endpoint 的不同限制
 @app.get("/expensive-operation")
 @limiter.limit("2/minute")
 async def expensive_operation(request: Request):
     return {"status": "processing"}
 
-# Multiple limits
+# 多重限制
 @app.get("/api/data")
 @limiter.limit("100/hour")
 @limiter.limit("1000/day")
@@ -985,11 +985,11 @@ async def get_data(request: Request):
     return {"data": []}
 ```
 
-### User-Based Rate Limiting
+### 基于用户的速率限制
 
 ```python
 def get_user_id(request: Request) -> str:
-    """Extract user ID from request"""
+    """从请求中提取用户 ID"""
     token = request.headers.get("Authorization", "").replace("Bearer ", "")
     if token:
         payload = verify_token(token)
@@ -999,18 +999,18 @@ def get_user_id(request: Request) -> str:
 limiter = Limiter(key_func=get_user_id)
 
 @app.post("/predict")
-@limiter.limit("100/minute")  # Per user, not per IP
+@limiter.limit("100/minute")  # 按用户，而不是按 IP
 async def predict(request: Request, input_data: PredictionInput):
     return {"prediction": "result"}
 ```
 
-### Custom Rate Limits Based on User Tier
+### 基于用户层级的自定义速率限制
 
 ```python
 from functools import wraps
 
 def get_user_rate_limit(user: User) -> str:
-    """Get rate limit based on user tier"""
+    """根据用户层级获取速率限制"""
     limits = {
         "free": "10/minute",
         "pro": "100/minute",
@@ -1024,22 +1024,22 @@ async def predict(
     input_data: PredictionInput,
     current_user: User = Depends(get_current_user)
 ):
-    # Apply custom limit
+    # 应用自定义限制
     limit = get_user_rate_limit(current_user)
-    # Use custom limiter logic
+    # 使用自定义限制器逻辑
     return {"prediction": "result"}
 ```
 
-### Rate Limit Headers
+### 速率限制头部
 
-Include rate limit information in responses:
+在响应中包含速率限制信息：
 
 ```python
 from fastapi import Response
 
 @app.get("/api/data")
 async def get_data(response: Response):
-    # Add rate limit headers
+    # 添加速率限制头部
     response.headers["X-RateLimit-Limit"] = "100"
     response.headers["X-RateLimit-Remaining"] = "95"
     response.headers["X-RateLimit-Reset"] = "1634567890"
@@ -1047,70 +1047,70 @@ async def get_data(response: Response):
     return {"data": []}
 ```
 
-## Input Validation and Sanitization
+## 输入验证和清理
 
-### SQL Injection Prevention
+### SQL 注入防护
 
-**Bad (vulnerable):**
+**不良（易受攻击）：**
 ```python
-# NEVER DO THIS!
+# 永远不要这样做！
 query = f"SELECT * FROM users WHERE username = '{username}'"
 db.execute(query)
 ```
 
-**Good (parameterized queries):**
+**良好（参数化查询）：**
 ```python
 query = "SELECT * FROM users WHERE username = ?"
 db.execute(query, (username,))
 ```
 
-### XSS (Cross-Site Scripting) Prevention
+### XSS (跨站脚本) 防护
 
 ```python
 from markupsafe import escape
 
 @app.post("/comments")
 async def create_comment(comment: str):
-    # Escape HTML
+    # 转义 HTML
     safe_comment = escape(comment)
     db.save_comment(safe_comment)
     return {"comment": safe_comment}
 ```
 
-### Command Injection Prevention
+### 命令注入防护
 
 ```python
 import subprocess
 import shlex
 
-# Bad
+# 不良
 filename = user_input
-subprocess.run(f"cat {filename}", shell=True)  # DANGEROUS!
+subprocess.run(f"cat {filename}", shell=True)  # 危险！
 
-# Good
+# 良好
 filename = shlex.quote(user_input)
-subprocess.run(["cat", filename])  # Safe
+subprocess.run(["cat", filename])  # 安全
 ```
 
-### Path Traversal Prevention
+### 路径遍历防护
 
 ```python
 from pathlib import Path
 
 @app.get("/files/{filename}")
 async def get_file(filename: str):
-    # Prevent path traversal
+    # 防止路径遍历
     base_dir = Path("/safe/directory")
     file_path = (base_dir / filename).resolve()
 
-    # Ensure file is within base directory
+    # 确保文件在基础目录内
     if not file_path.is_relative_to(base_dir):
         raise HTTPException(status_code=400, detail="Invalid file path")
 
     return FileResponse(file_path)
 ```
 
-### Pydantic Validation
+### Pydantic 验证
 
 ```python
 from pydantic import BaseModel, validator, constr, conint
@@ -1128,9 +1128,9 @@ class ModelConfig(BaseModel):
         return v
 ```
 
-## Security Headers
+## 安全头部
 
-### Important Security Headers
+### 重要的安全头部
 
 ```python
 from fastapi import FastAPI
@@ -1140,22 +1140,22 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         response = await call_next(request)
 
-        # Prevent clickjacking
+        # 防止点击劫持
         response.headers["X-Frame-Options"] = "DENY"
 
-        # XSS protection
+        # XSS 防护
         response.headers["X-Content-Type-Options"] = "nosniff"
 
-        # Control referrer information
+        # 控制 referrer 信息
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
-        # Content Security Policy
+        # 内容安全策略
         response.headers["Content-Security-Policy"] = "default-src 'self'"
 
-        # Strict Transport Security (HTTPS only)
+        # 严格传输安全（仅 HTTPS）
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
 
-        # Permissions Policy
+        # 权限策略
         response.headers["Permissions-Policy"] = "geolocation=(), microphone=()"
 
         return response
@@ -1164,11 +1164,11 @@ app = FastAPI()
 app.add_middleware(SecurityHeadersMiddleware)
 ```
 
-## Security for ML APIs
+## ML API 的安全
 
-### Model Security
+### 模型安全
 
-**1. Model File Protection:**
+**1. 模型文件保护：**
 ```python
 import os
 from pathlib import Path
@@ -1176,29 +1176,29 @@ from pathlib import Path
 MODEL_DIR = Path("/secure/models")
 
 def load_model(model_id: str):
-    # Validate model ID
+    # 验证模型 ID
     if not model_id.isalnum():
         raise ValueError("Invalid model ID")
 
     model_path = MODEL_DIR / f"{model_id}.pkl"
 
-    # Check file exists and is within allowed directory
+    # 检查文件存在且在允许的目录内
     if not model_path.is_file() or not model_path.is_relative_to(MODEL_DIR):
         raise FileNotFoundError("Model not found")
 
-    # Set restrictive permissions (owner read/write only)
+    # 设置限制性权限（仅所有者读写）
     os.chmod(model_path, 0o600)
 
     return pickle.load(open(model_path, "rb"))
 ```
 
-**2. Input Validation for ML Models:**
+**2. ML 模型的输入验证：**
 ```python
 from pydantic import BaseModel, validator
 import numpy as np
 
 class ImagePredictionInput(BaseModel):
-    image_data: str  # Base64 encoded
+    image_data: str  # Base64 编码
     max_size_mb: int = 10
 
     @validator("image_data")
@@ -1210,7 +1210,7 @@ class ImagePredictionInput(BaseModel):
         except Exception:
             raise ValueError("Invalid base64 encoding")
 
-        # Check size
+        # 检查大小
         size_mb = len(decoded) / (1024 * 1024)
         if size_mb > cls.max_size_mb:
             raise ValueError(f"Image too large: {size_mb:.2f}MB > {cls.max_size_mb}MB")
@@ -1218,14 +1218,14 @@ class ImagePredictionInput(BaseModel):
         return v
 ```
 
-**3. Resource Limits:**
+**3. 资源限制：**
 ```python
 from contextlib import contextmanager
 import signal
 
 @contextmanager
 def time_limit(seconds: int):
-    """Context manager to limit execution time"""
+    """上下文管理器，限制执行时间"""
     def signal_handler(signum, frame):
         raise TimeoutError("Prediction timed out")
 
@@ -1239,22 +1239,22 @@ def time_limit(seconds: int):
 @app.post("/predict")
 async def predict(input_data: PredictionInput):
     try:
-        with time_limit(5):  # 5 second timeout
+        with time_limit(5):  # 5 秒超时
             prediction = model.predict(input_data.features)
             return {"prediction": prediction}
     except TimeoutError:
         raise HTTPException(status_code=504, detail="Prediction timeout")
 ```
 
-**4. Adversarial Input Detection:**
+**4. 对抗性输入检测：**
 ```python
 def detect_adversarial_input(input_data: np.ndarray) -> bool:
-    """Basic adversarial input detection"""
-    # Check for extreme values
+    """基础对抗性输入检测"""
+    # 检查极端值
     if np.any(np.abs(input_data) > 1000):
         return True
 
-    # Check for NaN or Inf
+    # 检查 NaN 或 Inf
     if np.any(~np.isfinite(input_data)):
         return True
 
@@ -1270,35 +1270,35 @@ async def predict(input_data: PredictionInput):
     return model.predict(features)
 ```
 
-### Data Privacy
+### 数据隐私
 
-**1. PII Protection:**
+**1. PII 保护：**
 ```python
 import re
 
 def mask_pii(text: str) -> str:
-    """Mask personally identifiable information"""
-    # Email
+    """屏蔽个人身份信息"""
+    # 邮箱
     text = re.sub(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', '[EMAIL]', text)
 
-    # Phone
+    # 电话
     text = re.sub(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b', '[PHONE]', text)
 
-    # SSN
+    # 社会安全号码
     text = re.sub(r'\b\d{3}-\d{2}-\d{4}\b', '[SSN]', text)
 
     return text
 
 @app.post("/analyze")
 async def analyze_text(text: str):
-    # Mask PII before logging or processing
+    # 在记录或处理前屏蔽 PII
     safe_text = mask_pii(text)
     logger.info(f"Processing: {safe_text}")
 
     return {"result": "processed"}
 ```
 
-**2. Audit Logging:**
+**2. 审计日志：**
 ```python
 import logging
 from datetime import datetime
@@ -1310,7 +1310,7 @@ async def predict(
     input_data: PredictionInput,
     current_user: User = Depends(get_current_user)
 ):
-    # Log access
+    # 记录访问
     audit_logger.info({
         "timestamp": datetime.utcnow().isoformat(),
         "user": current_user.username,
@@ -1322,120 +1322,120 @@ async def predict(
     return model.predict(input_data.features)
 ```
 
-## Best Practices and Checklists
+## 最佳实践和清单
 
-### Security Checklist
+### 安全清单
 
-**Authentication & Authorization:**
-- [ ] Use HTTPS for all endpoints
-- [ ] Implement proper authentication (JWT, OAuth2)
-- [ ] Hash passwords with bcrypt or argon2
-- [ ] Implement role-based access control
-- [ ] Use API keys for service-to-service communication
-- [ ] Implement token expiration and refresh
+**认证和授权：**
+- [ ] 所有 endpoint 使用 HTTPS
+- [ ] 实现适当的认证（JWT、OAuth2）
+- [ ] 使用 bcrypt 或 argon2 哈希密码
+- [ ] 实现基于角色的访问控制
+- [ ] 服务间通信使用 API key
+- [ ] 实现令牌过期和刷新
 
-**Input Validation:**
-- [ ] Validate all inputs with Pydantic
-- [ ] Sanitize user inputs
-- [ ] Implement file upload restrictions
-- [ ] Check for SQL injection vulnerabilities
-- [ ] Prevent command injection
-- [ ] Protect against path traversal
+**输入验证：**
+- [ ] 使用 Pydantic 验证所有输入
+- [ ] 清理用户输入
+- [ ] 实现文件上传限制
+- [ ] 检查 SQL 注入漏洞
+- [ ] 防止命令注入
+- [ ] 防范路径遍历
 
-**Rate Limiting:**
-- [ ] Implement rate limiting per user/IP
-- [ ] Set appropriate limits for each endpoint
-- [ ] Return rate limit headers
-- [ ] Handle rate limit exceeded gracefully
+**速率限制：**
+- [ ] 为每个用户/IP 实现速率限制
+- [ ] 为每个 endpoint 设置适当的限制
+- [ ] 返回速率限制头部
+- [ ] 优雅地处理超过速率限制
 
-**Headers & CORS:**
-- [ ] Configure CORS properly
-- [ ] Set security headers
-- [ ] Implement CSP policy
-- [ ] Use HSTS for HTTPS enforcement
+**头部和 CORS：**
+- [ ] 正确配置 CORS
+- [ ] 设置安全头部
+- [ ] 实施 CSP 策略
+- [ ] 对 HTTPS 强制使用 HSTS
 
-**Monitoring & Logging:**
-- [ ] Log authentication attempts
-- [ ] Log authorization failures
-- [ ] Monitor for suspicious activity
-- [ ] Set up alerts for security events
-- [ ] Implement audit logging
+**监控和日志：**
+- [ ] 记录认证尝试
+- [ ] 记录授权失败
+- [ ] 监控可疑活动
+- [ ] 设置安全事件告警
+- [ ] 实现审计日志
 
-**Dependencies:**
-- [ ] Keep dependencies updated
-- [ ] Scan for vulnerabilities
-- [ ] Use verified packages only
-- [ ] Pin dependency versions
+**依赖：**
+- [ ] 保持依赖更新
+- [ ] 扫描漏洞
+- [ ] 仅使用经过验证的包
+- [ ] 锁定依赖版本
 
-**ML-Specific:**
-- [ ] Validate model inputs
-- [ ] Implement resource limits
-- [ ] Protect model files
-- [ ] Handle adversarial inputs
-- [ ] Mask PII in logs
+**ML 特定：**
+- [ ] 验证模型输入
+- [ ] 实现资源限制
+- [ ] 保护模型文件
+- [ ] 处理对抗性输入
+- [ ] 在日志中屏蔽 PII
 
-## Summary and Key Takeaways
+## 总结和关键要点
 
-### Core Concepts
+### 核心概念
 
-1. **Authentication vs Authorization**
-   - Authentication: Who are you?
-   - Authorization: What can you do?
+1. **认证 vs 授权**
+   - 认证：你是谁？
+   - 授权：你能做什么？
 
-2. **Authentication Methods**
-   - API Keys: Simple, stateless
-   - JWT: Self-contained tokens
-   - OAuth2: Third-party access
+2. **认证方法**
+   - API Key：简单、无状态
+   - JWT：自包含令牌
+   - OAuth2：第三方访问
 
-3. **Security Fundamentals**
-   - HTTPS everywhere
-   - Hash passwords, never store plain text
-   - Validate all inputs
-   - Implement rate limiting
-   - Set security headers
+3. **安全基础**
+   - 无处不在的 HTTPS
+   - 哈希密码，绝不存储明文
+   - 验证所有输入
+   - 实现速率限制
+   - 设置安全头部
 
-4. **ML-Specific Security**
-   - Validate model inputs
-   - Protect model files
-   - Implement timeouts
-   - Mask PII data
-   - Audit logging
+4. **ML 特定安全**
+   - 验证模型输入
+   - 保护模型文件
+   - 实现超时
+   - 屏蔽 PII 数据
+   - 审计日志
 
-### Implementation Priorities
+### 实现优先级
 
-1. **Must Have (P0):**
+1. **必须有 (P0)：**
    - HTTPS/TLS
-   - Authentication
-   - Input validation
-   - Password hashing
+   - 认证
+   - 输入验证
+   - 密码哈希
 
-2. **Should Have (P1):**
-   - Rate limiting
-   - Security headers
-   - CORS configuration
-   - Audit logging
+2. **应该有 (P1)：**
+   - 速率限制
+   - 安全头部
+   - CORS 配置
+   - 审计日志
 
-3. **Nice to Have (P2):**
-   - OAuth2 integration
-   - Advanced monitoring
-   - Anomaly detection
+3. **最好有 (P2)：**
+   - OAuth2 集成
+   - 高级监控
+   - 异常检测
 
-### Next Steps
+### 下一步
 
-- Complete Exercise 02: Implement authentication system
-- Review OWASP Top 10 API Security Risks
-- Practice implementing security features
-- Learn about security testing and penetration testing
+- 完成练习 02：实现认证系统
+- 复习 OWASP Top 10 API 安全风险
+- 练习实现安全功能
+- 学习安全测试和渗透测试
 
-### Resources
+### 资源
 
-- [OWASP API Security Top 10](https://owasp.org/www-project-api-security/)
-- [FastAPI Security Documentation](https://fastapi.tiangolo.com/tutorial/security/)
+- [OWASP API 安全 Top 10](https://owasp.org/www-project-api-security/)
+- [FastAPI 安全文档](https://fastapi.tiangolo.com/tutorial/security/)
 - [JWT.io](https://jwt.io/)
-- [OAuth 2.0 Simplified](https://www.oauth.com/)
+- [OAuth 2.0 简化版](https://www.oauth.com/)
 
 ---
 
-**Estimated Study Time**: 4-5 hours
-**Hands-on Practice**: Complete Exercise 02: Authentication & Security
-**Assessment**: Quiz covers authentication, authorization, and security best practices
+**预计学习时间**：4-5 小时
+**动手练习**：完成练习 02：认证和安全
+**评估**：测验涵盖认证、授权和安全最佳实践

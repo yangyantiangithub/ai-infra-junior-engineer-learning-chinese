@@ -1,99 +1,99 @@
-# Exercise 06: Apache Airflow - Workflow Orchestration and Monitoring
+# Exercise 06：Apache Airflow - 工作流编排与监控
 
-**Difficulty**: Beginner-Intermediate
-**Duration**: 3-4 hours
-**Prerequisites**: Docker, Python basics, monitoring fundamentals
+**难度**：初级-中级
+**时长**：3-4 小时
+**前置要求**：Docker、Python 基础、监控基础知识
 
-## Learning Objectives
+## 学习目标
 
-By the end of this exercise, you will:
+完成本练习后，你将能够：
 
-1. Understand what workflow orchestration is and why it's needed
-2. Install and configure Apache Airflow
-3. Create and run DAGs (Directed Acyclic Graphs)
-4. Monitor workflow execution and health
-5. Integrate Airflow with Prometheus for metrics
-6. Set up alerts for pipeline failures
-7. Debug failed workflows
+1. 理解什么是工作流编排以及为什么需要它
+2. 安装和配置 Apache Airflow
+3. 创建和运行 DAG（有向无环图）
+4. 监控工作流执行和健康状况
+5. 将 Airflow 与 Prometheus 集成以获取 metrics
+6. 设置管道故障告警
+7. 调试失败的工作流
 
-## What You'll Build
+## 你将构建的内容
 
-A complete Airflow setup with:
-- Airflow running in Docker
-- Sample ML data pipeline DAGs
-- Prometheus metrics integration
-- Grafana dashboard for workflow monitoring
-- Alerting for failed tasks
+一个完整的 Airflow 设置，包含：
+- 在 Docker 中运行的 Airflow
+- 示例 ML 数据管道 DAG
+- Prometheus metrics 集成
+- 用于工作流监控的 Grafana dashboard
+- 针对失败任务的告警
 
-## Background: What is Apache Airflow?
+## 背景：什么是 Apache Airflow？
 
-### The Problem: Managing Complex Workflows
+### 问题：管理复杂工作流
 
-**Without orchestration**:
+**没有编排**：
 ```bash
-# Manual workflow execution
+# 手动工作流执行
 python download_data.py
 python preprocess_data.py
 python train_model.py
 python deploy_model.py
 
-# Problems:
-# - What if step 2 fails? Do we restart everything?
-# - How do we schedule this daily?
-# - How do we handle retries?
-# - How do we monitor progress?
-# - How do we manage dependencies?
+# 问题：
+# - 如果步骤 2 失败怎么办？我们需要重新开始所有步骤吗？
+# - 如何每天调度这个流程？
+# - 如何处理重试？
+# - 如何监控进度？
+# - 如何管理依赖关系？
 ```
 
-### The Solution: Apache Airflow
+### 解决方案：Apache Airflow
 
-**Airflow** is a workflow orchestration platform that lets you:
-- ✅ Define workflows as code (Python)
-- ✅ Schedule automated execution
-- ✅ Manage dependencies between tasks
-- ✅ Monitor task execution
-- ✅ Retry failed tasks automatically
-- ✅ View logs and history
-- ✅ Alert on failures
+**Airflow** 是一个工作流编排平台，让你能够：
+- ✅ 将工作流定义为代码（Python）
+- ✅ 调度自动化执行
+- ✅ 管理任务间的依赖关系
+- ✅ 监控任务执行
+- ✅ 自动重试失败任务
+- ✅ 查看日志和历史记录
+- ✅ 失败时告警
 
-### Key Concepts
+### 关键概念
 
-**DAG (Directed Acyclic Graph)**:
-- Workflow definition
-- Collection of tasks with dependencies
-- No circular dependencies allowed
+**DAG（有向无环图）**：
+- 工作流定义
+- 带有依赖关系的任务集合
+- 不允许循环依赖
 
-**Task**:
-- Single unit of work
-- Can be Python function, bash command, etc.
-- Has states: success, failed, running, queued
+**任务**：
+- 单个工作单元
+- 可以是 Python 函数、bash 命令等
+- 具有状态：success、failed、running、queued
 
-**Operator**:
-- Template for creating tasks
-- PythonOperator, BashOperator, etc.
+**Operator**：
+- 用于创建任务的模板
+- PythonOperator、BashOperator 等
 
-**Scheduler**:
-- Triggers DAG runs on schedule
-- Manages task execution order
+**Scheduler**：
+- 按计划触发 DAG 运行
+- 管理任务执行顺序
 
-**Executor**:
-- Runs tasks (local, Celery, Kubernetes, etc.)
+**Executor**：
+- 运行任务（Local、Celery、Kubernetes 等）
 
-**Webserver**:
-- UI for monitoring and management
+**Webserver**：
+- 用于监控和管理的 UI
 
-## Part 1: Airflow Setup with Docker
+## 第 1 部分：使用 Docker 设置 Airflow
 
-### Step 1: Create Project Directory
+### 步骤 1：创建项目目录
 
 ```bash
 mkdir airflow-monitoring-lab
 cd airflow-monitoring-lab
 ```
 
-### Step 2: Create Docker Compose Configuration
+### 步骤 2：创建 Docker Compose 配置
 
-Create `docker-compose.yml`:
+创建 `docker-compose.yml`：
 
 ```yaml
 version: '3.8'
@@ -226,9 +226,9 @@ volumes:
   grafana-data:
 ```
 
-### Step 3: Create Configuration Files
+### 步骤 3：创建配置文件
 
-Create `statsd_mapping.yml`:
+创建 `statsd_mapping.yml`：
 
 ```yaml
 mappings:
@@ -258,7 +258,7 @@ mappings:
       job: "airflow"
 ```
 
-Create `prometheus.yml`:
+创建 `prometheus.yml`：
 
 ```yaml
 global:
@@ -271,35 +271,35 @@ scrape_configs:
       - targets: ['statsd-exporter:9102']
 ```
 
-### Step 4: Create Directories
+### 步骤 4：创建目录
 
 ```bash
 mkdir -p dags logs plugins
 ```
 
-### Step 5: Start Airflow
+### 步骤 5：启动 Airflow
 
 ```bash
-# Set Airflow UID
+# 设置 Airflow UID
 echo -e "AIRFLOW_UID=$(id -u)" > .env
 
-# Start services
+# 启动服务
 docker-compose up -d
 
-# Check status
+# 检查状态
 docker-compose ps
 ```
 
-**Wait 1-2 minutes for initialization**, then access:
-- **Airflow UI**: http://localhost:8080 (user: airflow, password: airflow)
-- **Prometheus**: http://localhost:9090
-- **Grafana**: http://localhost:3000 (user: admin, password: admin)
+**等待 1-2 分钟初始化**，然后访问：
+- **Airflow UI**：http://localhost:8080（用户：airflow，密码：airflow）
+- **Prometheus**：http://localhost:9090
+- **Grafana**：http://localhost:3000（用户：admin，密码：admin）
 
-## Part 2: Creating Your First DAG
+## 第 2 部分：创建你的第一个 DAG
 
-### Step 6: Simple Data Pipeline DAG
+### 步骤 6：简单的数据管道 DAG
 
-Create `dags/ml_training_pipeline.py`:
+创建 `dags/ml_training_pipeline.py`：
 
 ```python
 from datetime import datetime, timedelta
@@ -309,7 +309,7 @@ from airflow.operators.bash import BashOperator
 import time
 import random
 
-# Default arguments for all tasks
+# 所有任务的默认参数
 default_args = {
     'owner': 'data-team',
     'depends_on_past': False,
@@ -320,17 +320,17 @@ default_args = {
 }
 
 def download_dataset(**context):
-    """Simulate downloading training dataset"""
+    """模拟下载训练数据集"""
     print("📥 Downloading dataset from S3...")
     time.sleep(3)
     print("✓ Downloaded 1.2GB of training data")
 
-    # Pass data to next task via XCom
+    # 通过 XCom 将数据传递给下一个任务
     return {"dataset_size_gb": 1.2, "num_samples": 10000}
 
 def preprocess_data(**context):
-    """Simulate data preprocessing"""
-    # Get data from previous task
+    """模拟数据预处理"""
+    # 获取前一个任务的数据
     ti = context['ti']
     dataset_info = ti.xcom_pull(task_ids='download_dataset')
 
@@ -341,21 +341,21 @@ def preprocess_data(**context):
     return {"processed_samples": dataset_info['num_samples'], "validation_split": 0.2}
 
 def train_model(**context):
-    """Simulate model training"""
+    """模拟模型训练"""
     ti = context['ti']
     data_info = ti.xcom_pull(task_ids='preprocess_data')
 
     print(f"🤖 Training model on {data_info['processed_samples']} samples...")
     time.sleep(5)
 
-    # Simulate metrics
+    # 模拟 metrics
     accuracy = round(random.uniform(0.85, 0.95), 4)
     print(f"✓ Training complete! Validation accuracy: {accuracy}")
 
     return {"accuracy": accuracy, "model_size_mb": 450}
 
 def evaluate_model(**context):
-    """Simulate model evaluation"""
+    """模拟模型评估"""
     ti = context['ti']
     model_info = ti.xcom_pull(task_ids='train_model')
 
@@ -369,102 +369,102 @@ def evaluate_model(**context):
     return True
 
 def deploy_model(**context):
-    """Simulate model deployment"""
+    """模拟模型部署"""
     print("🚀 Deploying model to production...")
     time.sleep(3)
     print("✓ Model deployed successfully")
     return {"deployment_url": "https://api.example.com/model/v1"}
 
-# Define the DAG
+# 定义 DAG
 with DAG(
     'ml_training_pipeline',
     default_args=default_args,
     description='ML model training and deployment pipeline',
-    schedule_interval='0 2 * * *',  # Run daily at 2 AM
+    schedule_interval='0 2 * * *',  # 每天凌晨 2 点运行
     start_date=datetime(2024, 1, 1),
     catchup=False,
     tags=['ml', 'training', 'production'],
 ) as dag:
 
-    # Task 1: Download dataset
+    # 任务 1：下载数据集
     download = PythonOperator(
         task_id='download_dataset',
         python_callable=download_dataset,
     )
 
-    # Task 2: Preprocess data
+    # 任务 2：预处理数据
     preprocess = PythonOperator(
         task_id='preprocess_data',
         python_callable=preprocess_data,
     )
 
-    # Task 3: Train model
+    # 任务 3：训练模型
     train = PythonOperator(
         task_id='train_model',
         python_callable=train_model,
     )
 
-    # Task 4: Evaluate model
+    # 任务 4：评估模型
     evaluate = PythonOperator(
         task_id='evaluate_model',
         python_callable=evaluate_model,
     )
 
-    # Task 5: Deploy model
+    # 任务 5：部署模型
     deploy = PythonOperator(
         task_id='deploy_model',
         python_callable=deploy_model,
     )
 
-    # Task 6: Send notification
+    # 任务 6：发送通知
     notify = BashOperator(
         task_id='send_notification',
         bash_command='echo "✅ ML pipeline completed successfully!"',
     )
 
-    # Define task dependencies
+    # 定义任务依赖关系
     download >> preprocess >> train >> evaluate >> deploy >> notify
 ```
 
-**DAG workflow**:
+**DAG 工作流**：
 ```
 download_dataset → preprocess_data → train_model → evaluate_model → deploy_model → send_notification
 ```
 
-### Step 7: Verify DAG
+### 步骤 7：验证 DAG
 
 ```bash
-# Refresh Airflow UI (http://localhost:8080)
-# You should see "ml_training_pipeline" DAG
+# 刷新 Airflow UI (http://localhost:8080)
+# 你应该会看到 "ml_training_pipeline" DAG
 
-# Or check via CLI
+# 或者通过 CLI 检查
 docker-compose exec airflow-webserver airflow dags list
 docker-compose exec airflow-webserver airflow dags show ml_training_pipeline
 ```
 
-### Step 8: Trigger DAG Manually
+### 步骤 8：手动触发 DAG
 
-**Option 1: Via UI**:
-1. Go to http://localhost:8080
-2. Find "ml_training_pipeline"
-3. Click the play button ▶️ on the right
-4. Click "Trigger DAG"
+**选项 1：通过 UI**：
+1. 访问 http://localhost:8080
+2. 找到 "ml_training_pipeline"
+3. 点击右侧的播放按钮 ▶️
+4. 点击 "Trigger DAG"
 
-**Option 2: Via CLI**:
+**选项 2：通过 CLI**：
 ```bash
 docker-compose exec airflow-webserver airflow dags trigger ml_training_pipeline
 ```
 
-**Monitor execution**:
-1. Click on DAG name
-2. View "Graph" tab to see task progress
-3. Click individual tasks to see logs
+**监控执行**：
+1. 点击 DAG 名称
+2. 查看 "Graph" 标签页以查看任务进度
+3. 点击单个任务查看日志
 
-## Part 3: Creating a Data Quality DAG
+## 第 3 部分：创建数据质量 DAG
 
-### Step 9: Data Quality Pipeline
+### 步骤 9：数据质量管道
 
-Create `dags/data_quality_check.py`:
+创建 `dags/data_quality_check.py`：
 
 ```python
 from datetime import datetime, timedelta
@@ -480,9 +480,9 @@ default_args = {
 }
 
 def check_data_freshness(**context):
-    """Check if data is fresh (< 24 hours old)"""
+    """检查数据是否新鲜（< 24 小时）"""
     print("🕐 Checking data freshness...")
-    # Simulate check
+    # 模拟检查
     hours_old = random.randint(1, 30)
     print(f"Data is {hours_old} hours old")
 
@@ -494,7 +494,7 @@ def check_data_freshness(**context):
         return 'check_data_completeness'
 
 def check_data_completeness(**context):
-    """Check if all expected data is present"""
+    """检查是否所有预期数据都存在"""
     print("📋 Checking data completeness...")
     completeness = random.uniform(0.85, 1.0)
     print(f"Data completeness: {completeness:.2%}")
@@ -505,14 +505,14 @@ def check_data_completeness(**context):
     return True
 
 def check_schema_validity(**context):
-    """Validate data schema"""
+    """验证数据 schema"""
     print("🔍 Validating schema...")
-    # Simulate schema check
+    # 模拟 schema 检查
     print("✓ Schema is valid")
     return True
 
 def check_data_quality_metrics(**context):
-    """Check various data quality metrics"""
+    """检查各种数据质量指标"""
     print("📊 Checking data quality metrics...")
 
     metrics = {
@@ -524,14 +524,14 @@ def check_data_quality_metrics(**context):
     print(f"Metrics: {metrics}")
 
     for metric, value in metrics.items():
-        if value > 0.05:  # 5% threshold
+        if value > 0.05:  # 5% 阈值
             raise ValueError(f"{metric} too high: {value:.2%}")
 
     print("✓ All quality metrics passed")
     return metrics
 
 def handle_stale_data(**context):
-    """Handle stale data scenario"""
+    """处理数据过期场景"""
     print("🚨 Initiating data refresh process...")
     print("Sending alert to data team...")
     return "refresh_data_needed"
@@ -540,7 +540,7 @@ with DAG(
     'data_quality_pipeline',
     default_args=default_args,
     description='Data quality validation pipeline',
-    schedule_interval='0 * * * *',  # Run hourly
+    schedule_interval='0 * * * *',  # 每小时运行
     start_date=datetime(2024, 1, 1),
     catchup=False,
     tags=['data-quality', 'monitoring'],
@@ -576,80 +576,80 @@ with DAG(
         bash_command='echo "✅ All data quality checks passed!"',
     )
 
-    # Define workflow
+    # 定义工作流
     freshness_check >> [completeness_check, stale_data_handler]
     completeness_check >> schema_check >> quality_check >> success_notification
 ```
 
-## Part 4: Monitoring Airflow
+## 第 4 部分：监控 Airflow
 
-### Step 10: View Metrics in Prometheus
+### 步骤 10：在 Prometheus 中查看 Metrics
 
-1. Go to http://localhost:9090
-2. Try these queries:
+1. 访问 http://localhost:9090
+2. 尝试以下查询：
 
 ```promql
-# DAG run duration
+# DAG 运行时长
 airflow_dagrun_duration_seconds
 
-# Task failures
+# 任务失败
 rate(airflow_task_failed[5m])
 
-# Scheduler heartbeat
+# Scheduler 心跳
 airflow_scheduler_heartbeat
 
-# DAG processing time
+# DAG 处理时间
 airflow_dag_processing_total_parse_time
 ```
 
-### Step 11: Create Grafana Dashboard
+### 步骤 11：创建 Grafana Dashboard
 
-1. Go to http://localhost:3000
-2. Add Prometheus data source:
+1. 访问 http://localhost:3000
+2. 添加 Prometheus 数据源：
    - Configuration → Data Sources → Add data source
-   - Select Prometheus
-   - URL: `http://prometheus:9090`
+   - 选择 Prometheus
+   - URL：`http://prometheus:9090`
    - Save & Test
 
-3. Create new dashboard:
+3. 创建新 dashboard：
    - Create → Dashboard → Add new panel
 
-**Panel 1: Task Success Rate**
+**面板 1：任务成功率**
 ```promql
 rate(airflow_task_success[5m]) / rate(airflow_task_start[5m])
 ```
 
-**Panel 2: DAG Run Duration**
+**面板 2：DAG 运行时长**
 ```promql
 avg(airflow_dagrun_duration_seconds) by (dag_id)
 ```
 
-**Panel 3: Task Failures**
+**面板 3：任务失败**
 ```promql
 sum(rate(airflow_task_failed[5m])) by (dag_id)
 ```
 
-### Step 12: Viewing Logs
+### 步骤 12：查看日志
 
-**Via UI**:
-1. Click on DAG → Task
-2. Click "Log" button
-3. View real-time or historical logs
+**通过 UI**：
+1. 点击 DAG → 任务
+2. 点击 "Log" 按钮
+3. 查看实时或历史日志
 
-**Via CLI**:
+**通过 CLI**：
 ```bash
-# View task logs
+# 查看任务日志
 docker-compose exec airflow-webserver airflow tasks logs ml_training_pipeline download_dataset 2024-01-15
 
-# Follow logs
+# 跟踪日志
 docker-compose logs -f airflow-scheduler
 ```
 
-## Part 5: Handling Failures and Alerts
+## 第 5 部分：处理故障和告警
 
-### Step 13: Create Failing DAG for Testing
+### 步骤 13：创建用于测试的故障 DAG
 
-Create `dags/failure_test.py`:
+创建 `dags/failure_test.py`：
 
 ```python
 from datetime import datetime
@@ -658,7 +658,7 @@ from airflow.operators.python import PythonOperator
 import random
 
 def task_that_sometimes_fails():
-    """Task that fails 50% of the time"""
+    """50% 概率失败的任务"""
     if random.random() < 0.5:
         raise Exception("💥 Simulated failure!")
     print("✓ Task succeeded")
@@ -678,22 +678,22 @@ with DAG(
     )
 ```
 
-Trigger this DAG multiple times to see failures and retries!
+多次触发此 DAG 以查看失败和重试！
 
-### Step 14: Debug Failed Tasks
+### 步骤 14：调试失败任务
 
-When a task fails:
+当任务失败时：
 
-1. **View logs**: Click task → View Log
-2. **Check XCom**: See data passed between tasks
-3. **Clear and rerun**: Click "Clear" to retry
-4. **Mark success**: Override failure if needed
+1. **查看日志**：点击任务 → View Log
+2. **检查 XCom**：查看任务间传递的数据
+3. **清除并重新运行**：点击 "Clear" 以重试
+4. **标记成功**：根据需要覆盖失败状态
 
-## Challenges
+## 挑战
 
-### Challenge 1: Add Email Alerts
+### 挑战 1：添加邮件告警
 
-Configure email alerts for failures:
+为故障配置邮件告警：
 
 ```python
 default_args = {
@@ -703,29 +703,29 @@ default_args = {
 }
 ```
 
-### Challenge 2: Create Feature Engineering Pipeline
+### 挑战 2：创建特征工程管道
 
-Build a DAG that:
-1. Extracts data from source
-2. Computes features
-3. Stores in feature store
-4. Validates feature quality
+构建一个 DAG，实现：
+1. 从源提取数据
+2. 计算特征
+3. 存储在特征存储中
+4. 验证特征质量
 
-### Challenge 3: Implement SLA Monitoring
+### 挑战 3：实现 SLA 监控
 
-Add SLAs to ensure tasks complete within time limits:
+添加 SLA 以确保任务在时间限制内完成：
 
 ```python
 train = PythonOperator(
     task_id='train_model',
     python_callable=train_model,
-    sla=timedelta(hours=2),  # Alert if takes > 2 hours
+    sla=timedelta(hours=2),  # 如果超过 2 小时则告警
 )
 ```
 
-### Challenge 4: Create Dynamic DAG
+### 挑战 4：创建动态 DAG
 
-Generate tasks dynamically based on configuration:
+根据配置动态生成任务：
 
 ```python
 for model in ['resnet', 'vgg', 'efficientnet']:
@@ -736,33 +736,33 @@ for model in ['resnet', 'vgg', 'efficientnet']:
     )
 ```
 
-## Key Takeaways
+## 关键要点
 
-1. **Airflow orchestrates workflows**: Define complex pipelines as code
-2. **DAGs represent workflows**: Tasks with dependencies
-3. **Monitoring is built-in**: UI, logs, metrics all available
-4. **Retries handle transient failures**: Automatic retry logic
-5. **XCom enables data passing**: Share data between tasks
-6. **Prometheus integration**: Export metrics for monitoring
-7. **Scheduling is flexible**: Cron expressions or intervals
+1. **Airflow 编排工作流**：将复杂管道定义为代码
+2. **DAG 代表工作流**：带有依赖关系的任务
+3. **内置监控**：UI、日志、metrics 全部可用
+4. **重试处理临时故障**：自动重试逻辑
+5. **XCom 实现数据传递**：在任务间共享数据
+6. **Prometheus 集成**：导出 metrics 用于监控
+7. **灵活的调度**：Cron 表达式或间隔
 
-## Production Best Practices
+## 生产最佳实践
 
-### 1. Idempotent Tasks
+### 1. 幂等任务
 ```python
 def idempotent_task(**context):
-    """Task that can be safely re-run"""
-    # Check if already completed
+    """可以安全重新运行的任务"""
+    # 检查是否已完成
     if check_completion():
         print("Already done, skipping...")
         return
 
-    # Do work
+    # 执行工作
     process_data()
     mark_completed()
 ```
 
-### 2. Task Timeouts
+### 2. 任务超时
 ```python
 train = PythonOperator(
     task_id='train_model',
@@ -771,11 +771,11 @@ train = PythonOperator(
 )
 ```
 
-### 3. Resource Management
+### 3. 资源管理
 ```python
 from airflow.models import Pool
 
-# Create pool in UI or via CLI
+# 在 UI 或通过 CLI 创建 pool
 # airflow pools set gpu_pool 2 "GPU instances"
 
 train = PythonOperator(
@@ -785,63 +785,63 @@ train = PythonOperator(
 )
 ```
 
-### 4. Error Handling
+### 4. 错误处理
 ```python
 def safe_task(**context):
     try:
         process_data()
     except SpecificError as e:
-        # Log and handle gracefully
+        # 记录并优雅处理
         print(f"Known error: {e}")
         send_alert()
-        raise  # Re-raise to mark task as failed
+        raise  # 重新抛出以将任务标记为失败
     except Exception as e:
-        # Unexpected error
+        # 意外错误
         print(f"Unexpected error: {e}")
         raise
 ```
 
-## Next Steps
+## 下一步
 
-1. **Learn advanced features**:
-   - Sensors (wait for events)
-   - SubDAGs (nested workflows)
-   - TaskGroups (organize tasks)
-   - Dynamic task mapping
+1. **学习高级功能**：
+   - Sensors（等待事件）
+   - SubDAGs（嵌套工作流）
+   - TaskGroups（组织任务）
+   - 动态任务映射
 
-2. **Explore executors**:
-   - CeleryExecutor (distributed)
-   - KubernetesExecutor (scalable)
-   - DaskExecutor (parallel Python)
+2. **探索执行器**：
+   - CeleryExecutor（分布式）
+   - KubernetesExecutor（可扩展）
+   - DaskExecutor（并行 Python）
 
-3. **Study integrations**:
-   - AWS (S3, EMR, SageMaker)
-   - GCP (BigQuery, Dataflow)
-   - Spark, dbt, Great Expectations
+3. **研究集成**：
+   - AWS（S3、EMR、SageMaker）
+   - GCP（BigQuery、Dataflow）
+   - Spark、dbt、Great Expectations
 
-4. **Production deployment**:
-   - Kubernetes deployment
-   - High availability setup
-   - Security and authentication
-   - CI/CD for DAGs
+4. **生产部署**：
+   - Kubernetes 部署
+   - 高可用设置
+   - 安全和身份验证
+   - DAG 的 CI/CD
 
-## Resources
+## 资源
 
 - [Apache Airflow Documentation](https://airflow.apache.org/docs/)
 - [Airflow Best Practices](https://airflow.apache.org/docs/apache-airflow/stable/best-practices.html)
 - [Astronomer Guides](https://docs.astronomer.io/)
 - [Awesome Apache Airflow](https://github.com/jghoman/awesome-apache-airflow)
 
-## Clean Up
+## 清理
 
 ```bash
-# Stop all services
+# 停止所有服务
 docker-compose down
 
-# Remove volumes (data will be lost)
+# 移除 volumes（数据将丢失）
 docker-compose down -v
 ```
 
 ---
 
-**Congratulations!** You've learned workflow orchestration with Apache Airflow and how to monitor data pipelines. You can now build, schedule, and monitor complex ML workflows!
+**恭喜！** 你已学习了使用 Apache Airflow 进行工作流编排以及如何监控数据管道。你现在可以构建、调度和监控复杂的 ML 工作流！

@@ -1,3 +1,3 @@
-# Community
+# 社区
 
-Store learner support material here, such as FAQs, office hours notes, and study-group guidance.
+在此存储学习者支持材料，例如 FAQ、答疑时间笔记和学习小组指南。

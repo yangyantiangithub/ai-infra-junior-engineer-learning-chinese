@@ -1,390 +1,390 @@
-# Module 004: Machine Learning Basics for Infrastructure Engineers
-
-## Module Overview
-
-Welcome to the Machine Learning Basics module! This module bridges the gap between traditional infrastructure engineering and the specialized world of AI/ML systems. You won't become a data scientist here—instead, you'll learn exactly what infrastructure engineers need to know about ML to effectively build, deploy, and maintain ML systems.
-
-## Why ML Knowledge for Infrastructure Engineers?
-
-As an AI infrastructure engineer, you're not training cutting-edge models or tuning hyperparameters. But you ARE:
-
-- **Deploying models** that data scientists train
-- **Building infrastructure** that supports ML workloads
-- **Troubleshooting** when models fail in production
-- **Optimizing** model serving performance
-- **Managing** model lifecycles and versions
-- **Monitoring** model behavior and resource usage
-
-To do this effectively, you need to understand:
-- What ML models actually are (not just black boxes)
-- How models are trained and saved
-- Different model formats and their implications
-- Resource requirements (CPU, GPU, memory)
-- Common failure modes and debugging strategies
-
-## Target Audience Reality Check
-
-**You are NOT**:
-- Expected to implement ML algorithms from scratch
-- Required to understand advanced mathematical theory
-- Responsible for model architecture design
-- Tuning hyperparameters or improving model accuracy
-
-**You ARE**:
-- Building infrastructure that runs ML code
-- Deploying models to production safely
-- Monitoring ML system health
-- Collaborating with data scientists
-- Making infrastructure decisions that affect ML workflows
-
-## Learning Objectives
-
-By the end of this module, you will:
-
-### ML Fundamentals
-- Understand core ML concepts: training, inference, features, labels
-- Distinguish between supervised, unsupervised, and reinforcement learning
-- Recognize common ML tasks: classification, regression, clustering
-- Understand the ML workflow from data to deployed model
-
-### PyTorch Essentials
-- Load and save PyTorch models
-- Understand tensors and basic operations
-- Run inference with pre-trained models
-- Identify PyTorch model requirements (dependencies, hardware)
-- Debug common PyTorch issues in production
-
-### TensorFlow Essentials
-- Load and save TensorFlow/Keras models
-- Understand TensorFlow model formats (SavedModel, H5)
-- Run inference with pre-trained TensorFlow models
-- Identify TensorFlow model requirements
-- Compare TensorFlow vs PyTorch from infrastructure perspective
-
-### Model Formats and Interoperability
-- Understand ONNX (Open Neural Network Exchange)
-- Convert models between formats
-- Recognize when format conversion is needed
-- Choose appropriate format for deployment scenarios
-
-### Infrastructure Considerations
-- Estimate model resource requirements
-- Understand GPU vs CPU tradeoffs
-- Recognize model size and latency constraints
-- Plan for batch vs real-time inference
-- Handle model versioning and rollback
-
-## Module Structure
-
-### Lecture 01: Machine Learning Overview for Infrastructure (Week 1)
-**Duration**: 6-8 hours
-- What is machine learning?
-- The ML workflow: data → training → inference
-- Types of ML: supervised, unsupervised, reinforcement
-- Common ML tasks and use cases
-- ML system components and dependencies
-- Infrastructure implications of different ML approaches
-
-### Lecture 02: PyTorch Basics for Infrastructure (Week 1-2)
-**Duration**: 8-10 hours
-- PyTorch architecture and ecosystem
-- Tensors, devices (CPU/GPU), and data types
-- Loading pre-trained models
-- Running inference
-- Model serialization (state_dict, torch.save)
-- PyTorch requirements and dependencies
-- Common issues and troubleshooting
-
-### Lecture 03: TensorFlow Basics for Infrastructure (Week 2-3)
-**Duration**: 8-10 hours
-- TensorFlow/Keras architecture
-- TensorFlow model formats (SavedModel, H5, TFLite)
-- Loading pre-trained models
-- Running inference
-- Model serving with TensorFlow Serving
-- TensorFlow requirements and dependencies
-- Comparing TensorFlow and PyTorch
-
-### Lecture 04: Model Formats and Deployment Preparation (Week 3-4)
-**Duration**: 6-8 hours
-- ONNX overview and benefits
-- Converting PyTorch models to ONNX
-- Converting TensorFlow models to ONNX
-- Model optimization techniques (quantization, pruning)
-- Choosing deployment formats
-- Model packaging best practices
-
-## Prerequisites
-
-### Required Knowledge
-- Python programming (Module 001)
-- Basic command-line skills (Module 002)
-- File operations and package management
-
-### Recommended Background
-- Awareness of what neural networks are (conceptually)
-- Familiarity with arrays/matrices (conceptual, not mathematical)
-- Understanding that ML involves "training" and "prediction"
-
-### Technical Requirements
-- Python 3.11+ environment
-- 8GB+ RAM (16GB recommended)
-- (Optional but recommended) NVIDIA GPU with CUDA
-- 10GB+ free disk space for model downloads
-
-## Learning Timeline
-
-### Week 1: ML Fundamentals and PyTorch Introduction
-- **Day 1-2**: Lecture 01 (ML Overview)
-- **Day 3-4**: Lecture 02 (PyTorch Basics)
-- **Day 5**: Exercise 01 (Load and run PyTorch model)
-
-### Week 2: PyTorch Deep Dive and TensorFlow Introduction
-- **Day 1-2**: Complete PyTorch exercises
-- **Day 3-4**: Lecture 03 (TensorFlow Basics)
-- **Day 5**: Exercise 02 (Load and run TensorFlow model)
-
-### Week 3: Model Formats and Conversion
-- **Day 1-2**: Lecture 04 (Model Formats)
-- **Day 3-4**: Exercise 03 (Convert models to ONNX)
-- **Day 5**: Integration practice
-
-### Week 4: Practical Application and Assessment
-- **Day 1-3**: Build end-to-end model serving prototype
-- **Day 4**: Module 004 Quiz
-- **Day 5**: Review and prepare for Module 005
-
-**Total Estimated Time**: 30-40 hours
-
-## Topics Covered
-
-### 1. ML Fundamentals
-- Supervised learning (classification, regression)
-- Unsupervised learning (clustering, dimensionality reduction)
-- Training process: loss functions, optimization, epochs
-- Inference process: predictions, batching, throughput
-- Overfitting, underfitting, and generalization
-- Train/validation/test splits
-
-### 2. PyTorch Ecosystem
-- PyTorch core architecture
-- Tensor operations and device management
-- torch.nn.Module and model structure
-- Checkpoints and state dictionaries
-- TorchServe for production deployment
-- Common PyTorch model architectures (ResNet, BERT, GPT)
-
-### 3. TensorFlow Ecosystem
-- TensorFlow and Keras relationship
-- tf.keras Sequential and Functional APIs
-- SavedModel format structure
-- TensorFlow Serving protocol
-- TFLite for mobile/edge deployment
-- Common TensorFlow model architectures
-
-### 4. ONNX and Model Interoperability
-- ONNX format specification
-- ONNX Runtime for inference
-- Model conversion workflows
-- Supported operations and limitations
-- Performance implications
-
-### 5. Infrastructure Considerations
-- CPU vs GPU inference
-- Batch size optimization
-- Model loading time and memory footprint
-- Latency vs throughput tradeoffs
-- Model versioning strategies
-- A/B testing infrastructure needs
-
-## Hands-On Exercises
-
-### Exercise 01: PyTorch Model Inference
-**Difficulty**: Beginner
-**Duration**: 2-3 hours
-
-Load a pre-trained PyTorch image classification model (ResNet50), run inference on sample images, and measure performance metrics.
-
-### Exercise 02: TensorFlow Model Inference
-**Difficulty**: Beginner
-**Duration**: 2-3 hours
-
-Load a pre-trained TensorFlow/Keras model, run inference, and compare with PyTorch implementation from Exercise 01.
-
-### Exercise 03: Model Format Conversion
-**Difficulty**: Intermediate
-**Duration**: 3-4 hours
-
-Convert both PyTorch and TensorFlow models to ONNX format, verify outputs match original models, and measure performance differences.
-
-## Quizzes & Assessments
-
-### Module 004 Quiz
-**Format**: 20 multiple-choice and short-answer questions
-**Duration**: 30-45 minutes
-**Passing Score**: 80% (16/20 correct)
-
-**Topics Covered**:
-- ML workflow and terminology (4 questions)
-- PyTorch fundamentals (5 questions)
-- TensorFlow fundamentals (5 questions)
-- Model formats and conversion (4 questions)
-- Infrastructure considerations (2 questions)
-
-### Practical Assessment
-Build a simple model serving API that:
-- Loads a pre-trained model (PyTorch or TensorFlow)
-- Exposes a REST endpoint for inference
-- Handles batch requests
-- Includes health checks and metrics
-- Logs predictions and latency
-
-## Real-World Context
-
-Everything in this module relates directly to infrastructure engineering:
-
-### Model Deployment
-- **Load models**: Understanding save formats is crucial for deployment
-- **Version management**: Different formats affect versioning strategies
-- **Rollback procedures**: Know how to quickly switch model versions
-
-### Resource Management
-- **GPU allocation**: Understanding which operations need GPUs
-- **Memory planning**: Model size impacts infrastructure sizing
-- **Batch optimization**: Balance latency and throughput
-
-### Troubleshooting
-- **Debug model loading errors**: Dependency version mismatches
-- **Fix inference failures**: Input shape mismatches, device errors
-- **Diagnose performance issues**: Identify GPU underutilization
-
-### Collaboration
-- **Talk with data scientists**: Understand their requirements
-- **Document infrastructure**: ML-specific constraints and capabilities
-- **Bridge teams**: Translate between ML and infra terminology
-
-## What This Module Is NOT
-
-### We will NOT cover:
-- ❌ Deep learning theory and backpropagation math
-- ❌ Training models from scratch
-- ❌ Hyperparameter tuning strategies
-- ❌ Model architecture design
-- ❌ Advanced ML algorithms
-- ❌ Data preprocessing and feature engineering
-- ❌ Becoming a machine learning engineer
-
-### We WILL cover:
-- ✅ Running existing trained models
-- ✅ Understanding model files and formats
-- ✅ Deploying models to production infrastructure
-- ✅ Monitoring and debugging deployed models
-- ✅ Resource requirements and optimization
-- ✅ Working effectively with ML engineers
-
-## Success Criteria
-
-You will have successfully completed this module when you can:
-
-✅ Explain the difference between training and inference
-✅ Load a PyTorch model and run predictions
-✅ Load a TensorFlow model and run predictions
-✅ Convert models to ONNX format
-✅ Identify whether a model requires GPU or can run on CPU
-✅ Estimate model memory requirements
-✅ Troubleshoot common model loading errors
-✅ Choose appropriate model format for deployment
-✅ Measure model inference latency and throughput
-✅ Score 80% or higher on the module quiz
-
-## Connection to AI Infrastructure
-
-This module is foundational for:
-
-- **Module 005: Docker Containers** - Package ML models in containers
-- **Module 006: Kubernetes** - Deploy models at scale
-- **Module 007: APIs & Web Services** - Build model serving endpoints
-- **Module 009: Monitoring** - Monitor model performance
-- **Future Projects**: All projects involve deploying or managing ML models
-
-## What's Next?
-
-After completing this module, you'll move on to:
-- **Module 005**: Docker Containers (packaging ML models)
-- **Module 006**: Kubernetes Introduction (orchestrating ML workloads)
-- **Module 007**: APIs & Web Services (building serving endpoints)
-
-The ML knowledge from this module will be applied throughout the rest of the curriculum.
-
-## Getting Help
-
-### During the Module
-- Review lecture notes multiple times—ML concepts take repetition
-- Run all code examples in the lectures
-- Don't skip exercises—hands-on practice is essential
-- Use print statements to inspect tensors and model outputs
-- Read error messages carefully—they often indicate version mismatches
-
-### External Resources
-- PyTorch documentation and tutorials
-- TensorFlow official guides
-- ONNX Runtime documentation
-- Model zoos: HuggingFace Hub, TorchHub, TensorFlow Hub
-- Stack Overflow for specific errors
-
-### Common Pitfalls
-- Version mismatches between PyTorch/TensorFlow and models
-- CUDA version incompatibilities
-- Input shape mismatches during inference
-- Device errors (model on GPU, input on CPU)
-- Missing model files or checkpoints
-
-## Tools and Resources
-
-### Essential Tools
+# Module 004: 面向基础设施工程师的机器学习基础
+
+## 模块概述
+
+欢迎来到机器学习基础模块！本模块弥合了传统基础设施工程与 AI/ML 系统专业领域之间的差距。你不会成为数据科学家——而是学习基础设施工程师需要了解的关于 ML 的知识，以便有效地构建、部署和维护 ML 系统。
+
+## 为什么基础设施工程师需要 ML 知识？
+
+作为 AI 基础设施工程师，你不是在训练前沿模型或调整超参数。但你需要：
+
+- **部署**数据科学家训练的模型
+- **构建**支持 ML 工作负载的基础设施
+- **排查**模型在生产环境中的故障
+- **优化**模型服务的性能
+- **管理**模型生命周期和版本
+- **监控**模型行为和资源使用情况
+
+要有效做到这一点，你需要理解：
+- ML 模型到底是什么（不仅仅是黑盒）
+- 模型如何训练和保存
+- 不同的模型格式及其影响
+- 资源需求（CPU, GPU, 内存）
+- 常见故障模式和调试策略
+
+## 目标受众的现实情况
+
+**你不是**：
+- 需要从头实现 ML 算法
+- 需要理解高级数学理论
+- 负责模型架构设计
+- 调整超参数或提高模型准确率
+
+**你是**：
+- 构建运行 ML 代码的基础设施
+- 安全地将模型部署到生产环境
+- 监控 ML 系统健康状态
+- 与数据科学家协作
+- 做出影响 ML 工作流的基础设施决策
+
+## 学习目标
+
+完成本模块后，你将能够：
+
+### ML 基础
+- 理解核心 ML 概念：训练、推理、特征、标签
+- 区分监督学习、无监督学习和强化学习
+- 识别常见 ML 任务：分类、回归、聚类
+- 理解从数据到部署模型的 ML 工作流
+
+### PyTorch 要点
+- 加载和保存 PyTorch 模型
+- 理解 tensor 和基本操作
+- 使用预训练模型运行推理
+- 识别 PyTorch 模型需求（依赖、硬件）
+- 调试生产环境中的常见 PyTorch 问题
+
+### TensorFlow 要点
+- 加载和保存 TensorFlow/Keras 模型
+- 理解 TensorFlow 模型格式（SavedModel, H5）
+- 使用预训练 TensorFlow 模型运行推理
+- 识别 TensorFlow 模型需求
+- 从基础设施角度比较 TensorFlow 与 PyTorch
+
+### 模型格式和互操作性
+- 理解 ONNX（Open Neural Network Exchange）
+- 在不同格式之间转换模型
+- 识别何时需要进行格式转换
+- 为部署场景选择合适的格式
+
+### 基础设施注意事项
+- 估算模型资源需求
+- 理解 GPU 与 CPU 的权衡
+- 认识模型大小和延迟约束
+- 规划批量推理与实时推理
+- 处理模型版本管理和回滚
+
+## 模块结构
+
+### 讲座 01：面向基础设施的机器学习概述（第 1 周）
+**时长**：6-8 小时
+- 什么是机器学习？
+- ML 工作流：数据 → 训练 → 推理
+- ML 类型：监督、无监督、强化
+- 常见 ML 任务和用例
+- ML 系统组件和依赖
+- 不同 ML 方法的基础设施影响
+
+### 讲座 02：面向基础设施的 PyTorch 基础（第 1-2 周）
+**时长**：8-10 小时
+- PyTorch 架构和生态系统
+- Tensor、设备（CPU/GPU）和数据类型
+- 加载预训练模型
+- 运行推理
+- 模型序列化（state_dict, torch.save）
+- PyTorch 需求和依赖
+- 常见问题和故障排查
+
+### 讲座 03：面向基础设施的 TensorFlow 基础（第 2-3 周）
+**时长**：8-10 小时
+- TensorFlow/Keras 架构
+- TensorFlow 模型格式（SavedModel, H5, TFLite）
+- 加载预训练模型
+- 运行推理
+- 使用 TensorFlow Serving 进行模型服务
+- TensorFlow 需求和依赖
+- 比较 TensorFlow 和 PyTorch
+
+### 讲座 04：模型格式和部署准备（第 3-4 周）
+**时长**：6-8 小时
+- ONNX 概述和优势
+- 将 PyTorch 模型转换为 ONNX
+- 将 TensorFlow 模型转换为 ONNX
+- 模型优化技术（量化、剪枝）
+- 选择部署格式
+- 模型打包最佳实践
+
+## 前置要求
+
+### 所需知识
+- Python 编程（Module 001）
+- 基本命令行技能（Module 002）
+- 文件操作和包管理
+
+### 推荐背景
+- 了解什么是神经网络（概念层面）
+- 熟悉数组/矩阵（概念层面，非数学层面）
+- 理解 ML 涉及"训练"和"预测"
+
+### 技术要求
+- Python 3.11+ 环境
+- 8GB+ RAM（推荐 16GB）
+- （可选但推荐）NVIDIA GPU 和 CUDA
+- 10GB+ 可用磁盘空间用于模型下载
+
+## 学习时间线
+
+### 第 1 周：ML 基础和 PyTorch 入门
+- **第 1-2 天**：讲座 01（ML 概述）
+- **第 3-4 天**：讲座 02（PyTorch 基础）
+- **第 5 天**：练习 01（加载和运行 PyTorch 模型）
+
+### 第 2 周：PyTorch 深入和 TensorFlow 入门
+- **第 1-2 天**：完成 PyTorch 练习
+- **第 3-4 天**：讲座 03（TensorFlow 基础）
+- **第 5 天**：练习 02（加载和运行 TensorFlow 模型）
+
+### 第 3 周：模型格式和转换
+- **第 1-2 天**：讲座 04（模型格式）
+- **第 3-4 天**：练习 03（将模型转换为 ONNX）
+- **第 5 天**：集成实践
+
+### 第 4 周：实际应用和评估
+- **第 1-3 天**：构建端到端模型服务原型
+- **第 4 天**：Module 004 测验
+- **第 5 天**：复习并为 Module 005 做准备
+
+**总预计时间**：30-40 小时
+
+## 涵盖的主题
+
+### 1. ML 基础
+- 监督学习（分类、回归）
+- 无监督学习（聚类、降维）
+- 训练过程：loss function、优化、epochs
+- 推理过程：预测、批处理、吞吐量
+- 过拟合、欠拟合和泛化
+- 训练/验证/测试集划分
+
+### 2. PyTorch 生态系统
+- PyTorch 核心架构
+- Tensor 操作和设备管理
+- torch.nn.Module 和模型结构
+- 检查点和 state dictionary
+- TorchServe 用于生产部署
+- 常见 PyTorch 模型架构（ResNet, BERT, GPT）
+
+### 3. TensorFlow 生态系统
+- TensorFlow 和 Keras 的关系
+- tf.keras Sequential 和 Functional APIs
+- SavedModel 格式结构
+- TensorFlow Serving 协议
+- TFLite 用于移动/边缘部署
+- 常见 TensorFlow 模型架构
+
+### 4. ONNX 和模型互操作性
+- ONNX 格式规范
+- ONNX Runtime 用于推理
+- 模型转换工作流
+- 支持的操作和限制
+- 性能影响
+
+### 5. 基础设施注意事项
+- CPU 与 GPU 推理
+- 批大小优化
+- 模型加载时间和内存占用
+- 延迟与吞吐量的权衡
+- 模型版本策略
+- A/B 测试基础设施需求
+
+## 动手练习
+
+### 练习 01：PyTorch 模型推理
+**难度**：初级
+**时长**：2-3 小时
+
+加载预训练的 PyTorch 图像分类模型（ResNet50），对样本图像运行推理，并测量性能指标。
+
+### 练习 02：TensorFlow 模型推理
+**难度**：初级
+**时长**：2-3 小时
+
+加载预训练的 TensorFlow/Keras 模型，运行推理，并与练习 01 中的 PyTorch 实现进行比较。
+
+### 练习 03：模型格式转换
+**难度**：中级
+**时长**：3-4 小时
+
+将 PyTorch 和 TensorFlow 模型转换为 ONNX 格式，验证输出与原始模型匹配，并测量性能差异。
+
+## 测验与评估
+
+### Module 004 测验
+**形式**：20 道选择题和简答题
+**时长**：30-45 分钟
+**及格分数**：80%（20 题中答对 16 题）
+
+**涵盖主题**：
+- ML 工作流和术语（4 题）
+- PyTorch 基础（5 题）
+- TensorFlow 基础（5 题）
+- 模型格式和转换（4 题）
+- 基础设施注意事项（2 题）
+
+### 实践评估
+构建一个简单的模型服务 API：
+- 加载预训练模型（PyTorch 或 TensorFlow）
+- 暴露 REST endpoint 用于推理
+- 处理批量请求
+- 包含健康检查和指标
+- 记录预测结果和延迟
+
+## 实际背景
+
+本模块中的所有内容都与基础设施工程直接相关：
+
+### 模型部署
+- **加载模型**：理解保存格式对部署至关重要
+- **版本管理**：不同格式影响版本管理策略
+- **回滚流程**：知道如何快速切换模型版本
+
+### 资源管理
+- **GPU 分配**：理解哪些操作需要 GPU
+- **内存规划**：模型大小影响基础设施规模
+- **批处理优化**：平衡延迟和吞吐量
+
+### 故障排查
+- **调试模型加载错误**：依赖版本不匹配
+- **修复推理失败**：输入形状不匹配、设备错误
+- **诊断性能问题**：识别 GPU 利用率不足
+
+### 协作
+- **与数据科学家沟通**：理解他们的需求
+- **记录基础设施**：ML 特定的约束和能力
+- **连接团队**：在 ML 和基础设施术语之间进行翻译
+
+## 本模块不涵盖的内容
+
+### 我们不会涵盖：
+- ❌ 深度学习理论和反向传播数学
+- ❌ 从头训练模型
+- ❌ 超参数调整策略
+- ❌ 模型架构设计
+- ❌ 高级 ML 算法
+- ❌ 数据预处理和特征工程
+- ❌ 成为机器学习工程师
+
+### 我们会涵盖：
+- ✅ 运行现有的已训练模型
+- ✅ 理解模型文件和格式
+- ✅ 将模型部署到生产基础设施
+- ✅ 监控和调试已部署的模型
+- ✅ 资源需求和优化
+- ✅ 与 ML 工程师高效协作
+
+## 成功标准
+
+完成本模块后，你将能够：
+
+✅ 解释训练和推理之间的区别
+✅ 加载 PyTorch 模型并运行预测
+✅ 加载 TensorFlow 模型并运行预测
+✅ 将模型转换为 ONNX 格式
+✅ 判断模型是否需要 GPU 或可以在 CPU 上运行
+✅ 估算模型内存需求
+✅ 排查常见模型加载错误
+✅ 为部署选择合适的模型格式
+✅ 测量模型推理延迟和吞吐量
+✅ 在模块测验中得分 80% 或更高
+
+## 与 AI 基础设施的关联
+
+本模块是以下内容的基础：
+
+- **Module 005: Docker 容器** - 将 ML 模型打包到容器中
+- **Module 006: Kubernetes** - 大规模部署模型
+- **Module 007: API 与 Web 服务** - 构建模型服务端点
+- **Module 009: 监控** - 监控模型性能
+- **未来项目**：所有项目都涉及部署或管理 ML 模型
+
+## 下一步
+
+完成本模块后，你将进入：
+- **Module 005**: Docker 容器（打包 ML 模型）
+- **Module 006**: Kubernetes 入门（编排 ML 工作负载）
+- **Module 007**: API 与 Web 服务（构建服务端点）
+
+本模块的 ML 知识将在整个课程后续部分中应用。
+
+## 获取帮助
+
+### 在模块学习期间
+- 多次复习讲座笔记——ML 概念需要重复
+- 运行讲座中的所有代码示例
+- 不要跳过练习——动手实践至关重要
+- 使用 print 语句检查 tensor 和模型输出
+- 仔细阅读错误信息——它们通常指明版本不匹配
+
+### 外部资源
+- PyTorch 文档和教程
+- TensorFlow 官方指南
+- ONNX Runtime 文档
+- 模型库：HuggingFace Hub, TorchHub, TensorFlow Hub
+- Stack Overflow 用于特定错误
+
+### 常见陷阱
+- PyTorch/TensorFlow 与模型之间的版本不匹配
+- CUDA 版本不兼容
+- 推理过程中的输入形状不匹配
+- 设备错误（模型在 GPU 上，输入在 CPU 上）
+- 缺少模型文件或检查点
+
+## 工具和资源
+
+### 必备工具
 - **PyTorch**: 2.1.0+
 - **TensorFlow**: 2.13.0+
-- **ONNX**: Latest version
-- **ONNX Runtime**: Latest version
-- **NumPy**: For array operations
-- **Pillow**: For image processing
+- **ONNX**: 最新版本
+- **ONNX Runtime**: 最新版本
+- **NumPy**: 用于数组操作
+- **Pillow**: 用于图像处理
 
-### Model Sources
-- **HuggingFace Hub**: Pre-trained transformers (BERT, GPT, etc.)
-- **TorchHub**: Pre-trained PyTorch models
-- **TensorFlow Hub**: Pre-trained TensorFlow models
-- **ONNX Model Zoo**: Pre-converted ONNX models
+### 模型来源
+- **HuggingFace Hub**: 预训练 transformers（BERT, GPT 等）
+- **TorchHub**: 预训练 PyTorch 模型
+- **TensorFlow Hub**: 预训练 TensorFlow 模型
+- **ONNX Model Zoo**: 预转换的 ONNX 模型
 
-### Development Tools
-- **Jupyter notebooks**: Interactive experimentation
-- **tensorboard**: Visualization (TensorFlow)
-- **netron**: Visualize model architectures
-- **nvidia-smi**: GPU monitoring
+### 开发工具
+- **Jupyter notebooks**: 交互式实验
+- **tensorboard**: 可视化（TensorFlow）
+- **netron**: 可视化模型架构
+- **nvidia-smi**: GPU 监控
 
-## Important Notes
+## 重要提示
 
-### GPU Access
-While many exercises can run on CPU, having GPU access significantly improves the learning experience. If you don't have a local GPU:
+### GPU 访问
+虽然许多练习可以在 CPU 上运行，但拥有 GPU 访问权限能显著提升学习体验。如果你没有本地 GPU：
 
-- Use Google Colab (free GPU access)
-- Use AWS EC2 g4dn instances (pay per hour)
-- Use Paperspace Gradient (ML-focused cloud)
-- Focus on understanding concepts; run inference on CPU
+- 使用 Google Colab（免费 GPU 访问）
+- 使用 AWS EC2 g4dn 实例（按小时付费）
+- 使用 Paperspace Gradient（专注于 ML 的云服务）
+- 专注于理解概念；在 CPU 上运行推理
 
-### Download Requirements
-Pre-trained models can be large (100MB to several GB). Ensure you have:
-- Stable internet connection
-- Sufficient disk space
-- Patience for initial downloads (cached afterward)
+### 下载要求
+预训练模型可能很大（100MB 到数 GB）。确保你有：
+- 稳定的互联网连接
+- 足够的磁盘空间
+- 对初始下载有耐心（之后会缓存）
 
-### Framework Installation
-CUDA-enabled PyTorch and TensorFlow require specific CUDA versions. Follow official installation guides carefully for your system.
+### 框架安装
+支持 CUDA 的 PyTorch 和 TensorFlow 需要特定版本的 CUDA。请仔细按照官方安装指南为你的系统进行安装。
 
 ---
 
-**Module Version**: 1.0
-**Last Updated**: October 2025
-**Estimated Completion Time**: 30-40 hours
-**Difficulty Level**: Beginner to Intermediate
+**模块版本**: 1.0
+**最后更新**: 2025 年 10 月
+**预计完成时间**: 30-40 小时
+**难度等级**: 初级到中级
 
-**Ready to begin?** Start with `lecture-notes/01-ml-overview.md`
+**准备好了吗？** 从 `lecture-notes/01-ml-overview.md` 开始

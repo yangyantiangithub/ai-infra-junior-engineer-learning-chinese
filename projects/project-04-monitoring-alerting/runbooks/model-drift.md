@@ -1,43 +1,43 @@
-# Runbook: ModelDriftDetected
+# 手册：ModelDriftDetected
 
-**Alert:** `ModelDriftDetected`
-**Severity:** warning
-**Pages:** no (Slack `#alerts-warnings`, also notifies the model owner)
+**告警：** `ModelDriftDetected`
+**严重级别：** warning
+**是否呼叫：** 否（Slack `#alerts-warnings`，同时通知模型负责人）
 
-## What it means
+## 含义
 
-Feature distribution drift (PSI > 0.2) or output prediction drift has exceeded the configured threshold over a 24-hour window. The model's input or output no longer matches what it was trained on.
+特征分布漂移（PSI > 0.2）或输出预测漂移在 24 小时窗口内超出了配置的阈值。模型的输入或输出不再与训练时的数据匹配。
 
-## How bad is it?
+## 有多严重？
 
-Drift is not an outage but it predicts degradation. Left unchecked, model accuracy will decline and downstream metrics (conversion, fraud rate, etc.) will follow.
+漂移不是宕机，但它预示着性能退化。如果不加控制，模型准确率将会下降，下游指标（转化率、欺诈率等）也会随之恶化。
 
-## First checks
+## 首先检查
 
-1. **Which features are drifting?** The alert label `feature` identifies the worst offender. Look at the drift dashboard for the full ranking.
-2. **Is the drift abrupt or gradual?**
-   - **Abrupt** → likely upstream data pipeline change (new schema, new vendor).
-   - **Gradual** → likely real-world distribution shift (seasonality, market trend).
-3. **Is prediction distribution also drifting?** Input drift without output drift is sometimes a false alarm for tree models. Output drift is more actionable.
-4. **What's the latest model evaluation?** If we have ground-truth labels arriving, has measured accuracy / AUC moved?
+1. **哪些特征在漂移？** 告警标签 `feature` 标识了最严重的特征。查看漂移仪表盘获取完整排名。
+2. **漂移是突发的还是渐进的？**
+   - **突发** → 可能是上游数据流水线变更（新 schema、新供应商）。
+   - **渐进** → 可能是真实世界分布偏移（季节性、市场趋势）。
+3. **预测分布是否也在漂移？** 对于树模型，仅有输入漂移而无输出漂移有时是误报。输出漂移更具可操作性。
+4. **最新的模型评估结果如何？** 如果有真实标签到达，测量的准确率/AUC 是否发生了变化？
 
-## Likely causes
+## 可能的原因
 
-1. **Upstream schema change.** A producer changed how a field is computed.
-2. **New segment / cohort.** Onboarded users / markets / merchants the model didn't see at training time.
-3. **Seasonality.** Holidays, end of quarter, marketing campaigns.
-4. **Bug in feature pipeline.** A null-handling change makes a column always zero.
+1. **上游 schema 变更。** 生产者更改了某个字段的计算方式。
+2. **新的细分群体/队列。** 模型在训练时未见过的用户/市场/商家。
+3. **季节性。** 节假日、季末、营销活动。
+4. **特征流水线中的错误。** 空值处理变更导致某列始终为零。
 
-## Mitigation
+## 缓解措施
 
-This is **not** an action-now alert. The workflow is:
+这是一个**不需要立即操作**的告警。工作流程如下：
 
-1. File a ticket assigning the model owner.
-2. Confirm whether the drift correlates with a known event (campaign, schema change).
-3. If accuracy is measurably degrading, trigger retraining via the `model_retraining` DAG in Project 03.
-4. If the feature change is bug-shaped, fix the upstream pipeline rather than retrain over bad data.
+1. 提交工单，指定模型负责人。
+2. 确认漂移是否与已知事件（营销活动、schema 变更）相关。
+3. 如果准确率确实在下降，通过项目 03 中的 `model_retraining` DAG 触发重新训练。
+4. 如果特征变更是 bug 导致的，修复上游流水线，而不是在错误数据上重新训练。
 
-## When this requires a postmortem
+## 何时需要进行事后审查
 
-- Accuracy degradation noticed by an external party before us.
-- Drift was caused by a release we shipped (process gap).
+- 准确率下降被外部方先于我们发现。
+- 漂移由我们发布的版本引起（流程漏洞）。

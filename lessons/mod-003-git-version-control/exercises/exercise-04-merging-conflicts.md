@@ -1,47 +1,47 @@
-# Exercise 04: Merging and Conflict Resolution
+# 练习 04：合并与冲突解决
 
-## Overview
+## 概述
 
-**Difficulty**: Intermediate
-**Estimated Time**: 90-120 minutes
-**Prerequisites**: Exercise 03 - Branching, Lecture 02 - Branching and Merging
+**难度**：中级
+**预计时间**：90-120 分钟
+**前置条件**：练习 03 - 分支，讲座 02 - 分支与合并
 
-In this exercise, you'll learn how to merge feature branches, handle merge conflicts, and resolve conflicts in ML project files including code, configuration, and data files. You'll practice different merge strategies and learn when to use each approach.
+在本练习中，你将学习如何合并功能分支、处理合并冲突以及在 ML 项目文件（包括代码、配置和数据文件）中解决冲突。你将练习不同的合并策略并学习何时使用每种方法。
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
+完成本练习后，你将：
 
-- Perform fast-forward merges
-- Execute three-way merges
-- Identify and resolve merge conflicts
-- Handle conflicts in Python code, YAML configs, and documentation
-- Use merge tools effectively
-- Understand merge strategies (merge, squash, rebase)
-- Abort and retry merges
-- Handle complex multi-file conflicts
-- Prevent common merge mistakes
+- 执行快进合并
+- 执行三方合并
+- 识别和解决合并冲突
+- 处理 Python 代码、YAML 配置和文档中的冲突
+- 有效使用合并工具
+- 理解合并策略（merge、squash、rebase）
+- 中止和重试合并
+- 处理复杂的多文件冲突
+- 预防常见的合并错误
 
-## Scenario
+## 场景
 
-Your team has been developing multiple features in parallel. Now it's time to integrate them back into the main branch. Some features will merge cleanly, while others will have conflicts that need manual resolution. You'll need to carefully merge changes while maintaining code quality and functionality.
+你的团队一直在并行开发多个功能。现在是时候将它们整合回主分支了。有些功能可以干净地合并，而有些会有冲突需要手动解决。你需要仔细合并变更，同时保持代码质量和功能完整性。
 
-Features to merge:
-- Batch inference (developed in Exercise 03)
-- Model caching
-- Enhanced health checks
-- Bug fixes from hotfix branch
+需要合并的功能：
+- 批量推理（在练习 03 中开发）
+- 模型缓存
+- 增强的健康检查
+- 来自 hotfix 分支的 bug 修复
 
-## Prerequisites
+## 前置条件
 
 ```bash
-# Continue from Exercise 03 repository
+# 从练习 03 的仓库继续
 cd ml-inference-api
 
-# Ensure you have branches from Exercise 03
+# 确保你有练习 03 中的分支
 git branch
 
-# Should show:
+# 应显示：
 # - main
 # - feature/batch-inference
 # - feature/model-caching
@@ -51,32 +51,32 @@ git branch
 
 ---
 
-## Part 1: Fast-Forward Merges
+## 第一部分：快进合并
 
-### Task 1.1: Understanding Fast-Forward
+### 任务 1.1：理解快进
 
-Merge a simple, non-conflicting branch.
+合并一个简单的、无冲突的分支。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Switch to main
+# 切换到 main
 git switch main
 
-# View current commit
+# 查看当前 commit
 git log --oneline -1
 
-# View health check branch
+# 查看健康检查分支
 git log --oneline feature/health-check-enhancements
 
-# Merge health check feature (fast-forward)
+# 合并健康检查功能（快进）
 git merge feature/health-check-enhancements
 
-# View result
+# 查看结果
 git log --oneline --graph -5
 ```
 
-**Expected Output:**
+**预期输出：**
 ```
 Updating abc123..def456
 Fast-forward
@@ -86,23 +86,23 @@ Fast-forward
  3 files changed, 73 insertions(+)
 ```
 
-**Checkpoint:**
-- What does "Fast-forward" mean?
-- Why was this merge simple?
+**检查点：**
+- "Fast-forward"是什么意思？
+- 为什么这次合并很简单？
 
 ---
 
-### Task 1.2: No Fast-Forward Merge
+### 任务 1.2：非快进合并
 
-Force a merge commit even when fast-forward is possible.
+即使快进可能，也强制创建合并 commit。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create a simple branch
+# 创建一个简单分支
 git switch -c feature/add-version-info
 
-# Add version info
+# 添加版本信息
 cat > src/version.py << 'EOF'
 """Version information."""
 
@@ -120,43 +120,43 @@ EOF
 git add src/version.py
 git commit -m "feat: add version information module"
 
-# Switch back and merge with --no-ff
+# 切换回来并使用 --no-ff 合并
 git switch main
 git merge --no-ff feature/add-version-info -m "Merge feature: version information
 
 Adds version tracking module for API versioning."
 
-# View the graph - notice the merge commit
+# 查看图形 - 注意合并 commit
 git log --oneline --graph -5
 ```
 
-**Why use --no-ff?**
-- Preserves branch history
-- Shows when features were integrated
-- Useful for code review tracking
+**为什么使用 --no-ff？**
+- 保留分支历史
+- 显示功能何时被集成
+- 有助于代码审查跟踪
 
 ---
 
-## Part 2: Three-Way Merges
+## 第二部分：三方合并
 
-### Task 2.1: Basic Three-Way Merge
+### 任务 2.1：基本三方合并
 
-Merge branches that have diverged.
+合并已经分叉的分支。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Both main and feature/batch-inference have new commits
-# This requires a three-way merge
+# main 和 feature/batch-inference 都有新的 commit
+# 这需要一个三方合并
 
-# View the divergence
+# 查看分歧
 git log --oneline --graph --all -10
 
-# Merge batch inference feature
+# 合并批量推理功能
 git merge feature/batch-inference
 
-# Git opens editor for merge commit message
-# Default message is fine, or customize:
+# Git 打开编辑器输入合并 commit 消息
+# 默认消息就好，或自定义：
 # "Merge feature: batch inference
 #
 # Integrates batch prediction capability:
@@ -165,28 +165,28 @@ git merge feature/batch-inference
 # - Concurrent preprocessing
 # - Batch validation"
 
-# View the merge commit
+# 查看合并 commit
 git log --oneline --graph -8
 git show HEAD
 ```
 
-**Expected Result:**
-A merge commit with two parents (three-way merge).
+**预期结果：**
+一个带有两个父 commit 的合并 commit（三方合并）。
 
 ---
 
-## Part 3: Resolving Merge Conflicts
+## 第三部分：解决合并冲突
 
-### Task 3.1: Create and Resolve a Simple Conflict
+### 任务 3.1：创建并解决简单冲突
 
-Intentionally create a conflict to practice resolution.
+故意制造冲突以练习解决。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create two branches that modify the same file
+# 创建两个修改同一文件的分支
 
-# Branch 1: Update default config
+# 分支 1：更新默认配置
 git switch main
 git switch -c feature/config-update-1
 
@@ -202,7 +202,7 @@ EOF
 git add configs/default.yaml
 git commit -m "feat: add feature toggles to config"
 
-# Branch 2: Also update config (conflicting change)
+# 分支 2：也更新配置（冲突变更）
 git switch main
 git switch -c feature/config-update-2
 
@@ -218,39 +218,39 @@ EOF
 git add configs/default.yaml
 git commit -m "feat: add performance settings to config"
 
-# Merge first branch
+# 合并第一个分支
 git switch main
 git merge feature/config-update-1 --no-edit
 
-# Try to merge second branch - CONFLICT!
+# 尝试合并第二个分支 - 冲突！
 git merge feature/config-update-2
 ```
 
-**Expected Output:**
+**预期输出：**
 ```
 Auto-merging configs/default.yaml
 CONFLICT (content): Merge conflict in configs/default.yaml
 Automatic merge failed; fix conflicts and then commit the result.
 ```
 
-**Resolution:**
+**解决方法：**
 
 ```bash
-# Check status
+# 检查状态
 git status
 
-# View the conflict
+# 查看冲突
 cat configs/default.yaml
 
-# You'll see conflict markers:
+# 你会看到冲突标记：
 # <<<<<<< HEAD
 # (your changes)
 # =======
 # (their changes)
 # >>>>>>> feature/config-update-2
 
-# Edit the file to resolve
-# Remove conflict markers and keep both sections:
+# 编辑文件来解决
+# 移除冲突标记并保留两个部分：
 
 cat > configs/default.yaml << 'EOF'
 # Default Configuration for ML Inference API
@@ -321,38 +321,38 @@ performance:
   enable_profiling: false
 EOF
 
-# Stage the resolved file
+# 暂存已解决的文件
 git add configs/default.yaml
 
-# Check status - should show "all conflicts fixed"
+# 检查状态 - 应显示"all conflicts fixed"
 git status
 
-# Complete the merge
+# 完成合并
 git commit -m "Merge feature: config updates
 
 Resolved conflicts by integrating both feature toggles
 and performance settings into default configuration."
 
-# Verify
+# 验证
 git log --oneline --graph -5
 ```
 
 ---
 
-### Task 3.2: Resolve Python Code Conflict
+### 任务 3.2：解决 Python 代码冲突
 
-Handle conflicts in source code.
+处理源代码中的冲突。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create conflicting changes to the API
+# 创建对 API 的冲突更改
 
-# Branch 1: Add request validation
+# 分支 1：添加请求验证
 git switch main
 git switch -c feature/request-validation
 
-# Modify app.py
+# 修改 app.py
 cat > src/api/app.py << 'EOF'
 """ML Inference API - Main Application"""
 
@@ -429,7 +429,7 @@ EOF
 git add src/api/app.py
 git commit -m "feat: add image validation to predict endpoint"
 
-# Branch 2: Add metrics tracking
+# 分支 2：添加指标跟踪
 git switch main
 git switch -c feature/metrics-tracking
 
@@ -515,24 +515,24 @@ EOF
 git add src/api/app.py
 git commit -m "feat: add metrics tracking to predict endpoint"
 
-# Merge first feature
+# 合并第一个功能
 git switch main
 git merge feature/request-validation --no-edit
 
-# Merge second - CONFLICT!
+# 合并第二个 - 冲突！
 git merge feature/metrics-tracking
 ```
 
-**Resolve the conflict:**
+**解决冲突：**
 
 ```bash
-# View conflict
+# 查看冲突
 git diff
 
-# The predict function has conflicts
-# Need to combine both changes: validation AND metrics
+# predict 函数有冲突
+# 需要结合两个变更：验证 AND 指标
 
-# Edit src/api/app.py to include BOTH features:
+# 编辑 src/api/app.py 包含两个功能：
 
 cat > src/api/app.py << 'EOF'
 """ML Inference API - Main Application"""
@@ -620,7 +620,7 @@ async def predict(file: UploadFile = File(...)) -> JSONResponse:
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 EOF
 
-# Stage and commit
+# 暂存并提交
 git add src/api/app.py
 git commit -m "Merge feature: metrics tracking
 
@@ -630,29 +630,29 @@ Both features now work together:
 - Track all requests and errors
 - Record inference timing"
 
-# Verify
+# 验证
 git log --oneline --graph -6
 ```
 
 ---
 
-### Task 3.3: Resolve Multi-File Conflict
+### 任务 3.3：解决多文件冲突
 
-Handle conflicts across multiple files.
+处理跨多个文件的冲突。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Try to merge model caching feature
+# 尝试合并模型缓存功能
 git merge feature/model-caching
 
-# This might conflict if app.py was modified
+# 如果 app.py 被修改过，可能会有冲突
 
-# Check which files have conflicts
+# 检查哪些文件有冲突
 git status
 
-# Resolve each conflict
-# Then:
+# 解决每个冲突
+# 然后：
 git add <resolved-files>
 git commit -m "Merge feature: model caching
 
@@ -661,16 +661,16 @@ Integrated prediction caching with existing features."
 
 ---
 
-## Part 4: Merge Strategies
+## 第四部分：合并策略
 
-### Task 4.1: Squash Merge
+### 任务 4.1：Squash 合并
 
-Combine all commits from a feature branch into one.
+将功能分支的所有 commit 合并为一个。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create a feature with multiple small commits
+# 创建一个包含多个小 commit 的功能
 git switch -c feature/logging-improvements
 
 echo "improvement 1" >> src/utils/logging.py
@@ -685,17 +685,17 @@ echo "improvement 3" >> src/utils/logging.py
 git add src/utils/logging.py
 git commit -m "logging: add structured fields"
 
-# View commits
+# 查看 commit
 git log --oneline -3
 
-# Switch and squash merge
+# 切换并 squash 合并
 git switch main
 git merge --squash feature/logging-improvements
 
-# All changes staged, but not committed yet
+# 所有变更已暂存，但尚未提交
 git status
 
-# Commit as single commit
+# 作为单个 commit 提交
 git commit -m "feat: improve logging system
 
 Consolidated improvements:
@@ -703,28 +703,28 @@ Consolidated improvements:
 - Log rotation
 - Structured field support"
 
-# Note: Only ONE commit on main, not three
+# 注意：main 上只有一个 commit，不是三个
 git log --oneline -3
 ```
 
-**When to use squash:**
-- Feature has many WIP commits
-- Want clean history on main
-- Individual commits not important
+**何时使用 squash：**
+- 功能有许多 WIP commit
+- 希望在 main 上保持干净的历史
+- 单独的 commit 不重要
 
 ---
 
-### Task 4.2: Abort a Merge
+### 任务 4.2：中止合并
 
-Learn to cancel a problematic merge.
+学会取消有问题的合并。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Start a merge that creates conflicts
+# 开始一个会产生冲突的合并
 git switch -c feature/conflicting-change
 
-# Make conflicting change
+# 进行冲突性变更
 cat > src/api/app.py << 'EOF'
 # Completely different implementation
 print("This will conflict!")
@@ -736,104 +736,104 @@ git commit -m "Conflicting change"
 git switch main
 git merge feature/conflicting-change
 
-# Lots of conflicts!
+# 大量冲突！
 git status
 
-# Decide to abort and try later
+# 决定中止并稍后重试
 git merge --abort
 
-# Back to pre-merge state
+# 回到合并前状态
 git status
 git diff  # No changes
 ```
 
 ---
 
-## Part 5: Advanced Conflict Resolution
+## 第五部分：高级冲突解决
 
-### Task 5.1: Use Merge Tools
+### 任务 5.1：使用合并工具
 
-Configure and use merge tools.
+配置和使用合并工具。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Configure merge tool (optional)
+# 配置合并工具（可选）
 git config merge.tool vimdiff
-# Or: meld, kdiff3, vscode, etc.
+# 或：meld, kdiff3, vscode 等
 
-# When you have a conflict:
+# 当你有冲突时：
 # git mergetool
 
-# This opens a visual diff tool
-# Make changes, save, exit
+# 这会打开一个可视化差异工具
+# 进行更改，保存，退出
 
-# Verify resolution
+# 验证解决
 # git add <file>
 # git commit
 ```
 
 ---
 
-### Task 5.2: Choose One Side
+### 任务 5.2：选择一方
 
-Keep one version entirely.
+完全保留一个版本。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# During a conflict, choose one side:
+# 在冲突期间，选择一方：
 
-# Keep "ours" (current branch)
+# 保留"ours"（当前分支）
 git checkout --ours path/to/file
 git add path/to/file
 
-# Or keep "theirs" (merging branch)
+# 或保留"theirs"（合并分支）
 git checkout --theirs path/to/file
 git add path/to/file
 
-# Then commit
+# 然后提交
 git commit
 ```
 
 ---
 
-## Part 6: Preventing Merge Issues
+## 第六部分：预防合并问题
 
-### Task 6.1: Pre-Merge Checks
+### 任务 6.1：合并前检查
 
-Validate before merging.
+在合并前进行验证。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Before merging:
+# 在合并前：
 
-# 1. Update main
+# 1. 更新 main
 git switch main
 git pull  # (if working with remote)
 
-# 2. Check for conflicts without merging
+# 2. 在不合并的情况下检查冲突
 git merge --no-commit --no-ff feature/branch-name
 
-# Review changes
+# 审查变更
 git status
 git diff --cached
 
-# If good, commit
+# 如果没问题，提交
 git commit
 
-# If not, abort
+# 如果不行，中止
 git merge --abort
 ```
 
 ---
 
-### Task 6.2: Test After Merge
+### 任务 6.2：合并后测试
 
-Create a merge validation script.
+创建合并验证脚本。
 
-**Instructions:**
+**说明：**
 
 ```bash
 cat > scripts/post-merge-check.sh << 'EOF'
@@ -862,74 +862,74 @@ EOF
 
 chmod +x scripts/post-merge-check.sh
 
-# Run after each merge
+# 每次合并后运行
 ./scripts/post-merge-check.sh
 ```
 
 ---
 
-## Validation
+## 验证
 
-### Verify Your Merges
+### 验证你的合并
 
 ```bash
-# View merge history
+# 查看合并历史
 git log --oneline --graph --all
 
-# Check for unresolved conflicts
+# 检查未解决的冲突
 git status
 
-# Verify all features are integrated
+# 验证所有功能已集成
 ls src/api/
 ls src/utils/
 
-# Run tests
+# 运行测试
 # pytest tests/
 
-# Check commit history
+# 检查 commit 历史
 git log --merges --oneline
 ```
 
 ---
 
-## Challenge Tasks
+## 挑战任务
 
-### Challenge 1: Three-Way Merge with Conflicts
+### 挑战 1：带冲突的三方合并
 
-Create and resolve a complex three-way merge with multiple conflicting files.
+创建并解决一个包含多个冲突文件的复杂三方合并。
 
-### Challenge 2: Cherry-Pick Commits
+### 挑战 2：Cherry-Pick Commits
 
-Use `git cherry-pick` to selectively apply commits:
+使用 `git cherry-pick` 选择性应用 commit：
 
 ```bash
-# Pick specific commit from another branch
+# 从另一个分支挑选特定 commit
 git log feature/some-branch --oneline
 git cherry-pick <commit-hash>
 ```
 
-### Challenge 3: Merge Strategy Comparison
+### 挑战 3：合并策略比较
 
-Compare different merge strategies and document when to use each.
+比较不同的合并策略并记录何时使用每种策略。
 
 ---
 
-## Troubleshooting
+## 故障排除
 
-**Issue**: "Cannot merge, uncommitted changes"
+**问题**："无法合并，有未提交的变更"
 ```bash
 git stash
 git merge <branch>
 git stash pop
 ```
 
-**Issue**: "Merge created unexpected results"
+**问题**："合并产生了意外结果"
 ```bash
-# Undo the merge
+# 撤销合并
 git reset --hard HEAD~1
 ```
 
-**Issue**: "Lost track of what I'm merging"
+**问题**："忘记了我正在合并什么"
 ```bash
 git status  # Shows merge in progress
 cat .git/MERGE_HEAD  # Shows branch being merged
@@ -937,44 +937,44 @@ cat .git/MERGE_HEAD  # Shows branch being merged
 
 ---
 
-## Reflection Questions
+## 反思问题
 
-1. **What's the difference between fast-forward and three-way merge?**
-2. **When should you use `--squash` vs. regular merge?**
-3. **How do you identify the cause of a merge conflict?**
-4. **What's the safest way to handle a complex conflict?**
-5. **Why validate after merging?**
+1. **快进合并和三方合并之间的区别是什么？**
+2. **何时应该使用 `--squash` 而不是常规合并？**
+3. **如何识别合并冲突的原因？**
+4. **处理复杂冲突最安全的方式是什么？**
+5. **为什么要在合并后进行验证？**
 
 ---
 
-## Summary
+## 总结
 
-Congratulations! You've mastered merging and conflict resolution:
+恭喜！你已经掌握了合并和冲突解决：
 
-- ✅ Fast-forward merges
-- ✅ Three-way merges
-- ✅ Conflict resolution in code and configs
-- ✅ Merge strategies (squash, no-ff)
-- ✅ Aborting problematic merges
-- ✅ Using merge tools
-- ✅ Pre and post-merge validation
+- ✅ 快进合并
+- ✅ 三方合并
+- ✅ 代码和配置中的冲突解决
+- ✅ 合并策略（squash、no-ff）
+- ✅ 中止有问题的合并
+- ✅ 使用合并工具
+- ✅ 合并前和合并后验证
 
-### Key Commands
+### 学会的关键命令
 
 ```bash
-git merge <branch>           # Merge branch
-git merge --no-ff <branch>   # Force merge commit
-git merge --squash <branch>  # Squash commits
-git merge --abort            # Cancel merge
-git checkout --ours <file>   # Keep our version
-git checkout --theirs <file> # Keep their version
-git mergetool                # Open merge tool
-git log --merges             # Show merge commits
+git merge <branch>           # 合并分支
+git merge --no-ff <branch>   # 强制创建合并 commit
+git merge --squash <branch>  # Squash 合并
+git merge --abort            # 取消合并
+git checkout --ours <file>   # 保留我们的版本
+git checkout --theirs <file> # 保留他们的版本
+git mergetool                # 打开合并工具
+git log --merges             # 显示合并 commit
 ```
 
-### Next Steps
+### 下一步
 
-- Exercise 05: Collaboration workflows
-- Practice merging in team projects
+- 练习 05：协作工作流
+- 在团队项目中练习合并
 
-**Excellent work!** You can now confidently merge and resolve conflicts.
+**出色的工作！** 你现在可以自信地合并和解决冲突了。

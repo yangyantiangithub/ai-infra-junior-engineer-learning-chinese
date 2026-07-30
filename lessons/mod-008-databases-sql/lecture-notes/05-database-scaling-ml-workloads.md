@@ -1,162 +1,162 @@
-# Lecture 05: Database Scaling and Performance for ML Workloads
+# Lecture 05: ML 工作负载的数据库扩展与性能
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Database Scaling Fundamentals](#database-scaling-fundamentals)
-3. [Read Replicas and Replication](#read-replicas-and-replication)
-4. [Database Sharding](#database-sharding)
-5. [Caching Strategies](#caching-strategies)
-6. [NoSQL Databases for ML](#nosql-databases-for-ml)
-7. [Time-Series Databases](#time-series-databases)
-8. [Vector Databases for ML](#vector-databases-for-ml)
-9. [Database Performance Optimization](#database-performance-optimization)
-10. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [引言](#introduction)
+2. [数据库扩展基础](#database-scaling-fundamentals)
+3. [只读副本与复制](#read-replicas-and-replication)
+4. [数据库分片](#database-sharding)
+5. [缓存策略](#caching-strategies)
+6. [ML 的 NoSQL 数据库](#nosql-databases-for-ml)
+7. [时序数据库](#time-series-databases)
+8. [ML 的 Vector Database](#vector-databases-for-ml)
+9. [数据库性能优化](#database-performance-optimization)
+10. [总结与关键要点](#summary-and-key-takeaways)
 
-## Introduction
+## 引言
 
-ML applications generate massive amounts of data: training datasets, model metadata, predictions, metrics, logs, and embeddings. As your ML platform scales from hundreds to millions of predictions per day, your database becomes a bottleneck.
+ML 应用生成海量数据：训练数据集、模型元数据、预测结果、指标、日志和嵌入向量。随着你的 ML 平台从每天数百次预测扩展到数百万次，数据库会成为瓶颈。
 
-This lecture covers database scaling strategies, performance optimization, and specialized databases for ML workloads.
+本讲座涵盖数据库扩展策略、性能优化以及针对 ML 工作负载的专业数据库。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Understand vertical vs horizontal scaling trade-offs
-- Implement read replicas for scaling read-heavy workloads
-- Design sharding strategies for horizontal scaling
-- Use caching to reduce database load
-- Choose appropriate NoSQL databases for ML data
-- Work with time-series databases for metrics
-- Use vector databases for similarity search
-- Optimize database performance for ML workloads
+在本讲座结束时，你将：
+- 理解垂直与水平扩展的权衡
+- 实现只读副本以扩展读取密集型工作负载
+- 设计用于水平扩展的分片策略
+- 使用缓存减少数据库负载
+- 为 ML 数据选择合适的 NoSQL 数据库
+- 使用时序数据库处理指标
+- 使用 vector database 进行相似性搜索
+- 为 ML 工作负载优化数据库性能
 
-### Prerequisites
-- Lectures 01-04 (SQL fundamentals, query optimization, ORMs)
-- Understanding of ML workflows (training, inference, metrics)
-- Basic knowledge of caching concepts
+### 前置条件
+- 讲座 01-04（SQL 基础、查询优化、ORM）
+- 理解 ML 工作流（训练、推理、指标）
+- 基本缓存概念知识
 
-**Duration**: 90 minutes
-**Difficulty**: Intermediate to Advanced
+**时长**: 90 分钟
+**难度**: 中级到高级
 
 ---
 
-## 1. Database Scaling Fundamentals
+## 1. 数据库扩展基础
 
-### Vertical vs Horizontal Scaling
+### 垂直与水平扩展
 
 ```
-Vertical Scaling (Scale Up):
+垂直扩展（纵向扩展）：
 ┌─────────────────────────────┐
-│  Bigger Database Server     │
-│  ├── 4 CPUs  → 32 CPUs     │
+│  更大的数据库服务器         │
+│  ├── 4 CPU  → 32 CPU       │
 │  ├── 16GB RAM → 256GB RAM  │
 │  └── 1TB SSD → 10TB SSD    │
 └─────────────────────────────┘
 
-Pros: Simple, no code changes
-Cons: Expensive, hardware limits, single point of failure
+优点：简单，无需代码更改
+缺点：昂贵，硬件限制，单点故障
 
-Horizontal Scaling (Scale Out):
+水平扩展（横向扩展）：
 ┌──────────┐ ┌──────────┐ ┌──────────┐
-│ DB Node 1│ │ DB Node 2│ │ DB Node 3│
-│ 4 CPUs   │ │ 4 CPUs   │ │ 4 CPUs   │
+│ DB 节点 1│ │ DB 节点 2│ │ DB 节点 3│
+│ 4 CPU    │ │ 4 CPU    │ │ 4 CPU    │
 │ 16GB RAM │ │ 16GB RAM │ │ 16GB RAM │
 └──────────┘ └──────────┘ └──────────┘
 
-Pros: Cost-effective, unlimited scaling, high availability
-Cons: Complex, code changes needed, data consistency challenges
+优点：经济高效，无限扩展，高可用
+缺点：复杂，需要代码更改，数据一致性挑战
 ```
 
-### ML Database Workload Characteristics
+### ML 数据库工作负载特征
 
 ```
-Typical ML Database Access Patterns:
+典型 ML 数据库访问模式：
 
-Training Phase:
-├── Read: HEAVY (read datasets, features)
-├── Write: MEDIUM (save checkpoints, metrics)
-└── Query Pattern: Batch reads, sequential scans
+训练阶段：
+├── 读取：高（读取数据集、特征）
+├── 写入：中（保存检查点、指标）
+└── 查询模式：批量读取，顺序扫描
 
-Inference Phase:
-├── Read: HEAVY (load features for prediction)
-├── Write: HEAVY (store predictions, logs)
-└── Query Pattern: Point queries, high QPS
+推理阶段：
+├── 读取：高（加载用于预测的特征）
+├── 写入：高（存储预测结果、日志）
+└── 查询模式：点查询，高 QPS
 
-Metrics/Monitoring:
-├── Read: HEAVY (dashboards, alerts)
-├── Write: HEAVY (time-series metrics)
-└── Query Pattern: Time-range queries, aggregations
+指标/监控：
+├── 读取：高（仪表盘、告警）
+├── 写入：高（时序指标）
+└── 查询模式：时间范围查询，聚合
 
-Solution: Different databases for different workloads!
+解决方案：不同工作负载使用不同数据库！
 ```
 
 ---
 
-## 2. Read Replicas and Replication
+## 2. 只读副本与复制
 
-### Master-Replica Architecture
+### 主-副本架构
 
 ```
 ┌──────────────────────────────────────┐
-│        Master (Primary)              │
-│     Handles ALL writes               │
+│        主库（Primary）               │
+│     处理所有写入                     │
 │  ├── INSERT predictions              │
 │  ├── UPDATE model metadata           │
 │  └── DELETE old experiments          │
 └────────────┬─────────────────────────┘
-             │ Replication
+             │ 复制
       ┌──────┴──────┬──────────┐
       │             │          │
 ┌─────▼─────┐ ┌────▼──────┐ ┌─▼──────────┐
-│ Replica 1 │ │ Replica 2 │ │ Replica 3  │
-│ Read-only │ │ Read-only │ │ Read-only  │
-│ Dashboard │ │ Analytics │ │ ML Training│
+│ 副本 1    │ │ 副本 2    │ │ 副本 3     │
+│ 只读      │ │ 只读      │ │ 只读       │
+│ 仪表盘    │ │ 分析      │ │ ML 训练    │
 └───────────┘ └───────────┘ └────────────┘
 ```
 
-### Setting Up Read Replicas (PostgreSQL)
+### 设置只读副本（PostgreSQL）
 
-**On Master:**
+**在主库上：**
 
 ```sql
--- Enable replication in postgresql.conf
+-- 在 postgresql.conf 中启用复制
 wal_level = replica
 max_wal_senders = 3
 wal_keep_size = 1GB
 
--- Create replication user
+-- 创建复制用户
 CREATE USER replicator REPLICATION LOGIN PASSWORD 'secure_password';
 ```
 
-**On Replica:**
+**在副本上：**
 
 ```bash
-# Stop replica
+# 停止副本
 sudo systemctl stop postgresql
 
-# Remove old data
+# 删除旧数据
 rm -rf /var/lib/postgresql/14/main
 
-# Copy data from master
+# 从主库复制数据
 pg_basebackup -h master-host -D /var/lib/postgresql/14/main \
   -U replicator -v -P -W -R
 
-# Start replica
+# 启动副本
 sudo systemctl start postgresql
 ```
 
-**Application Code with Read Replicas:**
+**使用只读副本的应用代码：**
 
 ```python
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import random
 
-# Master for writes
+# 主库用于写入
 master_engine = create_engine('postgresql://user:pass@master-db:5432/mldb')
 MasterSession = sessionmaker(bind=master_engine)
 
-# Replicas for reads
+# 副本用于读取
 replica_engines = [
     create_engine('postgresql://user:pass@replica1-db:5432/mldb'),
     create_engine('postgresql://user:pass@replica2-db:5432/mldb'),
@@ -165,7 +165,7 @@ replica_engines = [
 ReplicaSession = sessionmaker(bind=random.choice(replica_engines))
 
 def save_prediction(prediction_data):
-    """Write to master"""
+    """写入主库"""
     session = MasterSession()
     try:
         prediction = Prediction(**prediction_data)
@@ -175,7 +175,7 @@ def save_prediction(prediction_data):
         session.close()
 
 def get_model_metadata(model_id):
-    """Read from replica"""
+    """从副本读取"""
     session = ReplicaSession()
     try:
         return session.query(Model).filter_by(id=model_id).first()
@@ -183,12 +183,12 @@ def get_model_metadata(model_id):
         session.close()
 ```
 
-### Replication Lag
+### 复制延迟
 
-**Problem**: Replicas may be behind master (seconds to minutes)
+**问题**: 副本可能落后于主库（数秒到数分钟）
 
 ```python
-# Check replication lag (PostgreSQL)
+# 检查复制延迟（PostgreSQL）
 import psycopg2
 
 conn = psycopg2.connect("dbname=mldb host=replica1")
@@ -204,41 +204,41 @@ cursor.execute("""
 lag = cursor.fetchone()
 print(f"Replication lag: {lag[2]} bytes")
 
-# If lag > threshold, warn user
-if lag[2] > 1000000:  # 1MB lag
+# 如果延迟超过阈值，警告用户
+if lag[2] > 1000000:  # 1MB 延迟
     print("WARNING: Replica is significantly behind master")
 ```
 
 ---
 
-## 3. Database Sharding
+## 3. 数据库分片
 
-### What is Sharding?
+### 什么是分片？
 
-**Sharding** = Horizontal partitioning across multiple databases
+**分片** = 跨多个数据库的水平分区
 
 ```
-Single Database (100M rows):
+单个数据库（1 亿行）：
 ┌────────────────────────────────┐
-│  Predictions Table             │
-│  ├── User 1 predictions        │
-│  ├── User 2 predictions        │
+│  Predictions 表                │
+│  ├── 用户 1 的预测             │
+│  ├── 用户 2 的预测             │
 │  ├── ...                       │
-│  └── User 1M predictions       │
-│  (Slow queries, single server) │
+│  └── 用户 100 万预测           │
+│  （查询慢，单台服务器）        │
 └────────────────────────────────┘
 
-Sharded (4 shards, 25M rows each):
+分片（4 个分片，每个 2500 万行）：
 ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
-│ Shard 0  │ │ Shard 1  │ │ Shard 2  │ │ Shard 3  │
-│ Users    │ │ Users    │ │ Users    │ │ Users    │
-│ 0-249K   │ │ 250-499K │ │ 500-749K │ │ 750K-1M  │
+│ 分片 0   │ │ 分片 1   │ │ 分片 2   │ │ 分片 3   │
+│ 用户     │ │ 用户     │ │ 用户     │ │ 用户     │
+│ 0-25 万  │ │ 25-50 万 │ │ 50-75 万 │ │ 75-100 万│
 └──────────┘ └──────────┘ └──────────┘ └──────────┘
 ```
 
-### Sharding Strategies
+### 分片策略
 
-#### 1. Hash-Based Sharding
+#### 1. 基于 Hash 的分片
 
 ```python
 import hashlib
@@ -246,19 +246,19 @@ import hashlib
 NUM_SHARDS = 4
 
 def get_shard(user_id):
-    """Determine shard based on user ID hash"""
+    """基于用户 ID 的 hash 确定分片"""
     hash_value = int(hashlib.md5(str(user_id).encode()).hexdigest(), 16)
     shard_id = hash_value % NUM_SHARDS
     return shard_id
 
-# Example
+# 示例
 user_id = 12345
 shard = get_shard(user_id)
 print(f"User {user_id} → Shard {shard}")
 # User 12345 → Shard 2
 ```
 
-**Database connections per shard:**
+**每个分片的数据库连接：**
 
 ```python
 from sqlalchemy import create_engine
@@ -274,7 +274,7 @@ def get_engine_for_user(user_id):
     shard_id = get_shard(user_id)
     return shard_engines[shard_id]
 
-# Save prediction to correct shard
+# 保存预测到正确的分片
 def save_prediction(user_id, prediction_data):
     engine = get_engine_for_user(user_id)
     with engine.connect() as conn:
@@ -284,10 +284,10 @@ def save_prediction(user_id, prediction_data):
         )
 ```
 
-#### 2. Range-Based Sharding
+#### 2. 基于范围的分片
 
 ```python
-# Shard by user_id ranges
+# 按 user_id 范围分片
 def get_shard_by_range(user_id):
     if user_id < 250000:
         return 0
@@ -299,13 +299,13 @@ def get_shard_by_range(user_id):
         return 3
 ```
 
-**Pros**: Easy to add new users to new shards
-**Cons**: Uneven distribution if user growth is non-linear
+**优点**: 容易向新分片添加新用户
+**缺点**: 如果用户增长非线性则分布不均
 
-#### 3. Geographic Sharding
+#### 3. 地理分片
 
 ```python
-# Shard by geographic region
+# 按地理区域分片
 SHARD_BY_REGION = {
     'us-east': 0,
     'us-west': 1,
@@ -317,18 +317,18 @@ def get_shard_by_region(region):
     return SHARD_BY_REGION.get(region, 0)
 ```
 
-**Use case**: Data residency requirements, low latency
+**使用场景**: 数据驻留要求，低延迟
 
-### Cross-Shard Queries
+### 跨分片查询
 
-**Problem**: Queries that span multiple shards
+**问题**: 跨多个分片的查询
 
 ```python
-# Get predictions for all users (across all shards)
+# 获取所有用户的预测（跨所有分片）
 def get_all_predictions_last_hour():
     results = []
 
-    # Query each shard
+    # 查询每个分片
     for shard_id, engine in shard_engines.items():
         with engine.connect() as conn:
             shard_results = conn.execute("""
@@ -339,7 +339,7 @@ def get_all_predictions_last_hour():
 
     return results
 
-# Aggregate across shards
+# 跨分片聚合
 def get_total_predictions_count():
     total = 0
     for shard_id, engine in shard_engines.items():
@@ -349,7 +349,7 @@ def get_total_predictions_count():
     return total
 ```
 
-**Performance tip**: Use async queries to parallelize:
+**性能提示**: 使用异步查询进行并行化：
 
 ```python
 import asyncio
@@ -366,26 +366,26 @@ async def get_total_count_parallel():
     counts = await asyncio.gather(*tasks)
     return sum(counts)
 
-# 4x faster than sequential
+# 比顺序执行快 4 倍
 total = asyncio.run(get_total_count_parallel())
 ```
 
 ---
 
-## 4. Caching Strategies
+## 4. 缓存策略
 
-### Why Cache for ML?
+### 为什么为 ML 使用缓存？
 
 ```
-Without Cache:
-Every prediction request → Database query → 50ms latency
+没有缓存：
+每次预测请求 → 数据库查询 → 50ms 延迟
 
-With Cache:
-First request → Database → Cache → 50ms
-Subsequent requests → Cache → 2ms (25x faster!)
+有缓存：
+首次请求 → 数据库 → 缓存 → 50ms
+后续请求 → 缓存 → 2ms（快 25 倍！）
 ```
 
-### Redis for ML Caching
+### 用于 ML 缓存的 Redis
 
 ```python
 import redis
@@ -395,54 +395,54 @@ import hashlib
 redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 def get_user_features(user_id):
-    """Get user features with caching"""
+    """获取用户特征，带缓存"""
     cache_key = f"user_features:{user_id}"
 
-    # Try cache first
+    # 先尝试缓存
     cached = redis_client.get(cache_key)
     if cached:
         return json.loads(cached)
 
-    # Cache miss - query database
+    # 缓存未命中 - 查询数据库
     features = db.query(f"SELECT * FROM user_features WHERE user_id = {user_id}")
 
-    # Store in cache (TTL: 1 hour)
+    # 存储到缓存（TTL：1 小时）
     redis_client.setex(cache_key, 3600, json.dumps(features))
 
     return features
 ```
 
-### Cache Invalidation
+### 缓存失效
 
 ```python
 def update_user_features(user_id, new_features):
-    """Update features and invalidate cache"""
-    # Update database
+    """更新特征并使缓存失效"""
+    # 更新数据库
     db.execute(
         "UPDATE user_features SET features = %s WHERE user_id = %s",
         (json.dumps(new_features), user_id)
     )
 
-    # Invalidate cache
+    # 使缓存失效
     cache_key = f"user_features:{user_id}"
     redis_client.delete(cache_key)
 ```
 
-### Caching Model Metadata
+### 缓存模型元数据
 
 ```python
 def get_model_config(model_id):
-    """Cache model configurations"""
+    """缓存模型配置"""
     cache_key = f"model_config:{model_id}"
 
     cached = redis_client.get(cache_key)
     if cached:
         return json.loads(cached)
 
-    # Load from DB
+    # 从 DB 加载
     config = db.query(f"SELECT config FROM models WHERE id = {model_id}")
 
-    # Cache for 24 hours (models change infrequently)
+    # 缓存 24 小时（模型不频繁变更）
     redis_client.setex(cache_key, 86400, json.dumps(config))
 
     return config
@@ -450,25 +450,25 @@ def get_model_config(model_id):
 
 ---
 
-## 5. NoSQL Databases for ML
+## 5. ML 的 NoSQL 数据库
 
-### When to Use NoSQL
+### 何时使用 NoSQL
 
 ```
-Use SQL for:
-✓ Structured data (tabular)
-✓ Complex joins
-✓ ACID transactions
-✓ Business-critical data
+使用 SQL 的情况：
+✓ 结构化数据（表格形式）
+✓ 复杂 JOIN
+✓ ACID 事务
+✓ 业务关键数据
 
-Use NoSQL for:
-✓ Unstructured/semi-structured data
-✓ Massive scale (billions of records)
-✓ High write throughput
-✓ Flexible schema
+使用 NoSQL 的情况：
+✓ 非结构化/半结构化数据
+✓ 大规模（数十亿条记录）
+✓ 高写入吞吐量
+✓ 灵活的 schema
 ```
 
-### MongoDB for ML Metadata
+### MongoDB 用于 ML 元数据
 
 ```python
 from pymongo import MongoClient
@@ -476,7 +476,7 @@ from pymongo import MongoClient
 client = MongoClient('mongodb://localhost:27017/')
 db = client['ml_platform']
 
-# Store experiment metadata
+# 存储实验元数据
 experiments = db['experiments']
 
 experiment = {
@@ -501,7 +501,7 @@ experiment = {
 
 experiments.insert_one(experiment)
 
-# Query experiments
+# 查询实验
 best_experiments = experiments.find(
     {'metrics.accuracy': {'$gte': 0.90}}
 ).sort('metrics.accuracy', -1).limit(10)
@@ -512,9 +512,9 @@ for exp in best_experiments:
 
 ---
 
-## 6. Time-Series Databases
+## 6. 时序数据库
 
-### InfluxDB for ML Metrics
+### InfluxDB 用于 ML 指标
 
 ```python
 from influxdb_client import InfluxDBClient, Point
@@ -523,7 +523,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 client = InfluxDBClient(url="http://localhost:8086", token="my-token", org="ml-org")
 write_api = client.write_api(write_options=SYNCHRONOUS)
 
-# Write metrics
+# 写入指标
 def log_inference_metrics(model_name, latency_ms, batch_size):
     point = Point("inference_metrics") \
         .tag("model", model_name) \
@@ -532,7 +532,7 @@ def log_inference_metrics(model_name, latency_ms, batch_size):
 
     write_api.write(bucket="ml-metrics", record=point)
 
-# Query metrics
+# 查询指标
 query_api = client.query_api()
 
 query = '''
@@ -551,21 +551,21 @@ for table in tables:
 
 ---
 
-## 7. Vector Databases for ML
+## 7. ML 的 Vector Database
 
-### Pinecone for Similarity Search
+### Pinecone 用于相似性搜索
 
 ```python
 import pinecone
 
 pinecone.init(api_key="your-api-key", environment="us-west1-gcp")
 
-# Create index
+# 创建 index
 pinecone.create_index("ml-embeddings", dimension=768, metric="cosine")
 
 index = pinecone.Index("ml-embeddings")
 
-# Store embeddings
+# 存储嵌入向量
 embeddings = [
     ("doc1", [0.1, 0.2, ...], {"text": "ML infrastructure"}),
     ("doc2", [0.3, 0.4, ...], {"text": "Model serving"}),
@@ -573,7 +573,7 @@ embeddings = [
 
 index.upsert(vectors=embeddings)
 
-# Similarity search
+# 相似性搜索
 query_embedding = [0.15, 0.25, ...]
 results = index.query(query_embedding, top_k=10, include_metadata=True)
 
@@ -583,24 +583,24 @@ for match in results['matches']:
 
 ---
 
-## 8. Database Performance Optimization
+## 8. 数据库性能优化
 
-### Query Optimization Checklist
+### 查询优化清单
 
 ```sql
--- 1. Add indexes on frequently queried columns
+-- 1. 在频繁查询的列上添加索引
 CREATE INDEX idx_predictions_user_timestamp
 ON predictions (user_id, timestamp DESC);
 
--- 2. Use EXPLAIN to analyze query plans
+-- 2. 使用 EXPLAIN 分析查询计划
 EXPLAIN ANALYZE
 SELECT * FROM predictions
 WHERE user_id = 12345 AND timestamp > NOW() - INTERVAL '1 hour';
 
--- 3. Avoid SELECT * (only select needed columns)
+-- 3. 避免 SELECT *（只选择需要的列）
 SELECT id, result, timestamp FROM predictions WHERE user_id = 12345;
 
--- 4. Use connection pooling (SQLAlchemy)
+-- 4. 使用连接池（SQLAlchemy）
 engine = create_engine(
     'postgresql://user:pass@db:5432/mldb',
     pool_size=20,
@@ -611,47 +611,47 @@ engine = create_engine(
 
 ---
 
-## 9. Summary and Key Takeaways
+## 9. 总结与关键要点
 
-### Core Concepts
+### 核心概念
 
-1. **Scaling strategies** for ML workloads
-   - Read replicas: 3-10x read throughput
-   - Sharding: Unlimited horizontal scaling
-   - Vertical scaling: Simple but limited
+1. **ML 工作负载的扩展策略**
+   - 只读副本：3-10 倍读取吞吐量
+   - 分片：无限水平扩展
+   - 垂直扩展：简单但有限
 
-2. **Caching** reduces database load
-   - Redis for hot data (user features, model configs)
-   - 10-50x latency reduction
-   - Implement cache invalidation
+2. **缓存** 减少数据库负载
+   - Redis 用于热数据（用户特征、模型配置）
+   - 延迟降低 10-50 倍
+   - 实现缓存失效
 
-3. **NoSQL** for unstructured ML data
-   - MongoDB: Experiment metadata
-   - InfluxDB: Time-series metrics
-   - Pinecone: Vector similarity search
+3. **NoSQL** 用于非结构化 ML 数据
+   - MongoDB：实验元数据
+   - InfluxDB：时序指标
+   - Pinecone：向量相似性搜索
 
-4. **Performance optimization** is critical
-   - Index frequently queried columns
-   - Use EXPLAIN to analyze queries
-   - Connection pooling for efficiency
+4. **性能优化** 至关重要
+   - 为频繁查询的列建立索引
+   - 使用 EXPLAIN 分析查询
+   - 连接池提高效率
 
-### Practical Skills Gained
+### 获得的实用技能
 
-✅ Set up read replicas for scaling reads
-✅ Implement database sharding strategies
-✅ Use Redis caching to reduce latency
-✅ Choose appropriate NoSQL databases
-✅ Work with time-series and vector databases
-✅ Optimize database performance
+✅ 设置只读副本以扩展读取
+✅ 实现数据库分片策略
+✅ 使用 Redis 缓存减少延迟
+✅ 选择合适的 NoSQL 数据库
+✅ 使用时序和 vector database
+✅ 优化数据库性能
 
-### Next Steps
+### 后续步骤
 
-- **Practice**: Set up read replicas in PostgreSQL
-- **Experiment**: Implement Redis caching for an ML API
-- **Explore**: Try InfluxDB for tracking model metrics
-- **Challenge**: Design a sharding strategy for 100M users
+- **练习**：在 PostgreSQL 中设置只读副本
+- **实验**：为 ML API 实现 Redis 缓存
+- **探索**：尝试使用 InfluxDB 跟踪模型指标
+- **挑战**：为 1 亿用户设计分片策略
 
-### Additional Resources
+### 额外资源
 
 - [PostgreSQL Replication](https://www.postgresql.org/docs/current/high-availability.html)
 - [Database Sharding Explained](https://www.mongodb.com/basics/sharding)
@@ -661,6 +661,6 @@ engine = create_engine(
 
 ---
 
-**Congratulations!** You now understand how to scale databases for ML workloads, from read replicas and sharding to specialized NoSQL databases for different ML data types.
+**恭喜！** 你现在已经了解了如何为 ML 工作负载扩展数据库，从只读副本和分片到针对不同 ML 数据类型专用的 NoSQL 数据库。
 
-**Module Complete!**
+**模块完成！**

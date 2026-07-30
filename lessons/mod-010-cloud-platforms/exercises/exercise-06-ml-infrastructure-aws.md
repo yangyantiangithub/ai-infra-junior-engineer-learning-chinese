@@ -1,95 +1,95 @@
-# Exercise 06: Deploy Complete ML Infrastructure on AWS
+# Exercise 06：在 AWS 上部署完整 ML 基础设施
 
-## Overview
+## 概述
 
-This capstone exercise guides you through deploying a complete, production-ready ML infrastructure on AWS using Infrastructure as Code (Terraform), including model training, inference, monitoring, and CI/CD. You'll build a real-world ML platform that demonstrates all cloud skills learned in this module.
+这个结业练习指导你使用基础设施即代码（Terraform）在 AWS 上部署完整、生产级的 ML 基础设施，包括模型训练、推理、监控和 CI/CD。你将构建一个展示本模块学到的所有云技能的真实 ML 平台。
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
-- Deploy ML infrastructure using Terraform (IaC)
-- Set up S3 for data and model storage
-- Configure EC2/ECS for model training and serving
-- Implement VPC networking and security groups
-- Set up monitoring with CloudWatch
-- Configure autoscaling for inference workloads
-- Implement cost optimization strategies
-- Build CI/CD pipeline for automated deployments
+完成本练习后，你将：
+- 使用 Terraform（IaC）部署 ML 基础设施
+- 设置用于数据和模型存储的 S3
+- 配置 EC2/ECS 用于模型训练和服务
+- 实施 VPC 网络和安全组
+- 使用 CloudWatch 设置监控
+- 配置推理工作负载的自动扩缩容
+- 实施成本优化策略
+- 构建用于自动化部署的 CI/CD 流水线
 
-## Prerequisites
+## 前置要求
 
-- Completed exercises 01-05 in this module
-- All Cloud Platform lectures
-- AWS account (free tier works)
-- AWS CLI configured
-- Terraform installed
-- Basic ML and Docker knowledge
+- 已完成本模块的练习 01-05
+- 所有云平台讲座
+- AWS 账户（免费套餐可用）
+- 已配置 AWS CLI
+- 已安装 Terraform
+- 基础的 ML 和 Docker 知识
 
-## Time Required
+## 所需时间
 
-- Estimated: 180-240 minutes
-- Difficulty: Advanced
+- 预计：180-240 分钟
+- 难度：高级
 
 ---
 
-## Part 1: AWS Account Setup
+## 第一部分：AWS 账户设置
 
-### Task 1.1: Create AWS Account and Configure CLI
+### 任务 1.1：创建 AWS 账户并配置 CLI
 
 ```bash
-# Install AWS CLI (if not already installed)
+# 安装 AWS CLI（如果尚未安装）
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
 
-# Configure AWS CLI
+# 配置 AWS CLI
 aws configure
-# Enter:
+# 输入：
 # - AWS Access Key ID
 # - AWS Secret Access Key
-# - Default region: us-east-1
-# - Default output: json
+# - Default region：us-east-1
+# - Default output：json
 
-# Verify configuration
+# 验证配置
 aws sts get-caller-identity
 ```
 
-### Task 1.2: Install Terraform
+### 任务 1.2：安装 Terraform
 
 ```bash
-# Install Terraform
+# 安装 Terraform
 wget https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_linux_amd64.zip
 unzip terraform_1.6.0_linux_amd64.zip
 sudo mv terraform /usr/local/bin/
 
-# Verify installation
+# 验证安装
 terraform version
 ```
 
 ---
 
-## Part 2: Infrastructure as Code (Terraform)
+## 第二部分：基础设施即代码（Terraform）
 
-### Task 2.1: Create Project Structure
+### 任务 2.1：创建项目结构
 
 ```bash
 mkdir ml-infrastructure-aws
 cd ml-infrastructure-aws
 
-# Create Terraform structure
+# 创建 Terraform 结构
 mkdir -p terraform/{modules,environments/{dev,prod}}
 mkdir -p terraform/modules/{networking,compute,storage,security}
 
-# Create files
+# 创建文件
 touch terraform/main.tf
 touch terraform/variables.tf
 touch terraform/outputs.tf
 touch terraform/terraform.tfvars
 ```
 
-### Task 2.2: Define Networking Module
+### 任务 2.2：定义网络模块
 
-**terraform/modules/networking/main.tf:**
+**terraform/modules/networking/main.tf：**
 ```hcl
 # VPC
 resource "aws_vpc" "ml_vpc" {
@@ -103,7 +103,7 @@ resource "aws_vpc" "ml_vpc" {
   }
 }
 
-# Public Subnets
+# 公有子网
 resource "aws_subnet" "public" {
   count                   = 2
   vpc_id                  = aws_vpc.ml_vpc.id
@@ -116,7 +116,7 @@ resource "aws_subnet" "public" {
   }
 }
 
-# Private Subnets
+# 私有子网
 resource "aws_subnet" "private" {
   count             = 2
   vpc_id            = aws_vpc.ml_vpc.id
@@ -137,7 +137,7 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-# Route Table
+# 路由表
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.ml_vpc.id
 
@@ -151,7 +151,6 @@ resource "aws_route_table" "public" {
   }
 }
 
-# Route Table Association
 resource "aws_route_table_association" "public" {
   count          = 2
   subnet_id      = aws_subnet.public[count.index].id
@@ -163,45 +162,11 @@ data "aws_availability_zones" "available" {
 }
 ```
 
-**terraform/modules/networking/variables.tf:**
+### 任务 2.3：定义存储模块（S3）
+
+**terraform/modules/storage/main.tf：**
 ```hcl
-variable "project_name" {
-  description = "Project name"
-  type        = string
-}
-
-variable "environment" {
-  description = "Environment (dev/prod)"
-  type        = string
-}
-
-variable "vpc_cidr" {
-  description = "VPC CIDR block"
-  type        = string
-  default     = "10.0.0.0/16"
-}
-```
-
-**terraform/modules/networking/outputs.tf:**
-```hcl
-output "vpc_id" {
-  value = aws_vpc.ml_vpc.id
-}
-
-output "public_subnet_ids" {
-  value = aws_subnet.public[*].id
-}
-
-output "private_subnet_ids" {
-  value = aws_subnet.private[*].id
-}
-```
-
-### Task 2.3: Define Storage Module (S3)
-
-**terraform/modules/storage/main.tf:**
-```hcl
-# S3 bucket for models
+# 用于模型的 S3 存储桶
 resource "aws_s3_bucket" "ml_models" {
   bucket = "${var.project_name}-models-${var.environment}"
 
@@ -211,19 +176,17 @@ resource "aws_s3_bucket" "ml_models" {
   }
 }
 
-# Enable versioning
+# 启用版本控制
 resource "aws_s3_bucket_versioning" "ml_models_versioning" {
   bucket = aws_s3_bucket.ml_models.id
-
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-# Enable encryption
+# 启用加密
 resource "aws_s3_bucket_server_side_encryption_configuration" "ml_models_encryption" {
   bucket = aws_s3_bucket.ml_models.id
-
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
@@ -231,60 +194,28 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "ml_models_encrypt
   }
 }
 
-# Block public access
+# 阻止公共访问
 resource "aws_s3_bucket_public_access_block" "ml_models_public_access" {
   bucket = aws_s3_bucket.ml_models.id
-
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
-
-# S3 bucket for training data
-resource "aws_s3_bucket" "training_data" {
-  bucket = "${var.project_name}-data-${var.environment}"
-
-  tags = {
-    Name        = "${var.project_name}-training-data"
-    Environment = var.environment
-  }
-}
-
-# Lifecycle policy to move old data to Glacier
-resource "aws_s3_bucket_lifecycle_configuration" "training_data_lifecycle" {
-  bucket = aws_s3_bucket.training_data.id
-
-  rule {
-    id     = "move-to-glacier"
-    status = "Enabled"
-
-    transition {
-      days          = 90
-      storage_class = "GLACIER"
-    }
-
-    expiration {
-      days = 365
-    }
-  }
-}
 ```
 
-### Task 2.4: Main Terraform Configuration
+### 任务 2.4：主 Terraform 配置
 
-**terraform/main.tf:**
+**terraform/main.tf：**
 ```hcl
 terraform {
   required_version = ">= 1.0"
-
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
   }
-
   backend "s3" {
     bucket = "my-terraform-state-bucket"
     key    = "ml-infrastructure/terraform.tfstate"
@@ -294,7 +225,6 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
-
   default_tags {
     tags = {
       Project     = var.project_name
@@ -304,171 +234,50 @@ provider "aws" {
   }
 }
 
-# Networking
 module "networking" {
   source = "./modules/networking"
-
   project_name = var.project_name
   environment  = var.environment
   vpc_cidr     = var.vpc_cidr
 }
 
-# Storage
 module "storage" {
   source = "./modules/storage"
-
   project_name = var.project_name
   environment  = var.environment
-}
-
-# Security Groups
-resource "aws_security_group" "ml_inference" {
-  name        = "${var.project_name}-inference-sg"
-  description = "Security group for ML inference service"
-  vpc_id      = module.networking.vpc_id
-
-  ingress {
-    from_port   = 8000
-    to_port     = 8000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.project_name}-inference-sg"
-  }
-}
-
-# ECS Cluster for inference
-resource "aws_ecs_cluster" "ml_cluster" {
-  name = "${var.project_name}-cluster"
-
-  setting {
-    name  = "containerInsights"
-    value = "enabled"
-  }
-}
-
-# IAM Role for ECS tasks
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "${var.project_name}-ecs-task-execution-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "ecs-tasks.amazonaws.com"
-      }
-    }]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-
-# CloudWatch Log Group
-resource "aws_cloudwatch_log_group" "ml_logs" {
-  name              = "/ecs/${var.project_name}"
-  retention_in_days = 7
-}
-```
-
-**terraform/variables.tf:**
-```hcl
-variable "aws_region" {
-  description = "AWS region"
-  type        = string
-  default     = "us-east-1"
-}
-
-variable "project_name" {
-  description = "Project name"
-  type        = string
-  default     = "ml-platform"
-}
-
-variable "environment" {
-  description = "Environment"
-  type        = string
-  default     = "dev"
-}
-
-variable "vpc_cidr" {
-  description = "VPC CIDR"
-  type        = string
-  default     = "10.0.0.0/16"
-}
-```
-
-**terraform/outputs.tf:**
-```hcl
-output "vpc_id" {
-  value = module.networking.vpc_id
-}
-
-output "models_bucket" {
-  value = module.storage.models_bucket_name
-}
-
-output "ecs_cluster_name" {
-  value = aws_ecs_cluster.ml_cluster.name
 }
 ```
 
 ---
 
-## Part 3: Deploy Infrastructure
+## 第三部分：部署基础设施
 
-### Task 3.1: Initialize and Apply Terraform
+### 任务 3.1：初始化和应用 Terraform
 
 ```bash
 cd terraform
 
-# Initialize Terraform
+# 初始化 Terraform
 terraform init
 
-# Validate configuration
+# 验证配置
 terraform validate
 
-# Plan deployment
+# 计划部署
 terraform plan
 
-# Apply (create infrastructure)
+# 应用（创建基础设施）
 terraform apply
 
-# Save outputs
+# 保存输出
 terraform output > ../outputs.txt
-```
-
-### Task 3.2: Verify Infrastructure
-
-```bash
-# List S3 buckets
-aws s3 ls
-
-# Describe VPC
-aws ec2 describe-vpcs --filters "Name=tag:Name,Values=ml-platform-vpc"
-
-# List ECS clusters
-aws ecs list-clusters
 ```
 
 ---
 
-## Part 4: Deploy ML Application to ECS
+## 第四部分：部署 ML 应用到 ECS
 
-### Task 4.1: Create ECS Task Definition
+### 任务 4.1：创建 ECS 任务定义
 
 ```json
 {
@@ -482,18 +291,7 @@ aws ecs list-clusters
     {
       "name": "ml-api",
       "image": "YOUR_ECR_REPO/ml-inference:latest",
-      "portMappings": [
-        {
-          "containerPort": 8000,
-          "protocol": "tcp"
-        }
-      ],
-      "environment": [
-        {
-          "name": "MODEL_PATH",
-          "value": "s3://ml-platform-models-dev/model.onnx"
-        }
-      ],
+      "portMappings": [{"containerPort": 8000, "protocol": "tcp"}],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
@@ -507,29 +305,13 @@ aws ecs list-clusters
 }
 ```
 
-### Task 4.2: Create ECS Service
-
-```bash
-# Register task definition
-aws ecs register-task-definition --cli-input-json file://task-definition.json
-
-# Create service
-aws ecs create-service \
-  --cluster ml-platform-cluster \
-  --service-name ml-inference-service \
-  --task-definition ml-inference-task \
-  --desired-count 2 \
-  --launch-type FARGATE \
-  --network-configuration "awsvpcConfiguration={subnets=[subnet-xxx,subnet-yyy],securityGroups=[sg-xxx],assignPublicIp=ENABLED}"
-```
-
 ---
 
-## Part 5: Cost Optimization
+## 第五部分：成本优化
 
-### Task 5.1: Implement Auto-Scaling
+### 任务 5.1：实施自动扩缩容
 
-**autoscaling.tf:**
+**autoscaling.tf：**
 ```hcl
 resource "aws_appautoscaling_target" "ecs_target" {
   max_capacity       = 10
@@ -545,10 +327,8 @@ resource "aws_appautoscaling_policy" "ecs_policy_cpu" {
   resource_id        = aws_appautoscaling_target.ecs_target.resource_id
   scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
   service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
-
   target_tracking_scaling_policy_configuration {
     target_value = 70.0
-
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
@@ -556,86 +336,46 @@ resource "aws_appautoscaling_policy" "ecs_policy_cpu" {
 }
 ```
 
-### Task 5.2: Cost Monitoring
-
-```bash
-# Get cost estimate
-aws ce get-cost-and-usage \
-  --time-period Start=2024-01-01,End=2024-01-31 \
-  --granularity MONTHLY \
-  --metrics "BlendedCost" "UnblendedCost" \
-  --group-by Type=DIMENSION,Key=SERVICE
-
-# Set budget alert
-aws budgets create-budget \
-  --account-id YOUR_ACCOUNT_ID \
-  --budget file://budget.json \
-  --notifications-with-subscribers file://notifications.json
-```
-
 ---
 
-## Part 6: Cleanup
+## 第六部分：清理
 
-### Task 6.1: Destroy Infrastructure
+### 任务 6.1：销毁基础设施
 
 ```bash
-# Destroy all Terraform-managed resources
+# 销毁所有 Terraform 管理的资源
 terraform destroy
 
-# Verify S3 buckets are empty before destroying
+# 确保 S3 存储桶已清空
 aws s3 rm s3://ml-platform-models-dev --recursive
 aws s3 rm s3://ml-platform-data-dev --recursive
 ```
 
 ---
 
-## Deliverables
+## 交付物
 
-Submit the following:
+提交以下内容：
 
-1. **Terraform Code**:
-   - Complete IaC for VPC, S3, ECS
-   - Modular structure
-   - Variables and outputs
+1. **Terraform 代码**：
+   - VPC、S3、ECS 的完整 IaC
+   - 模块化结构
+   - 变量和输出
 
-2. **Deployment Evidence**:
-   - Screenshots of AWS Console showing resources
-   - Terraform apply output
-   - Cost estimate
+2. **部署证据**：
+   - AWS 控制台显示资源的截图
+   - Terraform apply 输出
+   - 成本估算
 
-3. **Documentation**:
-   - Architecture diagram
-   - Deployment guide
-   - Cost breakdown
+3. **文档**：
+   - 架构图
+   - 部署指南
+   - 成本分解
 
-4. **Cleanup Evidence**:
-   - Terraform destroy output
-   - Confirmation all resources deleted
-
----
-
-## Challenge Questions
-
-1. **High Availability**: How would you deploy across multiple regions?
-
-2. **Cost**: Estimate monthly cost for 1M predictions/day
-
-3. **Security**: What additional security measures should you implement?
-
-4. **Disaster Recovery**: Design a backup and recovery strategy
-
-5. **Monitoring**: What CloudWatch alarms would you configure?
+4. **清理证据**：
+   - Terraform destroy 输出
+   - 确认所有资源已删除
 
 ---
 
-## Additional Resources
-
-- [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
-- [AWS ECS Best Practices](https://docs.aws.amazon.com/AmazonECS/latest/bestpracticesguide/)
-- [AWS Cost Optimization](https://aws.amazon.com/pricing/cost-optimization/)
-- [AWS Well-Architected Framework](https://aws.amazon.com/architecture/well-architected/)
-
----
-
-**Congratulations!** You've deployed a complete production ML infrastructure on AWS using Infrastructure as Code!
+**恭喜！** 你已使用基础设施即代码在 AWS 上部署了完整的生产 ML 基础设施！

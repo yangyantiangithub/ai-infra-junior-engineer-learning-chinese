@@ -1,156 +1,156 @@
-# Lecture 02: FastAPI Framework
+# 讲座 02：FastAPI 框架
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [What is FastAPI?](#what-is-fastapi)
-3. [FastAPI Installation and Setup](#fastapi-installation-and-setup)
-4. [Your First FastAPI Application](#your-first-fastapi-application)
-5. [Path Operations and Routing](#path-operations-and-routing)
-6. [Request and Response Models](#request-and-response-models)
-7. [Path Parameters and Query Parameters](#path-parameters-and-query-parameters)
-8. [Request Body and Validation](#request-body-and-validation)
-9. [Response Models and Status Codes](#response-models-and-status-codes)
-10. [Dependency Injection](#dependency-injection)
-11. [Error Handling and Custom Exceptions](#error-handling-and-custom-exceptions)
-12. [Background Tasks](#background-tasks)
-13. [Building ML APIs with FastAPI](#building-ml-apis-with-fastapi)
-14. [Testing FastAPI Applications](#testing-fastapi-applications)
-15. [Best Practices](#best-practices)
-16. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [介绍](#介绍)
+2. [什么是 FastAPI？](#什么是-fastapi)
+3. [FastAPI 安装和设置](#fastapi-安装和设置)
+4. [你的第一个 FastAPI 应用程序](#你的第一个-fastapi-应用程序)
+5. [路径操作和路由](#路径操作和路由)
+6. [请求和响应模型](#请求和响应模型)
+7. [路径参数和查询参数](#路径参数和查询参数)
+8. [请求体和验证](#请求体和验证)
+9. [响应模型和状态码](#响应模型和状态码)
+10. [依赖注入](#依赖注入)
+11. [错误处理和自定义异常](#错误处理和自定义异常)
+12. [后台任务](#后台任务)
+13. [使用 FastAPI 构建 ML API](#使用-fastapi-构建-ml-api)
+14. [测试 FastAPI 应用程序](#测试-fastapi-应用程序)
+15. [最佳实践](#最佳实践)
+16. [总结和关键要点](#总结和关键要点)
 
-## Introduction
+## 介绍
 
-FastAPI is a modern, high-performance web framework for building APIs with Python 3.7+ based on standard Python type hints. It has quickly become one of the most popular frameworks for building production-grade APIs, especially in the machine learning and data science communities.
+FastAPI 是一个现代、高性能的 Web 框架，用于使用基于标准 Python 类型提示的 Python 3.7+ 构建 API。它已迅速成为构建生产级 API 的最流行框架之一，特别是在机器学习和数据科学社区。
 
-This lecture will guide you through FastAPI's core concepts and features, teaching you how to build robust, performant APIs for AI/ML applications.
+本讲座将指导你了解 FastAPI 的核心概念和特性，教你如何为 AI/ML 应用程序构建健壮、高性能的 API。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Understand what makes FastAPI unique and why it's ideal for ML applications
-- Set up a FastAPI development environment
-- Create path operations using various HTTP methods
-- Define request and response models with automatic validation
-- Implement path parameters, query parameters, and request bodies
-- Use Pydantic for data validation and serialization
-- Implement dependency injection for cleaner code
-- Handle errors gracefully with custom exceptions
-- Build async endpoints for improved performance
-- Create a complete ML model serving API
-- Test FastAPI applications effectively
+在本讲座结束时，你将：
+- 理解 FastAPI 的独特之处以及为什么它适合 ML 应用程序
+- 设置 FastAPI 开发环境
+- 使用各种 HTTP 方法创建路径操作
+- 使用自动验证定义请求和响应模型
+- 实现路径参数、查询参数和请求体
+- 使用 Pydantic 进行数据验证和序列化
+- 使用依赖注入编写更清晰的代码
+- 使用自定义异常优雅地处理错误
+- 构建异步 endpoint 以提高性能
+- 创建完整的 ML 模型服务 API
+- 有效测试 FastAPI 应用程序
 
-### Prerequisites
-- Module 001: Python Fundamentals
-- Module 007 - Lecture 01: API Fundamentals & REST
-- Understanding of Python type hints
-- Basic async/await concepts (helpful but not required)
+### 先决条件
+- 模块 001：Python 基础
+- 模块 007 - 讲座 01：API 基础和 REST
+- 理解 Python 类型提示
+- 基本的 async/await 概念（有帮助但不是必需的）
 
-### Estimated Time
-4-5 hours (including hands-on coding)
+### 预计时间
+4-5 小时（包括动手编码）
 
-## What is FastAPI?
+## 什么是 FastAPI？
 
-### Overview
+### 概述
 
-**FastAPI** is a modern, fast (high-performance) web framework for building APIs with Python 3.7+ based on standard Python type hints. Created by Sebastián Ramírez in 2018, it has rapidly gained adoption due to its performance, developer experience, and automatic documentation generation.
+**FastAPI** 是一个现代、快速（高性能）的 Web 框架，用于使用基于标准 Python 类型提示的 Python 3.7+ 构建 API。由 Sebastián Ramírez 于 2018 年创建，由于其性能、开发者体验和自动文档生成而迅速获得采用。
 
-### Key Features
+### 主要特性
 
-1. **Fast**: Very high performance, on par with NodeJS and Go (thanks to Starlette and Pydantic)
-2. **Fast to code**: Increase development speed by 200-300%
-3. **Fewer bugs**: Reduce about 40% of human-induced errors
-4. **Intuitive**: Great editor support with auto-completion everywhere
-5. **Easy**: Designed to be easy to use and learn
-6. **Short**: Minimize code duplication
-7. **Robust**: Get production-ready code with automatic interactive documentation
-8. **Standards-based**: Based on OpenAPI and JSON Schema
+1. **快速**：非常高的性能，与 NodeJS 和 Go 相当（得益于 Starlette 和 Pydantic）
+2. **编码快**：开发速度提升 200-300%
+3. **更少错误**：减少约 40% 的人为错误
+4. **直观**：出色的编辑器支持，处处自动补全
+5. **简单**：设计易于使用和学习
+6. **简洁**：最小化代码重复
+7. **健壮**：获得带有自动交互式文档的生产就绪代码
+8. **基于标准**：基于 OpenAPI 和 JSON Schema
 
-### Why FastAPI for ML Infrastructure?
+### 为什么 FastAPI 适合 ML 基础设施？
 
-1. **Performance**: Critical for low-latency model inference
-2. **Async Support**: Handle multiple concurrent prediction requests efficiently
-3. **Automatic Validation**: Validate input data before feeding to models
-4. **Type Safety**: Catch errors during development, not production
-5. **Automatic Documentation**: Interactive API docs out-of-the-box
-6. **Easy Integration**: Works well with ML frameworks (PyTorch, TensorFlow, sklearn)
-7. **Modern Python**: Uses latest Python features (type hints, async/await)
+1. **性能**：对低延迟模型推理至关重要
+2. **异步支持**：高效处理多个并发预测请求
+3. **自动验证**：在将输入数据送入模型之前进行验证
+4. **类型安全**：在开发时（而非生产时）捕获错误
+5. **自动文档**：开箱即用的交互式 API 文档
+6. **易于集成**：与 ML 框架配合良好（PyTorch、TensorFlow、sklearn）
+7. **现代 Python**：使用最新的 Python 特性（类型提示、async/await）
 
-### FastAPI vs. Flask
+### FastAPI vs Flask
 
-| Feature | FastAPI | Flask |
+| 特性 | FastAPI | Flask |
 |---------|---------|-------|
-| Performance | Very High (async) | Moderate (sync) |
-| Type Hints | Built-in, required | Optional, via extensions |
-| Validation | Automatic (Pydantic) | Manual or via extensions |
-| Documentation | Auto-generated | Manual or via extensions |
-| Async Support | Native | Via extensions |
-| Learning Curve | Moderate | Low |
-| Best For | Production APIs, ML serving | Prototypes, simple apps |
+| 性能 | 非常高（异步） | 中等（同步） |
+| 类型提示 | 内置、必需 | 可选、通过扩展 |
+| 验证 | 自动（Pydantic） | 手动或通过扩展 |
+| 文档 | 自动生成 | 手动或通过扩展 |
+| 异步支持 | 原生 | 通过扩展 |
+| 学习曲线 | 中等 | 低 |
+| 最适合 | 生产 API、ML 服务 | 原型、简单应用 |
 
-## FastAPI Installation and Setup
+## FastAPI 安装和设置
 
-### Installation
+### 安装
 
 ```bash
-# Create virtual environment
+# 创建虚拟环境
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # 在 Windows 上：venv\Scripts\activate
 
-# Install FastAPI and ASGI server
+# 安装 FastAPI 和 ASGI 服务器
 pip install fastapi
 pip install "uvicorn[standard]"
 
-# For development
-pip install "fastapi[all]"  # Includes all optional dependencies
+# 用于开发
+pip install "fastapi[all]"  # 包含所有可选依赖
 ```
 
-**What gets installed:**
-- `fastapi`: The FastAPI framework
-- `uvicorn`: ASGI server to run the application
-- `pydantic`: Data validation using Python type hints
-- `starlette`: Web framework used by FastAPI
+**安装的内容：**
+- `fastapi`：FastAPI 框架
+- `uvicorn`：用于运行应用程序的 ASGI 服务器
+- `pydantic`：使用 Python 类型提示进行数据验证
+- `starlette`：FastAPI 使用的 Web 框架
 
-### Project Structure
+### 项目结构
 
-For a simple ML API:
+对于一个简单的 ML API：
 
 ```
 ml-api/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py           # FastAPI application
-│   ├── models.py         # Pydantic models
-│   ├── routers/          # API routes
+│   ├── main.py           # FastAPI 应用程序
+│   ├── models.py         # Pydantic 模型
+│   ├── routers/          # API 路由
 │   │   ├── __init__.py
 │   │   ├── predictions.py
 │   │   └── health.py
-│   ├── services/         # Business logic
+│   ├── services/         # 业务逻辑
 │   │   ├── __init__.py
 │   │   └── ml_model.py
-│   └── dependencies.py   # Shared dependencies
+│   └── dependencies.py   # 共享依赖
 ├── tests/
 │   ├── __init__.py
 │   └── test_api.py
-├── models/               # ML model files
+├── models/               # ML 模型文件
 │   └── model.pkl
 ├── requirements.txt
 ├── .env
 └── README.md
 ```
 
-## Your First FastAPI Application
+## 你的第一个 FastAPI 应用程序
 
 ### Hello World
 
-Create `main.py`:
+创建 `main.py`：
 
 ```python
 from fastapi import FastAPI
 
-# Create FastAPI instance
+# 创建 FastAPI 实例
 app = FastAPI()
 
-# Define a path operation
+# 定义路径操作
 @app.get("/")
 def read_root():
     return {"message": "Hello World"}
@@ -160,20 +160,20 @@ def health_check():
     return {"status": "healthy"}
 ```
 
-### Running the Application
+### 运行应用程序
 
 ```bash
-# Run with uvicorn
+# 使用 uvicorn 运行
 uvicorn main:app --reload
 
-# Options:
-# --reload: Auto-reload on code changes (development only)
-# --host 0.0.0.0: Make accessible from any IP
-# --port 8000: Specify port (default: 8000)
-# --workers 4: Number of worker processes (production)
+# 选项：
+# --reload：代码更改时自动重新加载（仅开发环境）
+# --host 0.0.0.0：允许从任何 IP 访问
+# --port 8000：指定端口（默认：8000）
+# --workers 4：工作进程数（生产环境）
 ```
 
-Output:
+输出：
 ```
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
 INFO:     Started reloader process [12345] using watchfiles
@@ -182,9 +182,9 @@ INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 ```
 
-### Testing Your API
+### 测试你的 API
 
-**Using curl:**
+**使用 curl：**
 ```bash
 curl http://localhost:8000/
 # {"message":"Hello World"}
@@ -193,7 +193,7 @@ curl http://localhost:8000/health
 # {"status":"healthy"}
 ```
 
-**Using Python requests:**
+**使用 Python requests：**
 ```python
 import requests
 
@@ -202,34 +202,34 @@ print(response.json())
 # {'message': 'Hello World'}
 ```
 
-### Interactive Documentation
+### 交互式文档
 
-FastAPI automatically generates interactive API documentation:
+FastAPI 自动生成交互式 API 文档：
 
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+- **Swagger UI**：http://localhost:8000/docs
+- **ReDoc**：http://localhost:8000/redoc
 
-You can test your API directly from the browser using these interfaces!
+你可以直接通过这些界面在浏览器中测试你的 API！
 
 ### OpenAPI Schema
 
-FastAPI generates an OpenAPI schema automatically:
+FastAPI 自动生成 OpenAPI schema：
 
 ```bash
 curl http://localhost:8000/openapi.json
 ```
 
-This schema can be used for:
-- Client code generation
-- API testing tools
-- Third-party integrations
-- Documentation
+这个 schema 可用于：
+- 客户端代码生成
+- API 测试工具
+- 第三方集成
+- 文档
 
-## Path Operations and Routing
+## 路径操作和路由
 
-### HTTP Methods
+### HTTP 方法
 
-FastAPI provides decorators for all HTTP methods:
+FastAPI 为所有 HTTP 方法提供了装饰器：
 
 ```python
 from fastapi import FastAPI
@@ -258,16 +258,16 @@ def delete_item(item_id: int):
 
 @app.head("/items")
 def items_head():
-    return None  # Only returns headers
+    return None  # 只返回头部
 
 @app.options("/items")
 def items_options():
     return {"methods": ["GET", "POST"]}
 ```
 
-### Path Operation Configuration
+### 路径操作配置
 
-Add metadata to your endpoints:
+为你的 endpoint 添加元数据：
 
 ```python
 @app.get(
@@ -282,9 +282,9 @@ def get_model(model_id: str):
     return {"model_id": model_id, "status": "ready"}
 ```
 
-### Tags for Organization
+### 用于组织结构的标签
 
-Group related endpoints:
+将相关 endpoint 分组：
 
 ```python
 @app.get("/models", tags=["Models"])
@@ -304,13 +304,13 @@ def predict():
     return {"prediction": 0.95}
 ```
 
-Tags create sections in the auto-generated documentation.
+标签在自动生成的文档中创建部分。
 
-### Routers for Modularity
+### 用于模块化的路由
 
-For larger applications, use `APIRouter`:
+对于大型应用程序，使用 `APIRouter`：
 
-**routers/models.py:**
+**routers/models.py：**
 ```python
 from fastapi import APIRouter
 
@@ -333,27 +333,27 @@ def create_model():
     return {"model_id": "new-model"}
 ```
 
-**main.py:**
+**main.py：**
 ```python
 from fastapi import FastAPI
 from routers import models
 
 app = FastAPI()
 
-# Include router
+# 包含路由
 app.include_router(models.router)
 ```
 
-Now your endpoints are available at:
+现在你的 endpoint 可在以下地址访问：
 - `GET /api/v1/models/`
 - `GET /api/v1/models/{model_id}`
 - `POST /api/v1/models/`
 
-## Request and Response Models
+## 请求和响应模型
 
-### Pydantic Models
+### Pydantic 模型
 
-FastAPI uses **Pydantic** for data validation and serialization. Pydantic models are Python classes that define the shape of data.
+FastAPI 使用 **Pydantic** 进行数据验证和序列化。Pydantic 模型是定义数据形状的 Python 类。
 
 ```python
 from pydantic import BaseModel, Field
@@ -370,7 +370,7 @@ class Model(BaseModel):
     accuracy: Optional[float] = None
 
     class Config:
-        # Example for documentation
+        # 用于文档的示例
         schema_extra = {
             "example": {
                 "id": "bert-base",
@@ -384,7 +384,7 @@ class Model(BaseModel):
         }
 ```
 
-### Field Validation
+### 字段验证
 
 ```python
 from pydantic import BaseModel, Field, validator
@@ -404,13 +404,13 @@ class TrainingConfig(BaseModel):
 
     @validator("batch_size")
     def validate_batch_size(cls, v):
-        # Must be power of 2
+        # 必须是 2 的幂
         if v & (v - 1) != 0:
             raise ValueError("Batch size should be power of 2 for optimal performance")
         return v
 ```
 
-### Using Models in Path Operations
+### 在路径操作中使用模型
 
 ```python
 from fastapi import FastAPI
@@ -429,11 +429,11 @@ class PredictionResponse(BaseModel):
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict(request: PredictionRequest):
-    # FastAPI automatically:
-    # 1. Validates request body against PredictionRequest
-    # 2. Converts JSON to PredictionRequest object
-    # 3. Validates response against PredictionResponse
-    # 4. Converts PredictionResponse to JSON
+    # FastAPI 自动：
+    # 1. 根据 PredictionRequest 验证请求体
+    # 2. 将 JSON 转换为 PredictionRequest 对象
+    # 3. 根据 PredictionResponse 验证响应
+    # 4. 将 PredictionResponse 转换为 JSON
 
     return PredictionResponse(
         prediction="positive",
@@ -442,21 +442,21 @@ def predict(request: PredictionRequest):
     )
 ```
 
-## Path Parameters and Query Parameters
+## 路径参数和查询参数
 
-### Path Parameters
+### 路径参数
 
 ```python
 @app.get("/models/{model_id}")
 def get_model(model_id: str):
     return {"model_id": model_id}
 
-# With type validation
+# 带类型验证
 @app.get("/models/{model_id}/versions/{version_num}")
 def get_model_version(model_id: str, version_num: int):
     return {"model_id": model_id, "version": version_num}
 
-# With Enum for limited values
+# 使用 Enum 限制值
 from enum import Enum
 
 class ModelFramework(str, Enum):
@@ -469,25 +469,25 @@ def get_models_by_framework(framework: ModelFramework):
     return {"framework": framework, "models": []}
 ```
 
-### Query Parameters
+### 查询参数
 
 ```python
 from typing import Optional, List
 
-# Optional query parameter
+# 可选查询参数
 @app.get("/models")
 def list_models(skip: int = 0, limit: int = 10):
     # GET /models?skip=0&limit=10
     return {"skip": skip, "limit": limit}
 
-# Required query parameter (no default value)
+# 必填查询参数（无默认值）
 @app.get("/search")
 def search_models(q: str):
     # GET /search?q=bert
-    # GET /search  → 422 Error (missing required parameter)
+    # GET /search  → 422 错误（缺少必填参数）
     return {"query": q}
 
-# Optional with None default
+# 可选带 None 默认值
 @app.get("/models")
 def list_models(status: Optional[str] = None):
     # GET /models
@@ -496,23 +496,23 @@ def list_models(status: Optional[str] = None):
         return {"filter": status}
     return {"message": "All models"}
 
-# Multiple values (List)
+# 多值（List）
 @app.get("/models")
 def list_models(tags: List[str] = []):
     # GET /models?tags=nlp&tags=transformer
     return {"tags": tags}
 
-# Boolean query parameters
+# 布尔查询参数
 @app.get("/models")
 def list_models(include_archived: bool = False):
     # GET /models?include_archived=true
     # GET /models?include_archived=1
     # GET /models?include_archived=yes
-    # All convert to True
+    # 全部转换为 True
     return {"include_archived": include_archived}
 ```
 
-### Combining Path and Query Parameters
+### 结合路径和查询参数
 
 ```python
 @app.get("/models/{model_id}")
@@ -533,9 +533,9 @@ def get_model(
     return result
 ```
 
-## Request Body and Validation
+## 请求体和验证
 
-### Simple Request Body
+### 简单请求体
 
 ```python
 from pydantic import BaseModel
@@ -548,12 +548,12 @@ class Item(BaseModel):
 
 @app.post("/items")
 def create_item(item: Item):
-    # FastAPI validates the request body
+    # FastAPI 验证请求体
     total = item.price + (item.tax or 0)
     return {"item": item, "total": total}
 ```
 
-### Nested Models
+### 嵌套模型
 
 ```python
 class DatasetInfo(BaseModel):
@@ -575,7 +575,7 @@ def create_training_job(config: TrainingJobConfig):
         "dataset": config.dataset.name
     }
 
-# Request body:
+# 请求体：
 # {
 #   "model_type": "bert",
 #   "dataset": {
@@ -588,7 +588,7 @@ def create_training_job(config: TrainingJobConfig):
 # }
 ```
 
-### Lists and Dictionaries
+### 列表和字典
 
 ```python
 from typing import List, Dict
@@ -602,7 +602,7 @@ def batch_predict(request: BatchPredictionRequest):
     predictions = [f"pred_{i}" for i in range(len(request.inputs))]
     return {"predictions": predictions}
 
-# Request:
+# 请求：
 # {
 #   "model_id": "bert-base",
 #   "inputs": ["text 1", "text 2", "text 3"]
@@ -615,7 +615,7 @@ class FlexibleConfig(BaseModel):
 def configure(config: FlexibleConfig):
     return config
 
-# Request:
+# 请求：
 # {
 #   "parameters": {
 #     "learning_rate": 0.001,
@@ -625,14 +625,14 @@ def configure(config: FlexibleConfig):
 # }
 ```
 
-### Advanced Validation
+### 高级验证
 
 ```python
 from pydantic import BaseModel, Field, validator, root_validator
 
 class PredictionInput(BaseModel):
     text: str = Field(..., min_length=1, max_length=10000)
-    language: str = Field("en", regex="^[a-z]{2}$")  # Two-letter language code
+    language: str = Field("en", regex="^[a-z]{2}$")  # 双字母语言代码
     confidence_threshold: float = Field(0.5, ge=0.0, le=1.0)
 
     @validator("text")
@@ -646,8 +646,8 @@ class PredictionInput(BaseModel):
         text = values.get("text")
         language = values.get("language")
 
-        # Example: Check if text matches language
-        # In practice, you'd use language detection library
+        # 示例：检查文本是否匹配语言
+        # 实际中，你会使用语言检测库
 
         return values
 
@@ -656,9 +656,9 @@ def predict(input_data: PredictionInput):
     return {"status": "validated", "text_length": len(input_data.text)}
 ```
 
-## Response Models and Status Codes
+## 响应模型和状态码
 
-### Response Model
+### 响应模型
 
 ```python
 from fastapi import FastAPI
@@ -673,23 +673,23 @@ class ModelResponse(BaseModel):
 
 @app.get("/models/{model_id}", response_model=ModelResponse)
 def get_model(model_id: str):
-    # Even if you return extra fields, only ModelResponse fields will be in response
+    # 即使你返回额外字段，只有 ModelResponse 中的字段会出现在响应中
     return {
         "id": model_id,
         "name": "BERT Model",
         "status": "ready",
-        "internal_field": "won't be shown"  # Filtered out
+        "internal_field": "won't be shown"  # 被过滤掉
     }
 ```
 
-### Excluding Fields
+### 排除字段
 
 ```python
 class UserInDB(BaseModel):
     username: str
     email: str
     full_name: str
-    hashed_password: str  # Sensitive!
+    hashed_password: str  # 敏感信息！
 
 class UserOut(BaseModel):
     username: str
@@ -698,18 +698,18 @@ class UserOut(BaseModel):
 
 @app.get("/users/{user_id}", response_model=UserOut)
 def get_user(user_id: str):
-    # Fetch from database
+    # 从数据库获取
     user_in_db = {
         "username": "alice",
         "email": "alice@example.com",
         "full_name": "Alice Smith",
         "hashed_password": "$2b$12$..."
     }
-    # hashed_password won't be in response
+    # hashed_password 不会在响应中出现
     return user_in_db
 ```
 
-### Response Status Codes
+### 响应状态码
 
 ```python
 from fastapi import FastAPI, status
@@ -722,7 +722,7 @@ def create_model():
 
 @app.delete("/models/{model_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_model(model_id: str):
-    # 204 responses don't return a body
+    # 204 响应不返回请求体
     return None
 
 @app.get("/models/{model_id}", status_code=status.HTTP_200_OK)
@@ -730,7 +730,7 @@ def get_model(model_id: str):
     return {"id": model_id}
 ```
 
-### Multiple Response Models
+### 多个响应模型
 
 ```python
 from typing import Union
@@ -759,22 +759,22 @@ def get_model(model_id: str, response: Response):
     return SuccessResponse(data={"id": model_id}, message="Success")
 ```
 
-## Dependency Injection
+## 依赖注入
 
-Dependency Injection is a powerful FastAPI feature that allows you to:
-- Share logic across endpoints
-- Manage database connections
-- Handle authentication
-- Validate permissions
-- Reduce code duplication
+依赖注入是 FastAPI 的一个强大特性，允许你：
+- 跨 endpoint 共享逻辑
+- 管理数据库连接
+- 处理认证
+- 验证权限
+- 减少代码重复
 
-### Basic Dependency
+### 基本依赖
 
 ```python
 from fastapi import Depends
 
 def get_current_user(token: str):
-    # In reality, decode and validate token
+    # 实际中，解码并验证令牌
     if token == "valid-token":
         return {"username": "alice"}
     raise HTTPException(status_code=401, detail="Invalid token")
@@ -784,7 +784,7 @@ def protected_route(user: dict = Depends(get_current_user)):
     return {"message": f"Hello {user['username']}"}
 ```
 
-### Database Connection Dependency
+### 数据库连接依赖
 
 ```python
 def get_db():
@@ -800,7 +800,7 @@ def list_models(db: Session = Depends(get_db)):
     return models
 ```
 
-### Layered Dependencies
+### 层级依赖
 
 ```python
 from fastapi import Header, HTTPException
@@ -811,7 +811,7 @@ def verify_token(x_token: str = Header(...)):
     return x_token
 
 def get_current_user(token: str = Depends(verify_token)):
-    # Token is already verified
+    # 令牌已验证通过
     return {"username": "alice", "token": token}
 
 def get_admin_user(user: dict = Depends(get_current_user)):
@@ -821,11 +821,11 @@ def get_admin_user(user: dict = Depends(get_current_user)):
 
 @app.get("/admin/dashboard")
 def admin_dashboard(admin: dict = Depends(get_admin_user)):
-    # Only admins can access
+    # 只有管理员可以访问
     return {"message": f"Welcome admin {admin['username']}"}
 ```
 
-### Class-Based Dependencies
+### 基于类的依赖
 
 ```python
 from typing import Optional
@@ -840,23 +840,23 @@ class CommonQueryParams:
 def list_items(commons: CommonQueryParams = Depends()):
     return {"skip": commons.skip, "limit": commons.limit, "q": commons.q}
 
-# Usage:
+# 用法：
 # GET /items?skip=10&limit=20&q=search
 ```
 
-### ML Model Loading Dependency
+### ML 模型加载依赖
 
 ```python
 import pickle
 from typing import Optional
 
-# Global model cache
+# 全局模型缓存
 _model_cache = {}
 
 def get_ml_model(model_id: str):
-    """Dependency to load and cache ML models"""
+    """加载和缓存 ML 模型的依赖"""
     if model_id not in _model_cache:
-        # Load model (expensive operation)
+        # 加载模型（昂贵操作）
         with open(f"models/{model_id}.pkl", "rb") as f:
             _model_cache[model_id] = pickle.load(f)
     return _model_cache[model_id]
@@ -867,12 +867,12 @@ def predict(
     input_data: PredictionInput,
     model = Depends(get_ml_model)
 ):
-    # Model is already loaded and cached
+    # 模型已加载并缓存
     prediction = model.predict([input_data.features])
     return {"prediction": prediction[0]}
 ```
 
-## Error Handling and Custom Exceptions
+## 错误处理和自定义异常
 
 ### HTTPException
 
@@ -881,7 +881,7 @@ from fastapi import HTTPException, status
 
 @app.get("/models/{model_id}")
 def get_model(model_id: str):
-    # Simulate database lookup
+    # 模拟数据库查找
     if model_id not in ["bert-base", "gpt-2"]:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -892,7 +892,7 @@ def get_model(model_id: str):
     return {"model_id": model_id, "status": "ready"}
 ```
 
-### Custom Exception Classes
+### 自定义异常类
 
 ```python
 class ModelNotFoundError(Exception):
@@ -904,7 +904,7 @@ class InvalidModelError(Exception):
         self.model_id = model_id
         self.reason = reason
 
-# Exception handlers
+# 异常处理器
 from fastapi import Request
 from fastapi.responses import JSONResponse
 
@@ -930,7 +930,7 @@ async def invalid_model_handler(request: Request, exc: InvalidModelError):
         }
     )
 
-# Using custom exceptions
+# 使用自定义异常
 @app.get("/models/{model_id}")
 def get_model(model_id: str):
     if model_id == "unknown":
@@ -940,12 +940,12 @@ def get_model(model_id: str):
     return {"model_id": model_id}
 ```
 
-### Global Exception Handler
+### 全局异常处理器
 
 ```python
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    # Log the exception
+    # 记录异常
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
 
     return JSONResponse(
@@ -958,16 +958,16 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 ```
 
-## Background Tasks
+## 后台任务
 
-For operations that don't need to block the response:
+对于不需要阻塞响应的操作：
 
 ```python
 from fastapi import BackgroundTasks
 
 def log_prediction(model_id: str, input_data: dict, prediction: dict):
-    """Log prediction to database or file"""
-    # Simulate logging
+    """记录预测到数据库或文件"""
+    # 模拟记录
     with open("predictions.log", "a") as f:
         f.write(f"{model_id}: {input_data} -> {prediction}\n")
 
@@ -976,10 +976,10 @@ def predict(
     input_data: PredictionInput,
     background_tasks: BackgroundTasks
 ):
-    # Make prediction
+    # 进行预测
     prediction = {"result": "positive", "confidence": 0.95}
 
-    # Add task to run after response is sent
+    # 在发送响应后添加要运行的任务
     background_tasks.add_task(
         log_prediction,
         model_id="bert-base",
@@ -987,19 +987,19 @@ def predict(
         prediction=prediction
     )
 
-    # Return immediately
+    # 立即返回
     return prediction
 ```
 
-### Multiple Background Tasks
+### 多个后台任务
 
 ```python
 def send_notification(email: str, message: str):
-    # Send email notification
+    # 发送邮件通知
     pass
 
 def update_metrics(model_id: str):
-    # Update prediction count
+    # 更新预测计数
     pass
 
 @app.post("/predict")
@@ -1016,9 +1016,9 @@ def predict(
     return prediction
 ```
 
-## Building ML APIs with FastAPI
+## 使用 FastAPI 构建 ML API
 
-### Complete Model Serving Example
+### 完整的模型服务示例
 
 ```python
 from fastapi import FastAPI, HTTPException, Depends
@@ -1030,7 +1030,7 @@ from datetime import datetime
 
 app = FastAPI(title="ML Model API", version="1.0.0")
 
-# Models
+# 模型
 class PredictionInput(BaseModel):
     features: List[float] = Field(..., min_items=4, max_items=4)
 
@@ -1056,13 +1056,13 @@ class ModelInfo(BaseModel):
     classes: List[str]
     accuracy: float
 
-# Global model storage
+# 全局模型存储
 _models = {}
 
-# Startup event to load models
+# 启动事件加载模型
 @app.on_event("startup")
 async def load_models():
-    """Load ML models on application startup"""
+    """在应用程序启动时加载 ML 模型"""
     try:
         with open("models/iris_classifier.pkl", "rb") as f:
             _models["iris"] = pickle.load(f)
@@ -1070,13 +1070,13 @@ async def load_models():
     except Exception as e:
         print(f"Error loading models: {e}")
 
-# Dependency to get model
+# 获取模型的依赖
 def get_model():
     if "iris" not in _models:
         raise HTTPException(status_code=503, detail="Model not loaded")
     return _models["iris"]
 
-# Health check
+# 健康检查
 @app.get("/health")
 def health_check():
     return {
@@ -1085,7 +1085,7 @@ def health_check():
         "timestamp": datetime.utcnow()
     }
 
-# Model info
+# 模型信息
 @app.get("/models/iris", response_model=ModelInfo)
 def get_model_info():
     return ModelInfo(
@@ -1097,21 +1097,21 @@ def get_model_info():
         accuracy=0.96
     )
 
-# Prediction endpoint
+# 预测 endpoint
 @app.post("/predict", response_model=PredictionOutput)
 def predict(
     input_data: PredictionInput,
     model = Depends(get_model)
 ):
     try:
-        # Prepare input
+        # 准备输入
         features = np.array([input_data.features])
 
-        # Make prediction
+        # 进行预测
         prediction = model.predict(features)[0]
         probabilities = model.predict_proba(features)[0]
 
-        # Get class names
+        # 获取类别名称
         classes = ["setosa", "versicolor", "virginica"]
 
         return PredictionOutput(
@@ -1128,7 +1128,7 @@ def predict(
             detail=f"Prediction failed: {str(e)}"
         )
 
-# Batch prediction
+# 批量预测
 @app.post("/batch-predict")
 def batch_predict(
     inputs: List[PredictionInput],
@@ -1146,9 +1146,9 @@ def batch_predict(
     return {"predictions": results, "count": len(results)}
 ```
 
-## Testing FastAPI Applications
+## 测试 FastAPI 应用程序
 
-### Using TestClient
+### 使用 TestClient
 
 ```python
 from fastapi.testclient import TestClient
@@ -1172,9 +1172,9 @@ def test_create_item():
 def test_invalid_item():
     response = client.post(
         "/items",
-        json={"name": "Test", "price": "invalid"}  # Wrong type
+        json={"name": "Test", "price": "invalid"}  # 错误类型
     )
-    assert response.status_code == 422  # Validation error
+    assert response.status_code == 422  # 验证错误
 
 def test_prediction():
     response = client.post(
@@ -1187,7 +1187,7 @@ def test_prediction():
     assert "confidence" in data
 ```
 
-### Pytest Fixtures
+### Pytest Fixture
 
 ```python
 import pytest
@@ -1207,11 +1207,11 @@ def test_protected_endpoint(client, auth_headers):
     assert response.status_code == 200
 ```
 
-## Best Practices
+## 最佳实践
 
-### 1. Project Structure
+### 1. 项目结构
 
-Use routers to organize code:
+使用路由组织代码：
 ```
 app/
 ├── main.py
@@ -1228,7 +1228,7 @@ app/
 └── dependencies.py
 ```
 
-### 2. Configuration Management
+### 2. 配置管理
 
 ```python
 from pydantic import BaseSettings
@@ -1245,7 +1245,7 @@ class Settings(BaseSettings):
 settings = Settings()
 ```
 
-### 3. Logging
+### 3. 日志
 
 ```python
 import logging
@@ -1265,23 +1265,23 @@ def predict(input_data: PredictionInput):
         raise
 ```
 
-### 4. CORS Configuration
+### 4. CORS 配置
 
 ```python
 from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend URL
+    allow_origins=["http://localhost:3000"],  # 前端 URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 ```
 
-### 5. Request Validation
+### 5. 请求验证
 
-Always validate inputs:
+始终验证输入：
 ```python
 class PredictionInput(BaseModel):
     text: str = Field(..., min_length=1, max_length=5000)
@@ -1293,9 +1293,9 @@ class PredictionInput(BaseModel):
         return v.strip()
 ```
 
-### 6. Async Endpoints
+### 6. 异步 Endpoint
 
-For I/O-bound operations:
+用于 I/O 密集型操作：
 ```python
 import aiofiles
 
@@ -1306,7 +1306,7 @@ async def get_logs():
     return {"logs": content}
 ```
 
-### 7. Rate Limiting
+### 7. 速率限制
 
 ```python
 from slowapi import Limiter
@@ -1321,55 +1321,55 @@ def predict(request: Request, input_data: PredictionInput):
     return {"prediction": "result"}
 ```
 
-## Summary and Key Takeaways
+## 总结和关键要点
 
-### What We Learned
+### 我们学到了什么
 
-1. **FastAPI Basics**
-   - High-performance async framework
-   - Automatic validation and documentation
-   - Type hints for development speed and safety
+1. **FastAPI 基础**
+   - 高性能异步框架
+   - 自动验证和文档
+   - 类型提示提高开发速度和安全性
 
-2. **Core Features**
-   - Path operations with HTTP methods
-   - Pydantic models for request/response validation
-   - Path and query parameters with type checking
-   - Dependency injection for clean code architecture
+2. **核心特性**
+   - 使用 HTTP 方法的路径操作
+   - 用于请求/响应验证的 Pydantic 模型
+   - 带类型检查的路径和查询参数
+   - 用于清晰代码架构的依赖注入
 
-3. **Advanced Topics**
-   - Error handling with custom exceptions
-   - Background tasks for async operations
-   - Model serving with proper structure
-   - Testing with TestClient
+3. **高级主题**
+   - 使用自定义异常进行错误处理
+   - 用于异步操作的后台任务
+   - 具有适当结构的模型服务
+   - 使用 TestClient 进行测试
 
-4. **ML-Specific Patterns**
-   - Model loading and caching
-   - Batch prediction endpoints
-   - Health checks and monitoring
-   - Proper error handling for production
+4. **ML 特定模式**
+   - 模型加载和缓存
+   - 批量预测 endpoint
+   - 健康检查和监控
+   - 生产环境的正确错误处理
 
-### Next Steps
+### 下一步
 
-In the next lecture, we'll cover **Authentication & Security**, including:
-- API key authentication
-- JWT tokens
+在下一讲中，我们将涵盖 **认证和安全**，包括：
+- API key 认证
+- JWT 令牌
 - OAuth2
-- Rate limiting
-- Input sanitization
-- HTTPS and security headers
+- 速率限制
+- 输入清理
+- HTTPS 和安全头部
 
-### Practice Exercise
+### 练习
 
-Build a complete model serving API:
-1. Load a scikit-learn model
-2. Create prediction endpoints
-3. Add health checks
-4. Implement error handling
-5. Write tests
-6. Add documentation
+构建一个完整的模型服务 API：
+1. 加载 scikit-learn 模型
+2. 创建预测 endpoint
+3. 添加健康检查
+4. 实现错误处理
+5. 编写测试
+6. 添加文档
 
 ---
 
-**Estimated Study Time**: 4-5 hours
-**Hands-on Practice**: Complete Exercise 01 and 02
-**Assessment**: Quiz will cover FastAPI concepts and practical implementation
+**预计学习时间**：4-5 小时
+**动手练习**：完成练习 01 和 02
+**评估**：测验将涵盖 FastAPI 概念和实际实现

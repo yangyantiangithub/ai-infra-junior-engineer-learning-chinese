@@ -1,835 +1,835 @@
-# Junior AI Infrastructure Engineer - Detailed Curriculum
+# Junior AI Infrastructure Engineer - 详细课程
 
-**Version:** 1.0.0
-**Last Updated:** October 2025
-**Total Duration:** 440 hours (11 weeks full-time, 22 weeks part-time)
-**Difficulty Level:** Beginner to Intermediate
-**Prerequisites:** Basic Python programming, command-line familiarity
-
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Learning Objectives](#learning-objectives)
-- [Prerequisites](#prerequisites)
-- [Module Breakdown](#module-breakdown)
-- [Project Breakdown](#project-breakdown)
-- [Assessment Strategy](#assessment-strategy)
-- [Time Commitment](#time-commitment)
-- [Career Outcomes](#career-outcomes)
+**版本：** 1.0.0
+**最后更新：** 2025 年 10 月
+**总时长：** 440 小时（全日制 11 周，非全日制 22 周）
+**难度：** 入门到中级
+**先修要求：** 基础 Python 编程，命令行基础
 
 ---
 
-## Overview
+## 目录
 
-This curriculum is designed to transform beginners into job-ready Junior AI Infrastructure Engineers through a combination of theoretical modules and hands-on projects. The learning path is carefully scaffolded, starting with foundational concepts and progressively building to production-grade ML systems.
-
-### Curriculum Philosophy
-
-- **Hands-on first:** 66% of time spent on projects
-- **Industry-aligned:** Skills match real job requirements
-- **Portfolio-focused:** Every project is showcase-worthy
-- **Progressive:** Each module/project builds on previous ones
-- **Comprehensive:** Covers full ML infrastructure lifecycle
-
-### Learning Approach
-
-1. **Module Study:** Learn concepts through lectures and exercises
-2. **Immediate Practice:** Apply concepts in guided exercises
-3. **Knowledge Checks:** Quiz yourself on key concepts
-4. **Project Application:** Use skills in real-world projects
-5. **Assessment:** Self-assess and iterate
+- [概述](#概述)
+- [学习目标](#学习目标)
+- [先修要求](#先修要求)
+- [模块详解](#模块详解)
+- [项目详解](#项目详解)
+- [评估策略](#评估策略)
+- [时间投入](#时间投入)
+- [职业方向](#职业方向)
 
 ---
 
-## Learning Objectives
+## 概述
 
-### By the end of this curriculum, you will be able to:
+本课程旨在通过理论模块和动手实践项目的结合，将初学者培养为具备就业能力的初级 AI 基础设施工程师。学习路径经过精心设计，从基础概念开始，逐步构建至生产级 ML 系统。
 
-#### Technical Skills
+### 课程理念
 
-**ML Deployment:**
-- Load and serve machine learning models via REST APIs
-- Implement model versioning and A/B testing
-- Optimize model serving for performance and cost
-- Handle common ML serving challenges (batch processing, streaming)
+- **实践优先：** 66% 的时间用于项目
+- **行业对齐：** 技能匹配真实岗位需求
+- **作品集导向：** 每个项目都值得展示
+- **循序渐进：** 每个模块/项目都建立在前者之上
+- **全面覆盖：** 涵盖完整的 ML 基础设施生命周期
 
-**Containerization & Orchestration:**
-- Containerize Python applications with Docker
-- Build multi-stage Docker images for production
-- Deploy applications to Kubernetes clusters
-- Configure auto-scaling, load balancing, and health checks
-- Manage Kubernetes resources with Helm charts
+### 学习方法
 
-**MLOps Fundamentals:**
-- Build end-to-end ML pipelines with Airflow/Prefect
-- Track experiments systematically with MLflow
-- Version datasets and models with DVC
-- Implement data validation and quality checks
-- Manage model lifecycle from training to retirement
-
-**Monitoring & Observability:**
-- Deploy Prometheus and Grafana for metrics
-- Instrument applications with custom metrics
-- Set up log aggregation with ELK Stack
-- Configure alerts and on-call rotations
-- Monitor ML-specific metrics (drift, accuracy, latency)
-
-**Cloud Infrastructure:**
-- Deploy to AWS, GCP, or Azure
-- Manage cloud resources and costs
-- Implement security best practices
-- Use managed services (RDS, S3, etc.)
-- Design for high availability
-
-**CI/CD & Automation:**
-- Build CI/CD pipelines with GitHub Actions
-- Automate testing and deployment
-- Implement infrastructure as code
-- Manage secrets and environment configuration
-- Handle rollbacks and disaster recovery
-
-#### Professional Skills
-
-- **Problem-solving:** Debug production issues systematically
-- **Documentation:** Write clear technical documentation
-- **Communication:** Explain technical concepts to non-technical stakeholders
-- **Collaboration:** Work effectively in cross-functional teams
-- **Time management:** Estimate tasks and meet deadlines
+1. **模块学习：** 通过讲座和练习学习概念
+2. **即时实践：** 在引导练习中应用概念
+3. **知识检验：** 通过测验自测关键概念
+4. **项目应用：** 在真实项目中运用技能
+5. **评估：** 自我评估和迭代
 
 ---
 
-## Prerequisites
+## 学习目标
 
-### Required Knowledge
+### 学完本课程后，你将能够：
 
-**Python Programming:**
-- Variables, data types, control flow
-- Functions and modules
-- Object-oriented programming basics
-- File I/O and error handling
-- Basic libraries (os, sys, json, requests)
+#### 技术技能
 
-**Command Line:**
-- Navigate file system (cd, ls, pwd)
-- File operations (cp, mv, rm, mkdir)
-- Text manipulation (cat, grep, less)
-- Process management (ps, kill, top)
+**ML 部署：**
+- 通过 REST API 加载和提供机器学习模型
+- 实现模型版本管理和 A/B 测试
+- 优化模型服务的性能和成本
+- 处理常见的 ML 服务挑战（批处理、流处理）
 
-**Basic Networking:**
-- HTTP/HTTPS basics
-- IP addresses and ports
-- DNS fundamentals
+**容器化与编排：**
+- 使用 Docker 容器化 Python 应用程序
+- 构建多阶段 Docker 镜像用于生产
+- 将应用部署到 Kubernetes 集群
+- 配置自动扩缩、负载均衡和健康检查
+- 使用 Helm Chart 管理 Kubernetes 资源
 
-### Recommended (Not Required)
+**MLOps 基础：**
+- 使用 Airflow/Prefect 构建端到端 ML 流水线
+- 使用 MLflow 系统化追踪实验
+- 使用 DVC 管理数据集和模型版本
+- 实现数据验证和质量检查
+- 管理从训练到退役的模型生命周期
 
-- Prior experience with Git
-- Familiarity with Linux/Unix systems
-- Basic SQL knowledge
-- Understanding of client-server architecture
+**监控与可观测性：**
+- 部署 Prometheus 和 Grafana 用于指标监控
+- 为应用程序添加自定义指标
+- 使用 ELK Stack 设置日志聚合
+- 配置告警和值班轮换
+- 监控 ML 特定指标（漂移、准确率、延迟）
 
-### Assessment Quiz
+**云基础设施：**
+- 部署到 AWS、GCP 或 Azure
+- 管理云资源和成本
+- 实施安全最佳实践
+- 使用托管服务（RDS、S3 等）
+- 设计高可用架构
 
-Before starting, take the [Prerequisites Assessment Quiz](assessments/quizzes/prerequisites-quiz.md) to gauge your readiness.
+**CI/CD 与自动化：**
+- 使用 GitHub Actions 构建 CI/CD 流水线
+- 自动化测试和部署
+- 实施基础设施即代码
+- 管理密钥和环境配置
+- 处理回滚和灾难恢复
 
-**Passing score:** 70%
-**If you score below 70%:** Review recommended preparatory materials
+#### 职业素养
 
----
-
-## Module Breakdown
-
-### Module 001: Python Fundamentals for Infrastructure
-
-**Duration:** 15 hours
-**Difficulty:** Beginner
-**Prerequisites:** None
-
-#### Topics Covered
-
-1. **Python Environment Setup** (2 hours)
-   - Virtual environments (venv, conda)
-   - Package management (pip, requirements.txt)
-   - IDE setup and configuration
-
-2. **Advanced Python for Infrastructure** (6 hours)
-   - Type hints and mypy
-   - Logging best practices
-   - Configuration management
-   - Error handling patterns
-   - Working with APIs (requests library)
-
-3. **Python for DevOps** (4 hours)
-   - Subprocess management
-   - File system operations
-   - JSON/YAML parsing
-   - Command-line arguments (argparse)
-
-4. **Testing & Quality** (3 hours)
-   - Unit testing with pytest
-   - Code formatting (black, isort)
-   - Linting (pylint, flake8)
-   - Pre-commit hooks
-
-#### Learning Outcomes
-
-- Set up professional Python development environment
-- Write production-quality Python code
-- Implement proper logging and error handling
-- Test and validate code before deployment
-
-#### Resources
-
-- [Lecture Notes](lessons/mod-001-python-fundamentals/lecture-notes/)
-- [Exercises](lessons/mod-001-python-fundamentals/exercises/)
-- [Quiz](lessons/mod-001-python-fundamentals/quizzes/)
+- **问题解决：** 系统化排查生产问题
+- **文档写作：** 编写清晰的技术文档
+- **沟通：** 向非技术人员解释技术概念
+- **协作：** 在跨职能团队中高效工作
+- **时间管理：** 估算任务并按时完成
 
 ---
 
-### Module 002: Linux Essentials
+## 先修要求
 
-**Duration:** 15 hours
-**Difficulty:** Beginner
-**Prerequisites:** None
+### 必需知识
 
-#### Topics Covered
+**Python 编程：**
+- 变量、数据类型、控制流
+- 函数和模块
+- 面向对象编程基础
+- 文件 I/O 和错误处理
+- 基础库（os、sys、json、requests）
 
-1. **Linux Fundamentals** (4 hours)
-   - File system hierarchy
-   - Users, groups, and permissions
-   - Process management
-   - System resources (CPU, memory, disk)
+**命令行：**
+- 文件系统导航（cd、ls、pwd）
+- 文件操作（cp、mv、rm、mkdir）
+- 文本处理（cat、grep、less）
+- 进程管理（ps、kill、top）
 
-2. **Shell Scripting** (5 hours)
-   - Bash basics
-   - Variables and conditionals
-   - Loops and functions
-   - Script debugging
+**基础网络：**
+- HTTP/HTTPS 基础
+- IP 地址和端口
+- DNS 基础
 
-3. **System Administration** (4 hours)
-   - Package management (apt, yum)
-   - Service management (systemd)
-   - Log management
-   - Cron jobs and scheduling
+### 推荐（非必需）
 
-4. **Networking Basics** (2 hours)
-   - Network configuration (ifconfig, ip)
-   - Firewall basics (iptables, ufw)
-   - SSH and key management
-   - Network troubleshooting (ping, netstat, curl)
+- 有 Git 使用经验
+- 熟悉 Linux/Unix 系统
+- 基础 SQL 知识
+- 理解客户端-服务器架构
 
-#### Learning Outcomes
+### 评估测验
 
-- Navigate and manage Linux systems confidently
-- Write shell scripts for automation
-- Troubleshoot common system issues
-- Secure Linux servers
+开始前，请参加[先修知识评估测验](assessments/quizzes/prerequisites-quiz.md)来评估你的准备情况。
+
+**及格分数：** 70%
+**如果分数低于 70%：** 复习推荐的预备材料
 
 ---
 
-### Module 003: Git & Version Control
+## 模块详解
 
-**Duration:** 10 hours
-**Difficulty:** Beginner
-**Prerequisites:** Command-line familiarity
+### 模块 001：基础设施 Python 基础
 
-#### Topics Covered
+**时长：** 15 小时
+**难度：** 入门
+**先修要求：** 无
 
-1. **Git Fundamentals** (3 hours)
-   - Repository initialization
-   - Commits and history
-   - Branches and merging
-   - Remote repositories
+#### 涵盖主题
 
-2. **Collaboration Workflows** (3 hours)
-   - Pull requests and code review
-   - Merge strategies
-   - Conflict resolution
-   - Git hooks
+1. **Python 环境搭建**（2 小时）
+   - 虚拟环境（venv、conda）
+   - 包管理（pip、requirements.txt）
+   - IDE 设置和配置
 
-3. **Advanced Git** (2 hours)
-   - Rebasing and cherry-picking
-   - Stashing and cleaning
-   - Bisect for debugging
-   - Submodules
+2. **基础设施高级 Python**（6 小时）
+   - 类型提示和 mypy
+   - 日志记录最佳实践
+   - 配置管理
+   - 错误处理模式
+   - 使用 API（requests 库）
 
-4. **GitHub Workflows** (2 hours)
-   - Issue tracking
-   - Project management
-   - GitHub Actions basics
-   - Documentation (README, CONTRIBUTING)
+3. **DevOps 的 Python**（4 小时）
+   - 子进程管理
+   - 文件系统操作
+   - JSON/YAML 解析
+   - 命令行参数（argparse）
 
-#### Learning Outcomes
+4. **测试与质量**（3 小时）
+   - 使用 pytest 进行单元测试
+   - 代码格式化（black、isort）
+   - 代码检查（pylint、flake8）
+   - 预提交钩子
 
-- Use Git for version control professionally
-- Collaborate on code with team members
-- Implement Git-based workflows
-- Leverage GitHub for project management
+#### 学习成果
+
+- 搭建专业的 Python 开发环境
+- 编写生产质量的 Python 代码
+- 实现正确的日志记录和错误处理
+- 在部署前测试和验证代码
+
+#### 资源
+
+- [讲座笔记](lessons/mod-001-python-fundamentals/lecture-notes/)
+- [练习](lessons/mod-001-python-fundamentals/exercises/)
+- [测验](lessons/mod-001-python-fundamentals/quizzes/)
 
 ---
 
-### Module 004: ML Basics (PyTorch/TensorFlow)
+### 模块 002：Linux 基础
 
-**Duration:** 20 hours
-**Difficulty:** Beginner
-**Prerequisites:** Python fundamentals
+**时长：** 15 小时
+**难度：** 入门
+**先修要求：** 无
 
-#### Topics Covered
+#### 涵盖主题
 
-1. **Machine Learning Overview** (4 hours)
-   - Supervised vs unsupervised learning
-   - Training, validation, testing
-   - Common ML workflows
-   - Model evaluation metrics
+1. **Linux 基础**（4 小时）
+   - 文件系统层次结构
+   - 用户、组和权限
+   - 进程管理
+   - 系统资源（CPU、内存、磁盘）
 
-2. **PyTorch Basics** (6 hours)
-   - Tensors and operations
-   - Building neural networks
-   - Training loops
-   - Saving and loading models
+2. **Shell 脚本编程**（5 小时）
+   - Bash 基础
+   - 变量和条件语句
+   - 循环和函数
+   - 脚本调试
 
-3. **TensorFlow/Keras Basics** (6 hours)
-   - TensorFlow fundamentals
+3. **系统管理**（4 小时）
+   - 包管理（apt、yum）
+   - 服务管理（systemd）
+   - 日志管理
+   - Cron 任务和调度
+
+4. **网络基础**（2 小时）
+   - 网络配置（ifconfig、ip）
+   - 防火墙基础（iptables、ufw）
+   - SSH 和密钥管理
+   - 网络故障排查（ping、netstat、curl）
+
+#### 学习成果
+
+- 自信地导航和管理 Linux 系统
+- 编写 shell 脚本实现自动化
+- 排查常见系统问题
+- 保护 Linux 服务器安全
+
+---
+
+### 模块 003：Git 与版本控制
+
+**时长：** 10 小时
+**难度：** 入门
+**先修要求：** 命令行基础
+
+#### 涵盖主题
+
+1. **Git 基础**（3 小时）
+   - 仓库初始化
+   - 提交和历史
+   - 分支和合并
+   - 远程仓库
+
+2. **协作工作流**（3 小时）
+   - 拉取请求和代码审查
+   - 合并策略
+   - 冲突解决
+   - Git 钩子
+
+3. **高级 Git**（2 小时）
+   - 变基和挑选
+   - 储藏和清理
+   - Bisect 调试
+   - 子模块
+
+4. **GitHub 工作流**（2 小时）
+   - Issue 追踪
+   - 项目管理
+   - GitHub Actions 基础
+   - 文档（README、CONTRIBUTING）
+
+#### 学习成果
+
+- 专业使用 Git 进行版本控制
+- 与团队成员协作开发代码
+- 实现基于 Git 的工作流
+- 利用 GitHub 进行项目管理
+
+---
+
+### 模块 004：ML 基础（PyTorch/TensorFlow）
+
+**时长：** 20 小时
+**难度：** 入门
+**先修要求：** Python 基础
+
+#### 涵盖主题
+
+1. **机器学习概述**（4 小时）
+   - 监督学习 vs 无监督学习
+   - 训练、验证、测试
+   - 常见 ML 工作流
+   - 模型评估指标
+
+2. **PyTorch 基础**（6 小时）
+   - 张量和操作
+   - 构建神经网络
+   - 训练循环
+   - 保存和加载模型
+
+3. **TensorFlow/Keras 基础**（6 小时）
+   - TensorFlow 基础
    - Keras API
-   - Model training and evaluation
-   - Model serialization
+   - 模型训练和评估
+   - 模型序列化
 
-4. **Model Deployment Preparation** (4 hours)
-   - Model formats (ONNX, TorchScript, SavedModel)
-   - Model optimization basics
-   - Input/output handling
-   - Model versioning
+4. **模型部署准备**（4 小时）
+   - 模型格式（ONNX、TorchScript、SavedModel）
+   - 模型优化基础
+   - 输入/输出处理
+   - 模型版本管理
 
-#### Learning Outcomes
+#### 学习成果
 
-- Understand ML model lifecycle
-- Work with PyTorch and TensorFlow models
-- Prepare models for deployment
-- Convert between model formats
-
----
-
-### Module 005: Docker & Containerization
-
-**Duration:** 15 hours
-**Difficulty:** Beginner
-**Prerequisites:** Linux essentials
-
-#### Topics Covered
-
-1. **Docker Fundamentals** (4 hours)
-   - Container vs VM
-   - Docker architecture
-   - Images and containers
-   - Docker Hub and registries
-
-2. **Dockerfile Best Practices** (5 hours)
-   - Layer caching
-   - Multi-stage builds
-   - Security considerations
-   - Image optimization
-
-3. **Docker Compose** (3 hours)
-   - Service definition
-   - Networking
-   - Volumes and persistence
-   - Environment configuration
-
-4. **Container Operations** (3 hours)
-   - Container networking
-   - Volume management
-   - Resource limits
-   - Logging and debugging
-
-#### Learning Outcomes
-
-- Containerize Python ML applications
-- Write production-ready Dockerfiles
-- Orchestrate multi-container applications
-- Debug containerized applications
+- 理解 ML 模型生命周期
+- 使用 PyTorch 和 TensorFlow 模型
+- 准备模型部署
+- 在不同模型格式之间转换
 
 ---
 
-### Module 006: Kubernetes Introduction
+### 模块 005：Docker 与容器化
 
-**Duration:** 20 hours
-**Difficulty:** Beginner+
-**Prerequisites:** Docker fundamentals
+**时长：** 15 小时
+**难度：** 入门
+**先修要求：** Linux 基础
 
-#### Topics Covered
+#### 涵盖主题
 
-1. **Kubernetes Architecture** (4 hours)
-   - Control plane and nodes
-   - Pods, services, deployments
-   - ConfigMaps and Secrets
-   - Namespaces
+1. **Docker 基础**（4 小时）
+   - 容器 vs 虚拟机
+   - Docker 架构
+   - 镜像和容器
+   - Docker Hub 和仓库
 
-2. **Deploying Applications** (6 hours)
-   - Writing manifests (YAML)
-   - Deployments and StatefulSets
-   - Services and ingress
-   - Persistent volumes
+2. **Dockerfile 最佳实践**（5 小时）
+   - 层缓存
+   - 多阶段构建
+   - 安全考虑
+   - 镜像优化
 
-3. **Helm Package Manager** (5 hours)
-   - Helm charts basics
-   - Chart templates
-   - Values and configuration
-   - Chart deployment
+3. **Docker Compose**（3 小时）
+   - 服务定义
+   - 网络
+   - 卷和持久化
+   - 环境配置
 
-4. **Kubernetes Operations** (5 hours)
-   - kubectl basics
-   - Debugging pods
-   - Log aggregation
-   - Resource monitoring
-   - Auto-scaling (HPA)
+4. **容器运维**（3 小时）
+   - 容器网络
+   - 卷管理
+   - 资源限制
+   - 日志记录和调试
 
-#### Learning Outcomes
+#### 学习成果
 
-- Deploy applications to Kubernetes
-- Write Kubernetes manifests
-- Use Helm for package management
-- Troubleshoot Kubernetes deployments
-
----
-
-### Module 007: APIs & Web Services
-
-**Duration:** 15 hours
-**Difficulty:** Beginner
-**Prerequisites:** Python fundamentals
-
-#### Topics Covered
-
-1. **REST API Fundamentals** (3 hours)
-   - HTTP methods and status codes
-   - API design principles
-   - Authentication and authorization
-   - Rate limiting
-
-2. **FastAPI Framework** (6 hours)
-   - Building REST APIs
-   - Request/response models (Pydantic)
-   - Dependency injection
-   - Async operations
-   - API documentation (OpenAPI)
-
-3. **Flask Framework** (3 hours)
-   - Flask basics
-   - Routing and views
-   - Request handling
-   - Flask extensions
-
-4. **API Testing** (3 hours)
-   - Unit testing APIs (pytest)
-   - Integration testing
-   - Load testing (locust)
-   - API documentation
-
-#### Learning Outcomes
-
-- Build production-grade REST APIs
-- Implement authentication and authorization
-- Test and document APIs
-- Choose appropriate frameworks
+- 容器化 Python ML 应用
+- 编写生产级 Dockerfile
+- 编排多容器应用
+- 调试容器化应用
 
 ---
 
-### Module 008: Databases & SQL
+### 模块 006：Kubernetes 入门
 
-**Duration:** 15 hours
-**Difficulty:** Beginner
-**Prerequisites:** Python fundamentals
+**时长：** 20 小时
+**难度：** 入门+
+**先修要求：** Docker 基础
 
-#### Topics Covered
+#### 涵盖主题
 
-1. **SQL Fundamentals** (5 hours)
-   - SELECT queries
-   - Joins and aggregations
-   - Indexes and optimization
-   - Transactions
+1. **Kubernetes 架构**（4 小时）
+   - 控制平面和工作节点
+   - Pod、Service、Deployment
+   - ConfigMap 和 Secret
+   - 命名空间
 
-2. **PostgreSQL** (5 hours)
-   - Installation and setup
-   - Database design
-   - Performance tuning
-   - Backup and recovery
+2. **部署应用**（6 小时）
+   - 编写清单文件（YAML）
+   - Deployment 和 StatefulSet
+   - Service 和 Ingress
+   - 持久卷
 
-3. **NoSQL Basics** (3 hours)
-   - Document databases (MongoDB)
-   - Key-value stores (Redis)
-   - Use cases for NoSQL
+3. **Helm 包管理器**（5 小时）
+   - Helm Chart 基础
+   - Chart 模板
+   - Values 和配置
+   - Chart 部署
 
-4. **Python Database Integration** (2 hours)
+4. **Kubernetes 运维**（5 小时）
+   - kubectl 基础
+   - 调试 Pod
+   - 日志聚合
+   - 资源监控
+   - 自动扩缩（HPA）
+
+#### 学习成果
+
+- 将应用部署到 Kubernetes
+- 编写 Kubernetes 清单文件
+- 使用 Helm 进行包管理
+- 排查 Kubernetes 部署问题
+
+---
+
+### 模块 007：API 与网络服务
+
+**时长：** 15 小时
+**难度：** 入门
+**先修要求：** Python 基础
+
+#### 涵盖主题
+
+1. **REST API 基础**（3 小时）
+   - HTTP 方法和状态码
+   - API 设计原则
+   - 认证和授权
+   - 速率限制
+
+2. **FastAPI 框架**（6 小时）
+   - 构建 REST API
+   - 请求/响应模型（Pydantic）
+   - 依赖注入
+   - 异步操作
+   - API 文档（OpenAPI）
+
+3. **Flask 框架**（3 小时）
+   - Flask 基础
+   - 路由和视图
+   - 请求处理
+   - Flask 扩展
+
+4. **API 测试**（3 小时）
+   - 单元测试 API（pytest）
+   - 集成测试
+   - 负载测试（locust）
+   - API 文档
+
+#### 学习成果
+
+- 构建生产级 REST API
+- 实现认证和授权
+- 测试和编写 API 文档
+- 选择合适的框架
+
+---
+
+### 模块 008：数据库与 SQL
+
+**时长：** 15 小时
+**难度：** 入门
+**先修要求：** Python 基础
+
+#### 涵盖主题
+
+1. **SQL 基础**（5 小时）
+   - SELECT 查询
+   - 连接和聚合
+   - 索引和优化
+   - 事务
+
+2. **PostgreSQL**（5 小时）
+   - 安装和设置
+   - 数据库设计
+   - 性能调优
+   - 备份和恢复
+
+3. **NoSQL 基础**（3 小时）
+   - 文档数据库（MongoDB）
+   - 键值存储（Redis）
+   - NoSQL 的使用场景
+
+4. **Python 数据库集成**（2 小时）
    - SQLAlchemy ORM
-   - Connection pooling
-   - Migration tools (Alembic)
-   - Database testing
+   - 连接池
+   - 迁移工具（Alembic）
+   - 数据库测试
 
-#### Learning Outcomes
+#### 学习成果
 
-- Design and query relational databases
-- Choose appropriate database technologies
-- Integrate databases with Python applications
-- Implement database best practices
-
----
-
-### Module 009: Monitoring & Logging Basics
-
-**Duration:** 15 hours
-**Difficulty:** Beginner+
-**Prerequisites:** Docker, Kubernetes
-
-#### Topics Covered
-
-1. **Monitoring Fundamentals** (3 hours)
-   - Metrics, logs, and traces
-   - SLIs, SLOs, and SLAs
-   - Monitoring strategies
-   - Alert design
-
-2. **Prometheus** (5 hours)
-   - Architecture and components
-   - Metrics collection
-   - PromQL basics
-   - Recording and alerting rules
-
-3. **Grafana** (4 hours)
-   - Dashboard creation
-   - Visualization types
-   - Variables and templating
-   - Alert integration
-
-4. **Logging Best Practices** (3 hours)
-   - Structured logging
-   - Log levels and formatting
-   - Centralized logging
-   - Log analysis
-
-#### Learning Outcomes
-
-- Implement monitoring for applications
-- Create operational dashboards
-- Set up alerting rules
-- Analyze logs effectively
+- 设计和查询关系型数据库
+- 选择合适的数据库技术
+- 将数据库与 Python 应用集成
+- 实施数据库最佳实践
 
 ---
 
-### Module 010: Cloud Platforms (AWS/GCP/Azure)
+### 模块 009：监控与日志记录基础
 
-**Duration:** 20 hours
-**Difficulty:** Beginner+
-**Prerequisites:** Docker, basic networking
+**时长：** 15 小时
+**难度：** 入门+
+**先修要求：** Docker、Kubernetes
 
-#### Topics Covered
+#### 涵盖主题
 
-1. **Cloud Fundamentals** (4 hours)
-   - Cloud service models (IaaS, PaaS, SaaS)
-   - Regions and availability zones
-   - Identity and access management
-   - Cost management
+1. **监控基础**（3 小时）
+   - 指标、日志和链路追踪
+   - SLI、SLO 和 SLA
+   - 监控策略
+   - 告警设计
 
-2. **Compute Services** (5 hours)
-   - Virtual machines (EC2, Compute Engine, VMs)
-   - Container services (ECS, GKE, AKS)
-   - Serverless (Lambda, Cloud Functions, Functions)
+2. **Prometheus**（5 小时）
+   - 架构和组件
+   - 指标采集
+   - PromQL 基础
+   - 记录规则和告警规则
 
-3. **Storage and Databases** (5 hours)
-   - Object storage (S3, Cloud Storage, Blob)
-   - Managed databases (RDS, Cloud SQL, Azure SQL)
-   - Caching (ElastiCache, Memorystore, Redis Cache)
+3. **Grafana**（4 小时）
+   - 仪表盘创建
+   - 可视化类型
+   - 变量和模板
+   - 告警集成
 
-4. **Networking and Security** (6 hours)
-   - VPC and subnets
-   - Load balancers
-   - Security groups and firewalls
-   - Secrets management
-   - SSL/TLS certificates
+4. **日志记录最佳实践**（3 小时）
+   - 结构化日志
+   - 日志级别和格式
+   - 集中式日志
+   - 日志分析
 
-#### Learning Outcomes
+#### 学习成果
 
-- Deploy applications to cloud platforms
-- Choose appropriate cloud services
-- Implement cloud security best practices
-- Manage cloud costs
-
----
-
-## Project Breakdown
-
-### Project 01: Simple Model API Deployment
-
-**Duration:** 60 hours
-**Difficulty:** Beginner
-**Prerequisites:** Modules 001-005
-
-#### Overview
-
-Build and deploy a REST API that serves machine learning predictions using Flask or FastAPI, containerize it with Docker, and deploy to a cloud platform.
-
-#### Key Deliverables
-
-- REST API with /predict endpoint
-- Model loading and inference code
-- Dockerfile and docker-compose.yml
-- Basic monitoring and logging
-- Cloud deployment (AWS/GCP/Azure)
-- README with API documentation
-
-#### Technologies
-
-- Flask/FastAPI, PyTorch/TensorFlow, Docker, AWS/GCP/Azure, PostgreSQL
-
-#### Assessment Weight
-
-**Total:** 100 points
-- Code Quality: 25 points
-- Functionality: 30 points
-- Deployment: 20 points
-- Documentation: 15 points
-- Performance: 10 points
-
-[Full Project Details →](projects/project-01-simple-model-api/)
+- 为应用实施监控
+- 创建运维仪表盘
+- 设置告警规则
+- 有效分析日志
 
 ---
 
-### Project 02: Kubernetes Model Serving
+### 模块 010：云平台（AWS/GCP/Azure）
 
-**Duration:** 80 hours
-**Difficulty:** Beginner+
-**Prerequisites:** Project 01, Module 006
+**时长：** 20 小时
+**难度：** 入门+
+**先修要求：** Docker、基础网络
 
-#### Overview
+#### 涵盖主题
 
-Deploy your ML model API to Kubernetes with auto-scaling, load balancing, monitoring, and zero-downtime updates.
+1. **云基础**（4 小时）
+   - 云服务模型（IaaS、PaaS、SaaS）
+   - 区域和可用区
+   - 身份和访问管理
+   - 成本管理
 
-#### Key Deliverables
+2. **计算服务**（5 小时）
+   - 虚拟机（EC2、Compute Engine、VMs）
+   - 容器服务（ECS、GKE、AKS）
+   - 无服务器（Lambda、Cloud Functions、Functions）
 
-- Kubernetes manifests (Deployment, Service, Ingress)
-- Helm chart
-- Horizontal Pod Autoscaler configuration
-- Prometheus metrics integration
-- Grafana dashboard
-- Load testing results
+3. **存储和数据库**（5 小时）
+   - 对象存储（S3、Cloud Storage、Blob）
+   - 托管数据库（RDS、Cloud SQL、Azure SQL）
+   - 缓存（ElastiCache、Memorystore、Redis Cache）
 
-#### Technologies
+4. **网络和安全**（6 小时）
+   - VPC 和子网
+   - 负载均衡器
+   - 安全组和防火墙
+   - 密钥管理
+   - SSL/TLS 证书
 
-- Kubernetes, Helm, Prometheus, Grafana, NGINX Ingress
+#### 学习成果
 
-#### Assessment Weight
-
-**Total:** 100 points
-- Infrastructure: 30 points
-- Functionality: 25 points
-- Monitoring: 20 points
-- Documentation: 15 points
-- Scalability: 10 points
-
-[Full Project Details →](projects/project-02-kubernetes-serving/)
-
----
-
-### Project 03: ML Pipeline with Experiment Tracking
-
-**Duration:** 100 hours
-**Difficulty:** Intermediate
-**Prerequisites:** Projects 01-02, Modules 007-008
-
-#### Overview
-
-Build an end-to-end ML pipeline with data ingestion, preprocessing, training, evaluation, and deployment, using MLflow for experiment tracking and DVC for versioning.
-
-#### Key Deliverables
-
-- Airflow/Prefect DAGs for pipeline orchestration
-- MLflow tracking and model registry
-- DVC for data and model versioning
-- Data validation with Great Expectations
-- PostgreSQL for metadata storage
-- Automated retraining pipeline
-
-#### Technologies
-
-- MLflow, Airflow/Prefect, DVC, Great Expectations, PostgreSQL, Docker, Kubernetes
-
-#### Assessment Weight
-
-**Total:** 100 points
-- Pipeline Design: 25 points
-- Experiment Tracking: 20 points
-- Data Versioning: 15 points
-- Code Quality: 20 points
-- Documentation: 20 points
-
-[Full Project Details →](projects/project-03-ml-pipeline-tracking/)
+- 将应用部署到云平台
+- 选择合适的云服务
+- 实施云安全最佳实践
+- 管理云成本
 
 ---
 
-### Project 04: Monitoring & Alerting System
+## 项目详解
 
-**Duration:** 80 hours
-**Difficulty:** Intermediate
-**Prerequisites:** Projects 01-03, Module 009
+### 项目 01：简单模型 API 部署
 
-#### Overview
+**时长：** 60 小时
+**难度：** 入门
+**先修要求：** 模块 001-005
 
-Deploy a comprehensive monitoring and alerting system for your ML infrastructure using Prometheus, Grafana, and ELK Stack.
+#### 概述
 
-#### Key Deliverables
+构建并部署一个 REST API，使用 Flask 或 FastAPI 提供机器学习预测服务，用 Docker 容器化，并部署到云平台。
 
-- Prometheus deployment with custom metrics
-- Grafana dashboards for ML metrics
-- ELK Stack for log aggregation
-- Alertmanager configuration
-- PagerDuty/Slack integration
-- Runbooks for common alerts
+#### 关键交付物
 
-#### Technologies
+- 带 /predict 端点的 REST API
+- 模型加载和推理代码
+- Dockerfile 和 docker-compose.yml
+- 基本监控和日志记录
+- 云平台部署（AWS/GCP/Azure）
+- 带 API 文档的 README
 
-- Prometheus, Grafana, Elasticsearch, Logstash, Kibana, Alertmanager, PagerDuty
+#### 技术栈
 
-#### Assessment Weight
+- Flask/FastAPI、PyTorch/TensorFlow、Docker、AWS/GCP/Azure、PostgreSQL
 
-**Total:** 100 points
-- Metrics Collection: 25 points
-- Dashboard Quality: 25 points
-- Alerting: 20 points
-- Log Management: 20 points
-- Documentation: 10 points
+#### 评估权重
 
-[Full Project Details →](projects/project-04-monitoring-alerting/)
+**总分：** 100 分
+- 代码质量：25 分
+- 功能完整性：30 分
+- 部署：20 分
+- 文档：15 分
+- 性能：10 分
 
----
-
-### Project 05: Production-Ready ML System (Capstone)
-
-**Duration:** 120 hours
-**Difficulty:** Intermediate+
-**Prerequisites:** All previous projects and modules
-
-#### Overview
-
-Integrate all previous projects into a complete, production-ready ML system with CI/CD, security, high availability, and disaster recovery.
-
-#### Key Deliverables
-
-- End-to-end ML system architecture
-- GitHub Actions CI/CD pipeline
-- Infrastructure as Code (Terraform basics)
-- Security implementation (HTTPS, secrets management)
-- Multi-environment setup (dev, staging, prod)
-- Disaster recovery plan
-- Complete documentation
-- Demo video presentation
-
-#### Technologies
-
-- All technologies from previous projects + GitHub Actions, Terraform, cert-manager, Vault, Velero
-
-#### Assessment Weight
-
-**Total:** 100 points
-- System Integration: 30 points
-- CI/CD: 20 points
-- Security: 20 points
-- Documentation: 20 points
-- Presentation: 10 points
-
-[Full Project Details →](projects/project-05-production-ml-capstone/)
+[完整项目详情 →](projects/project-01-simple-model-api/)
 
 ---
 
-## Assessment Strategy
+### 项目 02：Kubernetes 模型服务
 
-### Continuous Assessment
+**时长：** 80 小时
+**难度：** 入门+
+**先修要求：** 项目 01、模块 006
 
-- **Module Quizzes:** 10 quizzes (10 points each)
-- **Project Assessments:** 5 projects (100 points each)
-- **Total Possible:** 600 points
+#### 概述
 
-### Passing Criteria
+将 ML 模型 API 部署到 Kubernetes，配备自动扩缩、负载均衡、监控和零停机更新。
 
-- **Overall:** 70% (420/600 points)
-- **Each Project:** 70/100 points minimum
-- **Module Quizzes:** 7/10 points average
+#### 关键交付物
 
-### Grading Scale
+- Kubernetes 清单（Deployment、Service、Ingress）
+- Helm Chart
+- Horizontal Pod Autoscaler 配置
+- Prometheus 指标集成
+- Grafana 仪表盘
+- 负载测试结果
 
-| Grade | Points | Percentage |
+#### 技术栈
+
+- Kubernetes、Helm、Prometheus、Grafana、NGINX Ingress
+
+#### 评估权重
+
+**总分：** 100 分
+- 基础设施：30 分
+- 功能完整性：25 分
+- 监控：20 分
+- 文档：15 分
+- 可扩展性：10 分
+
+[完整项目详情 →](projects/project-02-kubernetes-serving/)
+
+---
+
+### 项目 03：带实验追踪的 ML 流水线
+
+**时长：** 100 小时
+**难度：** 中级
+**先修要求：** 项目 01-02、模块 007-008
+
+#### 概述
+
+构建端到端 ML 流水线，包含数据摄入、预处理、训练、评估和部署，使用 MLflow 进行实验追踪，使用 DVC 进行版本管理。
+
+#### 关键交付物
+
+- Airflow/Prefect DAG 用于流水线编排
+- MLflow 追踪和模型注册表
+- DVC 用于数据和模型版本管理
+- 使用 Great Expectations 进行数据验证
+- PostgreSQL 用于元数据存储
+- 自动重训练流水线
+
+#### 技术栈
+
+- MLflow、Airflow/Prefect、DVC、Great Expectations、PostgreSQL、Docker、Kubernetes
+
+#### 评估权重
+
+**总分：** 100 分
+- 流水线设计：25 分
+- 实验追踪：20 分
+- 数据版本管理：15 分
+- 代码质量：20 分
+- 文档：20 分
+
+[完整项目详情 →](projects/project-03-ml-pipeline-tracking/)
+
+---
+
+### 项目 04：监控与告警系统
+
+**时长：** 80 小时
+**难度：** 中级
+**先修要求：** 项目 01-03、模块 009
+
+#### 概述
+
+使用 Prometheus、Grafana 和 ELK Stack 为 ML 基础设施部署全面的监控和告警系统。
+
+#### 关键交付物
+
+- 带有自定义指标的 Prometheus 部署
+- 用于 ML 指标的 Grafana 仪表盘
+- ELK Stack 用于日志聚合
+- Alertmanager 配置
+- PagerDuty/Slack 集成
+- 常见告警的应急预案
+
+#### 技术栈
+
+- Prometheus、Grafana、Elasticsearch、Logstash、Kibana、Alertmanager、PagerDuty
+
+#### 评估权重
+
+**总分：** 100 分
+- 指标采集：25 分
+- 仪表盘质量：25 分
+- 告警：20 分
+- 日志管理：20 分
+- 文档：10 分
+
+[完整项目详情 →](projects/project-04-monitoring-alerting/)
+
+---
+
+### 项目 05：生产级 ML 系统（结业项目）
+
+**时长：** 120 小时
+**难度：** 中级+
+**先修要求：** 之前所有项目和模块
+
+#### 概述
+
+将所有之前的项目整合为一个完整的、生产级的 ML 系统，包含 CI/CD、安全、高可用和灾难恢复。
+
+#### 关键交付物
+
+- 端到端 ML 系统架构
+- GitHub Actions CI/CD 流水线
+- 基础设施即代码（Terraform 基础）
+- 安全实现（HTTPS、密钥管理）
+- 多环境配置（dev、staging、prod）
+- 灾难恢复计划
+- 完整文档
+- 演示视频
+
+#### 技术栈
+
+- 之前项目中的所有技术 + GitHub Actions、Terraform、cert-manager、Vault、Velero
+
+#### 评估权重
+
+**总分：** 100 分
+- 系统集成：30 分
+- CI/CD：20 分
+- 安全：20 分
+- 文档：20 分
+- 演示：10 分
+
+[完整项目详情 →](projects/project-05-production-ml-capstone/)
+
+---
+
+## 评估策略
+
+### 持续评估
+
+- **模块测验：** 10 个测验（每个 10 分）
+- **项目评估：** 5 个项目（每个 100 分）
+- **总分：** 600 分
+
+### 及格标准
+
+- **总体：** 70%（420/600 分）
+- **每个项目：** 最低 70/100 分
+- **模块测验：** 平均 7/10 分
+
+### 评分等级
+
+| 等级 | 分数 | 百分比 |
 |-------|--------|------------|
-| A (Excellent) | 540-600 | 90-100% |
-| B (Good) | 480-539 | 80-89% |
-| C (Satisfactory) | 420-479 | 70-79% |
-| F (Not Passing) | <420 | <70% |
+| A（优秀） | 540-600 | 90-100% |
+| B（良好） | 480-539 | 80-89% |
+| C（合格） | 420-479 | 70-79% |
+| F（不及格） | <420 | <70% |
 
-### Self-Assessment
+### 自我评估
 
-Each project includes:
-- **Detailed rubric** with scoring criteria
-- **Self-assessment checklist** to verify completion
-- **Peer review guidelines** for study groups
-- **Example solutions** (in solutions repository)
-
----
-
-## Time Commitment
-
-### Full-Time Study (40 hours/week)
-
-**Total Duration:** 11 weeks
-
-- **Weeks 1-3:** Modules (10 modules × 15 hours avg ÷ 40 hours/week)
-- **Weeks 4-11:** Projects (440 hours ÷ 40 hours/week)
-
-### Part-Time Study (20 hours/week)
-
-**Total Duration:** 22 weeks
-
-- **Weeks 1-7:** Modules
-- **Weeks 8-22:** Projects
-
-### Flexible/Self-Paced
-
-Complete at your own pace. Typical timelines:
-- **Aggressive:** 8-10 weeks (50+ hours/week)
-- **Moderate:** 16-20 weeks (20-25 hours/week)
-- **Relaxed:** 6-12 months (10-15 hours/week)
+每个项目包含：
+- **详细评分标准**，包含评分标准
+- **自我评估清单**，用于验证完成情况
+- **同行评审指南**，供学习小组使用
+- **示例解答**（在解答仓库中）
 
 ---
 
-## Career Outcomes
+## 时间投入
 
-### Job Titles You'll Qualify For
+### 全日制学习（每周 40 小时）
 
-- Junior ML Infrastructure Engineer
-- Junior MLOps Engineer
-- DevOps Engineer (ML focus)
-- Cloud Infrastructure Engineer (entry-level)
-- ML Platform Engineer (junior)
+**总时长：** 11 周
 
-### Expected Salary Range (US, 2025)
+- **第 1-3 周：** 模块（10 个模块 × 平均 15 小时 ÷ 每周 40 小时）
+- **第 4-11 周：** 项目（440 小时 ÷ 每周 40 小时）
 
-- **Entry-level:** $67,000 - $95,000
-- **With 1-2 years exp:** $80,000 - $110,000
-- **Tech hubs (SF, NYC, Seattle):** +20-40% premium
+### 非全日制学习（每周 20 小时）
 
-### Next Steps After Completion
+**总时长：** 22 周
 
-1. **Job Search:** Apply for Junior ML Infrastructure roles
-2. **Portfolio:** Showcase capstone project to employers
-3. **Continue Learning:** Advance to Level 1 (AI Infrastructure Engineer)
-4. **Specialize:** Choose specialized track (MLOps, Security, Platform, Performance)
-5. **Contribute:** Contribute to open-source ML infrastructure projects
+- **第 1-7 周：** 模块
+- **第 8-22 周：** 项目
 
----
+### 灵活/自学
 
-**Ready to begin?** Start with [Module 001: Python Fundamentals](lessons/mod-001-python-fundamentals/)
-
-**Questions?** See [FAQ](community/FAQ.md) or open an issue
+按照自己的节奏完成。典型周期：
+- **激进型：** 8-10 周（每周 50+ 小时）
+- **适中型：** 16-20 周（每周 20-25 小时）
+- **轻松型：** 6-12 个月（每周 10-15 小时）
 
 ---
 
-**Last Updated:** October 2025
-**Maintained By:** AI Infrastructure Curriculum Team
-**Contact:** ai-infra-curriculum@joshua-ferguson.com
+## 职业方向
+
+### 你能胜任的岗位
+
+- 初级 ML 基础设施工程师
+- 初级 MLOps 工程师
+- DevOps 工程师（ML 方向）
+- 云基础设施工程师（入门级）
+- ML 平台工程师（初级）
+
+### 预期薪资范围（美国，2025 年）
+
+- **入门级：** $67,000 - $95,000
+- **1-2 年经验：** $80,000 - $110,000
+- **科技中心（旧金山、纽约、西雅图）：** 溢价 20-40%
+
+### 完成后的下一步
+
+1. **求职：** 申请初级 ML 基础设施岗位
+2. **作品集：** 向雇主展示结业项目
+3. **继续学习：** 进阶到 Level 1（AI Infrastructure Engineer）
+4. **专业化：** 选择专业方向（MLOps、安全、平台、性能）
+5. **贡献：** 为开源 ML 基础设施项目做贡献
+
+---
+
+**准备好开始了吗？** 从[模块 001：Python 基础](lessons/mod-001-python-fundamentals/)开始
+
+**有问题？** 参见 [FAQ](community/FAQ.md) 或开启一个 Issue
+
+---
+
+**最后更新：** 2025 年 10 月
+**维护者：** AI Infrastructure Curriculum 团队
+**联系：** ai-infra-curriculum@joshua-ferguson.com

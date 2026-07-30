@@ -1,37 +1,37 @@
-# Exercise 05: API Documentation and OpenAPI
+# 练习 05：API 文档和 OpenAPI
 
-## Overview
+## 概述
 
-Create comprehensive API documentation using OpenAPI/Swagger, customize the auto-generated docs, add examples, and learn best practices for documenting ML APIs. Good documentation is essential for API adoption and maintenance.
+使用 OpenAPI/Swagger 创建全面的 API 文档，自定义自动生成的文档，添加示例，并学习记录 ML API 的最佳实践。良好的文档对于 API 的采用和维护至关重要。
 
-**Difficulty:** Beginner-Intermediate
-**Estimated Time:** 1-2 hours
-**Prerequisites:**
-- Exercise 01-02 completed
-- Understanding of REST principles
-- Lecture 01-02
+**难度：** 初级-中级
+**预计时间：** 1-2 小时
+**先决条件：**
+- 已完成练习 01-02
+- 理解 REST 原则
+- 讲座 01-02
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
-- Customize FastAPI's auto-generated documentation
-- Add detailed descriptions and examples to endpoints
-- Document request/response models thoroughly
-- Add authentication documentation
-- Create custom API documentation pages
-- Export OpenAPI schema for client generation
+完成此练习后，你将：
+- 自定义 FastAPI 的自动生成文档
+- 为 endpoint 添加详细的描述和示例
+- 全面记录请求/响应模型
+- 添加认证文档
+- 创建自定义 API 文档页面
+- 导出 OpenAPI schema 用于客户端生成
 
-## Scenario
+## 场景
 
-Your ML API needs professional documentation for:
-- Internal developers integrating the API
-- External partners using your models
-- Client SDK generation
-- API testing and validation
+你的 ML API 需要专业的文档用于：
+- 集成 API 的内部开发者
+- 使用你模型的外部合作伙伴
+- 客户端 SDK 生成
+- API 测试和验证
 
-## Part 1: Enhanced Endpoint Documentation
+## 第一部分：增强的 Endpoint 文档
 
-**File: app/main.py** (enhance existing endpoints)
+**文件：app/main.py**（增强现有 endpoint）
 
 ```python
 from fastapi import FastAPI, status
@@ -78,7 +78,7 @@ app = FastAPI(
     }
 )
 
-# TODO: Add detailed endpoint documentation
+# TODO: 添加详细的 endpoint 文档
 @app.post(
     "/api/v1/predict",
     response_model=PredictionOutput,
@@ -166,13 +166,13 @@ async def predict(
     Raises:
         HTTPException: If model is not loaded or prediction fails
     """
-    # Implementation
+    # 实现
     pass
 ```
 
-## Part 2: Enhanced Pydantic Models
+## 第二部分：增强的 Pydantic 模型
 
-**File: app/models.py**
+**文件：app/models.py**
 
 ```python
 from pydantic import BaseModel, Field, validator
@@ -181,17 +181,17 @@ from datetime import datetime
 from enum import Enum
 
 class SentimentLabel(str, Enum):
-    """Sentiment classification labels"""
+    """情感分类标签"""
     positive = "positive"
     negative = "negative"
     neutral = "neutral"
 
 class PredictionInput(BaseModel):
     """
-    Input data for sentiment prediction.
+    情感预测的输入数据。
 
-    The model accepts text up to 5000 characters and performs
-    sentiment analysis.
+    模型接受最多 5000 个字符的文本并执行
+    情感分析。
     """
 
     text: str = Field(
@@ -229,10 +229,9 @@ class PredictionInput(BaseModel):
 
 class PredictionOutput(BaseModel):
     """
-    Prediction result from sentiment analysis.
+    情感分析的预测结果。
 
-    Contains the predicted sentiment, confidence score, and optional
-    probability distribution across all classes.
+    包含预测的情感、置信度分数以及可选的所有类别的概率分布。
     """
 
     text: str = Field(
@@ -306,7 +305,7 @@ class PredictionOutput(BaseModel):
         }
 
 class BatchPredictionInput(BaseModel):
-    """Input for batch predictions"""
+    """批量预测的输入"""
 
     texts: List[str] = Field(
         ...,
@@ -323,7 +322,7 @@ class BatchPredictionInput(BaseModel):
 
     @validator('texts')
     def validate_texts(cls, v):
-        """Ensure each text is not empty"""
+        """确保每个文本不为空"""
         for text in v:
             if not text.strip():
                 raise ValueError("Text cannot be empty")
@@ -342,14 +341,14 @@ class BatchPredictionInput(BaseModel):
         }
 ```
 
-## Part 3: Tag Organization
+## 第三部分：标签组织
 
-**File: app/main.py** (organize with tags)
+**文件：app/main.py**（使用标签组织）
 
 ```python
 from fastapi import FastAPI
 
-# TODO: Define tag metadata
+# TODO: 定义标签元数据
 tags_metadata = [
     {
         "name": "Authentication",
@@ -382,7 +381,7 @@ app = FastAPI(
     openapi_tags=tags_metadata
 )
 
-# Apply tags to endpoints
+# 将标签应用于 endpoint
 @app.post("/token", tags=["Authentication"])
 async def login():
     pass
@@ -400,20 +399,20 @@ async def health_check():
     pass
 ```
 
-## Part 4: Custom Documentation Pages
+## 第四部分：自定义文档页面
 
-**File: app/main.py** (add custom docs)
+**文件：app/main.py**（添加自定义文档）
 
 ```python
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.openapi.utils import get_openapi
 
-app = FastAPI(docs_url=None, redoc_url=None)  # Disable default docs
+app = FastAPI(docs_url=None, redoc_url=None)  # 禁用默认文档
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
-    """Custom Swagger UI with custom styling"""
+    """带自定义样式的 Swagger UI"""
     return get_swagger_ui_html(
         openapi_url=app.openapi_url,
         title=f"{app.title} - Documentation",
@@ -422,7 +421,7 @@ async def custom_swagger_ui_html():
 
 @app.get("/redoc", include_in_schema=False)
 async def redoc_html():
-    """Custom ReDoc documentation"""
+    """自定义 ReDoc 文档"""
     return get_redoc_html(
         openapi_url=app.openapi_url,
         title=f"{app.title} - ReDoc",
@@ -430,7 +429,7 @@ async def redoc_html():
     )
 
 def custom_openapi():
-    """Customize OpenAPI schema"""
+    """自定义 OpenAPI schema"""
     if app.openapi_schema:
         return app.openapi_schema
 
@@ -441,12 +440,12 @@ def custom_openapi():
         routes=app.routes,
     )
 
-    # TODO: Add custom schema properties
+    # TODO: 添加自定义 schema 属性
     openapi_schema["info"]["x-logo"] = {
         "url": "https://example.com/logo.png"
     }
 
-    # TODO: Add security schemes
+    # TODO: 添加安全方案
     openapi_schema["components"]["securitySchemes"] = {
         "Bearer": {
             "type": "http",
@@ -462,16 +461,16 @@ def custom_openapi():
 app.openapi = custom_openapi
 ```
 
-## Part 5: Code Examples in Documentation
+## 第五部分：文档中的代码示例
 
-**File: app/docs_examples.py**
+**文件：app/docs_examples.py**
 
 ```python
 """
-Code examples for API documentation
+API 文档的代码示例
 """
 
-# Python example
+# Python 示例
 python_example = """
 import requests
 
@@ -493,7 +492,7 @@ result = response.json()
 print(f"Sentiment: {result['prediction']}, Confidence: {result['confidence']}")
 """
 
-# cURL example
+# cURL 示例
 curl_example = """
 # 1. Authenticate
 curl -X POST "https://api.example.com/token" \\
@@ -507,7 +506,7 @@ curl -X POST "https://api.example.com/api/v1/predict" \\
   -d '{"text": "This product is amazing!"}'
 """
 
-# JavaScript example
+# JavaScript 示例
 javascript_example = """
 // 1. Authenticate
 const authResponse = await fetch('https://api.example.com/token', {
@@ -536,28 +535,28 @@ console.log(`Sentiment: ${result.prediction}, Confidence: ${result.confidence}`)
 """
 ```
 
-## Part 6: Export OpenAPI Schema
+## 第六部分：导出 OpenAPI Schema
 
-**File: scripts/export_openapi.py**
+**文件：scripts/export_openapi.py**
 
 ```python
 """
-Export OpenAPI schema for client generation
+导出 OpenAPI schema 用于客户端生成
 """
 import json
 import yaml
 from app.main import app
 
-# Export as JSON
+# 导出为 JSON
 def export_json():
-    """Export OpenAPI schema as JSON"""
+    """将 OpenAPI schema 导出为 JSON"""
     with open('openapi.json', 'w') as f:
         json.dump(app.openapi(), f, indent=2)
     print("OpenAPI schema exported to openapi.json")
 
-# Export as YAML
+# 导出为 YAML
 def export_yaml():
-    """Export OpenAPI schema as YAML"""
+    """将 OpenAPI schema 导出为 YAML"""
     with open('openapi.yaml', 'w') as f:
         yaml.dump(app.openapi(), f, sort_keys=False)
     print("OpenAPI schema exported to openapi.yaml")
@@ -567,58 +566,58 @@ if __name__ == "__main__":
     export_yaml()
 ```
 
-**Run export:**
+**运行导出：**
 ```bash
 python scripts/export_openapi.py
 ```
 
-## Part 7: Generate Client SDKs
+## 第七部分：生成客户端 SDK
 
-### Using OpenAPI Generator
+### 使用 OpenAPI Generator
 
 ```bash
-# Install OpenAPI Generator
+# 安装 OpenAPI Generator
 npm install -g @openapitools/openapi-generator-cli
 
-# Generate Python client
+# 生成 Python 客户端
 openapi-generator-cli generate \
   -i openapi.json \
   -g python \
   -o clients/python-client
 
-# Generate JavaScript client
+# 生成 JavaScript 客户端
 openapi-generator-cli generate \
   -i openapi.json \
   -g javascript \
   -o clients/js-client
 
-# Generate Java client
+# 生成 Java 客户端
 openapi-generator-cli generate \
   -i openapi.json \
   -g java \
   -o clients/java-client
 ```
 
-### Test Generated Client
+### 测试生成的客户端
 
 ```python
-# Using auto-generated Python client
+# 使用自动生成的 Python 客户端
 from generated_client import ApiClient, PredictionsApi
 from generated_client.models import PredictionInput
 
-# Configure client
+# 配置客户端
 client = ApiClient(configuration)
 client.configuration.access_token = 'your_jwt_token'
 
-# Make prediction
+# 进行预测
 api = PredictionsApi(client)
 result = api.predict(PredictionInput(text="This is great!"))
 print(result.prediction)
 ```
 
-## Part 8: Documentation Testing
+## 第八部分：文档测试
 
-**File: tests/test_documentation.py**
+**文件：tests/test_documentation.py**
 
 ```python
 from fastapi.testclient import TestClient
@@ -627,7 +626,7 @@ from app.main import app
 client = TestClient(app)
 
 def test_openapi_schema():
-    """Test OpenAPI schema is generated"""
+    """测试 OpenAPI schema 已生成"""
     response = client.get("/openapi.json")
     assert response.status_code == 200
 
@@ -638,23 +637,23 @@ def test_openapi_schema():
     assert "components" in schema
 
 def test_swagger_docs_accessible():
-    """Test Swagger UI is accessible"""
+    """测试 Swagger UI 可访问"""
     response = client.get("/docs")
     assert response.status_code == 200
     assert "swagger" in response.text.lower()
 
 def test_redoc_accessible():
-    """Test ReDoc is accessible"""
+    """测试 ReDoc 可访问"""
     response = client.get("/redoc")
     assert response.status_code == 200
 
 def test_all_endpoints_documented():
-    """Test all endpoints have descriptions"""
+    """测试所有 endpoint 都有描述"""
     schema = client.get("/openapi.json").json()
 
     for path, methods in schema["paths"].items():
         for method, details in methods.items():
-            # Skip non-HTTP methods
+            # 跳过非 HTTP 方法
             if method not in ["get", "post", "put", "delete", "patch"]:
                 continue
 
@@ -662,12 +661,12 @@ def test_all_endpoints_documented():
                 f"Endpoint {method.upper()} {path} missing documentation"
 
 def test_models_have_examples():
-    """Test that models have examples in schema"""
+    """测试模型在 schema 中有示例"""
     schema = client.get("/openapi.json").json()
 
     if "components" in schema and "schemas" in schema["components"]:
         for model_name, model_schema in schema["components"]["schemas"].items():
-            # Check if example exists
+            # 检查是否存在示例
             has_example = (
                 "example" in model_schema or
                 ("properties" in model_schema and
@@ -676,7 +675,7 @@ def test_models_have_examples():
             print(f"{model_name}: has_example={has_example}")
 
 def test_security_scheme_documented():
-    """Test security scheme is documented"""
+    """测试安全方案已记录"""
     schema = client.get("/openapi.json").json()
 
     assert "components" in schema
@@ -684,46 +683,46 @@ def test_security_scheme_documented():
     assert "Bearer" in schema["components"]["securitySchemes"]
 ```
 
-## Deliverables
+## 交付物
 
-- ✅ Comprehensive endpoint documentation
-- ✅ Enhanced Pydantic models with examples
-- ✅ Organized tags and sections
-- ✅ Custom documentation pages
-- ✅ Exported OpenAPI schema (JSON/YAML)
-- ✅ Generated client SDKs
-- ✅ Documentation tests
+- ✅ 全面的 endpoint 文档
+- ✅ 带示例的增强 Pydantic 模型
+- ✅ 组织有序的标签和章节
+- ✅ 自定义文档页面
+- ✅ 导出的 OpenAPI schema (JSON/YAML)
+- ✅ 生成的客户端 SDK
+- ✅ 文档测试
 
-## Best Practices Checklist
+## 最佳实践清单
 
-- [ ] Every endpoint has a clear summary
-- [ ] Every endpoint has a detailed description
-- [ ] Every parameter has a description
-- [ ] All models have examples
-- [ ] Response codes are documented
-- [ ] Error responses are documented
-- [ ] Authentication is documented
-- [ ] Rate limits are documented
-- [ ] Code examples are provided
-- [ ] Changelog is maintained
+- [ ] 每个 endpoint 有清晰的摘要
+- [ ] 每个 endpoint 有详细的描述
+- [ ] 每个参数有描述
+- [ ] 所有模型有示例
+- [ ] 响应码已记录
+- [ ] 错误响应已记录
+- [ ] 认证已记录
+- [ ] 速率限制已记录
+- [ ] 提供了代码示例
+- [ ] 维护了变更日志
 
-## Key Takeaways
+## 关键要点
 
-1. **Auto-Generation:** FastAPI automatically generates OpenAPI docs
-2. **Customization:** Extensive customization through Pydantic and decorators
-3. **Examples:** Examples make APIs much easier to use
-4. **Client Generation:** OpenAPI schema enables automatic client generation
-5. **Testing:** Documentation should be tested like code
+1. **自动生成：** FastAPI 自动生成 OpenAPI 文档
+2. **自定义：** 通过 Pydantic 和装饰器进行广泛自定义
+3. **示例：** 示例使 API 更易于使用
+4. **客户端生成：** OpenAPI schema 支持自动客户端生成
+5. **测试：** 文档应像代码一样被测试
 
-## Next Steps
+## 下一步
 
-- Learn about API versioning strategies
-- Implement changelog tracking
-- Create interactive tutorials
-- Set up documentation site (Docusaurus, MkDocs)
+- 学习 API 版本化策略
+- 实现变更日志跟踪
+- 创建交互式教程
+- 搭建文档站点（Docusaurus、MkDocs）
 
 ---
 
-**Estimated Time:** 1-2 hours
-**Difficulty:** Beginner-Intermediate
-**Focus:** API documentation, OpenAPI, examples, client generation
+**预计时间：** 1-2 小时
+**难度：** 初级-中级
+**重点：** API 文档、OpenAPI、示例、客户端生成

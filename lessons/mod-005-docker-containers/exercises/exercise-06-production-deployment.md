@@ -2,88 +2,88 @@
 
 ## Exercise Overview
 
-**Objective**: Master production-ready Docker deployment patterns including security hardening, resource management, monitoring, logging, high availability, and CI/CD integration.
+**Objective**: 掌握生产就绪的 Docker 部署模式，包括安全加固、资源管理、监控、日志记录、高可用性和 CI/CD 集成。
 
-**Difficulty**: Advanced
-**Estimated Time**: 4-5 hours
+**Difficulty**: 高级
+**Estimated Time**: 4-5 小时
 **Prerequisites**:
-- Exercise 01-05 (All previous Docker exercises)
-- All Docker lectures
+- Exercise 01-05 (所有之前的 Docker 练习)
+- 所有 Docker 讲座
 
 **What You'll Learn**:
-- Production security best practices
-- Resource limits and quotas
-- Health checks and monitoring
-- Logging strategies
-- High availability patterns
-- Blue-green and canary deployments
-- CI/CD integration
-- Secret management
-- Multi-stage deployments
-- Rollback strategies
+- 生产安全最佳实践
+- 资源限制和配额
+- 健康检查和监控
+- 日志记录策略
+- 高可用模式
+- 蓝绿部署和金丝雀部署
+- CI/CD 集成
+- 密钥管理
+- 多阶段部署
+- 回滚策略
 
 ---
 
-## Part 1: Security Hardening
+## Part 1: 安全加固
 
-### Step 1.1: Non-Root User Pattern
+### Step 1.1: 非 Root 用户模式
 
 ```dockerfile
-# Create production-secure Dockerfile
+# 创建生产安全的 Dockerfile
 mkdir -p ~/docker-exercises/production
 cd ~/docker-exercises/production
 
 cat > Dockerfile.secure << 'EOF'
 FROM python:3.11-slim
 
-# Create non-root user
+# 创建非 root 用户
 RUN groupadd -r appuser && \
     useradd -r -g appuser -u 1000 -m -s /bin/bash appuser
 
-# Set working directory
+# 设置工作目录
 WORKDIR /app
 
-# Install dependencies as root
+# 以 root 身份安装依赖
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application files with correct ownership
+# 以正确所有权复制应用文件
 COPY --chown=appuser:appuser . .
 
-# Switch to non-root user
+# 切换到非 root 用户
 USER appuser
 
-# Run application
+# 运行应用
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
 EOF
 ```
 
-### Step 1.2: Minimal Attack Surface
+### Step 1.2: 最小化攻击面
 
 ```dockerfile
 cat > Dockerfile.minimal << 'EOF'
-# Multi-stage build
+# 多阶段构建
 FROM python:3.11 AS builder
 
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --user --no-cache-dir -r requirements.txt
 
-# Minimal runtime
+# 最小化运行时
 FROM python:3.11-slim
 
-# Install only runtime dependencies
+# 仅安装运行时依赖
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
+# 创建非 root 用户
 RUN groupadd -r appuser && useradd -r -g appuser -u 1000 appuser
 
 WORKDIR /app
 
-# Copy only necessary files
+# 仅复制必要文件
 COPY --from=builder /root/.local /home/appuser/.local
 COPY --chown=appuser:appuser app.py .
 
@@ -95,10 +95,10 @@ CMD ["python", "app.py"]
 EOF
 ```
 
-### Step 1.3: Security Scanning
+### Step 1.3: 安全扫描
 
 ```bash
-# Create simple app for testing
+# 创建用于测试的简单应用
 cat > app.py << 'EOF'
 from flask import Flask
 app = Flask(__name__)
@@ -116,18 +116,18 @@ flask==3.0.0
 gunicorn==21.2.0
 EOF
 
-# Build image
+# 构建 image
 docker build -f Dockerfile.secure -t myapp:secure .
 
-# Scan for vulnerabilities (using Docker Scout or Trivy)
+# 扫描漏洞（使用 Docker Scout 或 Trivy）
 # docker scout cves myapp:secure
 
-# Or use Trivy
+# 或使用 Trivy
 # docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
 #   aquasec/trivy image myapp:secure
 ```
 
-### Step 1.4: Read-Only Root Filesystem
+### Step 1.4: 只读根文件系统
 
 ```yaml
 cat > docker-compose-readonly.yml << 'EOF'
@@ -138,31 +138,31 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.secure
-    read_only: true  # Root filesystem is read-only
+    read_only: true  # 根文件系统只读
     tmpfs:
-      - /tmp  # Writable temporary directory
+      - /tmp  # 可写临时目录
       - /var/run
     volumes:
-      - app-data:/app/data  # Writable data directory
+      - app-data:/app/data  # 可写数据目录
     security_opt:
-      - no-new-privileges:true  # Prevent privilege escalation
+      - no-new-privileges:true  # 防止权限提升
     cap_drop:
-      - ALL  # Drop all capabilities
+      - ALL  # 删除所有能力
     cap_add:
-      - NET_BIND_SERVICE  # Only add necessary capabilities
+      - NET_BIND_SERVICE  # 仅添加必要的能力
 
 volumes:
   app-data:
 EOF
 ```
 
-✅ **Checkpoint**: You can implement security hardening for containers.
+✅ **Checkpoint**: 你可以为 container 实现安全加固。
 
 ---
 
-## Part 2: Resource Management
+## Part 2: 资源管理
 
-### Step 2.1: CPU and Memory Limits
+### Step 2.1: CPU 和内存限制
 
 ```yaml
 cat > docker-compose-resources.yml << 'EOF'
@@ -174,11 +174,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'  # Max 50% of one CPU
-          memory: 512M  # Max 512MB RAM
+          cpus: '0.5'  # 最多 50% 的 CPU
+          memory: 512M  # 最多 512MB RAM
         reservations:
-          cpus: '0.25'  # Guaranteed 25% CPU
-          memory: 256M  # Guaranteed 256MB RAM
+          cpus: '0.25'  # 保证 25% CPU
+          memory: 256M  # 保证 256MB RAM
     restart: always
 
   api:
@@ -213,16 +213,16 @@ volumes:
 EOF
 ```
 
-### Step 2.2: Testing Resource Limits
+### Step 2.2: 测试资源限制
 
 ```bash
-# Start with resource limits
+# 启动带资源限制的 compose
 docker compose -f docker-compose-resources.yml up -d
 
-# Monitor resource usage
+# 监控资源使用
 docker stats
 
-# Test memory limit
+# 测试内存限制
 docker run -d \
   --name memory-test \
   --memory="100m" \
@@ -230,49 +230,49 @@ docker run -d \
   progrium/stress \
   --vm 1 --vm-bytes 150M
 
-# Container should be killed (OOM)
+# Container 应被杀死（OOM）
 docker logs memory-test
 docker ps -a | grep memory-test
 
-# Test CPU limit
+# 测试 CPU 限制
 docker run -d \
   --name cpu-test \
   --cpus="0.5" \
   progrium/stress \
   --cpu 2
 
-# Check CPU usage (should not exceed 50%)
+# 检查 CPU 使用（不应超过 50%）
 docker stats cpu-test
 
-# Cleanup
+# 清理
 docker rm -f memory-test cpu-test
 docker compose -f docker-compose-resources.yml down
 ```
 
-### Step 2.3: Disk I/O Limits
+### Step 2.3: 磁盘 I/O 限制
 
 ```bash
-# Limit disk I/O
+# 限制磁盘 I/O
 docker run -d \
   --name io-test \
   --device-read-bps /dev/sda:1mb \
   --device-write-bps /dev/sda:1mb \
   alpine sh -c "while true; do dd if=/dev/zero of=/tmp/test bs=1M count=10; done"
 
-# Monitor I/O
+# 监控 I/O
 docker stats io-test
 
-# Cleanup
+# 清理
 docker rm -f io-test
 ```
 
-✅ **Checkpoint**: You can configure and enforce resource limits.
+✅ **Checkpoint**: 你可以配置和实施资源限制。
 
 ---
 
-## Part 3: Health Checks and Monitoring
+## Part 3: 健康检查和监控
 
-### Step 3.1: Comprehensive Health Checks
+### Step 3.1: 全面的健康检查
 
 ```dockerfile
 cat > Dockerfile.health << 'EOF'
@@ -282,11 +282,11 @@ WORKDIR /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt && \
-    pip install requests  # For health check
+    pip install requests  # 用于健康检查
 
 COPY app.py health_check.py ./
 
-# Comprehensive health check
+# 全面的健康检查
 HEALTHCHECK --interval=30s \
             --timeout=10s \
             --start-period=40s \
@@ -303,7 +303,7 @@ import requests
 import psutil
 
 def check_app_health():
-    """Check if application is responding"""
+    """检查应用是否响应"""
     try:
         r = requests.get('http://localhost:8000/health', timeout=5)
         return r.status_code == 200
@@ -311,20 +311,20 @@ def check_app_health():
         return False
 
 def check_system_health():
-    """Check system resources"""
-    # Check CPU usage
+    """检查系统资源"""
+    # 检查 CPU 使用
     cpu = psutil.cpu_percent(interval=1)
     if cpu > 90:
         print(f"High CPU usage: {cpu}%")
         return False
 
-    # Check memory usage
+    # 检查内存使用
     memory = psutil.virtual_memory()
     if memory.percent > 90:
         print(f"High memory usage: {memory.percent}%")
         return False
 
-    # Check disk usage
+    # 检查磁盘使用
     disk = psutil.disk_usage('/')
     if disk.percent > 90:
         print(f"High disk usage: {disk.percent}%")
@@ -345,7 +345,7 @@ if __name__ == '__main__':
 EOF
 ```
 
-### Step 3.2: Docker Compose Health Checks
+### Step 3.2: Docker Compose 健康检查
 
 ```yaml
 cat > docker-compose-health.yml << 'EOF'
@@ -395,14 +395,14 @@ volumes:
 EOF
 ```
 
-### Step 3.3: Monitoring with Prometheus
+### Step 3.3: 使用 Prometheus 监控
 
 ```yaml
 cat > docker-compose-monitoring.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Application with metrics endpoint
+  # 带指标端点的应用
   app:
     build: .
     ports:
@@ -439,7 +439,7 @@ services:
     depends_on:
       - prometheus
 
-  # Node exporter for system metrics
+  # 用于系统指标的 Node exporter
   node-exporter:
     image: prom/node-exporter:latest
     ports:
@@ -478,20 +478,20 @@ scrape_configs:
 EOF
 ```
 
-✅ **Checkpoint**: You can implement health checks and monitoring.
+✅ **Checkpoint**: 你可以实现健康检查和监控。
 
 ---
 
-## Part 4: Logging Strategies
+## Part 4: 日志记录策略
 
-### Step 4.1: Centralized Logging
+### Step 4.1: 集中式日志记录
 
 ```yaml
 cat > docker-compose-logging.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Application
+  # 应用
   app:
     build: .
     logging:
@@ -534,7 +534,7 @@ services:
     depends_on:
       - elasticsearch
 
-  # Filebeat for log collection
+  # 用于日志收集的 Filebeat
   filebeat:
     image: docker.elastic.co/beats/filebeat:8.10.0
     user: root
@@ -551,7 +551,7 @@ volumes:
 EOF
 ```
 
-### Step 4.2: Structured Logging
+### Step 4.2: 结构化日志记录
 
 ```python
 cat > logging_app.py << 'EOF'
@@ -562,7 +562,7 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
-# Structured logging
+# 结构化日志记录
 class JSONFormatter(logging.Formatter):
     def format(self, record):
         log_obj = {
@@ -600,7 +600,7 @@ if __name__ == '__main__':
 EOF
 ```
 
-### Step 4.3: Log Aggregation Pattern
+### Step 4.3: 日志聚合模式
 
 ```yaml
 cat > docker-compose-fluentd.yml << 'EOF'
@@ -629,20 +629,20 @@ volumes:
 EOF
 ```
 
-✅ **Checkpoint**: You can implement production logging strategies.
+✅ **Checkpoint**: 你可以实现生产日志记录策略。
 
 ---
 
-## Part 5: High Availability Patterns
+## Part 5: 高可用模式
 
-### Step 5.1: Replica Management
+### Step 5.1: 副本管理
 
 ```yaml
 cat > docker-compose-ha.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Load balancer
+  # 负载均衡器
   nginx:
     image: nginx:alpine
     ports:
@@ -652,13 +652,13 @@ services:
     depends_on:
       - app
 
-  # Application with multiple replicas
+  # 带多个副本的应用
   app:
     build: .
     deploy:
       replicas: 3
       update_config:
-        parallelism: 1  # Update one at a time
+        parallelism: 1  # 一次更新一个
         delay: 10s
         failure_action: rollback
       restart_policy:
@@ -672,7 +672,7 @@ services:
       timeout: 10s
       retries: 3
 
-  # Database with replication
+  # 带复制的数据库
   db-primary:
     image: postgres:15
     environment:
@@ -702,7 +702,7 @@ volumes:
 EOF
 ```
 
-### Step 5.2: Automatic Failover
+### Step 5.2: 自动故障转移
 
 ```yaml
 cat > docker-compose-failover.yml << 'EOF'
@@ -714,7 +714,7 @@ services:
     deploy:
       replicas: 3
       placement:
-        max_replicas_per_node: 1  # Spread across nodes
+        max_replicas_per_node: 1  # 跨节点分布
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
@@ -723,7 +723,7 @@ services:
       start_period: 40s
     restart: always
 
-  # Redis with Sentinel for automatic failover
+  # 带 Sentinel 自动故障转移的 Redis
   redis-master:
     image: redis:7-alpine
     command: redis-server --appendonly yes
@@ -751,13 +751,13 @@ services:
 EOF
 ```
 
-✅ **Checkpoint**: You can implement high availability patterns.
+✅ **Checkpoint**: 你可以实现高可用模式。
 
 ---
 
-## Part 6: Deployment Strategies
+## Part 6: 部署策略
 
-### Step 6.1: Blue-Green Deployment
+### Step 6.1: 蓝绿部署
 
 ```yaml
 cat > docker-compose-bluegreen.yml << 'EOF'
@@ -773,7 +773,7 @@ services:
     environment:
       - ACTIVE_ENV=${ACTIVE_ENV:-blue}
 
-  # Blue environment (current production)
+  # 蓝色环境（当前生产环境）
   app-blue:
     build:
       context: .
@@ -784,7 +784,7 @@ services:
     deploy:
       replicas: 3
 
-  # Green environment (new version)
+  # 绿色环境（新版本）
   app-green:
     build:
       context: .
@@ -796,7 +796,7 @@ services:
       replicas: 3
 EOF
 
-# Nginx configuration for blue-green
+# 蓝绿部署的 Nginx 配置
 cat > nginx-bluegreen.conf << 'EOF'
 events {
     worker_connections 1024;
@@ -811,9 +811,9 @@ http {
         server app-green:8000;
     }
 
-    # Switch between blue and green
+    # 在蓝色和绿色之间切换
     map $http_upgrade $backend {
-        default blue;  # Change to 'green' to switch
+        default blue;  # 改为 'green' 以切换
     }
 
     server {
@@ -829,24 +829,24 @@ EOF
 ```
 
 ```bash
-# Deploy blue (current)
+# 部署蓝色（当前）
 ACTIVE_ENV=blue docker compose -f docker-compose-bluegreen.yml up -d app-blue
 
-# Deploy green (new version) alongside blue
+# 在蓝色旁边部署绿色（新版本）
 docker compose -f docker-compose-bluegreen.yml up -d app-green
 
-# Test green environment
+# 测试绿色环境
 curl -H "Host: green.example.com" http://localhost/
 
-# Switch traffic to green (update nginx config)
-# Then reload nginx
+# 将流量切换到绿色（更新 nginx 配置）
+# 然后重新加载 nginx
 docker compose -f docker-compose-bluegreen.yml exec nginx nginx -s reload
 
-# If successful, remove blue
-# If failed, switch back to blue
+# 如果成功，删除蓝色
+# 如果失败，切换回蓝色
 ```
 
-### Step 6.2: Canary Deployment
+### Step 6.2: 金丝雀部署
 
 ```yaml
 cat > docker-compose-canary.yml << 'EOF'
@@ -860,7 +860,7 @@ services:
     volumes:
       - ./nginx-canary.conf:/etc/nginx/nginx.conf
 
-  # Stable version (90% traffic)
+  # 稳定版本（90% 流量）
   app-stable:
     build:
       context: .
@@ -871,7 +871,7 @@ services:
     environment:
       - VERSION=stable
 
-  # Canary version (10% traffic)
+  # 金丝雀版本（10% 流量）
   app-canary:
     build:
       context: .
@@ -890,9 +890,9 @@ events {
 
 http {
     upstream backend {
-        # 90% to stable
+        # 90% 到 stable
         server app-stable:8000 weight=9;
-        # 10% to canary
+        # 10% 到 canary
         server app-canary:8000 weight=1;
     }
 
@@ -903,7 +903,7 @@ http {
             proxy_pass http://backend;
             proxy_set_header Host $host;
 
-            # Add header to identify version
+            # 添加标头以标识版本
             add_header X-App-Version $upstream_addr;
         }
     }
@@ -911,7 +911,7 @@ http {
 EOF
 ```
 
-### Step 6.3: Rolling Updates
+### Step 6.3: 滚动更新
 
 ```yaml
 cat > docker-compose-rolling.yml << 'EOF'
@@ -923,12 +923,12 @@ services:
     deploy:
       replicas: 6
       update_config:
-        parallelism: 2  # Update 2 at a time
-        delay: 10s  # Wait 10s between batches
-        failure_action: rollback  # Rollback on failure
-        monitor: 30s  # Monitor for 30s
-        max_failure_ratio: 0.3  # Rollback if >30% fail
-        order: start-first  # Start new before stopping old
+        parallelism: 2  # 一次更新 2 个
+        delay: 10s  # 批次之间等待 10s
+        failure_action: rollback  # 失败时回滚
+        monitor: 30s  # 监控 30 秒
+        max_failure_ratio: 0.3  # 如果 >30% 失败则回滚
+        order: start-first  # 先启动新的，再停止旧的
       rollback_config:
         parallelism: 2
         delay: 5s
@@ -947,34 +947,34 @@ EOF
 ```
 
 ```bash
-# Initial deployment
+# 初始部署
 docker compose -f docker-compose-rolling.yml up -d
 
-# Update to new version
+# 更新到新版本
 docker compose -f docker-compose-rolling.yml build
 docker compose -f docker-compose-rolling.yml up -d --no-deps --build app
 
-# Monitor rolling update
+# 监控滚动更新
 watch docker compose -f docker-compose-rolling.yml ps
 ```
 
-✅ **Checkpoint**: You can implement various deployment strategies.
+✅ **Checkpoint**: 你可以实现各种部署策略。
 
 ---
 
-## Part 7: Secret Management
+## Part 7: 密钥管理
 
 ### Step 7.1: Docker Secrets
 
 ```bash
-# Create secrets
+# 创建密钥
 echo "db_password_secret" | docker secret create db_password -
 echo "api_key_secret" | docker secret create api_key -
 
-# List secrets
+# 列出密钥
 docker secret ls
 
-# Use in Docker Compose
+# 在 Docker Compose 中使用
 cat > docker-compose-secrets.yml << 'EOF'
 version: '3.8'
 
@@ -1003,7 +1003,7 @@ secrets:
 EOF
 ```
 
-### Step 7.2: Environment-Specific Secrets
+### Step 7.2: 环境特定密钥
 
 ```yaml
 cat > docker-compose-env-secrets.yml << 'EOF'
@@ -1015,7 +1015,7 @@ services:
     secrets:
       - source: db_password
         target: /run/secrets/db_password
-        mode: 0400  # Read-only for owner
+        mode: 0400  # 仅所有者只读
     environment:
       - ENVIRONMENT=${ENVIRONMENT:-production}
 
@@ -1026,18 +1026,18 @@ EOF
 ```
 
 ```bash
-# Create secrets directory structure
+# 创建密钥目录结构
 mkdir -p secrets/development secrets/production
 
 echo "dev_password" > secrets/development/db_password.txt
 echo "prod_password" > secrets/production/db_password.txt
 
-# Run with different environments
+# 使用不同环境运行
 ENVIRONMENT=development docker compose -f docker-compose-env-secrets.yml up -d
 ENVIRONMENT=production docker compose -f docker-compose-env-secrets.yml up -d
 ```
 
-### Step 7.3: Vault Integration (Conceptual)
+### Step 7.3: Vault 集成（概念）
 
 ```python
 # app_with_vault.py
@@ -1048,13 +1048,13 @@ from flask import Flask
 
 app = Flask(__name__)
 
-# Initialize Vault client
+# 初始化 Vault 客户端
 vault_client = hvac.Client(
     url=os.environ.get('VAULT_ADDR', 'http://vault:8200'),
     token=os.environ.get('VAULT_TOKEN')
 )
 
-# Read secrets from Vault
+# 从 Vault 读取密钥
 def get_secret(path):
     try:
         secret = vault_client.secrets.kv.v2.read_secret_version(path=path)
@@ -1063,7 +1063,7 @@ def get_secret(path):
         print(f"Error reading secret: {e}")
         return None
 
-# Use secrets
+# 使用密钥
 db_credentials = get_secret('database/credentials')
 api_keys = get_secret('api/keys')
 
@@ -1076,13 +1076,13 @@ if __name__ == '__main__':
 EOF
 ```
 
-✅ **Checkpoint**: You can manage secrets securely.
+✅ **Checkpoint**: 你可以安全地管理密钥。
 
 ---
 
-## Part 8: CI/CD Integration
+## Part 8: CI/CD 集成
 
-### Step 8.1: GitHub Actions Workflow
+### Step 8.1: GitHub Actions 工作流
 
 ```yaml
 # .github/workflows/docker-deploy.yml
@@ -1162,7 +1162,7 @@ jobs:
     steps:
       - name: Deploy to production
         run: |
-          # SSH to server and update containers
+          # SSH 到服务器并更新 container
           # docker-compose pull
           # docker-compose up -d
           echo "Deploy step would go here"
@@ -1213,10 +1213,10 @@ deploy_production:
 EOF
 ```
 
-### Step 8.3: Automated Testing
+### Step 8.3: 自动化测试
 
 ```bash
-# create test script
+# 创建测试脚本
 cat > test-deployment.sh << 'EOF'
 #!/bin/bash
 
@@ -1224,24 +1224,24 @@ set -e
 
 echo "Starting deployment tests..."
 
-# Build image
+# 构建 image
 docker build -t myapp:test .
 
-# Start services
+# 启动服务
 docker compose -f docker-compose.test.yml up -d
 
-# Wait for services to be healthy
+# 等待服务健康
 echo "Waiting for services..."
 timeout 60 sh -c 'until docker compose -f docker-compose.test.yml ps | grep -q healthy; do sleep 2; done'
 
-# Run integration tests
+# 运行集成测试
 docker compose -f docker-compose.test.yml exec -T app pytest tests/integration/
 
-# Run smoke tests
+# 运行冒烟测试
 curl -f http://localhost:8000/health || exit 1
 curl -f http://localhost:8000/api/status || exit 1
 
-# Cleanup
+# 清理
 docker compose -f docker-compose.test.yml down -v
 
 echo "All tests passed!"
@@ -1250,20 +1250,20 @@ EOF
 chmod +x test-deployment.sh
 ```
 
-✅ **Checkpoint**: You can integrate Docker with CI/CD pipelines.
+✅ **Checkpoint**: 你可以将 Docker 与 CI/CD pipeline 集成。
 
 ---
 
-## Part 9: Complete Production Stack
+## Part 9: 完整生产栈
 
-### Step 9.1: Full Production Configuration
+### Step 9.1: 完整生产配置
 
 ```yaml
 cat > docker-compose.production.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Reverse proxy
+  # 反向代理
   nginx:
     image: nginx:alpine
     ports:
@@ -1282,7 +1282,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # Application
+  # 应用
   app:
     build:
       context: .
@@ -1332,7 +1332,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # Database
+  # 数据库
   db:
     image: postgres:15
     secrets:
@@ -1359,7 +1359,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # Cache
+  # 缓存
   redis:
     image: redis:7-alpine
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
@@ -1377,7 +1377,7 @@ services:
       retries: 5
     restart: always
 
-  # Monitoring
+  # 监控
   prometheus:
     image: prom/prometheus:latest
     ports:
@@ -1435,34 +1435,34 @@ networks:
 EOF
 ```
 
-✅ **Checkpoint**: You can deploy a complete production stack.
+✅ **Checkpoint**: 你可以部署完整的生产栈。
 
 ---
 
 ## Summary
 
 **What You Accomplished**:
-✅ Implemented security hardening
-✅ Configured resource limits
-✅ Set up health checks and monitoring
-✅ Implemented centralized logging
-✅ Built high availability patterns
-✅ Mastered deployment strategies
-✅ Managed secrets securely
-✅ Integrated with CI/CD
-✅ Deployed complete production stacks
+✅ 实现了安全加固
+✅ 配置了资源限制
+✅ 设置了健康检查和监控
+✅ 实现了集中式日志记录
+✅ 构建了高可用模式
+✅ 掌握了部署策略
+✅ 安全地管理了密钥
+✅ 集成了 CI/CD
+✅ 部署了完整生产栈
 
 **Production Checklist**:
-- [x] Non-root users
-- [x] Read-only filesystems
-- [x] Resource limits
-- [x] Health checks
-- [x] Logging configured
-- [x] Monitoring enabled
-- [x] Secrets management
-- [x] High availability
-- [x] Automated deployments
-- [x] Rollback strategy
+- [x] 非 root 用户
+- [x] 只读文件系统
+- [x] 资源限制
+- [x] 健康检查
+- [x] 日志配置
+- [x] 监控启用
+- [x] 密钥管理
+- [x] 高可用
+- [x] 自动化部署
+- [x] 回滚策略
 
 ---
 
@@ -1470,11 +1470,11 @@ EOF
 
 **Continue Learning**:
 - **Exercise 07**: Complete ML Application Containerization
-- **Module Quiz**: Test your Docker knowledge
+- **Module Quiz**: 测试你的 Docker 知识
 
 ---
 
 **Exercise Version**: 1.0
 **Last Updated**: October 2025
-**Estimated Time**: 4-5 hours
-**Difficulty**: Advanced
+**Estimated Time**: 4-5 小时
+**Difficulty**: 高级

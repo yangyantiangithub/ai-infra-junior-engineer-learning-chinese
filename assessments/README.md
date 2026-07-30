@@ -1,263 +1,263 @@
-# Assessment Overview
+# 评估概览
 
-## Purpose
+## 目的
 
-Assessments in this curriculum serve multiple purposes:
-- **Self-evaluation**: Gauge your understanding and identify knowledge gaps
-- **Progress tracking**: Measure advancement through the curriculum
-- **Job readiness**: Validate skills against industry expectations
-- **Portfolio building**: Generate artifacts demonstrating competency
+本课程中的评估有多重目的：
+- **自我评估**：衡量你的理解程度并发现知识盲区
+- **进度追踪**：衡量在课程中的学习进展
+- **就业准备**：根据行业期望验证技能
+- **作品集构建**：生成展示能力的成果
 
-## Assessment Types
+## 评估类型
 
-### 1. Prerequisites Quiz
-**File**: `quizzes/prerequisites-quiz.md`
+### 1. 先决条件测验
+**文件**：`quizzes/prerequisites-quiz.md`
 
-- **When to take**: Before starting the curriculum
-- **Duration**: 30 minutes
-- **Questions**: 20 multiple-choice and short-answer
-- **Passing score**: 70%
-- **Purpose**: Verify foundational knowledge in Python, Linux, and basic CS concepts
+- **何时进行**：开始课程之前
+- **时长**：30 分钟
+- **题数**：20 道选择题和简答题
+- **及格分数**：70%
+- **目的**：验证 Python、Linux 和基础 CS 概念方面的基础知识
 
-**Topics covered**:
-- Python fundamentals
-- Linux command line
-- Basic networking
-- Version control (Git)
-- Database basics
+**涵盖主题**：
+- Python 基础
+- Linux 命令行
+- 基础网络
+- 版本控制 (Git)
+- 数据库基础
 
-### 2. Module Quizzes
-**Location**: Within each lesson module
+### 2. 模块测验
+**位置**：每个课程模块内
 
-- **When to take**: After completing each module
-- **Duration**: 15-20 minutes each
-- **Questions**: 10-15 per quiz
-- **Passing score**: 75%
-- **Purpose**: Reinforce learning and identify areas needing review
+- **何时进行**：完成每个模块后
+- **时长**：每次 15-20 分钟
+- **题数**：每次 10-15 道
+- **及格分数**：75%
+- **目的**：巩固学习成果，发现需要复习的领域
 
-### 3. Project Rubrics
-**File**: `rubrics/project-rubrics.md`
+### 3. 项目评分标准
+**文件**：`rubrics/project-rubrics.md`
 
-- **Application**: All 5 hands-on projects
-- **Scoring dimensions**:
-  - Functionality (40%)
-  - Code quality (25%)
-  - Documentation (20%)
-  - Best practices (15%)
-- **Purpose**: Provide clear expectations and self-assessment criteria
+- **适用范围**：全部 5 个动手项目
+- **评分维度**：
+  - 功能性 (40%)
+  - 代码质量 (25%)
+  - 文档 (20%)
+  - 最佳实践 (15%)
+- **目的**：提供明确的期望和自我评估标准
 
-### 4. Practical Exams
+### 4. 实践考试
 
-#### Midterm Practical Exam
-**File**: `practical-exams/midterm-practical.md`
+#### 期中实践考试
+**文件**：`practical-exams/midterm-practical.md`
 
-- **When to take**: After completing Projects 1-2 and Modules 1-2
-- **Duration**: 3 hours
-- **Format**: Hands-on coding and deployment tasks
-- **Passing score**: 75%
-- **Topics**:
-  - Docker containerization
-  - Basic model deployment
-  - Simple monitoring setup
-  - Troubleshooting common issues
+- **何时进行**：完成项目 1-2 和模块 1-2 后
+- **时长**：3 小时
+- **形式**：动手编码和部署任务
+- **及格分数**：75%
+- **主题**：
+  - Docker 容器化
+  - 基础模型部署
+  - 简单监控搭建
+  - 常见问题排查
 
-#### Final Practical Exam
-**File**: `practical-exams/final-practical.md`
+#### 期末实践考试
+**文件**：`practical-exams/final-practical.md`
 
-- **When to take**: After completing all modules and projects
-- **Duration**: 4 hours
-- **Format**: Comprehensive capstone project
-- **Passing score**: 80%
-- **Topics**:
-  - End-to-end ML system deployment
-  - Multi-container orchestration
-  - Monitoring and logging
-  - Documentation and presentation
+- **何时进行**：完成所有模块和项目后
+- **时长**：4 小时
+- **形式**：综合顶点项目
+- **及格分数**：80%
+- **主题**：
+  - 端到端 ML 系统部署
+  - 多容器编排
+  - 监控与日志记录
+  - 文档与演示
 
-## Assessment Schedule
+## 评估时间表
 
-### Recommended Timeline (12-Week Program)
+### 建议时间线（12 周制）
 
 ```
-Week 1:  Prerequisites Quiz
-Week 2:  Module 1 Quiz
-Week 3:  Project 1 Submission
-Week 4:  Module 2 Quiz
-Week 5:  Project 2 Submission
-Week 6:  Midterm Practical Exam
-Week 7:  Module 3 Quiz
-Week 8:  Project 3 Submission
-Week 9:  Module 4 Quiz
-Week 10: Projects 4-5 Submission
-Week 11: Review and practice
-Week 12: Final Practical Exam
+第 1 周：  先决条件测验
+第 2 周：  模块 1 测验
+第 3 周：  项目 1 提交
+第 4 周：  模块 2 测验
+第 5 周：  项目 2 提交
+第 6 周：  期中实践考试
+第 7 周：  模块 3 测验
+第 8 周：  项目 3 提交
+第 9 周：  模块 4 测验
+第 10 周： 项目 4-5 提交
+第 11 周： 复习与实践
+第 12 周： 期末实践考试
 ```
 
-### Self-Paced Timeline
+### 自定进度时间线
 
-For self-paced learners, take assessments when you feel confident with the material:
-1. Complete all lessons in a module
-2. Practice with exercises
-3. Take the module quiz
-4. If score < 75%, review weak areas and retake
-5. Move to next module or project
+对于自定进度的学习者，在自信掌握材料后再进行评估：
+1. 完成模块中的所有课程
+2. 通过练习进行实践
+3. 参加模块测验
+4. 如果分数 < 75%，复习薄弱环节并重考
+5. 进入下一个模块或项目
 
-## Grading Scale
+## 评分等级
 
-### Percentage to Letter Grade
-- **A (90-100%)**: Exceeds expectations, ready for next level
-- **B (80-89%)**: Meets expectations, minor improvements needed
-- **C (70-79%)**: Approaching expectations, review recommended
-- **D (60-69%)**: Below expectations, significant review needed
-- **F (<60%)**: Does not meet minimum standards, restart recommended
+### 百分比转字母等级
+- **A (90-100%)**：超出预期，已准备好进入下一阶段
+- **B (80-89%)**：符合预期，需小幅改进
+- **C (70-79%)**：接近预期，建议复习
+- **D (60-69%)**：低于预期，需大幅复习
+- **F (<60%)**：未达到最低标准，建议重新开始
 
-### Project Rubric Scoring
-Each criterion is scored 1-5:
-- **5 - Exceptional**: Exceeds industry standards
-- **4 - Proficient**: Meets professional standards
-- **3 - Adequate**: Meets basic requirements
-- **2 - Developing**: Partially meets requirements
-- **1 - Insufficient**: Does not meet requirements
+### 项目评分标准
+每个标准评分 1-5 分：
+- **5 - 卓越**：超出行业标准
+- **4 - 精通**：达到专业标准
+- **3 - 合格**：满足基本要求
+- **2 - 发展中**：部分满足要求
+- **1 - 不足**：未达到要求
 
-## Self-Assessment Guidelines
+## 自我评估指南
 
-### Before Taking Assessments
+### 评估之前
 
-1. **Review materials**: Go through lecture notes and exercises
-2. **Complete all exercises**: Don't skip hands-on practice
-3. **Test your projects**: Ensure everything runs correctly
-4. **Read documentation**: Review official docs for tools covered
+1. **复习材料**：浏览课程笔记和练习
+2. **完成所有练习**：不要跳过动手实践
+3. **测试你的项目**：确保一切正常运行
+4. **阅读文档**：查阅所涉及工具的官方文档
 
-### During Assessments
+### 评估期间
 
-1. **Read carefully**: Understand what's being asked
-2. **Manage time**: Allocate time based on point values
-3. **Show your work**: Include comments and explanations
-4. **Test thoroughly**: Verify your solutions work as expected
+1. **仔细阅读**：理解题目要求
+2. **管理时间**：根据分值分配时间
+3. **展示你的工作**：包含注释和说明
+4. **全面测试**：验证你的解决方案按预期工作
 
-### After Assessments
+### 评估之后
 
-1. **Review mistakes**: Understand why answers were incorrect
-2. **Fill gaps**: Revisit topics where you scored poorly
-3. **Practice more**: Work on additional exercises if needed
-4. **Seek help**: Use community resources for difficult concepts
+1. **回顾错误**：理解答案错误的原因
+2. **填补空白**：重新学习得分较低的主题
+3. **多加练习**：必要时做额外练习
+4. **寻求帮助**：针对困难概念使用社区资源
 
-## Retake Policy
+## 重考政策
 
-### Quizzes
-- **Unlimited retakes** allowed
-- Must wait **24 hours** between attempts
-- Review incorrect answers before retaking
-- Track improvement over time
+### 测验
+- **不限重考次数**
+- 两次尝试之间必须等待 **24 小时**
+- 重考前复习错误答案
+- 追踪进步情况
 
-### Practical Exams
-- **Up to 3 attempts** recommended
-- Wait **1 week** between attempts
-- Use failed attempts as learning opportunities
-- Focus review on weak areas identified
+### 实践考试
+- 建议最多 **3 次**尝试
+- 两次尝试之间等待 **1 周**
+- 将失败的尝试作为学习机会
+- 有针对性地复习发现的薄弱环节
 
-### Projects
-- **Resubmit until passing** (75%+)
-- Address feedback from previous submission
-- Document improvements made
-- No time limits between resubmissions
+### 项目
+- **可重新提交直到通过**（75%+）
+- 针对上次提交的反馈进行改进
+- 记录所做的改进
+- 重新提交无时间限制
 
-## Portfolio Development
+## 作品集开发
 
-Use assessments to build your professional portfolio:
+利用评估成果构建专业作品集：
 
-### What to Include
-1. **Completed projects** with documentation
-2. **High-scoring practical exam** submissions
-3. **Quiz results** showing progression
-4. **Reflection documents** on learning journey
+### 包含的内容
+1. **已完成的项目**及文档
+2. **高分实践考试**的提交成果
+3. **测验结果**展示学习进展
+4. **学习历程反思**文档
 
-### How to Present
-- Create GitHub repository with best work
-- Write README explaining each project
-- Include screenshots and demos
-- Document challenges overcome
+### 如何展示
+- 创建包含最佳作品的 GitHub 仓库
+- 编写 README 解释每个项目
+- 包含截图和演示
+- 记录克服的挑战
 
-## Feedback and Continuous Improvement
+## 反馈与持续改进
 
-### Self-Evaluation Questions
-After each assessment, reflect on:
-- What concepts did I find easiest?
-- What topics need more practice?
-- How effective was my study approach?
-- What would I do differently next time?
+### 自我评估问题
+每次评估后，反思以下问题：
+- 哪些概念对我来说最容易？
+- 哪些主题需要更多练习？
+- 我的学习方法效果如何？
+- 下次我会采取什么不同的做法？
 
-### Tracking Progress
-Use the progress tracking templates in `/progress/`:
-- Overall curriculum progress
-- Module completion status
-- Project assessment scores
-- Skills mastery checklist
+### 进度追踪
+使用 `/progress/` 中的进度追踪模板：
+- 整体课程进度
+- 模块完成状态
+- 项目评估分数
+- 技能掌握清单
 
-## Additional Resources
+## 其他资源
 
-### Study Tips
-- **Spaced repetition**: Review material over multiple days
-- **Active recall**: Test yourself without looking at notes
-- **Practice projects**: Build variations of assignment projects
-- **Teach others**: Explain concepts to solidify understanding
+### 学习建议
+- **间隔重复**：在多天内复习材料
+- **主动回忆**：不看笔记进行自我测试
+- **实践项目**：构建作业项目的变体
+- **教给别人**：讲解概念以巩固理解
 
-### Assessment Preparation
-- **Create study guides**: Summarize key concepts
-- **Form study groups**: Collaborate with other learners
-- **Use flashcards**: For terminology and commands
-- **Mock exams**: Practice under timed conditions
+### 备考建议
+- **制作学习指南**：总结关键概念
+- **组建学习小组**：与其他学习者协作
+- **使用闪卡**：记忆术语和命令
+- **模拟考试**：在计时条件下练习
 
-## Getting Help
+## 获取帮助
 
-If you're struggling with assessments:
+如果在评估中遇到困难：
 
-1. **Review lesson materials**: Start with the basics
-2. **Check FAQ**: See `community/FAQ.md`
-3. **Study groups**: Join or form groups (see `community/study-groups.md`)
-4. **Office hours**: Attend virtual sessions (see `community/office-hours.md`)
-5. **Online communities**: Stack Overflow, Reddit, Discord
+1. **复习课程材料**：从基础开始
+2. **查看 FAQ**：见 `community/FAQ.md`
+3. **学习小组**：加入或组建小组（见 `community/study-groups.md`）
+4. **答疑时间**：参加虚拟会议（见 `community/office-hours.md`）
+5. **在线社区**：Stack Overflow、Reddit、Discord
 
-## Academic Integrity
+## 学术诚信
 
-### Expectations
-- Complete assessments independently
-- Use projects as learning exercises, not just for grades
-- Don't share quiz answers or exam solutions
-- Cite all external resources used in projects
+### 期望
+- 独立完成评估
+- 将项目视为学习练习，而不仅是为分数
+- 不要分享测验答案或考试解答
+- 引用项目中使用的所有外部资源
 
-### Allowed Resources
-- Official documentation
-- Course materials and lecture notes
-- Stack Overflow and similar Q&A sites
-- Your own previous work
+### 允许使用的资源
+- 官方文档
+- 课程材料和课程笔记
+- Stack Overflow 及类似 Q&A 网站
+- 你自己之前的工作
 
-### Not Allowed
-- Copying solutions from other learners
-- Sharing answers during active assessments
-- Using AI tools to complete entire projects
-- Plagiarizing code without attribution
+### 不允许的行为
+- 复制其他学习者的解答
+- 在评估进行中分享答案
+- 使用 AI 工具完成整个项目
+- 未经署名抄袭代码
 
-## Success Metrics
+## 成功指标
 
-By the end of this curriculum, you should be able to:
+完成本课程后，你应该能够：
 
-- [ ] Score 85%+ on the final practical exam
-- [ ] Complete all 5 projects with passing grades
-- [ ] Demonstrate proficiency in Docker and basic Kubernetes
-- [ ] Deploy and monitor ML models independently
-- [ ] Troubleshoot common infrastructure issues
-- [ ] Write clear technical documentation
-- [ ] Follow DevOps and MLOps best practices
+- [ ] 在期末实践考试中获得 85%+ 的分数
+- [ ] 完成全部 5 个项目且成绩及格
+- [ ] 展示 Docker 和基础 Kubernetes 的熟练度
+- [ ] 独立部署和监控 ML 模型
+- [ ] 排查常见基础设施问题
+- [ ] 撰写清晰的技术文档
+- [ ] 遵循 DevOps 和 MLOps 最佳实践
 
-## Next Steps
+## 后续步骤
 
-1. Take the **Prerequisites Quiz** to establish baseline
-2. Review results to identify any foundational gaps
-3. Begin **Module 1** lessons and exercises
-4. Use the **progress tracking** templates to monitor advancement
-5. Join the **community** for support and collaboration
+1. 参加**先决条件测验**以确定基线
+2. 查看结果，找出基础知识方面的差距
+3. 开始**模块 1** 的课程和练习
+4. 使用**进度追踪**模板监控学习进展
+5. 加入**社区**获得支持和协作
 
 ---
 
-**Remember**: Assessments are learning tools, not just evaluations. Use them to guide your study and identify areas for growth. The goal is genuine competency, not just passing scores.
+**记住**：评估是学习工具，而不仅是考核方式。用它们来指导学习和发现需要成长的领域。目标是真实的能力，而不仅是及格的分数。

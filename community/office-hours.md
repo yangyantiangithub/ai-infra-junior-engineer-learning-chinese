@@ -1,498 +1,498 @@
-# Virtual Office Hours
+# 虚拟答疑时间
 
-Get help, ask questions, and connect with other learners through virtual office hours.
-
----
-
-## Overview
-
-Virtual office hours provide:
-- **Live help** with curriculum challenges
-- **Code review** for your projects
-- **Career advice** for AI infrastructure roles
-- **Community connection** with fellow learners
-- **Motivation boost** when you're stuck
-
-These sessions are designed to supplement self-paced learning with human interaction and guidance.
+通过虚拟答疑时间获取帮助、提问问题并与其他学习者交流。
 
 ---
 
-## How Office Hours Work
+## 概述
 
-### Format
-- **Virtual sessions** via Zoom/Google Meet
-- **Drop-in style**: Come with questions or just to listen
-- **Screen sharing**: Show your code/errors for help
-- **Collaborative**: Learn from others' questions too
-- **Recorded**: Most sessions recorded for later viewing (with permission)
+虚拟答疑时间提供：
+- **实时帮助**解决课程难题
+- **代码审查**针对你的项目
+- **职业建议**关于 AI 基础设施岗位
+- **社区连接**与同在学习的人
+- **动力提升**在你卡住的时候
 
-### Who Can Attend
-- Anyone working through the curriculum
-- Any skill level from beginner to advanced
-- Those considering starting the curriculum
-- Alumni wanting to give back
-
-### What to Expect
-- **Informal atmosphere**: No judgment, all questions welcome
-- **Problem-solving focus**: Work through issues together
-- **Peer learning**: Often learners help each other
-- **Real-time debugging**: See solutions in action
-- **Career discussions**: Job search, interviews, industry insights
+这些会议旨在以人际互动和指导来补充自学。
 
 ---
 
-## Schedule
+## 答疑时间如何运作
 
-### Weekly Sessions
+### 形式
+- **虚拟会议**通过 Zoom/Google Meet
+- **自由参与**：带着问题来，或者只听
+- **屏幕共享**：展示你的代码/错误以寻求帮助
+- **协作式**：也能从别人的问题中学习
+- **录制**：大多数会议会录制供后续观看（经许可）
 
-**Note**: These are example schedules. Check the official calendar for current times and signup links.
+### 谁可以参加
+- 正在学习课程的任何人员
+- 任何技能水平，从初级到高级
+- 考虑开始课程的人
+- 希望回馈社区的学员
 
-#### Session 1: Technical Help
-**When**: Tuesdays, 6:00-7:30 PM EST
-**Focus**: Debugging, technical questions, Docker/Kubernetes help
-**Best for**: Currently working on projects or stuck on technical issues
-
-#### Session 2: Project Reviews
-**When**: Thursdays, 7:00-8:30 PM EST
-**Focus**: Code review, project feedback, best practices
-**Best for**: Completed projects ready for review
-
-#### Session 3: Career & Learning Support
-**When**: Saturdays, 10:00-11:30 AM EST
-**Focus**: Career advice, learning strategies, motivation
-**Best for**: Job searching, feeling stuck, need direction
-
-### Office Hours Calendar
-**Link**: [Insert Google Calendar link]
-**Timezone**: Convert to your timezone using [timeanddate.com](https://www.timeanddate.com/)
+### 可以期待什么
+- **轻松氛围**：不做评判，欢迎所有问题
+- **以解决问题为核心**：一起解决问题
+- **同伴学习**：学习者经常互相帮助
+- **实时调试**：现场看解决方案
+- **职业讨论**：求职、面试、行业洞察
 
 ---
 
-## Preparing for Office Hours
+## 时间安排
 
-### Come Prepared
+### 每周会议
 
-To get the most value:
+**注意**：以下为示例时间表。请查看官方日历获取最新时间和报名链接。
 
-1. **Have specific questions**:
-   - ✓ "My Docker container exits with code 137. I've tried X and Y."
-   - ✗ "Docker doesn't work. Help?"
+#### 会议 1：技术支持
+**时间**：周二，下午 6:00-7:30 EST
+**重点**：调试、技术问题、Docker/Kubernetes 帮助
+**适合**：正在做项目或在技术问题上卡住的人
 
-2. **Share context**:
-   - What module/project are you on?
-   - What have you tried?
-   - Error messages (copy-paste, don't screenshot)
-   - Relevant code snippets
+#### 会议 2：项目审查
+**时间**：周四，下午 7:00-8:30 EST
+**重点**：代码审查、项目反馈、最佳实践
+**适合**：已完成项目准备审查的人
 
-3. **Be ready to share screen**:
-   - Have your code open
-   - Terminal with error messages visible
-   - Browser with relevant tabs
+#### 会议 3：职业与学习支持
+**时间**：周六，上午 10:00-11:30 EST
+**重点**：职业建议、学习策略、动力
+**适合**：正在求职、感到卡住、需要方向的人
 
-4. **Prepare a fallback question**:
-   - In case your main question is answered quickly
-   - Or if other questions run long
-
-### What to Bring
-
-**For Technical Questions**:
-- Link to your code (GitHub repo)
-- Error messages (text, not screenshots)
-- Description of expected vs. actual behavior
-- What you've already tried
-
-**For Project Review**:
-- GitHub repository link
-- Specific areas you want feedback on
-- Self-assessment completed
-- Questions about improvements
-
-**For Career Questions**:
-- Current resume (optional, for feedback)
-- Target job descriptions
-- Specific career concerns
+### 答疑时间日历
+**链接**：[插入 Google Calendar 链接]
+**时区**：使用 [timeanddate.com](https://www.timeanddate.com/) 转换为你的时区
 
 ---
 
-## Session Guidelines
+## 为答疑时间做准备
 
-### Do's
-- ✓ Arrive on time or join late quietly
-- ✓ Mute when not speaking
-- ✓ Use chat for questions if speaking is intimidating
-- ✓ Help others if you know the answer
-- ✓ Share what you've learned
-- ✓ Thank volunteers who help
-- ✓ Follow up if you solve your problem
+### 做好准备
 
-### Don'ts
-- ✗ Dominate the conversation
-- ✗ Expect private tutoring
-- ✗ Share sensitive/proprietary code
-- ✗ Record without permission
-- ✗ Be rude or dismissive of others' questions
-- ✗ Ask for help with unrelated coursework or exams
-- ✗ Expect solutions to be written for you
+为获得最大价值：
 
-### Code of Conduct
-- **Respectful**: All skill levels welcome
-- **Inclusive**: No gatekeeping or elitism
-- **Collaborative**: We learn together
-- **Patient**: Questions take time
-- **Professional**: Appropriate language and behavior
+1. **准备具体问题**：
+   - ✓ "我的 Docker 容器以退出码 137 退出。我已经尝试过 X 和 Y。"
+   - ✗ "Docker 不工作。帮帮我？"
 
-Violations may result in removal from the session.
+2. **提供背景信息**：
+   - 你在哪个模块/项目？
+   - 你尝试过什么？
+   - 错误信息（复制粘贴，不要截图）
+   - 相关代码片段
 
----
+3. **准备好共享屏幕**：
+   - 打开你的代码
+   - 打开显示错误信息的终端
+   - 打开相关标签页的浏览器
 
-## Types of Help Available
+4. **准备一个备选问题**：
+   - 以防你的主要问题很快得到解答
+   - 或者如果其他人的问题占用时间较长
 
-### 1. Technical Debugging
+### 携带什么
 
-**Examples**:
-- "My Docker container won't start"
-- "Kubernetes pod is in CrashLoopBackOff"
-- "CI/CD pipeline failing at X step"
-- "Can't connect to database from container"
+**技术问题**：
+- 代码链接（GitHub 仓库）
+- 错误信息（文本，不是截图）
+- 预期行为与实际行为的描述
+- 你已经尝试过的方法
 
-**Process**:
-1. Describe the problem
-2. Share screen with error
-3. Walk through debugging steps together
-4. Identify root cause
-5. Implement solution
+**项目审查**：
+- GitHub 仓库链接
+- 你想获得反馈的具体方面
+- 已完成自我评估
+- 关于改进的问题
 
-**Expected time**: 10-20 minutes
+**职业问题**：
+- 当前简历（可选，用于反馈）
+- 目标职位描述
+- 具体的职业疑虑
 
 ---
 
-### 2. Code Review
+## 会议准则
 
-**Examples**:
-- "Is my Dockerfile optimized?"
-- "Review my Kubernetes manifests"
-- "Feedback on my project structure"
-- "Am I following best practices?"
+### 该做的
+- ✓ 准时到达或安静地迟到加入
+- ✓ 不发言时静音
+- ✓ 如果不敢开口，在聊天中提问
+- ✓ 如果你知道答案，帮助他人
+- ✓ 分享你学到的内容
+- ✓ 感谢提供帮助的志愿者
+- ✓ 解决问题后反馈结果
 
-**Process**:
-1. Share GitHub repo link in advance
-2. Presenter gives quick overview (2 min)
-3. Group reviews code together
-4. Provide constructive feedback
-5. Suggest improvements
+### 不该做的
+- ✗ 主导整个对话
+- ✗ 期望获得私人辅导
+- ✗ 分享敏感/专有代码
+- ✗ 未经许可录制
+- ✗ 对他人的问题粗鲁或不屑一顾
+- ✗ 寻求与课程无关的作业或考试帮助
+- ✗ 期望别人为你写好解答
 
-**Expected time**: 15-25 minutes
+### 行为准则
+- **尊重**：欢迎所有技能水平
+- **包容**：不搞门槛歧视或精英主义
+- **协作**：我们一起学习
+- **耐心**：解决问题需要时间
+- **专业**：使用得体的语言和行为
 
----
-
-### 3. Conceptual Questions
-
-**Examples**:
-- "I don't understand container networking"
-- "How does HPA actually work?"
-- "What's the difference between ReplicaSet and Deployment?"
-- "When should I use ConfigMap vs. Secret?"
-
-**Process**:
-1. Ask your question
-2. Facilitator explains concept
-3. Group discussion and examples
-4. Q&A for clarification
-
-**Expected time**: 10-15 minutes
+违反者可能被请出会议。
 
 ---
 
-### 4. Learning Strategy
+## 可获得的帮助类型
 
-**Examples**:
-- "I'm stuck on Module 3 for weeks"
-- "How do I balance learning with full-time job?"
-- "Which resources are most helpful?"
-- "Should I slow down or skip ahead?"
+### 1. 技术调试
 
-**Process**:
-1. Describe your situation
-2. Discuss challenges
-3. Brainstorm strategies
-4. Create action plan
+**示例**：
+- "我的 Docker 容器无法启动"
+- "Kubernetes pod 处于 CrashLoopBackOff 状态"
+- "CI/CD 流水线在 X 步骤失败"
+- "无法从容器连接到数据库"
 
-**Expected time**: 10-15 minutes
+**流程**：
+1. 描述问题
+2. 共享屏幕显示错误
+3. 一起逐步调试
+4. 确定根本原因
+5. 实施解决方案
 
----
-
-### 5. Career Advice
-
-**Examples**:
-- "What skills do employers really want?"
-- "How to talk about self-taught experience?"
-- "When am I ready to apply?"
-- "Resume/portfolio feedback"
-
-**Process**:
-1. Share your career situation
-2. Discuss specific concerns
-3. Get advice from others' experiences
-4. Action steps
-
-**Expected time**: 10-20 minutes
+**预计时间**：10-20 分钟
 
 ---
 
-## Sample Session Structure
+### 2. 代码审查
 
-### Tuesday Technical Help Session (90 minutes)
+**示例**：
+- "我的 Dockerfile 是否优化？"
+- "请审查我的 Kubernetes 清单文件"
+- "关于我项目结构的反馈"
+- "我是否遵循了最佳实践？"
 
-**6:00-6:10**: Welcome and Intros
-- Quick round of names and what you're working on
-- Queue of questions/topics
+**流程**：
+1. 提前共享 GitHub 仓库链接
+2. 展示者快速概述（2 分钟）
+3. 小组一起审查代码
+4. 提供建设性反馈
+5. 提出改进建议
 
-**6:10-6:30**: Question 1
-- Debugging a Docker issue
-
-**6:30-6:50**: Question 2
-- Kubernetes deployment troubleshooting
-
-**6:50-7:10**: Question 3
-- CI/CD pipeline help
-
-**7:10-7:25**: Open Discussion
-- Quick questions, clarifications
-- Resource sharing
-
-**7:25-7:30**: Wrap Up
-- Recap of what we covered
-- Reminders for next session
-- Survey link for feedback
+**预计时间**：15-25 分钟
 
 ---
 
-## Virtual Office Hours Etiquette
+### 3. 概念性问题
 
-### For Attendees
+**示例**：
+- "我不理解容器网络"
+- "HPA 实际上是如何工作的？"
+- "ReplicaSet 和 Deployment 有什么区别？"
+- "什么时候应该使用 ConfigMap 而不是 Secret？"
 
-**Audio**:
-- Mute when not speaking
-- Unmute to ask questions or contribute
-- Use headphones to avoid echo
-- Find a quiet space
+**流程**：
+1. 提出你的问题
+2. 主持人解释概念
+3. 小组讨论和举例
+4. 问答以澄清
 
-**Video**:
-- Camera optional but encouraged
-- Blurred background okay
-- Professional appearance preferred
+**预计时间**：10-15 分钟
 
-**Chat**:
-- Ask questions in chat anytime
-- Share helpful links
-- No spam or off-topic chatter
-- Be respectful
+---
 
-**Participation**:
-- Wait for turn to speak
-- Don't interrupt (use "raise hand")
-- Keep questions concise
-- Let others have time too
+### 4. 学习策略
+
+**示例**：
+- "我在模块 3 上卡了好几周"
+- "如何平衡学习与全职工作？"
+- "哪些资源最有帮助？"
+- "我应该放慢速度还是跳着学？"
+
+**流程**：
+1. 描述你的情况
+2. 讨论挑战
+3. 集思广益制定策略
+4. 制定行动计划
+
+**预计时间**：10-15 分钟
+
+---
+
+### 5. 职业建议
+
+**示例**：
+- "雇主真正想要什么技能？"
+- "如何谈论自学经历？"
+- "我什么时候准备好申请？"
+- "简历/作品集反馈"
+
+**流程**：
+1. 分享你的职业情况
+2. 讨论具体问题
+3. 从他人经验中获取建议
+4. 制定行动步骤
+
+**预计时间**：10-20 分钟
+
+---
+
+## 会议结构示例
+
+### 周二技术支持会议（90 分钟）
+
+**6:00-6:10**：欢迎与介绍
+- 快速自我介绍和你正在做什么
+- 问题/主题队列
+
+**6:10-6:30**：问题 1
+- 调试 Docker 问题
+
+**6:30-6:50**：问题 2
+- Kubernetes 部署故障排查
+
+**6:50-7:10**：问题 3
+- CI/CD 流水线帮助
+
+**7:10-7:25**：开放讨论
+- 快速提问、澄清
+- 资料分享
+
+**7:25-7:30**：总结
+- 回顾涵盖的内容
+- 下次会议的提醒
+- 反馈问卷链接
+
+---
+
+## 虚拟答疑时间礼仪
+
+### 参会者须知
+
+**音频**：
+- 不发言时静音
+- 开麦提问或参与讨论
+- 使用耳机避免回声
+- 找一个安静的地方
+
+**视频**：
+- 可开可不开，但鼓励开启
+- 可使用虚化背景
+- 建议仪表得体
+
+**聊天**：
+- 随时在聊天中提问
+- 分享有用的链接
+- 不要刷屏或聊无关话题
+- 保持尊重
+
+**参与**：
+- 等待轮到发言
+- 不要打断（使用"举手"功能）
+- 问题尽量简洁
+- 也要给别人发言时间
 
 ---
 
 ## FAQ
 
-### Q: Do I need to sign up in advance?
-**A**: Recommended but not required. Sign-up helps us prepare and prioritize questions. Walk-ins are welcome if there's time.
+### Q: 我需要提前报名吗？
+**A**: 建议但不强制。报名有助于我们准备和安排问题优先级。如有时间，也欢迎临时加入。
 
-### Q: What if my question doesn't get answered?
+### Q: 如果我的问题没被解答怎么办？
 **A**:
-- Post in Discord/Slack with #office-hours tag
-- Sign up for next session (priority for return attendees)
-- Schedule 1-on-1 during open slots (if available)
+- 在 Discord/Slack 中发布，带上 #office-hours 标签
+- 报名参加下一次会议（回头客优先）
+- 在空闲时段安排一对一（如有）
 
-### Q: Can I attend multiple sessions per week?
-**A**: Yes! Attend as many as you find helpful. Be mindful of taking up time if it's crowded.
+### Q: 我可以每周参加多次会议吗？
+**A**: 可以！只要能帮到你，参加多少次都行。但如果人很多，注意不要占用过多时间。
 
-### Q: Are sessions recorded?
-**A**: Most sessions are recorded (with permission) and shared with attendees. If you're uncomfortable being recorded, let us know and we'll pause recording or turn off your camera/audio.
+### Q: 会议会录制吗？
+**A**: 大多数会议会录制（经许可）并与参会者分享。如果你不习惯被录制，请告知我们，我们会暂停录制或关闭你的摄像头/音频。
 
-### Q: What if I'm too nervous to speak?
+### Q: 我太紧张不敢说话怎么办？
 **A**:
-- Use chat to ask questions
-- Just listen and learn from others
-- Private message the facilitator
-- Start with easier sessions (career advice less technical)
+- 在聊天中提问
+- 只听不说话，从他人那里学习
+- 私信主持人
+- 从较轻松的会议开始（如职业建议，不那么技术性）
 
-### Q: Can I bring a friend/colleague?
-**A**: Yes, if they're also learning AI infrastructure. No recruiters or observers without permission.
+### Q: 我可以带朋友/同事来吗？
+**A**: 可以，如果他们也在学习 AI 基础设施的话。未经许可，不允许招聘人员或观察者参加。
 
-### Q: Are there beginner-specific sessions?
-**A**: All sessions welcome beginners. "No stupid questions" rule applies. We were all beginners once!
+### Q: 有面向初学者的专门会议吗？
+**A**: 所有会议都欢迎初学者。"没有愚蠢的问题"原则适用。我们曾经都是初学者！
 
-### Q: What if the time doesn't work for me?
+### Q: 如果会议时间不合适怎么办？
 **A**:
-- Check recorded sessions
-- Request alternative times in feedback
-- Form study group in your timezone
-- Use async support (Discord, GitHub discussions)
+- 观看录制回放
+- 在反馈中申请其他时间
+- 在你的时区组建学习小组
+- 使用异步支持（Discord、GitHub Discussions）
 
 ---
 
-## After Office Hours
+## 答疑时间之后
 
-### Follow-Up Actions
+### 后续行动
 
-**If your question was answered**:
-- [ ] Implement the solution
-- [ ] Test thoroughly
-- [ ] Document what you learned
-- [ ] Share solution in Discord (help future learners)
-- [ ] Thank helpers
+**如果你的问题得到了解答**：
+- [ ] 实施解决方案
+- [ ] 充分测试
+- [ ] 记录你学到的内容
+- [ ] 在 Discord 中分享解决方案（帮助未来的学习者）
+- [ ] 感谢提供帮助的人
 
-**If you're still stuck**:
-- [ ] Review session recording
-- [ ] Try suggested approaches
-- [ ] Research recommended resources
-- [ ] Come back next session
-- [ ] Ask in community channels
+**如果你仍然卡住**：
+- [ ] 回顾会议录制
+- [ ] 尝试建议的方法
+- [ ] 研究推荐的资源
+- [ ] 下次会议再来
+- [ ] 在社区频道提问
 
-**For everyone**:
-- [ ] Fill out feedback survey
-- [ ] Share helpful resources you found
-- [ ] Help others with similar questions
-
----
-
-## Alternative Support Options
-
-If office hours don't work for you:
-
-### Async Support
-- **Discord**: #help channel, responses within 24 hours
-- **GitHub Discussions**: Detailed technical questions
-- **Stack Overflow**: Tag questions appropriately
-- **Reddit**: r/devops, r/kubernetes, r/docker
-
-### Peer Support
-- **Study groups**: See `community/study-groups.md`
-- **Pair programming**: Find a partner on Discord
-- **Code review trades**: Review each other's projects
-
-### Self-Help Resources
-- **Documentation**: Official docs for all tools
-- **Cheat sheets**: In `resources/cheat-sheets/`
-- **FAQ**: See `community/FAQ.md`
-- **YouTube**: Thousands of tutorials
+**所有人**：
+- [ ] 填写反馈问卷
+- [ ] 分享你发现的有用资源
+- [ ] 帮助有类似问题的其他人
 
 ---
 
-## Giving Back
+## 替代支持方案
 
-Once you progress through the curriculum, consider:
+如果答疑时间不适合你：
 
-### Attending as a Helper
-- Answer questions from beginners
-- Share your experiences
-- Review others' code
-- Provide encouragement
+### 异步支持
+- **Discord**：#help 频道，24 小时内回复
+- **GitHub Discussions**：详细的技术问题
+- **Stack Overflow**：为问题打上适当标签
+- **Reddit**：r/devops、r/kubernetes、r/docker
 
-### Hosting Office Hours
-- Volunteer as facilitator
-- Share your expertise
-- Build teaching skills
-- Give back to community
+### 同伴支持
+- **学习小组**：见 `community/study-groups.md`
+- **结对编程**：在 Discord 上找搭档
+- **代码审查交换**：互相审查对方的项目
 
-**Interested?** Email [ai-infra-curriculum@joshua-ferguson.com](mailto:ai-infra-curriculum@joshua-ferguson.com)
-
----
-
-## Volunteer Facilitators
-
-Virtual office hours are made possible by volunteers:
-
-### Current Facilitators
-- **[Name]** - [Role/Company] - Focus: Docker & Containers
-- **[Name]** - [Role/Company] - Focus: Kubernetes
-- **[Name]** - [Role/Company] - Focus: CI/CD
-- **[Name]** - [Role/Company] - Focus: Career Coaching
-
-### Become a Facilitator
-**Requirements**:
-- Completed the curriculum or equivalent experience
-- Patient and good at explaining
-- Available 1-2 hours per week
-- Passionate about helping others
-
-**Benefits**:
-- Give back to community
-- Improve teaching/communication skills
-- Stay current with technologies
-- Networking opportunities
-- Great resume/LinkedIn content
-
-**Apply**: [Link to volunteer form]
+### 自助资源
+- **文档**：所有工具的官方文档
+- **速查表**：在 `resources/cheat-sheets/` 中
+- **FAQ**：见 `community/FAQ.md`
+- **YouTube**：成千上万的教程
 
 ---
 
-## Success Stories
+## 回馈社区
 
-> "I was stuck on Project 3 for 3 weeks. Came to office hours, got my database connection fixed in 20 minutes, and finished the project that weekend!" - Alex
+当你完成一定课程内容后，可以考虑：
 
-> "Office hours gave me the confidence to start applying for jobs. Hearing others' experiences and getting resume feedback was invaluable." - Jordan
+### 以帮助者身份参加
+- 回答初学者的问题
+- 分享你的经验
+- 审查他人的代码
+- 给予鼓励
 
-> "I'm an introvert and was nervous about joining. But everyone was so supportive. Now I attend regularly and even help others with Docker questions!" - Taylor
+### 主持答疑时间
+- 自愿担任主持人
+- 分享你的专业知识
+- 培养教学技能
+- 回馈社区
 
----
-
-## Feedback
-
-Help us improve office hours:
-
-**After each session**:
-- Fill out quick survey (1-2 minutes)
-- Rate helpfulness
-- Suggest improvements
-
-**Questions**:
-- Was your question answered?
-- Was the session helpful?
-- What could be better?
-- Topics for future sessions?
-
-**Submit feedback**: [Link to feedback form]
+**感兴趣？** 发送邮件至 [ai-infra-curriculum@joshua-ferguson.com](mailto:ai-infra-curriculum@joshua-ferguson.com)
 
 ---
 
-## Important Links
+## 志愿者主持人
 
-- **Session calendar**: [Google Calendar link]
-- **Zoom meeting room**: [Link]
-- **Sign-up sheet**: [Link]
-- **Recordings**: [Link to past recordings]
-- **Feedback form**: [Link]
-- **Volunteer application**: [Link]
+虚拟答疑时间由志愿者提供支持：
 
----
+### 当前主持人
+- **[姓名]** - [职位/公司] - 专长：Docker 和容器
+- **[姓名]** - [职位/公司] - 专长：Kubernetes
+- **[姓名]** - [职位/公司] - 专长：CI/CD
+- **[姓名]** - [职位/公司] - 专长：职业指导
 
-## Contact
+### 成为主持人
+**要求**：
+- 已完成本课程或具有同等经验
+- 有耐心且善于解释
+- 每周可用 1-2 小时
+- 热心帮助他人
 
-**General inquiries**: [ai-infra-curriculum@joshua-ferguson.com](mailto:ai-infra-curriculum@joshua-ferguson.com)
+**好处**：
+- 回馈社区
+- 提高教学/沟通能力
+- 保持技术更新
+- 人脉拓展机会
+- 优秀的简历/LinkedIn 内容
 
-**Technical issues with sessions**: [support@example.com](mailto:support@example.com)
-
-**Volunteer questions**: [volunteers@example.com](mailto:volunteers@example.com)
-
----
-
-## Quick Reference
-
-**When you're stuck**: Tuesday 6 PM EST (Technical Help)
-**For project review**: Thursday 7 PM EST (Project Reviews)
-**Career questions**: Saturday 10 AM EST (Career Support)
-
-**Can't make live sessions?**: Watch recordings or use async support
-
-**First time**: Just join! All questions welcome. Introduce yourself in chat.
+**申请**：[志愿者表格链接]
 
 ---
 
-**Remember**: Office hours are a community resource. Be respectful, help others when you can, and don't be afraid to ask questions. We're all learning together!
+## 成功故事
 
-See you at office hours! 🎓
+> "我在项目 3 上卡了 3 周。来答疑时间后，20 分钟内就解决了数据库连接问题，那个周末就完成了项目！"——Alex
+
+> "答疑时间给了我开始求职的自信。听取别人的经验和获得简历反馈是无价的。"——Jordan
+
+> "我是个内向的人，一开始很紧张。但每个人都很支持。现在我定期参加，甚至还帮别人解答 Docker 问题！"——Taylor
+
+---
+
+## 反馈
+
+帮助我们改进答疑时间：
+
+**每次会议后**：
+- 填写快速问卷（1-2 分钟）
+- 评价帮助程度
+- 提出改进建议
+
+**问题**：
+- 你的问题得到解答了吗？
+- 会议有帮助吗？
+- 哪些地方可以改进？
+- 未来会议的主题建议？
+
+**提交反馈**：[反馈表格链接]
+
+---
+
+## 重要链接
+
+- **会议日历**：[Google Calendar 链接]
+- **Zoom 会议室**：[链接]
+- **报名表**：[链接]
+- **录制回放**：[过往录制的链接]
+- **反馈表**：[链接]
+- **志愿者申请表**：[链接]
+
+---
+
+## 联系方式
+
+**一般咨询**：[ai-infra-curriculum@joshua-ferguson.com](mailto:ai-infra-curriculum@joshua-ferguson.com)
+
+**会议技术问题**：[support@example.com](mailto:support@example.com)
+
+**志愿者相关问题**：[volunteers@example.com](mailto:volunteers@example.com)
+
+---
+
+## 快速参考
+
+**卡住的时候**：周二下午 6 点 EST（技术支持）
+**项目审查**：周四下午 7 点 EST（项目审查）
+**职业问题**：周六上午 10 点 EST（职业支持）
+
+**无法参加直播？**：观看录制回放或使用异步支持
+
+**第一次参加？**：直接加入！欢迎所有问题。在聊天中做自我介绍。
+
+---
+
+**记住**：答疑时间是社区资源。请保持尊重，在能够的时候帮助他人，不要害怕提问。我们都在共同学习！
+
+答疑时间见！🎓

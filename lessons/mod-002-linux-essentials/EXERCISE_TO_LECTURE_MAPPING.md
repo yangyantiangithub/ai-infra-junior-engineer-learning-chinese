@@ -1,786 +1,786 @@
-# Module 002: Exercise to Lecture Mapping Analysis
+# 模块 002：练习与讲座映射分析
 
-**Generated**: 2025-10-28
-**Module**: Linux Essentials for AI Infrastructure
-**Total Exercises**: 8
-**Total Lectures**: 8
-
----
-
-## Executive Summary
-
-This document provides a comprehensive analysis of all 8 exercises in Module 002, mapping them to the 8-lecture structure. Key findings:
-
-- **Alignment Status**: 7/8 exercises need prerequisite updates
-- **Coverage**: Good distribution across all lectures
-- **Gaps**: Exercise 08 appears to need networking concepts from Lecture 08
-- **Recommendations**: Update prerequisites to reflect new 8-lecture structure
+**生成日期**：2025-10-28
+**模块**：AI 基础设施的 Linux 基础
+**练习总数**：8
+**讲座总数**：8
 
 ---
 
-## Exercise 01: Linux Navigation and File System Mastery
+## 执行摘要
 
-### Overview
-- **File**: `exercise-01-navigation.md`
-- **Focus**: File system navigation, directory structures, file operations, symbolic links
-- **Time Required**: 60-90 minutes
-- **Difficulty**: Beginner
+本文档对模块 002 中全部 8 个练习进行全面分析，将其映射到 8 讲结构中。主要发现：
 
-### Current Prerequisites
-- ✗ Lecture 01: Linux Fundamentals (OUTDATED - doesn't exist)
-- Access to Linux system
-- Terminal emulator
-- 1GB free disk space
+- **对齐状态**：7/8 的练习需要更新先决条件
+- **覆盖范围**：各讲座之间分布良好
+- **差距**：练习 08 似乎需要讲座 08 的网络概念
+- **建议**：更新先决条件以反映新的 8 讲结构
 
-### Topics Covered
-1. File system navigation (pwd, cd, ls)
-2. Creating ML project directory structures
-3. File operations (copy, move, delete)
-4. Finding files (find, locate)
-5. Symbolic links
-6. ML project organization best practices
+---
 
-### Skills Practiced
-- Navigation commands (cd, pwd, ls)
-- Creating nested directories (mkdir -p)
-- File operations (cp, mv, rm)
-- Search commands (find)
-- Symbolic link creation (ln -s)
-- Creating backup scripts
-- Project organization
+## 练习 01：Linux 导航和文件系统掌握
 
-### Mapping to NEW Lecture Structure
+### 概述
+- **文件**：`exercise-01-navigation.md`
+- **重点**：文件系统导航、目录结构、文件操作、符号链接
+- **所需时间**：60-90 分钟
+- **难度**：初级
 
-**Primary Lecture**: Lecture 02: File System and Navigation
-- ✓ File system hierarchy
-- ✓ Navigation commands
-- ✓ Directory operations
-- ✓ File operations
-- ✓ Find command
-- ✓ Symbolic links
+### 当前先决条件
+- ✗ 讲座 01：Linux 基础（已过时 - 不存在）
+- 可访问 Linux 系统
+- 终端模拟器
+- 1GB 可用磁盘空间
 
-**Secondary Lecture**: Lecture 01: Introduction to Linux and Command Line
-- ✓ Basic command line usage
-- ✓ Terminal basics
+### 涵盖主题
+1. 文件系统导航（pwd、cd、ls）
+2. 创建 ML 项目目录结构
+3. 文件操作（复制、移动、删除）
+4. 查找文件（find、locate）
+5. 符号链接
+6. ML 项目组织最佳实践
 
-### Recommendations
+### 练习的技能
+- 导航命令（cd、pwd、ls）
+- 创建嵌套目录（mkdir -p）
+- 文件操作（cp、mv、rm）
+- 搜索命令（find）
+- 创建符号链接（ln -s）
+- 创建备份脚本
+- 项目组织
 
-**REQUIRED UPDATE**:
+### 映射到新讲座结构
+
+**主要讲座**：讲座 02：文件系统和导航
+- ✓ 文件系统层级
+- ✓ 导航命令
+- ✓ 目录操作
+- ✓ 文件操作
+- ✓ Find 命令
+- ✓ 符号链接
+
+**辅助讲座**：讲座 01：Linux 和命令行简介
+- ✓ 基本命令行使用
+- ✓ 终端基础
+
+### 建议
+
+**需要更新**：
 ```markdown
-## Prerequisites
-- Completed Lecture 01: Introduction to Linux and Command Line
-- Completed Lecture 02: File System and Navigation
-- Access to a Linux system (VM, WSL, or cloud instance)
-- Terminal emulator
-- At least 1GB free disk space
+## 先决条件
+- 已完成讲座 01：Linux 和命令行简介
+- 已完成讲座 02：文件系统和导航
+- 可访问 Linux 系统（VM、WSL 或云实例）
+- 终端模拟器
+- 至少 1GB 可用磁盘空间
 ```
 
-**Alignment Score**: 95% - Excellent alignment with Lecture 02
+**对齐评分**：95% - 与讲座 02 高度对齐
 
 ---
 
-## Exercise 02: File Permissions and Access Control for ML Teams
+## 练习 02：ML 团队的文件权限和访问控制
 
-### Overview
-- **File**: `exercise-02-permissions.md`
-- **Focus**: Linux permission model, chmod, chown, ACLs, umask
-- **Time Required**: 75-90 minutes
-- **Difficulty**: Intermediate
+### 概述
+- **文件**：`exercise-02-permissions.md`
+- **重点**：Linux 权限模型、chmod、chown、ACL、umask
+- **所需时间**：75-90 分钟
+- **难度**：中级
 
-### Current Prerequisites
-- ✓ Completed Exercise 01: Linux Navigation
-- ✗ Completed Lecture 02: File Systems and Permissions (OUTDATED)
-- Access to Linux system with sudo privileges
-- Understanding of Linux user and group concepts
-- 2GB free disk space
+### 当前先决条件
+- ✓ 已完成练习 01：Linux 导航
+- ✗ 已完成讲座 02：文件系统和权限（已过时）
+- 可访问具有 sudo 权限的 Linux 系统
+- 理解 Linux 用户和组概念
+- 2GB 可用磁盘空间
 
-### Topics Covered
-1. Linux permission model (user, group, other)
-2. Numeric and symbolic chmod
-3. File ownership (chown, chgrp)
-4. Access Control Lists (ACLs)
-5. Default permissions (umask)
-6. Security best practices for ML infrastructure
-7. Multi-user collaboration
+### 涵盖主题
+1. Linux 权限模型（user、group、other）
+2. 数字和符号 chmod
+3. 文件所有权（chown、chgrp）
+4. 访问控制列表（ACL）
+5. 默认权限（umask）
+6. ML 基础设施安全最佳实践
+7. 多用户协作
 
-### Skills Practiced
-- Reading permission strings (rwxr-xr-x)
-- Numeric permission calculation (755, 644, etc.)
-- Using chmod (numeric and symbolic)
-- Changing ownership with chown
-- Setting ACLs with setfacl/getfacl
-- Configuring umask
-- Creating secure shared directories
-- Implementing least privilege principle
+### 练习的技能
+- 读取权限字符串（rwxr-xr-x）
+- 数字权限计算（755、644 等）
+- 使用 chmod（数字和符号）
+- 使用 chown 更改所有权
+- 使用 setfacl/getfacl 设置 ACL
+- 配置 umask
+- 创建安全的共享目录
+- 实施最小权限原则
 
-### Mapping to NEW Lecture Structure
+### 映射到新讲座结构
 
-**Primary Lecture**: Lecture 03: Permissions and Security
-- ✓ Permission model (rwx, ugo)
-- ✓ chmod command
-- ✓ chown/chgrp commands
-- ✓ ACLs
+**主要讲座**：讲座 03：权限和安全
+- ✓ 权限模型（rwx、ugo）
+- ✓ chmod 命令
+- ✓ chown/chgrp 命令
+- ✓ ACL
 - ✓ umask
-- ✓ Security best practices
+- ✓ 安全最佳实践
 
-**Supporting Lectures**:
-- Lecture 02: File System and Navigation (prerequisite knowledge)
+**辅助讲座**：
+- 讲座 02：文件系统和导航（先决知识）
 
-### Recommendations
+### 建议
 
-**REQUIRED UPDATE**:
+**需要更新**：
 ```markdown
-## Prerequisites
-- Completed Exercise 01: Linux Navigation
-- Completed Lecture 02: File System and Navigation
-- Completed Lecture 03: Permissions and Security
-- Access to a Linux system with sudo privileges
-- Understanding of Linux user and group concepts
-- At least 2GB free disk space
+## 先决条件
+- 已完成练习 01：Linux 导航
+- 已完成讲座 02：文件系统和导航
+- 已完成讲座 03：权限和安全
+- 可访问具有 sudo 权限的 Linux 系统
+- 理解 Linux 用户和组概念
+- 至少 2GB 可用磁盘空间
 ```
 
-**Alignment Score**: 100% - Perfect alignment with Lecture 03
+**对齐评分**：100% - 与讲座 03 完美对齐
 
 ---
 
-## Exercise 03: Process Management for ML Training Jobs
+## 练习 03：ML 训练作业的进程管理
 
-### Overview
-- **File**: `exercise-03-processes.md`
-- **Focus**: Process monitoring, job control, signals, GPU processes, systemd services, screen/tmux
-- **Time Required**: 75-90 minutes
-- **Difficulty**: Intermediate
+### 概述
+- **文件**：`exercise-03-processes.md`
+- **重点**：进程监控、作业控制、信号、GPU 进程、systemd 服务、screen/tmux
+- **所需时间**：75-90 分钟
+- **难度**：中级
 
-### Current Prerequisites
-- ✓ Completed Exercise 01 and 02
-- ✗ Completed Lecture 03: Process Management (OUTDATED - should be Lecture 04)
-- Access to a Linux system
-- Basic Python knowledge
-- Optional: NVIDIA GPU
-- 2GB RAM and 2 CPU cores
+### 当前先决条件
+- ✓ 已完成练习 01 和 02
+- ✗ 已完成讲座 03：进程管理（已过时 - 应为讲座 04）
+- 可访问 Linux 系统
+- 基本 Python 知识
+- 可选：NVIDIA GPU
+- 2GB RAM 和 2 个 CPU 核心
 
-### Topics Covered
-1. Process viewing (ps, top, htop)
-2. Job control (background/foreground)
-3. Process signals (SIGTERM, SIGKILL, etc.)
-4. Monitoring ML training processes
-5. GPU process management (nvidia-smi)
-6. systemd service management
-7. Persistent sessions (screen, tmux)
-8. Troubleshooting hung processes
+### 涵盖主题
+1. 进程查看（ps、top、htop）
+2. 作业控制（后台/前台）
+3. 进程信号（SIGTERM、SIGKILL 等）
+4. 监控 ML 训练进程
+5. GPU 进程管理（nvidia-smi）
+6. systemd 服务管理
+7. 持久会话（screen、tmux）
+8. 排查挂起进程
 
-### Skills Practiced
-- Using ps, top, htop
-- Background job management (&, fg, bg, jobs)
-- Sending signals (kill command)
-- Creating process management wrappers
-- Monitoring resource usage
-- GPU process monitoring
-- Using screen/tmux
-- Diagnosing process issues
+### 练习的技能
+- 使用 ps、top、htop
+- 后台作业管理（&、fg、bg、jobs）
+- 发送信号（kill 命令）
+- 创建进程管理包装器
+- 监控资源使用情况
+- GPU 进程监控
+- 使用 screen/tmux
+- 诊断进程问题
 
-### Mapping to NEW Lecture Structure
+### 映射到新讲座结构
 
-**Primary Lecture**: Lecture 04: System Administration Basics
-- ✓ Process concepts
-- ✓ ps, top, htop commands
-- ✓ Job control
-- ✓ kill signals
-- ✓ systemd services
-- ✓ Resource monitoring
+**主要讲座**：讲座 04：系统管理基础
+- ✓ 进程概念
+- ✓ ps、top、htop 命令
+- ✓ 作业控制
+- ✓ kill 信号
+- ✓ systemd 服务
+- ✓ 资源监控
 
-**Supporting Content**: (Not in lectures, exercise-specific)
-- GPU monitoring with nvidia-smi
-- ML training-specific scenarios
-- screen/tmux (may need to add to lecture)
+**辅助内容**：（不在讲座中，练习特定）
+- 使用 nvidia-smi 进行 GPU 监控
+- ML 训练特定场景
+- screen/tmux（可能需要添加到讲座中）
 
-### Recommendations
+### 建议
 
-**REQUIRED UPDATE**:
+**需要更新**：
 ```markdown
-## Prerequisites
-- Completed Exercise 01 and 02
-- Completed Lecture 04: System Administration Basics
-- Access to a Linux system
-- Basic Python knowledge (for ML training examples)
-- Optional: NVIDIA GPU for GPU monitoring sections
-- At least 2GB RAM and 2 CPU cores
+## 先决条件
+- 已完成练习 01 和 02
+- 已完成讲座 04：系统管理基础
+- 可访问 Linux 系统
+- 基本 Python 知识（用于 ML 训练示例）
+- 可选：用于 GPU 监控部分的 NVIDIA GPU
+- 至少 2GB RAM 和 2 个 CPU 核心
 ```
 
-**Alignment Score**: 90% - Strong alignment, screen/tmux may need lecture coverage
+**对齐评分**：90% - 高度对齐，screen/tmux 可能需要讲座覆盖
 
 ---
 
-## Exercise 04: Bash Scripting for ML Deployment Automation
+## 练习 04：ML 部署自动化的 Bash 脚本
 
-### Overview
-- **File**: `exercise-04-scripting.md`
-- **Focus**: Bash scripting fundamentals, functions, error handling, deployment automation
-- **Time Required**: 90 minutes
-- **Difficulty**: Intermediate
+### 概述
+- **文件**：`exercise-04-scripting.md`
+- **重点**：Bash 脚本基础、函数、错误处理、部署自动化
+- **所需时间**：90 分钟
+- **难度**：中级
 
-### Current Prerequisites
-- ✓ Completed Exercises 01-03
-- ✗ Completed Lecture 04: Shell Scripting Basics (OUTDATED - should be Lecture 05)
-- Comfortable with Linux command line
-- Basic understanding of ML workflows
-- Text editor (vim, nano, or VS Code)
+### 当前先决条件
+- ✓ 已完成练习 01-03
+- ✗ 已完成讲座 04：Shell 脚本基础（已过时 - 应为讲座 05）
+- 熟练使用 Linux 命令行
+- 基本理解 ML 工作流
+- 文本编辑器（vim、nano 或 VS Code）
 
-### Topics Covered
-1. Bash script structure and best practices
-2. Variables and arrays
-3. Control structures (if/else, loops, case)
-4. Functions
-5. Error handling (set -euo pipefail, trap)
-6. Command-line arguments
-7. Logging
-8. ML deployment automation
-9. Data pipeline automation
-10. System monitoring scripts
-11. Backup and restore scripts
+### 涵盖主题
+1. Bash 脚本结构和最佳实践
+2. 变量和数组
+3. 控制结构（if/else、循环、case）
+4. 函数
+5. 错误处理（set -euo pipefail、trap）
+6. 命令行参数
+7. 日志记录
+8. ML 部署自动化
+9. 数据管道自动化
+10. 系统监控脚本
+11. 备份和恢复脚本
 
-### Skills Practiced
-- Writing structured bash scripts
-- Using functions effectively
-- Handling errors gracefully
-- Parsing command-line arguments
-- Creating deployment scripts
-- Building data pipelines
-- Implementing monitoring
-- Automating backups
+### 练习的技能
+- 编写结构化的 bash 脚本
+- 有效使用函数
+- 优雅地处理错误
+- 解析命令行参数
+- 创建部署脚本
+- 构建数据管道
+- 实现监控
+- 自动化备份
 
-### Mapping to NEW Lecture Structure
+### 映射到新讲座结构
 
-**Primary Lectures**:
-- Lecture 05: Introduction to Shell Scripting
-  - ✓ Script basics
-  - ✓ Variables
-  - ✓ Control structures
-  - ✓ Functions
+**主要讲座**：
+- 讲座 05：Shell 脚本入门
+  - ✓ 脚本基础
+  - ✓ 变量
+  - ✓ 控制结构
+  - ✓ 函数
 
-- Lecture 06: Advanced Shell Scripting
-  - ✓ Error handling
-  - ✓ Advanced patterns
-  - ✓ Real-world examples
+- 讲座 06：高级 Shell 脚本
+  - ✓ 错误处理
+  - ✓ 高级模式
+  - ✓ 真实世界示例
 
-**Supporting Lectures**:
-- Lecture 02: File System (for file operations in scripts)
-- Lecture 04: System Administration (for service management scripts)
+**辅助讲座**：
+- 讲座 02：文件系统（用于脚本中的文件操作）
+- 讲座 04：系统管理（用于服务管理脚本）
 
-### Recommendations
+### 建议
 
-**REQUIRED UPDATE**:
+**需要更新**：
 ```markdown
-## Prerequisites
-- Completed Exercises 01-04
-- Completed Lecture 05: Introduction to Shell Scripting
-- Completed Lecture 06: Advanced Shell Scripting
-- Comfortable with Linux command line
-- Basic understanding of ML workflows
-- Text editor (vim, nano, or VS Code)
+## 先决条件
+- 已完成练习 01-04
+- 已完成讲座 05：Shell 脚本入门
+- 已完成讲座 06：高级 Shell 脚本
+- 熟练使用 Linux 命令行
+- 基本理解 ML 工作流
+- 文本编辑器（vim、nano 或 VS Code）
 ```
 
-**Alignment Score**: 95% - Excellent alignment with Lectures 05 and 06
+**对齐评分**：95% - 与讲座 05 和 06 高度对齐
 
 ---
 
-## Exercise 05: Package Management for ML Stack Installation
+## 练习 05：ML 栈安装的包管理
 
-### Overview
-- **File**: `exercise-05-package-mgmt.md`
-- **Focus**: Installing system packages, Python environments, CUDA, Docker, ML frameworks
-- **Time Required**: 75-90 minutes
-- **Difficulty**: Intermediate
+### 概述
+- **文件**：`exercise-05-package-mgmt.md`
+- **重点**：安装系统包、Python 环境、CUDA、Docker、ML 框架
+- **所需时间**：75-90 分钟
+- **难度**：中级
 
-### Current Prerequisites
-- ✓ Completed Exercises 01-04
-- ✗ Completed Lecture 05: Package Management (OUTDATED - doesn't exist in new structure)
-- Access to Linux system (Ubuntu/Debian or RHEL/CentOS)
-- Sudo privileges
-- Internet connection
+### 当前先决条件
+- ✓ 已完成练习 01-04
+- ✗ 已完成讲座 05：包管理（已过时 - 在新结构中不存在）
+- 可访问 Linux 系统（Ubuntu/Debian 或 RHEL/CentOS）
+- Sudo 权限
+- 互联网连接
 
-### Topics Covered
-1. Package manager basics (apt, yum, dnf)
-2. System package installation
-3. Python package management (pip, conda)
-4. Virtual environments
-5. CUDA and GPU driver installation
-6. Docker installation
-7. ML framework installation (TensorFlow, PyTorch)
-8. Dependency management
-9. Creating reproducible installations
+### 涵盖主题
+1. 包管理器基础（apt、yum、dnf）
+2. 系统包安装
+3. Python 包管理（pip、conda）
+4. 虚拟环境
+5. CUDA 和 GPU 驱动安装
+6. Docker 安装
+7. ML 框架安装（TensorFlow、PyTorch）
+8. 依赖管理
+9. 创建可复现的安装
 
-### Skills Practiced
-- Using apt/yum package managers
-- Managing Python environments
-- Installing system libraries
-- Setting up CUDA
-- Docker installation
-- Creating installation scripts
-- Handling dependency conflicts
+### 练习的技能
+- 使用 apt/yum 包管理器
+- 管理 Python 环境
+- 安装系统库
+- 设置 CUDA
+- Docker 安装
+- 创建安装脚本
+- 处理依赖冲突
 
-### Mapping to NEW Lecture Structure
+### 映射到新讲座结构
 
-**GAP IDENTIFIED**: No dedicated lecture for package management in new structure!
+**发现差距**：新结构中没有专门的包管理讲座！
 
-**Closest Lecture**: Lecture 04: System Administration Basics
-- Partial coverage of system package management
-- May need to be expanded
+**最接近的讲座**：讲座 04：系统管理基础
+- 部分覆盖系统包管理
+- 可能需要扩展
 
-**Recommendation**: This topic should be covered in:
-- Option A: Expand Lecture 04 to include package management
-- Option B: Create supplemental material for package management
-- Option C: Integrate into Lecture 01 as "System Setup"
+**建议**：该主题应涵盖在：
+- 选项 A：扩展讲座 04 以包含包管理
+- 选项 B：为包管理创建补充资料
+- 选项 C：作为"系统设置"整合到讲座 01 中
 
-### Recommendations
+### 建议
 
-**SUGGESTED UPDATE** (assuming Lecture 04 covers this):
+**建议更新**（假设讲座 04 涵盖此内容）：
 ```markdown
-## Prerequisites
-- Completed Exercises 01-04
-- Completed Lecture 04: System Administration Basics (package management section)
-- Access to a Linux system (Ubuntu/Debian or RHEL/CentOS)
-- Sudo privileges (for system package installation)
-- Internet connection for downloading packages
+## 先决条件
+- 已完成练习 01-04
+- 已完成讲座 04：系统管理基础（包管理部分）
+- 可访问 Linux 系统（Ubuntu/Debian 或 RHEL/CentOS）
+- Sudo 权限（用于系统包安装）
+- 用于下载包的互联网连接
 ```
 
-**Alignment Score**: 60% - SIGNIFICANT GAP, needs lecture content
+**对齐评分**：60% - 存在重大差距，需要讲座内容
 
-**ACTION REQUIRED**: Add package management content to lectures or create supplemental material
+**需要采取行动**：向讲座中添加包管理内容或创建补充资料
 
 ---
 
-## Exercise 06: Log File Analysis for ML Systems
+## 练习 06：ML 系统的日志文件分析
 
-### Overview
-- **File**: `exercise-06-logs.md`
-- **Focus**: Reading logs, grep/awk/sed, log analysis, journalctl, log rotation
-- **Time Required**: 60-75 minutes
-- **Difficulty**: Intermediate
+### 概述
+- **文件**：`exercise-06-logs.md`
+- **重点**：读取日志、grep/awk/sed、日志分析、journalctl、日志轮转
+- **所需时间**：60-75 分钟
+- **难度**：中级
 
-### Current Prerequisites
-- ✓ Completed Exercises 01-05
-- Understanding of Linux command line
-- Basic regex knowledge
-- Text editor familiarity
+### 当前先决条件
+- ✓ 已完成练习 01-05
+- 理解 Linux 命令行
+- 基本正则表达式知识
+- 熟悉文本编辑器
 
-### Topics Covered
-1. Common log file locations
-2. Reading logs (cat, head, tail, less)
-3. Filtering with grep
-4. Parsing with awk and sed
-5. Training metrics extraction
-6. Error pattern analysis
-7. journalctl usage
-8. Log rotation configuration
-9. Creating log analysis scripts
+### 涵盖主题
+1. 常见日志文件位置
+2. 读取日志（cat、head、tail、less）
+3. 使用 grep 过滤
+4. 使用 awk 和 sed 解析
+5. 训练指标提取
+6. 错误模式分析
+7. journalctl 使用
+8. 日志轮转配置
+9. 创建日志分析脚本
 
-### Skills Practiced
-- Reading and navigating log files
-- Using grep with regex patterns
-- Parsing logs with awk
-- Extracting metrics from logs
-- Analyzing error patterns
-- Using journalctl
-- Configuring logrotate
-- Creating analysis scripts
+### 练习的技能
+- 读取和浏览日志文件
+- 使用 grep 进行正则表达式模式匹配
+- 使用 awk 解析日志
+- 从日志中提取指标
+- 分析错误模式
+- 使用 journalctl
+- 配置 logrotate
+- 创建分析脚本
 
-### Mapping to NEW Lecture Structure
+### 映射到新讲座结构
 
-**Primary Lecture**: Lecture 07: Text Processing Tools
-- ✓ grep command
-- ✓ awk basics
-- ✓ sed basics
-- ✓ Text manipulation
+**主要讲座**：讲座 07：文本处理工具
+- ✓ grep 命令
+- ✓ awk 基础
+- ✓ sed 基础
+- ✓ 文本操作
 
-**Secondary Lectures**:
-- Lecture 04: System Administration Basics (for journalctl, system logs)
-- Lecture 06: Advanced Shell Scripting (for log analysis scripts)
+**辅助讲座**：
+- 讲座 04：系统管理基础（用于 journalctl、系统日志）
+- 讲座 06：高级 Shell 脚本（用于日志分析脚本）
 
-### Recommendations
+### 建议
 
-**REQUIRED UPDATE**:
+**需要更新**：
 ```markdown
-## Prerequisites
-- Completed Exercises 01-05
-- Completed Lecture 07: Text Processing Tools
-- Completed Lecture 04: System Administration Basics (for journalctl)
-- Understanding of Linux command line
-- Basic regex knowledge
-- Text editor familiarity
+## 先决条件
+- 已完成练习 01-05
+- 已完成讲座 07：文本处理工具
+- 已完成讲座 04：系统管理基础（用于 journalctl）
+- 理解 Linux 命令行
+- 基本正则表达式知识
+- 熟悉文本编辑器
 ```
 
-**Alignment Score**: 90% - Strong alignment with Lecture 07
+**对齐评分**：90% - 与讲座 07 高度对齐
 
 ---
 
-## Exercise 07: Real-World Troubleshooting Scenarios
+## 练习 07：真实世界故障排查场景
 
-### Overview
-- **File**: `exercise-07-troubleshooting.md`
-- **Focus**: Diagnosing and fixing real-world issues (disk full, permissions, hung processes, OOM, CUDA, network)
-- **Time Required**: 90 minutes
-- **Difficulty**: Intermediate to Advanced
+### 概述
+- **文件**：`exercise-07-troubleshooting.md`
+- **重点**：诊断和修复真实世界问题（磁盘已满、权限、挂起进程、OOM、CUDA、网络）
+- **所需时间**：90 分钟
+- **难度**：中级到高级
 
-### Current Prerequisites
-- ✓ Completed all previous exercises (01-06)
-- ✓ All lectures in Module 002
-- Confidence with Linux command line
-- Access to a test Linux system
+### 当前先决条件
+- ✓ 已完成所有先前练习（01-06）
+- ✓ 模块 002 中的所有讲座
+- 对 Linux 命令行有信心
+- 可访问测试用 Linux 系统
 
-### Topics Covered
-1. Disk space troubleshooting
-2. Permission issues
-3. Hung/zombie processes
-4. Out of Memory (OOM) issues
-5. CUDA/GPU problems
-6. Network connectivity debugging
-7. Systematic troubleshooting approach
-8. Creating troubleshooting checklists
+### 涵盖主题
+1. 磁盘空间故障排查
+2. 权限问题
+3. 挂起/僵尸进程
+4. 内存不足（OOM）问题
+5. CUDA/GPU 问题
+6. 网络连接调试
+7. 系统化排查方法
+8. 创建排查检查清单
 
-### Skills Practiced
-- Diagnosing disk space issues
-- Fixing permission problems
-- Handling stuck processes
-- Managing memory issues
-- Troubleshooting GPU/CUDA
-- Debugging network problems
-- Creating systematic workflows
-- Documenting solutions
+### 练习的技能
+- 诊断磁盘空间问题
+- 修复权限问题
+- 处理卡住的进程
+- 管理内存问题
+- 排查 GPU/CUDA 问题
+- 调试网络问题
+- 创建系统化工作流
+- 记录解决方案
 
-### Mapping to NEW Lecture Structure
+### 映射到新讲座结构
 
-**This exercise is INTEGRATIVE** - pulls from ALL lectures:
-- Lecture 02: File System (disk space)
-- Lecture 03: Permissions (permission issues)
-- Lecture 04: System Administration (processes, services)
-- Lecture 05/06: Shell Scripting (diagnostic scripts)
-- Lecture 07: Text Processing (log analysis)
-- Lecture 08: Networking Fundamentals (network issues)
+**此练习是综合性的** - 涉及所有讲座：
+- 讲座 02：文件系统（磁盘空间）
+- 讲座 03：权限（权限问题）
+- 讲座 04：系统管理（进程、服务）
+- 讲座 05/06：Shell 脚本（诊断脚本）
+- 讲座 07：文本处理（日志分析）
+- 讲座 08：网络基础（网络问题）
 
-### Recommendations
+### 建议
 
-**Current prerequisite is CORRECT**:
+**当前先决条件是正确的**：
 ```markdown
-## Prerequisites
-- Completed all previous exercises (01-06)
-- All lectures in Module 002
-- Confidence with Linux command line
-- Access to a test Linux system
+## 先决条件
+- 已完成所有先前练习（01-06）
+- 模块 002 中的所有讲座
+- 对 Linux 命令行有信心
+- 可访问测试用 Linux 系统
 ```
 
-**Alignment Score**: 100% - Perfect capstone exercise integrating all concepts
+**对齐评分**：100% - 完美的综合练习，整合所有概念
 
 ---
 
-## Exercise 08: System Automation and Maintenance for ML Infrastructure
+## 练习 08：ML 基础设施的系统自动化和维护
 
-### Overview
-- **File**: `exercise-08-system-automation.md`
-- **Focus**: Automated backups, monitoring, log rotation, cleanup tasks, health checks
-- **Time Required**: 120 minutes
-- **Difficulty**: Intermediate to Advanced
+### 概述
+- **文件**：`exercise-08-system-automation.md`
+- **重点**：自动化备份、监控、日志轮转、清理任务、健康检查
+- **所需时间**：120 分钟
+- **难度**：中级到高级
 
-### Current Prerequisites
-- ✓ Completed exercises 01-07
-- ✗ All lectures in Module 002, especially Lecture 06 (Networking & System Services) (OUTDATED)
-- Understanding of systemd and cron
-- Access to Linux system with sudo privileges
-- Basic understanding of ML workflows
+### 当前先决条件
+- ✓ 已完成练习 01-07
+- ✗ 模块 002 中的所有讲座，特别是讲座 06（网络和系统服务）（已过时）
+- 理解 systemd 和 cron
+- 可访问具有 sudo 权限的 Linux 系统
+- 基本理解 ML 工作流
 
-### Topics Covered
-1. Automated backup scripts
-2. Scheduling with cron and systemd timers
-3. GPU health monitoring
-4. Log rotation configuration
-5. Automated cleanup tasks
-6. System health checks
-7. Integration testing
-8. Creating master automation workflows
+### 涵盖主题
+1. 自动化备份脚本
+2. 使用 cron 和 systemd timers 进行调度
+3. GPU 健康监控
+4. 日志轮转配置
+5. 自动化清理任务
+6. 系统健康检查
+7. 集成测试
+8. 创建主自动化工作流
 
-### Skills Practiced
-- Writing backup scripts
-- Creating systemd services and timers
-- Setting up cron jobs
-- Implementing monitoring
-- Configuring logrotate
-- Building cleanup automation
-- Creating health check scripts
-- Testing automation pipelines
+### 练习的技能
+- 编写备份脚本
+- 创建 systemd 服务和 timers
+- 设置 cron 作业
+- 实现监控
+- 配置 logrotate
+- 构建清理自动化
+- 创建健康检查脚本
+- 测试自动化管道
 
-### Mapping to NEW Lecture Structure
+### 映射到新讲座结构
 
-**Primary Lectures**:
-- Lecture 04: System Administration Basics
-  - ✓ systemd services
-  - ✓ cron jobs
-  - ✓ System maintenance
+**主要讲座**：
+- 讲座 04：系统管理基础
+  - ✓ systemd 服务
+  - ✓ cron 作业
+  - ✓ 系统维护
 
-- Lecture 06: Advanced Shell Scripting
-  - ✓ Complex automation scripts
-  - ✓ Error handling
+- 讲座 06：高级 Shell 脚本
+  - ✓ 复杂自动化脚本
+  - ✓ 错误处理
 
-**Networking Component**:
-- Lecture 08: Networking Fundamentals
-  - The exercise mentions "especially Lecture 06 (Networking & System Services)"
-  - However, Exercise 08 doesn't heavily rely on networking concepts
-  - May be a legacy reference
+**网络组件**：
+- 讲座 08：网络基础
+  - 练习提到"特别是讲座 06（网络和系统服务）"
+  - 然而，练习 08 并不严重依赖网络概念
+  - 可能是遗留引用
 
-### Recommendations
+### 建议
 
-**REQUIRED UPDATE**:
+**需要更新**：
 ```markdown
-## Prerequisites
-- Completed exercises 01-07 in this module
-- All lectures in Module 002, especially:
-  - Lecture 04: System Administration Basics (systemd, cron)
-  - Lecture 06: Advanced Shell Scripting (automation)
-- Understanding of systemd and cron
-- Access to a Linux system with sudo privileges
-- Basic understanding of ML workflows
+## 先决条件
+- 已完成本模块中的练习 01-07
+- 模块 002 中的所有讲座，特别是：
+  - 讲座 04：系统管理基础（systemd、cron）
+  - 讲座 06：高级 Shell 脚本（自动化）
+- 理解 systemd 和 cron
+- 可访问具有 sudo 权限的 Linux 系统
+- 基本理解 ML 工作流
 ```
 
-**Alignment Score**: 95% - Excellent alignment, networking reference may be outdated
+**对齐评分**：95% - 高度对齐，网络引用可能已过时
 
 ---
 
-## Summary Matrix: Exercise to Lecture Mapping
+## 汇总矩阵：练习到讲座映射
 
-| Exercise | Primary Lecture(s) | Secondary Lecture(s) | Alignment Score | Update Needed? |
+| 练习 | 主要讲座 | 辅助讲座 | 对齐评分 | 需要更新？ |
 |----------|-------------------|---------------------|----------------|----------------|
-| 01: Navigation | Lecture 02 | Lecture 01 | 95% | ✓ Yes - Update prereqs |
-| 02: Permissions | Lecture 03 | Lecture 02 | 100% | ✓ Yes - Update prereqs |
-| 03: Processes | Lecture 04 | - | 90% | ✓ Yes - Update prereqs |
-| 04: Scripting | Lectures 05, 06 | Lectures 02, 04 | 95% | ✓ Yes - Update prereqs |
-| 05: Package Mgmt | **GAP** | Lecture 04 (partial) | 60% | ✓ **YES - Major gap** |
-| 06: Logs | Lecture 07 | Lectures 04, 06 | 90% | ✓ Yes - Update prereqs |
-| 07: Troubleshooting | ALL (integrative) | - | 100% | ✗ No - Already correct |
-| 08: Automation | Lectures 04, 06 | - | 95% | ✓ Yes - Update prereqs |
+| 01：导航 | 讲座 02 | 讲座 01 | 95% | ✓ 是 - 更新先决条件 |
+| 02：权限 | 讲座 03 | 讲座 02 | 100% | ✓ 是 - 更新先决条件 |
+| 03：进程 | 讲座 04 | - | 90% | ✓ 是 - 更新先决条件 |
+| 04：脚本 | 讲座 05、06 | 讲座 02、04 | 95% | ✓ 是 - 更新先决条件 |
+| 05：包管理 | **差距** | 讲座 04（部分） | 60% | ✓ **是 - 重大差距** |
+| 06：日志 | 讲座 07 | 讲座 04、06 | 90% | ✓ 是 - 更新先决条件 |
+| 07：故障排查 | 全部（综合性） | - | 100% | ✗ 否 - 已正确 |
+| 08：自动化 | 讲座 04、06 | - | 95% | ✓ 是 - 更新先决条件 |
 
 ---
 
-## Key Findings and Recommendations
+## 主要发现和建议
 
-### 1. Critical Gap: Package Management (Exercise 05)
+### 1. 关键差距：包管理（练习 05）
 
-**Issue**: Exercise 05 extensively covers package management, but there's no corresponding lecture in the 8-lecture structure.
+**问题**：练习 05 广泛涵盖包管理，但 8 讲结构中没有相应的讲座。
 
-**Impact**: HIGH - Students may not have lecture material to prepare for this exercise.
+**影响**：高 - 学生可能没有讲座材料来为此练习做准备。
 
-**Recommendations**:
-- **Option A** (Preferred): Expand Lecture 04 to include a dedicated section on package management
-  - Add apt/yum basics
-  - Cover pip and virtual environments
-  - Include system library installation
+**建议**：
+- **选项 A**（推荐）：扩展讲座 04，包含专门的包管理部分
+  - 添加 apt/yum 基础
+  - 涵盖 pip 和虚拟环境
+  - 包含系统库安装
 
-- **Option B**: Create supplemental reading material
-  - Separate document on package management
-  - Reference in Exercise 05 prerequisites
+- **选项 B**：创建补充阅读材料
+  - 单独的包管理文档
+  - 在练习 05 先决条件中引用
 
-- **Option C**: Split package management across multiple lectures
-  - Lecture 01: Basic package installation
-  - Lecture 04: Advanced package management
+- **选项 C**：将包管理分散到多个讲座
+  - 讲座 01：基本包安装
+  - 讲座 04：高级包管理
 
-### 2. Prerequisite Updates Required
+### 2. 先决条件更新要求
 
-**All exercises except 07** reference outdated lecture numbers. Recommended updates:
+**除 07 外的所有练习**都引用了过时的讲座编号。推荐的更新：
 
-| Exercise | Current Prereq | Should Be |
+| 练习 | 当前先决条件 | 应为 |
 |----------|---------------|-----------|
-| 01 | Lecture 01: Linux Fundamentals | Lectures 01 + 02 |
-| 02 | Lecture 02: File Systems | Lectures 02 + 03 |
-| 03 | Lecture 03: Process Mgmt | Lecture 04 |
-| 04 | Lecture 04: Shell Scripting | Lectures 05 + 06 |
-| 05 | Lecture 05: Package Mgmt | **GAP - needs content** |
-| 06 | (Not specified) | Lectures 07 + 04 |
-| 08 | Lecture 06: Networking | Lectures 04 + 06 |
+| 01 | 讲座 01：Linux 基础 | 讲座 01 + 02 |
+| 02 | 讲座 02：文件系统 | 讲座 02 + 03 |
+| 03 | 讲座 03：进程管理 | 讲座 04 |
+| 04 | 讲座 04：Shell 脚本 | 讲座 05 + 06 |
+| 05 | 讲座 05：包管理 | **差距 - 需要内容** |
+| 06 | （未指定） | 讲座 07 + 04 |
+| 08 | 讲座 06：网络 | 讲座 04 + 06 |
 
-### 3. Content Coverage Analysis
+### 3. 内容覆盖分析
 
-**Well Covered**:
-- File system navigation (Exercise 01 → Lecture 02)
-- Permissions (Exercise 02 → Lecture 03)
-- Processes (Exercise 03 → Lecture 04)
-- Shell scripting (Exercise 04 → Lectures 05, 06)
-- Text processing (Exercise 06 → Lecture 07)
+**良好覆盖**：
+- 文件系统导航（练习 01 → 讲座 02）
+- 权限（练习 02 → 讲座 03）
+- 进程（练习 03 → 讲座 04）
+- Shell 脚本（练习 04 → 讲座 05、06）
+- 文本处理（练习 06 → 讲座 07）
 
-**Partially Covered**:
-- Package management (Exercise 05 → No primary lecture)
+**部分覆盖**：
+- 包管理（练习 05 → 无主要讲座）
 
-**Not Explicitly Covered but Used**:
-- screen/tmux (Exercise 03)
-- CUDA installation (Exercise 05)
-- Docker setup (Exercise 05)
+**未明确涵盖但被使用**：
+- screen/tmux（练习 03）
+- CUDA 安装（练习 05）
+- Docker 设置（练习 05）
 
-### 4. Exercise Difficulty Progression
+### 4. 练习难度递进
 
-Appropriate progression from beginner to advanced:
-1. Exercise 01: Beginner (navigation)
-2. Exercise 02: Intermediate (permissions)
-3. Exercise 03: Intermediate (processes)
-4. Exercise 04: Intermediate (scripting)
-5. Exercise 05: Intermediate (packages)
-6. Exercise 06: Intermediate (logs)
-7. Exercise 07: Intermediate-Advanced (troubleshooting)
-8. Exercise 08: Intermediate-Advanced (automation)
+从初级到高级的适当递进：
+1. 练习 01：初级（导航）
+2. 练习 02：中级（权限）
+3. 练习 03：中级（进程）
+4. 练习 04：中级（脚本）
+5. 练习 05：中级（包）
+6. 练习 06：中级（日志）
+7. 练习 07：中级-高级（故障排查）
+8. 练习 08：中级-高级（自动化）
 
-### 5. Time Allocation
+### 5. 时间分配
 
-Total exercise time: **9-11 hours**
-- Exercise 01: 60-90 min
-- Exercise 02: 75-90 min
-- Exercise 03: 75-90 min
-- Exercise 04: 90 min
-- Exercise 05: 75-90 min
-- Exercise 06: 60-75 min
-- Exercise 07: 90 min
-- Exercise 08: 120 min
+练习总时间：**9-11 小时**
+- 练习 01：60-90 分钟
+- 练习 02：75-90 分钟
+- 练习 03：75-90 分钟
+- 练习 04：90 分钟
+- 练习 05：75-90 分钟
+- 练习 06：60-75 分钟
+- 练习 07：90 分钟
+- 练习 08：120 分钟
 
-This is reasonable for a comprehensive Linux module.
+这对于一个全面的 Linux 模块来说是合理的。
 
-### 6. Lecture 08 (Networking) Usage
+### 6. 讲座 08（网络）的使用
 
-**Finding**: Lecture 08 (Networking Fundamentals) is only lightly referenced:
-- Exercise 07 uses networking troubleshooting
-- Exercise 08 incorrectly references it
+**发现**：讲座 08（网络基础）仅被轻微引用：
+- 练习 07 使用网络故障排查
+- 练习 08 错误地引用了它
 
-**Recommendation**:
-- Exercise 07 correctly uses networking concepts
-- Exercise 08 reference should be updated
-- Consider adding a dedicated networking exercise, or
-- Ensure networking is covered in troubleshooting scenarios
-
----
-
-## Action Items
-
-### Immediate (High Priority)
-
-1. **Fix Exercise 05 Gap**
-   - [ ] Add package management section to Lecture 04, OR
-   - [ ] Create supplemental package management guide
-   - [ ] Update Exercise 05 prerequisites accordingly
-
-2. **Update All Exercise Prerequisites**
-   - [ ] Exercise 01: Update to Lectures 01, 02
-   - [ ] Exercise 02: Update to Lectures 02, 03
-   - [ ] Exercise 03: Update to Lecture 04
-   - [ ] Exercise 04: Update to Lectures 05, 06
-   - [ ] Exercise 05: Update based on #1 above
-   - [ ] Exercise 06: Update to Lectures 04, 07
-   - [ ] Exercise 08: Update to Lectures 04, 06
-
-### Medium Priority
-
-3. **Enhance Lecture Content**
-   - [ ] Add screen/tmux coverage (for Exercise 03)
-   - [ ] Ensure package management is comprehensively covered
-   - [ ] Verify all lecture examples align with exercise topics
-
-4. **Add Networking Exercise** (Optional)
-   - [ ] Consider adding Exercise 09 for dedicated networking practice
-   - [ ] Or ensure Exercise 07 adequately covers networking troubleshooting
-
-### Low Priority
-
-5. **Documentation**
-   - [ ] Create exercise-to-lecture quick reference guide
-   - [ ] Add "recommended lecture order" to module introduction
-   - [ ] Update module README with exercise flow
+**建议**：
+- 练习 07 正确使用网络概念
+- 练习 08 引用应更新
+- 考虑添加专门的网络练习，或
+- 确保网络覆盖在故障排查场景中
 
 ---
 
-## Recommended Exercise Sequence
+## 行动项
 
-Based on lecture dependencies:
+### 立即（高优先级）
 
-**Phase 1: Foundation** (Complete Lectures 01-02 first)
-1. Exercise 01: Navigation
+1. **修复练习 05 的差距**
+   - [ ] 向讲座 04 添加包管理部分，或
+   - [ ] 创建补充包管理指南
+   - [ ] 相应更新练习 05 的先决条件
 
-**Phase 2: System Basics** (Complete Lecture 03-04)
-2. Exercise 02: Permissions
-3. Exercise 03: Processes
-4. Exercise 05: Package Management (after gap is fixed)
+2. **更新所有练习的先决条件**
+   - [ ] 练习 01：更新为讲座 01、02
+   - [ ] 练习 02：更新为讲座 02、03
+   - [ ] 练习 03：更新为讲座 04
+   - [ ] 练习 04：更新为讲座 05、06
+   - [ ] 练习 05：根据上述第 1 点更新
+   - [ ] 练习 06：更新为讲座 04、07
+   - [ ] 练习 08：更新为讲座 04、06
 
-**Phase 3: Automation** (Complete Lectures 05-06)
-5. Exercise 04: Scripting
+### 中等优先级
 
-**Phase 4: Analysis** (Complete Lecture 07)
-6. Exercise 06: Logs
+3. **增强讲座内容**
+   - [ ] 添加 screen/tmux 覆盖（用于练习 03）
+   - [ ] 确保包管理得到全面覆盖
+   - [ ] 验证所有讲座示例与练习主题对齐
 
-**Phase 5: Integration** (Complete all lectures)
-7. Exercise 07: Troubleshooting
-8. Exercise 08: Automation
+4. **添加网络练习**（可选）
+   - [ ] 考虑添加练习 09 用于专门的网络实践
+   - [ ] 或确保练习 07 充分覆盖网络故障排查
 
----
+### 低优先级
 
-## Conclusion
-
-The exercises in Module 002 are well-designed and comprehensive. Key findings:
-
-**Strengths**:
-- Excellent hands-on practice
-- Progressive difficulty
-- Real-world ML focus
-- Integration exercise (07) ties everything together
-
-**Critical Gap**:
-- Exercise 05 (Package Management) lacks corresponding lecture content
-
-**Minor Issues**:
-- Outdated prerequisite references (easy to fix)
-- Some advanced topics (screen/tmux) not in lectures
-
-**Overall Assessment**: 85/100
-- Would be 95/100 once package management lecture content is added
-- Exercises are production-ready after prerequisite updates
+5. **文档**
+   - [ ] 创建练习到讲座快速参考指南
+   - [ ] 在模块介绍中添加"推荐讲座顺序"
+   - [ ] 使用练习流程更新模块 README
 
 ---
 
-## Appendix: Quick Reference Table
+## 推荐的练习顺序
 
-### Exercise 01: Navigation
-- **Lectures**: 01, 02
-- **Topics**: File system, navigation, project structure
-- **Status**: ✓ Ready (needs prereq update)
+基于讲座依赖关系：
 
-### Exercise 02: Permissions
-- **Lectures**: 02, 03
-- **Topics**: Permissions, chmod, chown, ACLs, umask
-- **Status**: ✓ Ready (needs prereq update)
+**阶段 1：基础**（先完成讲座 01-02）
+1. 练习 01：导航
 
-### Exercise 03: Processes
-- **Lectures**: 04
-- **Topics**: ps, top, kill, systemd, screen/tmux
-- **Status**: ✓ Ready (needs prereq update)
+**阶段 2：系统基础**（完成讲座 03-04）
+2. 练习 02：权限
+3. 练习 03：进程
+4. 练习 05：包管理（差距修复后）
 
-### Exercise 04: Scripting
-- **Lectures**: 05, 06
-- **Topics**: Bash scripting, automation, deployment
-- **Status**: ✓ Ready (needs prereq update)
+**阶段 3：自动化**（完成讲座 05-06）
+5. 练习 04：脚本
 
-### Exercise 05: Package Management
-- **Lectures**: **NONE** (GAP)
-- **Topics**: apt, pip, conda, CUDA, Docker
-- **Status**: ⚠ BLOCKED (needs lecture content)
+**阶段 4：分析**（完成讲座 07）
+6. 练习 06：日志
 
-### Exercise 06: Logs
-- **Lectures**: 07, 04
-- **Topics**: grep, awk, sed, journalctl, log rotation
-- **Status**: ✓ Ready (needs prereq update)
-
-### Exercise 07: Troubleshooting
-- **Lectures**: ALL (integrative)
-- **Topics**: Real-world problem solving
-- **Status**: ✓ Ready (prereqs correct)
-
-### Exercise 08: Automation
-- **Lectures**: 04, 06
-- **Topics**: Cron, systemd timers, monitoring, backups
-- **Status**: ✓ Ready (needs prereq update)
+**阶段 5：综合**（完成所有讲座）
+7. 练习 07：故障排查
+8. 练习 08：自动化
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: 2025-10-28
-**Status**: Final Analysis
+## 结论
+
+模块 002 中的练习设计良好且全面。主要发现：
+
+**优势**：
+- 优秀的动手实践
+- 渐进式难度
+- 真实的 ML 重点
+- 综合练习（07）将所有内容联系在一起
+
+**关键差距**：
+- 练习 05（包管理）缺少相应的讲座内容
+
+**次要问题**：
+- 过时的先决条件引用（容易修复）
+- 一些高级主题（screen/tmux）不在讲座中
+
+**总体评估**：85/100
+- 添加包管理讲座内容后可达到 95/100
+- 先决条件更新后，练习可投入生产使用
+
+---
+
+## 附录：快速参考表
+
+### 练习 01：导航
+- **讲座**：01、02
+- **主题**：文件系统、导航、项目结构
+- **状态**：✓ 就绪（需要更新先决条件）
+
+### 练习 02：权限
+- **讲座**：02、03
+- **主题**：权限、chmod、chown、ACL、umask
+- **状态**：✓ 就绪（需要更新先决条件）
+
+### 练习 03：进程
+- **讲座**：04
+- **主题**：ps、top、kill、systemd、screen/tmux
+- **状态**：✓ 就绪（需要更新先决条件）
+
+### 练习 04：脚本
+- **讲座**：05、06
+- **主题**：Bash 脚本、自动化、部署
+- **状态**：✓ 就绪（需要更新先决条件）
+
+### 练习 05：包管理
+- **讲座**：**无**（差距）
+- **主题**：apt、pip、conda、CUDA、Docker
+- **状态**：⚠ 阻塞（需要讲座内容）
+
+### 练习 06：日志
+- **讲座**：07、04
+- **主题**：grep、awk、sed、journalctl、日志轮转
+- **状态**：✓ 就绪（需要更新先决条件）
+
+### 练习 07：故障排查
+- **讲座**：全部（综合性）
+- **主题**：真实世界问题解决
+- **状态**：✓ 就绪（先决条件正确）
+
+### 练习 08：自动化
+- **讲座**：04、06
+- **主题**：Cron、systemd timers、监控、备份
+- **状态**：✓ 就绪（需要更新先决条件）
+
+---
+
+**文档版本**：1.0
+**最后更新**：2025-10-28
+**状态**：最终分析

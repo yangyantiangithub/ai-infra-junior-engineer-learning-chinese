@@ -2,95 +2,95 @@
 
 ## Overview
 
-This comprehensive exercise guides you through building production-ready Docker images for ML applications, implementing multi-stage builds for optimization, setting up health checks, configuring resource limits, and deploying to production with proper monitoring and security.
+本综合练习将指导你为 ML 应用构建生产就绪的 Docker image，实现多阶段构建优化，设置健康检查，配置资源限制，并使用适当的监控和安全措施部署到生产环境。
 
 ## Learning Objectives
 
-By completing this exercise, you will:
-- Build optimized multi-stage Docker images for ML applications
-- Implement health checks and readiness probes
-- Configure resource limits for GPU and CPU workloads
-- Set up proper logging and monitoring
-- Implement security best practices
-- Create production deployment configurations
-- Handle secrets and environment variables securely
-- Build CI/CD pipelines for automated Docker builds
+完成本练习后，你将能够：
+- 为 ML 应用构建优化的多阶段 Docker image
+- 实现健康检查和就绪探测
+- 配置 GPU 和 CPU 工作负载的资源限制
+- 设置适当的日志记录和监控
+- 实现安全最佳实践
+- 创建生产部署配置
+- 安全地处理密钥和环境变量
+- 构建用于自动化 Docker 构建的 CI/CD pipeline
 
 ## Prerequisites
 
-- Completed exercises 01-07 in this module
-- All Docker lectures in Module 005
-- Understanding of ML inference workflows
-- Basic knowledge of Kubernetes (helpful but not required)
+- 已完成本模块中的练习 01-07
+- Module 005 中的所有 Docker 讲座
+- 理解 ML 推理工作流
+- Kubernetes 基本知识（有帮助但非必需）
 
 ## Time Required
 
-- Estimated: 120-150 minutes
-- Difficulty: Advanced
+- 预计时间：120-150 分钟
+- 难度：高级
 
 ---
 
-## Part 1: Multi-Stage Dockerfile for ML Application
+## Part 1: ML 应用的多阶段 Dockerfile
 
-### Task 1.1: Create Production-Optimized Dockerfile
+### Task 1.1: 创建生产优化的 Dockerfile
 
-Create a FastAPI ML inference service with multi-stage build:
+创建一个带多阶段构建的 FastAPI ML 推理服务：
 
 ```dockerfile
 # Dockerfile.production
-# Stage 1: Build stage with development tools
+# 阶段 1：带开发工具的构建阶段
 FROM python:3.11-slim as builder
 
-# Install build dependencies
+# 安装构建依赖
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Create virtual environment
+# 创建虚拟环境
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Copy requirements first (better caching)
+# 先复制 requirements（更好的缓存）
 COPY requirements.txt .
 
-# Install Python dependencies
+# 安装 Python 依赖
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Stage 2: Runtime stage (production)
+# 阶段 2：运行时阶段（生产）
 FROM python:3.11-slim
 
-# Add non-root user for security
+# 为安全添加非 root 用户
 RUN groupadd -r mluser && useradd -r -g mluser mluser
 
-# Copy virtual environment from builder
+# 从构建阶段复制虚拟环境
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Set working directory
+# 设置工作目录
 WORKDIR /app
 
-# Copy application code
+# 复制应用代码
 COPY --chown=mluser:mluser app/ /app/
 COPY --chown=mluser:mluser models/ /app/models/
 
-# Switch to non-root user
+# 切换到非 root 用户
 USER mluser
 
-# Expose port
+# 暴露端口
 EXPOSE 8000
 
-# Health check
+# 健康检查
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-# Run application
+# 运行应用
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-### Task 1.2: Create Application Files
+### Task 1.2: 创建应用文件
 
 **requirements.txt:**
 ```txt
@@ -112,18 +112,18 @@ from prometheus_client import Counter, Histogram, generate_latest
 import time
 import logging
 
-# Configure logging
+# 配置日志
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Prometheus metrics
+# Prometheus 指标
 PREDICTION_COUNT = Counter('predictions_total', 'Total predictions')
 PREDICTION_LATENCY = Histogram('prediction_latency_seconds', 'Prediction latency')
 ERROR_COUNT = Counter('prediction_errors_total', 'Total prediction errors')
 
 app = FastAPI(title="ML Inference API", version="1.0.0")
 
-# Load model at startup
+# 启动时加载模型
 model_session = None
 
 @app.on_event("startup")
@@ -145,32 +145,32 @@ class PredictionResponse(BaseModel):
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint for load balancers"""
+    """负载均衡器的健康检查端点"""
     if model_session is None:
         raise HTTPException(status_code=503, detail="Model not loaded")
     return {"status": "healthy", "model": "loaded"}
 
 @app.get("/ready")
 async def readiness_check():
-    """Readiness check for Kubernetes"""
+    """Kubernetes 的就绪检查"""
     if model_session is None:
         raise HTTPException(status_code=503, detail="Not ready")
     return {"status": "ready"}
 
 @app.post("/predict", response_model=PredictionResponse)
 async def predict(request: PredictionRequest):
-    """Make prediction"""
+    """进行预测"""
     start_time = time.time()
 
     try:
-        # Prepare input
+        # 准备输入
         input_data = np.array([request.features], dtype=np.float32)
 
-        # Run inference
+        # 运行推理
         outputs = model_session.run(None, {"input": input_data})
         prediction = float(outputs[0][0])
 
-        # Metrics
+        # 指标
         latency = (time.time() - start_time) * 1000
         PREDICTION_COUNT.inc()
         PREDICTION_LATENCY.observe(time.time() - start_time)
@@ -187,7 +187,7 @@ async def predict(request: PredictionRequest):
 
 @app.get("/metrics")
 async def metrics():
-    """Prometheus metrics endpoint"""
+    """Prometheus 指标端点"""
     return generate_latest()
 
 @app.get("/")
@@ -204,16 +204,16 @@ async def root():
     }
 ```
 
-### Task 1.3: Build and Test
+### Task 1.3: 构建和测试
 
 ```bash
-# Build multi-stage image
+# 构建多阶段 image
 docker build -t ml-inference:v1.0.0 -f Dockerfile.production .
 
-# Check image size (should be smaller than single-stage)
+# 检查 image 大小（应小于单阶段构建）
 docker images ml-inference:v1.0.0
 
-# Run container
+# 运行 container
 docker run -d \
     --name ml-api \
     -p 8000:8000 \
@@ -221,32 +221,32 @@ docker run -d \
     --cpus="2.0" \
     ml-inference:v1.0.0
 
-# Test health check
+# 测试健康检查
 curl http://localhost:8000/health
 
-# Test prediction
+# 测试预测
 curl -X POST http://localhost:8000/predict \
     -H "Content-Type: application/json" \
     -d '{"features": [1.0, 2.0, 3.0, 4.0]}'
 
-# Check metrics
+# 检查指标
 curl http://localhost:8000/metrics
 
-# View logs
+# 查看日志
 docker logs ml-api
 
-# Check resource usage
+# 检查资源使用
 docker stats ml-api
 
-# Stop container
+# 停止 container
 docker stop ml-api && docker rm ml-api
 ```
 
 ---
 
-## Part 2: Docker Compose for Development
+## Part 2: 开发环境的 Docker Compose
 
-### Task 2.1: Create docker-compose.yml
+### Task 2.1: 创建 docker-compose.yml
 
 ```yaml
 version: '3.8'
@@ -263,7 +263,7 @@ services:
       - LOG_LEVEL=INFO
       - MODEL_PATH=/app/models/model.onnx
     volumes:
-      - ./models:/app/models:ro  # Read-only model mount
+      - ./models:/app/models:ro  # 只读模型挂载
     networks:
       - ml-network
     deploy:
@@ -319,7 +319,7 @@ volumes:
   grafana-data:
 ```
 
-### Task 2.2: Prometheus Configuration
+### Task 2.2: Prometheus 配置
 
 **prometheus.yml:**
 ```yaml
@@ -333,58 +333,58 @@ scrape_configs:
     metrics_path: '/metrics'
 ```
 
-### Task 2.3: Launch Stack
+### Task 2.3: 启动栈
 
 ```bash
-# Start all services
+# 启动所有服务
 docker-compose up -d
 
-# View logs
+# 查看日志
 docker-compose logs -f ml-api
 
-# Check services
+# 检查服务
 docker-compose ps
 
-# Test API
+# 测试 API
 curl http://localhost:8000/health
 
-# Access Prometheus
+# 访问 Prometheus
 open http://localhost:9090
 
-# Access Grafana (admin/admin)
+# 访问 Grafana (admin/admin)
 open http://localhost:3000
 
-# Stop all services
+# 停止所有服务
 docker-compose down
 
-# Stop and remove volumes
+# 停止并删除 volume
 docker-compose down -v
 ```
 
 ---
 
-## Part 3: GPU Support
+## Part 3: GPU 支持
 
-### Task 3.1: Dockerfile with CUDA
+### Task 3.1: 带 CUDA 的 Dockerfile
 
 ```dockerfile
 # Dockerfile.gpu
 FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
 
-# Install Python
+# 安装 Python
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.11 \
     python3-pip \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PyTorch with CUDA
+# 安装带 CUDA 的 PyTorch
 RUN pip3 install --no-cache-dir \
     torch==2.0.1+cu118 \
     torchvision==0.15.2+cu118 \
     --extra-index-url https://download.pytorch.org/whl/cu118
 
-# Copy requirements and app
+# 复制 requirements 和应用
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
@@ -393,20 +393,20 @@ COPY app/ /app/
 
 EXPOSE 8000
 
-# Health check
+# 健康检查
 HEALTHCHECK --interval=30s --timeout=3s \
     CMD curl -f http://localhost:8000/health || exit 1
 
 CMD ["python3", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-### Task 3.2: Run with GPU
+### Task 3.2: 使用 GPU 运行
 
 ```bash
-# Build GPU image
+# 构建 GPU image
 docker build -t ml-inference:v1.0.0-gpu -f Dockerfile.gpu .
 
-# Run with GPU access
+# 使用 GPU 访问运行
 docker run -d \
     --name ml-api-gpu \
     --gpus all \
@@ -414,46 +414,46 @@ docker run -d \
     --memory="4g" \
     ml-inference:v1.0.0-gpu
 
-# Verify GPU access inside container
+# 验证 container 内部的 GPU 访问
 docker exec ml-api-gpu nvidia-smi
 
-# Monitor GPU usage
+# 监控 GPU 使用
 watch -n 1 docker exec ml-api-gpu nvidia-smi
 ```
 
 ---
 
-## Part 4: Security Best Practices
+## Part 4: 安全最佳实践
 
-### Task 4.1: Scan for Vulnerabilities
+### Task 4.1: 扫描漏洞
 
 ```bash
-# Install Trivy
+# 安装 Trivy
 sudo apt-get install wget apt-transport-https gnupg lsb-release
 wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
 echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
 sudo apt-get update
 sudo apt-get install trivy
 
-# Scan image for vulnerabilities
+# 扫描 image 漏洞
 trivy image ml-inference:v1.0.0
 
-# Scan for high/critical only
+# 仅扫描高/严重级别
 trivy image --severity HIGH,CRITICAL ml-inference:v1.0.0
 
-# Generate report
+# 生成报告
 trivy image --format json --output report.json ml-inference:v1.0.0
 ```
 
-### Task 4.2: Implement Secrets Management
+### Task 4.2: 实现密钥管理
 
-**Using Docker secrets:**
+**使用 Docker secrets：**
 
 ```bash
-# Create secret
+# 创建密钥
 echo "my-api-key-12345" | docker secret create api_key -
 
-# Run with secret (Swarm mode)
+# 使用密钥运行（Swarm 模式）
 docker service create \
     --name ml-api \
     --secret api_key \
@@ -461,9 +461,9 @@ docker service create \
     ml-inference:v1.0.0
 ```
 
-**Using environment file:**
+**使用环境文件：**
 
-**.env (DO NOT commit to Git!):**
+**.env（不要提交到 Git!）：**
 ```bash
 API_KEY=my-secure-api-key
 MODEL_PATH=/app/models/model.onnx
@@ -471,7 +471,7 @@ LOG_LEVEL=INFO
 ```
 
 ```bash
-# Run with env file
+# 使用 env 文件运行
 docker run -d \
     --env-file .env \
     -p 8000:8000 \
@@ -482,9 +482,9 @@ docker run -d \
 
 ## Part 5: CI/CD Pipeline
 
-### Task 5.1: GitHub Actions Workflow
+### Task 5.1: GitHub Actions 工作流
 
-**.github/workflows/docker-build.yml:**
+**.github/workflows/docker-build.yml：**
 ```yaml
 name: Build and Push Docker Image
 
@@ -557,11 +557,11 @@ jobs:
 
 ---
 
-## Part 6: Kubernetes Deployment
+## Part 6: Kubernetes 部署
 
-### Task 6.1: Create Kubernetes Manifests
+### Task 6.1: 创建 Kubernetes 清单
 
-**deployment.yaml:**
+**deployment.yaml：**
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -625,45 +625,45 @@ spec:
 
 ## Deliverables
 
-Submit the following:
+提交以下内容：
 
-1. **Dockerfiles**:
-   - Multi-stage Dockerfile for CPU
-   - Dockerfile for GPU workloads
-   - docker-compose.yml for full stack
+1. **Dockerfiles**：
+   - CPU 的多阶段 Dockerfile
+   - GPU 工作负载的 Dockerfile
+   - 完整栈的 docker-compose.yml
 
-2. **Application Code**:
-   - FastAPI inference service
-   - Health check endpoints
-   - Prometheus metrics
+2. **Application Code**：
+   - FastAPI 推理服务
+   - 健康检查端点
+   - Prometheus 指标
 
-3. **CI/CD**:
-   - GitHub Actions workflow
-   - Automated vulnerability scanning
+3. **CI/CD**：
+   - GitHub Actions 工作流
+   - 自动化漏洞扫描
 
-4. **Documentation**:
-   - Deployment guide
-   - Security checklist
-   - Troubleshooting runbook
+4. **Documentation**：
+   - 部署指南
+   - 安全检查清单
+   - 排错手册
 
-5. **Evidence**:
-   - Build logs
-   - Trivy scan results
-   - Performance benchmarks
+5. **Evidence**：
+   - 构建日志
+   - Trivy 扫描结果
+   - 性能基准测试
 
 ---
 
 ## Challenge Questions
 
-1. **Image Size**: Your image is 2GB. How can you reduce it to <500MB?
+1. **Image Size**: 你的 image 是 2GB。如何将其减少到 <500MB？
 
-2. **Security**: What are the top 5 security risks in ML Docker images?
+2. **Security**: ML Docker image 中的前 5 大安全风险是什么？
 
-3. **Performance**: How do you optimize container startup time for models >1GB?
+3. **Performance**: 如何优化大于 1GB 模型的 container 启动时间？
 
-4. **Scaling**: How do you auto-scale based on GPU utilization?
+4. **Scaling**: 如何基于 GPU 利用率进行自动扩展？
 
-5. **Monitoring**: What metrics should you track for production ML containers?
+5. **Monitoring**: 生产 ML container 应跟踪哪些指标？
 
 ---
 
@@ -677,4 +677,4 @@ Submit the following:
 
 ---
 
-**Congratulations!** You've built a production-ready ML Docker deployment with security, monitoring, and CI/CD automation.
+**Congratulations!** 你已经构建了一个生产就绪的 ML Docker 部署，包含安全、监控和 CI/CD 自动化。

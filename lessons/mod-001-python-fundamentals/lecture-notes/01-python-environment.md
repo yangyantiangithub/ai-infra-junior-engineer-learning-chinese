@@ -1,197 +1,197 @@
-# Lecture 01: Python Environment & Dependency Management
+# Lecture 01：Python 环境与依赖管理
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Understanding Python Environments](#understanding-python-environments)
-3. [Virtual Environments Deep Dive](#virtual-environments-deep-dive)
-4. [Package Management with pip](#package-management-with-pip)
-5. [Requirements Files](#requirements-files)
-6. [Python Version Management](#python-version-management)
-7. [Best Practices for AI Infrastructure](#best-practices-for-ai-infrastructure)
-8. [Common Issues and Troubleshooting](#common-issues-and-troubleshooting)
-9. [Summary and Key Takeaways](#summary-and-key-takeaways)
-
----
-
-## Introduction
-
-### Why Environment Management Matters
-
-Imagine this scenario: You've spent weeks developing an ML model training pipeline. It works perfectly on your laptop. You deploy it to production, and suddenly, cryptic errors appear. The model won't load. Libraries throw version incompatibility warnings. Your carefully tuned pipeline crashes.
-
-What happened? **Environment mismatch**.
-
-In AI infrastructure engineering, environment management isn't just best practice—it's survival. The ML ecosystem involves hundreds of dependencies, many with complex version requirements. PyTorch needs specific CUDA versions. TensorFlow has strict numpy version requirements. One mismatched package can cascade into system-wide failures.
-
-This lecture teaches you to prevent these disasters through rigorous environment and dependency management.
-
-### Learning Objectives
-
-By the end of this lecture, you will:
-
-- Understand how Python finds and loads packages
-- Create isolated virtual environments using multiple tools
-- Manage dependencies with pip effectively
-- Write bulletproof requirements files
-- Handle multiple Python versions on one system
-- Apply environment management to AI/ML workflows
-- Troubleshoot common environment issues
-
-### The AI Infrastructure Context
-
-AI infrastructure engineers work at the intersection of:
-- **Data Science**: Managing environments for data scientists and ML engineers
-- **Software Engineering**: Building production-grade Python applications
-- **DevOps**: Deploying and maintaining services across multiple environments
-
-You'll need to ensure that:
-- Training jobs run with correct library versions
-- Model serving APIs load the right ML framework version
-- Development environments match production exactly
-- Team members can reproduce each other's work
-- CI/CD pipelines use consistent dependencies
+## 目录
+1. [引言](#引言)
+2. [理解 Python 环境](#理解-python-环境)
+3. [虚拟环境深入解析](#虚拟环境深入解析)
+4. [使用 pip 进行包管理](#使用-pip-进行包管理)
+5. [需求文件](#需求文件)
+6. [Python 版本管理](#python-版本管理)
+7. [AI 基础设施的最佳实践](#ai-基础设施的最佳实践)
+8. [常见问题与故障排除](#常见问题与故障排除)
+9. [总结与关键要点](#总结与关键要点)
 
 ---
 
-## Understanding Python Environments
+## 引言
 
-### How Python Finds Packages
+### 为什么环境管理很重要
 
-When you write `import tensorflow`, Python searches for the package through a specific process:
+想象这样一个场景：你花了数周时间开发一个 ML 模型训练流水线。它在你的笔记本电脑上完美运行。你将其部署到生产环境，突然出现神秘的错误。模型无法加载。库抛出版本不兼容警告。你精心调优的流水线崩溃了。
+
+发生了什么？**环境不匹配**。
+
+在 AI 基础设施工程中，环境管理不仅仅是最佳实践——它是生存之道。ML 生态涉及数百个依赖项，许多具有复杂的版本要求。PyTorch 需要特定的 CUDA 版本。TensorFlow 对 numpy 版本有严格要求。一个不匹配的包可能级联导致系统范围的故障。
+
+本讲座教你通过严格的环境和依赖管理来防止这些灾难。
+
+### 学习目标
+
+完成本讲座后，你将能够：
+
+- 理解 Python 如何查找和加载包
+- 使用多种工具创建隔离的虚拟环境
+- 有效使用 pip 管理依赖
+- 编写可靠的 requirements 文件
+- 在一个系统上处理多个 Python 版本
+- 将环境管理应用于 AI/ML 工作流
+- 排查常见的环境问题
+
+### AI 基础设施背景
+
+AI 基础设施工程师工作在以下交叉领域：
+- **数据科学**：为数据科学家和 ML 工程师管理环境
+- **软件工程**：构建生产级 Python 应用程序
+- **DevOps**：跨多个环境部署和维护服务
+
+你需要确保：
+- 训练作业使用正确的库版本运行
+- 模型服务 API 加载正确的 ML 框架版本
+- 开发环境与生产环境完全匹配
+- 团队成员可以重现彼此的工作
+- CI/CD 流水线使用一致的依赖
+
+---
+
+## 理解 Python 环境
+
+### Python 如何查找包
+
+当你编写 `import tensorflow` 时，Python 通过特定过程搜索包：
 
 ```
-1. Check sys.modules (already imported packages)
-2. Search through directories in sys.path:
-   - Current directory
-   - PYTHONPATH environment variable
-   - Standard library directories
-   - Site-packages directories (3rd party packages)
+1. 检查 sys.modules（已导入的包）
+2. 搜索 sys.path 中的目录：
+   - 当前目录
+   - PYTHONPATH 环境变量
+   - 标准库目录
+   - Site-packages 目录（第三方包）
 ```
 
-You can inspect this yourself:
+你可以自己检查：
 
 ```python
 import sys
 print(sys.path)
 ```
 
-Output might look like:
+输出可能如下：
 ```
 [
-    '/home/user/my-project',  # Current directory
-    '/usr/lib/python3.11',    # Standard library
-    '/usr/lib/python3.11/site-packages',  # System packages
-    '/home/user/.local/lib/python3.11/site-packages'  # User packages
+    '/home/user/my-project',  # 当前目录
+    '/usr/lib/python3.11',    # 标准库
+    '/usr/lib/python3.11/site-packages',  # 系统包
+    '/home/user/.local/lib/python3.11/site-packages'  # 用户包
 ]
 ```
 
-### The Global vs Local Package Problem
+### 全局与本地包问题
 
-**Global Installation** (problematic):
+**全局安装**（有问题）：
 ```bash
-pip install tensorflow  # Installs to system Python
+pip install tensorflow  # 安装到系统 Python
 ```
 
-Issues with global installation:
-- Every project uses the same package versions
-- Upgrading for one project breaks others
-- Can't test with different versions
-- Risk of system Python corruption
-- Requires admin/sudo on many systems
-- Conflicts between project requirements
+全局安装的问题：
+- 每个项目使用相同的包版本
+- 为一个项目升级会破坏其他项目
+- 无法测试不同版本
+- 系统 Python 有被破坏的风险
+- 许多系统需要管理员/sudo 权限
+- 项目需求之间的冲突
 
-**Local Installation** (isolated):
+**本地安装**（隔离）：
 ```bash
 python -m venv my-project-env
 source my-project-env/bin/activate
-pip install tensorflow  # Installs only for this environment
+pip install tensorflow  # 仅安装到此环境
 ```
 
-Benefits of isolation:
-- Each project has independent dependencies
-- Safe to experiment with versions
-- No admin privileges needed
-- Reproducible across machines
-- Clear dependency manifest per project
+隔离的好处：
+- 每个项目有独立的依赖
+- 安全地尝试版本实验
+- 无需管理员权限
+- 跨机器可重现
+- 每个项目有清晰的依赖清单
 
-### Site-Packages Directory Structure
+### Site-Packages 目录结构
 
-Understanding where packages live helps debug import issues:
+理解包的存放位置有助于调试导入问题：
 
 ```
 my-venv/
-├── bin/               # Executables (python, pip, scripts)
+├── bin/               # 可执行文件（python、pip、脚本）
 │   ├── python -> python3.11
 │   ├── pip
-│   └── activate       # Activation script
-├── include/           # C headers for compiled extensions
+│   └── activate       # 激活脚本
+├── include/           # 编译扩展的 C 头文件
 ├── lib/
 │   └── python3.11/
-│       └── site-packages/    # ALL installed packages go here
+│       └── site-packages/    # 所有已安装包都在这里
 │           ├── tensorflow/
 │           ├── numpy/
 │           ├── requests/
 │           └── ...
-└── pyvenv.cfg         # Environment configuration
+└── pyvenv.cfg         # 环境配置
 ```
 
-When you activate a virtual environment, it modifies:
-- `PATH`: Prepends `my-venv/bin/` so its python runs first
-- `PYTHONPATH`: Points to `my-venv/lib/python3.11/site-packages`
+当你激活虚拟环境时，它会修改：
+- `PATH`：前置 `my-venv/bin/` 以使其 python 先运行
+- `PYTHONPATH`：指向 `my-venv/lib/python3.11/site-packages`
 
 ---
 
-## Virtual Environments Deep Dive
+## 虚拟环境深入解析
 
-### Using venv (Built-in, Recommended)
+### 使用 venv（内置，推荐）
 
-The `venv` module comes with Python 3.3+. It's the standard, official solution.
+`venv` 模块随 Python 3.3+ 提供。它是标准的官方解决方案。
 
-#### Creating an Environment
+#### 创建环境
 
 ```bash
-# Basic creation
+# 基本创建
 python3 -m venv myenv
 
-# Specify Python version explicitly
+# 显式指定 Python 版本
 python3.11 -m venv myenv
 
-# Create in a specific location
+# 在特定位置创建
 python3 -m venv /path/to/my/project/venv
 ```
 
-**What happens during creation?**
-1. Creates directory structure (bin, lib, include)
-2. Copies or symlinks Python interpreter
-3. Installs pip and setuptools
-4. Creates activation scripts for various shells
+**创建过程中发生了什么？**
+1. 创建目录结构（bin、lib、include）
+2. 复制或符号链接 Python 解释器
+3. 安装 pip 和 setuptools
+4. 为各种 shell 创建激活脚本
 
-#### Activating the Environment
+#### 激活环境
 
-**Linux/macOS (bash/zsh)**:
+**Linux/macOS（bash/zsh）**：
 ```bash
 source myenv/bin/activate
 ```
 
-**Windows (Command Prompt)**:
+**Windows（命令提示符）**：
 ```cmd
 myenv\Scripts\activate.bat
 ```
 
-**Windows (PowerShell)**:
+**Windows（PowerShell）**：
 ```powershell
 myenv\Scripts\Activate.ps1
 ```
 
-**What activation does**:
+**激活操作的效果**：
 ```bash
-# Before activation
+# 激活前
 which python
 # /usr/bin/python
 
 source myenv/bin/activate
 
-# After activation
+# 激活后
 which python
 # /home/user/myproject/myenv/bin/python
 
@@ -199,52 +199,52 @@ echo $PATH
 # /home/user/myproject/myenv/bin:/usr/local/bin:/usr/bin:...
 ```
 
-Your prompt changes to indicate active environment:
+你的提示符会改变以指示活动环境：
 ```bash
 (myenv) user@host:~/project$
 ```
 
-#### Working in the Environment
+#### 在环境中工作
 
 ```bash
-# Activate
+# 激活
 source myenv/bin/activate
 
-# Install packages (only affects this environment)
+# 安装包（仅影响此环境）
 pip install numpy pandas tensorflow
 
-# Check installed packages
+# 检查已安装的包
 pip list
 
-# Run Python code (uses environment's packages)
+# 运行 Python 代码（使用环境的包）
 python my_script.py
 
-# Deactivate when done
+# 完成后停用
 deactivate
 ```
 
-#### Environment Best Practices
+#### 环境最佳实践
 
-**1. Environment Location**
+**1. 环境位置**
 ```bash
-# Good: In project root, gitignored
+# 好：在项目根目录中，被 gitignore
 my-ml-project/
-├── venv/              # or .venv/
+├── venv/              # 或 .venv/
 ├── src/
 ├── tests/
 ├── requirements.txt
-└── .gitignore         # includes venv/
+└── .gitignore         # 包含 venv/
 ```
 
-**2. Naming Conventions**
+**2. 命名约定**
 ```bash
-venv        # Most common
-.venv       # Hidden, keeps directory clean
-env         # Short alternative
-virtualenv  # Explicit
+venv        # 最常见
+.venv       # 隐藏，保持目录整洁
+env         # 简短替代
+virtualenv  # 显式
 ```
 
-**3. Gitignore Virtual Environments**
+**3. Gitignore 虚拟环境**
 ```gitignore
 # .gitignore
 venv/
@@ -254,125 +254,125 @@ env/
 __pycache__/
 ```
 
-Never commit virtual environments to git—they're machine-specific and easily recreated.
+永远不要将虚拟环境提交到 git——它们是机器特定的且易于重新创建。
 
-### Advanced: virtualenv vs venv
+### 高级：virtualenv vs venv
 
-While `venv` is built-in and sufficient, `virtualenv` offers additional features:
+虽然 `venv` 是内置的且足够使用，但 `virtualenv` 提供了额外功能：
 
 ```bash
-# Install virtualenv
+# 安装 virtualenv
 pip install virtualenv
 
-# Create environment
+# 创建环境
 virtualenv myenv
 
-# Features venv doesn't have:
-virtualenv --python=python3.9 myenv     # Specify any Python version
-virtualenv --system-site-packages myenv  # Access system packages
-virtualenv --no-setuptools myenv         # Minimal environment
+# venv 没有的功能：
+virtualenv --python=python3.9 myenv     # 指定任何 Python 版本
+virtualenv --system-site-packages myenv  # 访问系统包
+virtualenv --no-setuptools myenv         # 最小环境
 ```
 
-**When to use virtualenv**:
-- Need Python version not managed by venv
-- Want additional customization options
-- Working with legacy Python 2.7 projects
-- Need faster environment creation (it's optimized)
+**何时使用 virtualenv**：
+- 需要 venv 无法管理的 Python 版本
+- 想要额外的自定义选项
+- 处理遗留的 Python 2.7 项目
+- 需要更快的环境创建（它经过优化）
 
-**For AI infrastructure work, venv is usually sufficient.**
+**对于 AI 基础设施工作，venv 通常就足够了。**
 
-### Alternative: pyenv and pyenv-virtualenv
+### 替代方案：pyenv 和 pyenv-virtualenv
 
-For managing multiple Python versions AND virtual environments:
+用于管理多个 Python 版本和虚拟环境：
 
 ```bash
-# Install pyenv (Linux/macOS)
+# 安装 pyenv（Linux/macOS）
 curl https://pyenv.run | bash
 
-# Install a specific Python version
+# 安装特定 Python 版本
 pyenv install 3.11.5
 
-# Set global Python version
+# 设置全局 Python 版本
 pyenv global 3.11.5
 
-# Create virtual environment with pyenv-virtualenv
+# 使用 pyenv-virtualenv 创建虚拟环境
 pyenv virtualenv 3.11.5 my-ml-project
 
-# Activate automatically when entering directory
+# 进入目录时自动激活
 cd my-ml-project
 echo "my-ml-project" > .python-version
-# Now auto-activates when you cd into directory!
+# 现在当你 cd 进入目录时会自动激活！
 ```
 
-**Advantages for ML work**:
-- Test code against multiple Python versions
-- Automatic activation per directory
-- Manage Python versions without root access
-- Integrates with venv seamlessly
+**ML 工作的优势**：
+- 针对多个 Python 版本测试代码
+- 每个目录自动激活
+- 无需 root 权限即可管理 Python 版本
+- 与 venv 无缝集成
 
 ---
 
-## Package Management with pip
+## 使用 pip 进行包管理
 
-### Understanding pip
+### 理解 pip
 
-`pip` is Python's package installer, interfacing with PyPI (Python Package Index) and other repositories.
+`pip` 是 Python 的包安装程序，与 PyPI（Python 包索引）和其他仓库交互。
 
-#### Basic pip Commands
+#### 基本 pip 命令
 
 ```bash
-# Install a package
+# 安装包
 pip install requests
 
-# Install specific version
+# 安装特定版本
 pip install requests==2.31.0
 
-# Install version constraint
+# 安装版本约束
 pip install "requests>=2.31.0,<3.0.0"
 
-# Install multiple packages
+# 安装多个包
 pip install requests numpy pandas
 
-# Upgrade a package
+# 升级包
 pip install --upgrade requests
 
-# Uninstall a package
+# 卸载包
 pip uninstall requests
 
-# Show package information
+# 显示包信息
 pip show tensorflow
 
-# List installed packages
+# 列出已安装的包
 pip list
 
-# List outdated packages
+# 列出过时的包
 pip list --outdated
 ```
 
-#### Understanding Version Specifiers
+#### 理解版本说明符
 
 ```bash
-# Exact version
+# 精确版本
 pip install numpy==1.24.0
 
-# Minimum version
+# 最低版本
 pip install numpy>=1.24.0
 
-# Compatible version (allows patch updates)
-pip install numpy~=1.24.0     # Allows 1.24.x, not 1.25.0
+# 兼容版本（允许补丁更新）
+pip install numpy~=1.24.0     # 允许 1.24.x，不允许 1.25.0
 
-# Exclude versions
-pip install "numpy>=1.24.0,<2.0.0,!=1.24.1"  # Avoid buggy 1.24.1
+# 排除版本
+pip install "numpy>=1.24.0,<2.0.0,!=1.24.1"  # 避免有 bug 的 1.24.1
 
-# Latest version (dangerous for production)
+# 最新版本（生产环境中危险）
 pip install numpy
 ```
 
-**For AI infrastructure, always pin versions in production!**
+**对于 AI 基础设施，始终在生产环境中固定版本！**
 
-### Pip Configuration
+### Pip 配置
 
-Create `~/.pip/pip.conf` (Linux/macOS) or `%APPDATA%\pip\pip.ini` (Windows):
+创建 `~/.pip/pip.conf`（Linux/macOS）或 `%APPDATA%\pip\pip.ini`（Windows）：
 
 ```ini
 [global]
@@ -385,45 +385,45 @@ trusted-host = pypi.org
                files.pythonhosted.org
 ```
 
-**Private package repositories**:
+**私有包仓库**：
 ```ini
 [global]
 index-url = https://my-company-pypi.example.com/simple
 extra-index-url = https://pypi.org/simple
 ```
 
-### Installing from Different Sources
+### 从不同来源安装
 
 ```bash
-# From PyPI (default)
+# 从 PyPI（默认）
 pip install tensorflow
 
-# From Git repository
+# 从 Git 仓库
 pip install git+https://github.com/user/repo.git
 
-# From specific branch
+# 从特定分支
 pip install git+https://github.com/user/repo.git@dev-branch
 
-# From local directory (development mode)
-pip install -e /path/to/package  # Editable install
+# 从本地目录（开发模式）
+pip install -e /path/to/package  # 可编辑安装
 
-# From local wheel file
+# 从本地 wheel 文件
 pip install /path/to/package.whl
 
-# From requirements file
+# 从需求文件
 pip install -r requirements.txt
 ```
 
-### Dependency Resolution
+### 依赖解析
 
-When you `pip install tensorflow`, pip must:
-1. Fetch tensorflow's metadata
-2. Read its dependencies (numpy, protobuf, etc.)
-3. Recursively fetch dependency metadata
-4. Resolve compatible versions for all packages
-5. Download and install in correct order
+当你 `pip install tensorflow` 时，pip 必须：
+1. 获取 tensorflow 的元数据
+2. 读取其依赖（numpy、protobuf 等）
+3. 递归获取依赖元数据
+4. 解析所有包的兼容版本
+5. 按正确顺序下载和安装
 
-**Example dependency tree**:
+**依赖树示例**：
 ```
 tensorflow==2.13.0
 ├── numpy>=1.24.0,<2.0.0
@@ -435,22 +435,22 @@ tensorflow==2.13.0
     └── numpy>=1.23.0
 ```
 
-Pip finds versions satisfying ALL constraints: `numpy>=1.24.0` (from tensorflow's strictest requirement).
+Pip 找到满足所有约束的版本：`numpy>=1.24.0`（来自 tensorflow 最严格的要求）。
 
-**Dependency conflicts** happen when no version satisfies all constraints:
+**依赖冲突**发生在没有版本满足所有约束时：
 ```
-Package A requires numpy>=1.24.0
-Package B requires numpy<1.20.0
-# No version of numpy satisfies both! pip will error.
+Package A 需要 numpy>=1.24.0
+Package B 需要 numpy<1.20.0
+# 没有 numpy 版本同时满足两者！pip 将报错。
 ```
 
 ---
 
-## Requirements Files
+## 需求文件
 
-Requirements files document your project's dependencies, enabling reproducibility.
+需求文件记录项目的依赖，实现可重现性。
 
-### Basic Requirements.txt
+### 基本 Requirements.txt
 
 ```txt
 # requirements.txt
@@ -461,122 +461,122 @@ tensorflow==2.13.0
 requests==2.31.0
 ```
 
-**Creating from current environment**:
+**从当前环境创建**：
 ```bash
 pip freeze > requirements.txt
 ```
 
-**Installing from requirements file**:
+**从需求文件安装**：
 ```bash
 pip install -r requirements.txt
 ```
 
-### Requirements.txt Best Practices
+### Requirements.txt 最佳实践
 
-#### 1. Pin Exact Versions for Production
+#### 1. 为生产环境固定精确版本
 
 ```txt
-# Good: Reproducible builds
+# 好：可重现的构建
 numpy==1.24.3
 tensorflow==2.13.0
 
-# Bad: Unpredictable (may break between deployments)
+# 不好：不可预测（可能在部署之间崩溃）
 numpy
 tensorflow>=2.0.0
 ```
 
-#### 2. Use Comments for Clarity
+#### 2. 使用注释提高清晰度
 
 ```txt
-# Core ML frameworks
-tensorflow==2.13.0      # Model training
-scikit-learn==1.3.0     # Preprocessing
+# 核心 ML 框架
+tensorflow==2.13.0      # 模型训练
+scikit-learn==1.3.0     # 预处理
 
-# Data processing
+# 数据处理
 numpy==1.24.3
 pandas==2.0.3
 
-# API serving
+# API 服务
 fastapi==0.103.0
 uvicorn==0.23.2
 
-# Monitoring
+# 监控
 prometheus-client==0.17.1
 ```
 
-#### 3. Separate Dev and Production Requirements
+#### 3. 分离开发和生产的依赖
 
-**requirements.txt** (production):
+**requirements.txt**（生产）：
 ```txt
 tensorflow==2.13.0
 numpy==1.24.3
 fastapi==0.103.0
 ```
 
-**requirements-dev.txt** (development):
+**requirements-dev.txt**（开发）：
 ```txt
--r requirements.txt     # Include production requirements
+-r requirements.txt     # 包含生产依赖
 
-# Testing
+# 测试
 pytest==7.4.0
 pytest-cov==4.1.0
 pytest-mock==3.11.1
 
-# Code quality
+# 代码质量
 black==23.7.0
 flake8==6.1.0
 mypy==1.5.1
 
-# Development tools
+# 开发工具
 ipython==8.14.0
 jupyter==1.0.0
 ```
 
-Install both:
+两者都安装：
 ```bash
 pip install -r requirements-dev.txt
 ```
 
-#### 4. Handle Platform-Specific Dependencies
+#### 4. 处理平台特定依赖
 
 ```txt
-# Common dependencies
+# 通用依赖
 numpy==1.24.3
 pandas==2.0.3
 
-# Linux-specific (GPU support)
+# Linux 特定（GPU 支持）
 tensorflow-gpu==2.13.0; sys_platform == 'linux'
 
-# macOS-specific (CPU only)
+# macOS 特定（仅 CPU）
 tensorflow==2.13.0; sys_platform == 'darwin'
 
-# Windows-specific
+# Windows 特定
 pywin32==306; sys_platform == 'win32'
 ```
 
-### Advanced: Pip-tools for Lock Files
+### 高级：Pip-tools 用于锁定文件
 
-**Problem**: `requirements.txt` with pinned versions is hard to maintain.
+**问题**：固定版本的 `requirements.txt` 难以维护。
 
-**Solution**: Use `pip-tools` to separate high-level requirements from locked versions.
+**解决方案**：使用 `pip-tools` 将高级需求与锁定版本分离。
 
 ```bash
 pip install pip-tools
 ```
 
-**requirements.in** (high-level requirements):
+**requirements.in**（高级需求）：
 ```txt
 tensorflow>=2.13.0,<3.0.0
 numpy
 pandas
 ```
 
-**Generate locked requirements.txt**:
+**生成锁定的 requirements.txt**：
 ```bash
 pip-compile requirements.in
 ```
 
-**Produces requirements.txt** with ALL dependencies pinned:
+**生成包含所有依赖都固定的 requirements.txt**：
 ```txt
 # This file is autogenerated by pip-compile
 # To update, run: pip-compile requirements.in
@@ -591,124 +591,124 @@ pandas==2.0.3
     # via -r requirements.in
 protobuf==4.23.4
     # via tensorflow
-# ... all transitive dependencies pinned
+# ... 所有传递依赖都被固定
 ```
 
-**Benefits**:
-- Maintain simple `.in` file
-- Get fully pinned, reproducible `.txt`
-- Easy to update: `pip-compile --upgrade`
-- See why each dependency exists
+**好处**：
+- 维护简单的 `.in` 文件
+- 获得完全固定、可重现的 `.txt`
+- 易于更新：`pip-compile --upgrade`
+- 查看每个依赖存在的原因
 
-**Workflow**:
+**工作流**：
 ```bash
-# Edit high-level requirements
+# 编辑高级需求
 vim requirements.in
 
-# Regenerate lock file
+# 重新生成锁定文件
 pip-compile requirements.in
 
-# Install exact versions
+# 安装精确版本
 pip-sync requirements.txt
 
-# Commit both files
+# 提交两个文件
 git add requirements.in requirements.txt
 git commit -m "Update dependencies"
 ```
 
 ---
 
-## Python Version Management
+## Python 版本管理
 
-AI/ML projects often require specific Python versions. TensorFlow 2.13 might require Python 3.8-3.11. You need flexibility.
+AI/ML 项目通常需要特定的 Python 版本。TensorFlow 2.13 可能需要 Python 3.8-3.11。你需要灵活性。
 
-### Using pyenv (Recommended)
+### 使用 pyenv（推荐）
 
-**Installation (Linux/macOS)**:
+**安装（Linux/macOS）**：
 ```bash
 curl https://pyenv.run | bash
 
-# Add to ~/.bashrc or ~/.zshrc
+# 添加到 ~/.bashrc 或 ~/.zshrc
 export PATH="$HOME/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 ```
 
-**Basic pyenv usage**:
+**基本 pyenv 用法**：
 ```bash
-# List available Python versions
+# 列出可用的 Python 版本
 pyenv install --list
 
-# Install specific versions
+# 安装特定版本
 pyenv install 3.11.5
 pyenv install 3.10.13
 pyenv install 3.9.18
 
-# List installed versions
+# 列出已安装的版本
 pyenv versions
 
-# Set global Python version
+# 设置全局 Python 版本
 pyenv global 3.11.5
 
-# Set local version for project directory
+# 为项目目录设置本地版本
 cd my-ml-project
 pyenv local 3.10.13
-# Creates .python-version file
+# 创建 .python-version 文件
 
-# Use specific version temporarily
+# 临时使用特定版本
 pyenv shell 3.9.18
 ```
 
-**Directory-specific Python versions**:
+**目录特定的 Python 版本**：
 ```bash
 my-ml-project/
-├── .python-version    # Contains "3.10.13"
+├── .python-version    # 包含 "3.10.13"
 ├── venv/
 └── requirements.txt
 
-# When you cd into directory, Python 3.10.13 activates automatically!
+# 当你 cd 进入目录时，Python 3.10.13 自动激活！
 cd my-ml-project
 python --version  # Python 3.10.13
 ```
 
-### Combining pyenv with Virtual Environments
+### 将 pyenv 与虚拟环境结合
 
-**Create environment with specific Python version**:
+**使用特定 Python 版本创建环境**：
 ```bash
-# Install Python version
+# 安装 Python 版本
 pyenv install 3.11.5
 
-# Create virtual environment using that version
+# 使用该版本创建虚拟环境
 pyenv virtualenv 3.11.5 my-project-env
 
-# Activate it
+# 激活它
 pyenv activate my-project-env
 
-# Or set as local for directory
+# 或将其设置为目录的本地环境
 cd my-project
-pyenv local my-project-env  # Auto-activates when entering directory
+pyenv local my-project-env  # 进入目录时自动激活
 ```
 
-### Windows: Managing Python Versions
+### Windows：管理 Python 版本
 
-Windows doesn't have pyenv, but alternatives exist:
+Windows 没有 pyenv，但有替代方案：
 
-**Option 1: Python Launcher (py)**:
+**选项 1：Python Launcher（py）**：
 ```cmd
-REM Install multiple Python versions from python.org
+REM 从 python.org 安装多个 Python 版本
 
-REM List installed versions
+REM 列出已安装的版本
 py --list
 
-REM Run specific version
+REM 运行特定版本
 py -3.11 script.py
 py -3.10 -m venv myenv
 
-REM Create venv with specific version
+REM 使用特定版本创建 venv
 py -3.11 -m venv myenv-py311
 ```
 
-**Option 2: Conda (heavy but cross-platform)**:
+**选项 2：Conda（重量级但跨平台）**：
 ```bash
 conda create -n myenv python=3.11
 conda activate myenv
@@ -716,96 +716,96 @@ conda activate myenv
 
 ---
 
-## Best Practices for AI Infrastructure
+## AI 基础设施的最佳实践
 
-### 1. Reproducible Environments
+### 1. 可重现环境
 
-**Always include**:
+**始终包含**：
 ```
 my-ml-project/
-├── .python-version        # Specify Python version
-├── requirements.txt       # Pinned dependencies
-├── README.md             # Setup instructions
-└── Makefile or setup.sh  # Automated setup
+├── .python-version        # 指定 Python 版本
+├── requirements.txt       # 固定依赖
+├── README.md             # 设置说明
+└── Makefile 或 setup.sh  # 自动设置
 ```
 
-**setup.sh example**:
+**setup.sh 示例**：
 ```bash
 #!/bin/bash
 set -e
 
 echo "Setting up ML training environment..."
 
-# Check Python version
+# 检查 Python 版本
 python --version | grep "3.11" || {
     echo "Error: Python 3.11 required"
     exit 1
 }
 
-# Create virtual environment
+# 创建虚拟环境
 python -m venv venv
 
-# Activate
+# 激活
 source venv/bin/activate
 
-# Upgrade pip
+# 升级 pip
 pip install --upgrade pip
 
-# Install dependencies
+# 安装依赖
 pip install -r requirements.txt
 
 echo "Environment ready! Activate with: source venv/bin/activate"
 ```
 
-Make it executable:
+使其可执行：
 ```bash
 chmod +x setup.sh
 ./setup.sh
 ```
 
-### 2. Docker for Complete Isolation
+### 2. Docker 实现完全隔离
 
-Virtual environments isolate Python packages, but not:
-- System libraries (CUDA, cuDNN)
-- Python interpreter itself
-- OS-level dependencies
+虚拟环境隔离 Python 包，但不隔离：
+- 系统库（CUDA、cuDNN）
+- Python 解释器本身
+- 操作系统级依赖
 
-Docker provides full isolation:
+Docker 提供完全隔离：
 
-**Dockerfile**:
+**Dockerfile**：
 ```dockerfile
 FROM python:3.11-slim
 
-# Install system dependencies
+# 安装系统依赖
 RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# 设置工作目录
 WORKDIR /app
 
-# Copy requirements first (Docker layer caching)
+# 先复制需求文件（Docker 层缓存）
 COPY requirements.txt .
 
-# Install Python dependencies
+# 安装 Python 依赖
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# 复制应用程序代码
 COPY . .
 
-# Run application
+# 运行应用程序
 CMD ["python", "train.py"]
 ```
 
-Build and run:
+构建和运行：
 ```bash
 docker build -t my-ml-training .
 docker run my-ml-training
 ```
 
-### 3. CI/CD Environment Consistency
+### 3. CI/CD 环境一致性
 
-**GitHub Actions example**:
+**GitHub Actions 示例**：
 ```yaml
 # .github/workflows/test.yml
 name: Test ML Pipeline
@@ -840,15 +840,15 @@ jobs:
       run: pytest tests/
 ```
 
-This ensures tests run with exact dependencies every time.
+这确保了测试每次都使用精确的依赖运行。
 
-### 4. Environment Variables for Configuration
+### 4. 用于配置的环境变量
 
-Never hardcode configurations. Use environment variables:
+永远不要硬编码配置。使用环境变量：
 
-**.env file**:
+**.env 文件**：
 ```bash
-# .env (never commit to git!)
+# .env（永远不要提交到 git！）
 MODEL_PATH=/data/models
 BATCH_SIZE=32
 LEARNING_RATE=0.001
@@ -856,27 +856,27 @@ AWS_ACCESS_KEY_ID=your-key-id
 AWS_SECRET_ACCESS_KEY=your-secret
 ```
 
-**Load in Python**:
+**在 Python 中加载**：
 ```python
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # Loads .env file
+load_dotenv()  # 加载 .env 文件
 
 model_path = os.getenv('MODEL_PATH', '/default/path')
 batch_size = int(os.getenv('BATCH_SIZE', '16'))
 ```
 
-**Include in .gitignore**:
+**包含在 .gitignore 中**：
 ```gitignore
 .env
 .env.local
 .env.*.local
 ```
 
-**Provide template**:
+**提供模板**：
 ```bash
-# .env.example (commit this)
+# .env.example（提交此文件）
 MODEL_PATH=/data/models
 BATCH_SIZE=32
 LEARNING_RATE=0.001
@@ -886,174 +886,174 @@ AWS_SECRET_ACCESS_KEY=your-secret-here
 
 ---
 
-## Common Issues and Troubleshooting
+## 常见问题与故障排除
 
-### Issue 1: "Command 'python' not found"
+### 问题 1："Command 'python' not found"
 
-**Problem**: System uses `python3` not `python`.
+**问题**：系统使用 `python3` 而不是 `python`。
 
-**Solution**:
+**解决方案**：
 ```bash
-# Option 1: Use python3 explicitly
+# 选项 1：显式使用 python3
 python3 -m venv myenv
 
-# Option 2: Create alias
+# 选项 2：创建别名
 echo "alias python=python3" >> ~/.bashrc
 source ~/.bashrc
 
-# Option 3: Symlink
+# 选项 3：符号链接
 sudo ln -s /usr/bin/python3 /usr/bin/python
 ```
 
-### Issue 2: Permission Denied
+### 问题 2：权限被拒绝
 
-**Problem**:
+**问题**：
 ```bash
 pip install tensorflow
 # ERROR: Could not install packages due to an OSError: [Errno 13] Permission denied
 ```
 
-**Solution**: Don't use sudo! Use virtual environment:
+**解决方案**：不要使用 sudo！使用虚拟环境：
 ```bash
 python -m venv myenv
 source myenv/bin/activate
-pip install tensorflow  # No permission issue
+pip install tensorflow  # 没有权限问题
 ```
 
-### Issue 3: Dependency Conflicts
+### 问题 3：依赖冲突
 
-**Problem**:
+**问题**：
 ```
 ERROR: Cannot install packageA and packageB because these package versions have conflicting dependencies.
 ```
 
-**Solution**:
+**解决方案**：
 ```bash
-# 1. Check what's conflicting
+# 1. 检查冲突内容
 pip install --dry-run packageA packageB
 
-# 2. Try installing sequentially
+# 2. 尝试顺序安装
 pip install packageA
 pip install packageB
 
-# 3. Use compatible versions
+# 3. 使用兼容版本
 pip install "packageA==1.0.0" "packageB==2.0.0"
 
-# 4. Last resort: separate environments
+# 4. 最后手段：分离环境
 python -m venv env-for-A
 python -m venv env-for-B
 ```
 
-### Issue 4: Wrong Package Version After Install
+### 问题 4：安装后包版本错误
 
-**Problem**: Installed new version but imports show old version.
+**问题**：安装了新版本但导入时显示旧版本。
 
-**Solution**:
+**解决方案**：
 ```bash
-# 1. Check what's actually installed
+# 1. 检查实际安装的内容
 pip show tensorflow
 
-# 2. Restart Python (old import cached)
-# exit() and restart
+# 2. 重启 Python（旧导入已缓存）
+# exit() 然后重启
 
-# 3. Force reinstall
+# 3. 强制重新安装
 pip install --force-reinstall tensorflow==2.13.0
 
-# 4. Check for system-wide install shadowing venv
-which python  # Should show venv path
+# 4. 检查是否有系统级安装遮盖了 venv
+which python  # 应显示 venv 路径
 ```
 
-### Issue 5: "No module named X" After Installing
+### 问题 5：安装后出现"No module named X"
 
-**Problem**: Installed package but Python can't find it.
+**问题**：已安装包但 Python 找不到它。
 
-**Solution**:
+**解决方案**：
 ```bash
-# 1. Check virtual environment is activated
-which python  # Should be in venv path
+# 1. 检查虚拟环境是否已激活
+which python  # 应在 venv 路径中
 
-# 2. Check package installed in correct environment
+# 2. 检查包是否安装在正确环境中
 pip list | grep package-name
 
-# 3. Install in correct environment
+# 3. 在正确环境中安装
 source venv/bin/activate
 pip install package-name
 
-# 4. Check for typos
-pip list  # See exact package name
+# 4. 检查拼写错误
+pip list  # 查看确切的包名
 ```
 
 ---
 
-## Summary and Key Takeaways
+## 总结与关键要点
 
-### Essential Commands Reference
+### 基本命令参考
 
 ```bash
-# Virtual environment
+# 虚拟环境
 python -m venv myenv
 source myenv/bin/activate  # Linux/macOS
 myenv\Scripts\activate     # Windows
 deactivate
 
-# Package management
+# 包管理
 pip install package-name
 pip install -r requirements.txt
 pip freeze > requirements.txt
 pip list
 pip show package-name
 
-# Version management (pyenv)
+# 版本管理（pyenv）
 pyenv install 3.11.5
 pyenv global 3.11.5
 pyenv local 3.11.5
 ```
 
-### Best Practices Checklist
+### 最佳实践检查清单
 
-✅ Always use virtual environments for projects
-✅ Pin exact versions in requirements.txt for production
-✅ Separate dev dependencies from production
-✅ Never commit virtual environments to git
-✅ Use .env files for configuration
-✅ Document setup process in README
-✅ Test dependency installation on clean environment
-✅ Use pip-tools or Poetry for complex projects
-✅ Consider Docker for full environment reproducibility
-✅ Keep requirements.txt updated as dependencies change
+✅ 始终为项目使用虚拟环境
+✅ 在生产环境中固定 requirements.txt 中的精确版本
+✅ 将开发依赖与生产依赖分离
+✅ 永远不要将虚拟环境提交到 git
+✅ 使用 .env 文件进行配置
+✅ 在 README 中记录设置过程
+✅ 在干净环境中测试依赖安装
+✅ 对复杂项目使用 pip-tools 或 Poetry
+✅ 考虑使用 Docker 实现完全环境可重现性
+✅ 随着依赖变化保持 requirements.txt 更新
 
-### What You've Learned
+### 你学到的内容
 
-1. **Python's import system** and how it finds packages
-2. **Virtual environments** for dependency isolation
-3. **pip package management** and version specifiers
-4. **Requirements files** for reproducible installations
-5. **Python version management** with pyenv
-6. **Best practices** for AI/ML infrastructure projects
-7. **Troubleshooting** common environment issues
+1. **Python 的导入系统**以及它如何查找包
+2. **虚拟环境**用于依赖隔离
+3. **pip 包管理**和版本说明符
+4. **需求文件**用于可重现安装
+5. **Python 版本管理**使用 pyenv
+6. **AI/ML 基础设施项目的最佳实践**
+7. **排查**常见环境问题
 
-### Next Steps
+### 下一步
 
-You now understand Python environment management—the foundation for all AI infrastructure work. Next:
+你现在了解了 Python 环境管理——所有 AI 基础设施工作的基础。接下来：
 
-1. Complete **Exercise 01**: Create a full project with proper environment setup
-2. Practice creating and managing multiple environments
-3. Experiment with pip-tools or Poetry
-4. Move to **Lecture 02**: Advanced Python patterns for infrastructure
+1. 完成**练习 01**：创建一个具有适当环境设置的完整项目
+2. 练习创建和管理多个环境
+3. 尝试使用 pip-tools 或 Poetry
+4. 进入**Lecture 02**：基础设施的高级 Python 模式
 
-### Additional Resources
+### 附加资源
 
-- [Python Packaging User Guide](https://packaging.python.org/)
-- [pip documentation](https://pip.pypa.io/)
-- [pyenv GitHub repository](https://github.com/pyenv/pyenv)
-- [pip-tools documentation](https://pip-tools.readthedocs.io/)
-- [PEP 405 - Python Virtual Environments](https://peps.python.org/pep-0405/)
+- [Python 打包用户指南](https://packaging.python.org/)
+- [pip 文档](https://pip.pypa.io/)
+- [pyenv GitHub 仓库](https://github.com/pyenv/pyenv)
+- [pip-tools 文档](https://pip-tools.readthedocs.io/)
+- [PEP 405 - Python 虚拟环境](https://peps.python.org/pep-0405/)
 
 ---
 
-**Lecture Version**: 1.0
-**Last Updated**: October 2025
-**Word Count**: ~3,800 words
-**Estimated Reading Time**: 45-60 minutes
+**讲座版本**：1.0
+**最后更新**：2025 年 10 月
+**字数**：约 3,800 字
+**预计阅读时间**：45-60 分钟
 
-**Ready for more?** Continue to `02-advanced-python.md` for type hints, logging, and configuration management.
+**准备好继续了吗？** 进入 `02-advanced-python.md` 学习类型提示、日志记录和配置管理。

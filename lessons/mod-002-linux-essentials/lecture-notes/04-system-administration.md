@@ -1,201 +1,201 @@
-# Lecture 04: System Administration Basics
+# 讲座 04：系统管理基础
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Package Management](#package-management)
-3. [Service Management with systemd](#service-management-with-systemd)
-4. [Process Management](#process-management)
-5. [System Monitoring](#system-monitoring)
-6. [Log Files and Analysis](#log-files-and-analysis)
-7. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [简介](#简介)
+2. [包管理](#包管理)
+3. [使用 systemd 进行服务管理](#使用-systemd-进行服务管理)
+4. [进程管理](#进程管理)
+5. [系统监控](#系统监控)
+6. [日志文件和分析](#日志文件和分析)
+7. [总结和要点](#总结和要点)
 
-## Introduction
+## 简介
 
-System administration is the backbone of AI infrastructure engineering. As an AI Infrastructure Engineer, you'll install ML frameworks, manage GPU services, monitor training processes, and debug system issues. Mastering system administration ensures your ML infrastructure runs reliably and efficiently.
+系统管理是 AI 基础设施工程的支柱。作为 AI 基础设施工程师，你将安装 ML 框架、管理 GPU 服务、监控训练进程和调试系统问题。掌握系统管理确保你的 ML 基础设施可靠高效地运行。
 
-This lecture covers essential system administration skills: package management, service control, process management, system monitoring, and log analysis - all critical for maintaining production AI systems.
+本讲座涵盖基本系统管理技能：包管理、服务控制、进程管理、系统监控和日志分析 - 这些都是维护生产 AI 系统的关键。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Manage system packages with apt/yum/dnf
-- Control services using systemd
-- Monitor and manage processes effectively
-- Track system resource usage (CPU, memory, disk)
-- Analyze system logs for troubleshooting
-- Apply these skills to AI infrastructure scenarios
+完成本讲座后，你将能够：
+- 使用 apt/yum/dnf 管理系统包
+- 使用 systemd 控制服务
+- 有效监控和管理进程
+- 跟踪系统资源使用情况（CPU、内存、磁盘）
+- 分析系统日志以进行故障排查
+- 将这些技能应用到 AI 基础设施场景
 
-### Prerequisites
-- Lectures 01-03 (Linux fundamentals, file systems, permissions)
-- Root/sudo access to a Linux system
-- Basic understanding of command-line operations
+### 先决条件
+- 讲座 01-03（Linux 基础、文件系统、权限）
+- 对 Linux 系统的 root/sudo 访问权限
+- 基本理解命令行操作
 
-### Why System Administration for AI?
+### 为什么 AI 需要系统管理？
 
-**Infrastructure Reliability**: ML training jobs run for hours or days. System failures waste time and resources.
+**基础设施可靠性**：ML 训练作业运行数小时或数天。系统故障会浪费时间和资源。
 
-**Resource Management**: GPUs, memory, and storage must be monitored and optimized.
+**资源管理**：GPU、内存和存储必须受到监控和优化。
 
-**Dependency Management**: ML frameworks have complex dependencies that must be carefully maintained.
+**依赖管理**：ML 框架具有必须仔细维护的复杂依赖关系。
 
-**Service Orchestration**: APIs, databases, and model servers must work together seamlessly.
+**服务编排**：API、数据库和模型服务器必须无缝协同工作。
 
-**Troubleshooting**: When things break (and they will), you need to diagnose and fix issues quickly.
+**故障排查**：当出现问题时（一定会出现），你需要快速诊断和修复问题。
 
-**Duration**: 120 minutes
-**Difficulty**: Intermediate
+**时长**：120 分钟
+**难度**：中级
 
 ---
 
-## Package Management
+## 包管理
 
-### Understanding Package Management
+### 理解包管理
 
-A **package** is a compressed archive containing:
-- Compiled binaries or scripts
-- Configuration files
-- Documentation
-- Metadata (dependencies, version, description)
-- Installation/removal scripts
+一个**包**是一个压缩归档，包含：
+- 编译好的二进制文件或脚本
+- 配置文件
+- 文档
+- 元数据（依赖、版本、描述）
+- 安装/卸载脚本
 
-**Package managers** automate software installation, updates, and dependency resolution.
+**包管理器**自动化软件的安装、更新和依赖解析。
 
-### Package Manager Types
+### 包管理器类型
 
-**High-Level** (User-friendly, handles dependencies):
-- `apt` / `apt-get` (Debian, Ubuntu)
-- `yum` / `dnf` (RHEL, CentOS, Fedora)
-- `zypper` (openSUSE)
+**高级**（用户友好，处理依赖）：
+- `apt` / `apt-get`（Debian、Ubuntu）
+- `yum` / `dnf`（RHEL、CentOS、Fedora）
+- `zypper`（openSUSE）
 
-**Low-Level** (Manual dependency handling):
-- `dpkg` (Debian packages)
-- `rpm` (Red Hat packages)
+**低级**（手动处理依赖）：
+- `dpkg`（Debian 包）
+- `rpm`（Red Hat 包）
 
-### APT - Debian/Ubuntu Package Manager
+### APT - Debian/Ubuntu 包管理器
 
-#### Essential APT Commands
+#### 基本 APT 命令
 
-**Update Package Lists**:
+**更新包列表**：
 ```bash
-# Download package information from repositories
+# 从软件源下载包信息
 sudo apt update
 
-# Always run before installing to get latest package info
+# 安装前始终运行以获取最新包信息
 ```
 
-**Upgrade Packages**:
+**升级包**：
 ```bash
-# Upgrade all installed packages
+# 升级所有已安装包
 sudo apt upgrade
 
-# Upgrade with smart conflict resolution
+# 带智能冲突解决的升级
 sudo apt full-upgrade
 
-# Upgrade without confirmation (for scripts)
+# 不确认的升级（用于脚本）
 sudo apt upgrade -y
 ```
 
-**Installing Packages**:
+**安装包**：
 ```bash
-# Install single package
+# 安装单个包
 sudo apt install nginx
 
-# Install multiple packages
+# 安装多个包
 sudo apt install python3 python3-pip python3-venv
 
-# Install specific version
+# 安装特定版本
 sudo apt install nginx=1.18.0-0ubuntu1
 
-# Install without prompts
+# 无提示安装
 sudo apt install -y docker.io
 
-# Simulate installation (dry run)
+# 模拟安装（空运行）
 sudo apt install --dry-run cuda-11-8
 ```
 
-**Removing Packages**:
+**删除包**：
 ```bash
-# Remove package (keep configuration)
+# 删除包（保留配置）
 sudo apt remove nginx
 
-# Remove package and configuration
+# 删除包和配置
 sudo apt purge nginx
 
-# Remove package and unused dependencies
+# 删除包和未使用的依赖
 sudo apt autoremove nginx
 
-# Clean up
-sudo apt autoremove        # Remove unused dependencies
-sudo apt autoclean         # Remove old package files
-sudo apt clean             # Remove all package files from cache
+# 清理
+sudo apt autoremove        # 删除未使用的依赖
+sudo apt autoclean         # 删除旧的包文件
+sudo apt clean             # 从缓存中删除所有包文件
 ```
 
-**Searching Packages**:
+**搜索包**：
 ```bash
-# Search for package
+# 搜索包
 apt search python3
 
-# Search in package names only
+# 仅在包名中搜索
 apt search --names-only cuda
 
-# Show package details
+# 显示包详情
 apt show python3-pip
 
-# List installed packages
+# 列出已安装包
 apt list --installed
 apt list --installed | grep python
 
-# List upgradable packages
+# 列出可升级包
 apt list --upgradable
 ```
 
-**Package Information**:
+**包信息**：
 ```bash
-# Show package details
+# 显示包详情
 apt show nvidia-driver-530
 
-# Show package dependencies
+# 显示包依赖
 apt depends python3-pip
 
-# Show reverse dependencies (what needs this package)
+# 显示反向依赖（什么需要这个包）
 apt rdepends python3
 
-# Which package provides a file
+# 哪个包提供了文件
 dpkg -S /usr/bin/python3
 
-# List files in package
+# 列出包中的文件
 dpkg -L python3-pip
 ```
 
-#### Managing Repositories
+#### 管理软件源
 
-Repository configuration: `/etc/apt/sources.list` and `/etc/apt/sources.list.d/`
+软件源配置：`/etc/apt/sources.list` 和 `/etc/apt/sources.list.d/`
 
 ```bash
-# View current repositories
+# 查看当前软件源
 cat /etc/apt/sources.list
 ls /etc/apt/sources.list.d/
 
-# Add repository (PPA)
+# 添加软件源（PPA）
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt update
 
-# Add repository manually
+# 手动添加软件源
 echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" | \
     sudo tee /etc/apt/sources.list.d/docker.list
 
-# Add GPG key for repository
+# 为软件源添加 GPG 密钥
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
     sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
-# Remove repository
+# 删除软件源
 sudo add-apt-repository --remove ppa:deadsnakes/ppa
 sudo rm /etc/apt/sources.list.d/docker.list
 ```
 
-#### AI/ML Package Installation Examples
+#### AI/ML 包安装示例
 
-**Python Development Environment**:
+**Python 开发环境**：
 ```bash
 sudo apt update
 sudo apt install -y \
@@ -209,49 +209,49 @@ sudo apt install -y \
     wget
 ```
 
-**System ML Dependencies**:
+**系统 ML 依赖**：
 ```bash
-# Linear algebra libraries
+# 线性代数库
 sudo apt install -y \
     libblas-dev \
     liblapack-dev \
     libatlas-base-dev
 
-# HDF5 for large datasets
+# 用于大数据集的 HDF5
 sudo apt install -y libhdf5-dev
 
-# OpenCV dependencies
+# OpenCV 依赖
 sudo apt install -y \
     libopencv-dev \
     python3-opencv
 
-# Database libraries
+# 数据库库
 sudo apt install -y \
     libpq-dev \
     libmysqlclient-dev \
     libsqlite3-dev
 ```
 
-**NVIDIA CUDA Installation**:
+**NVIDIA CUDA 安装**：
 ```bash
-# Add NVIDIA repository
+# 添加 NVIDIA 软件源
 wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
 sudo dpkg -i cuda-keyring_1.1-1_all.deb
 sudo apt update
 
-# Install CUDA toolkit
+# 安装 CUDA 工具包
 sudo apt install -y cuda-toolkit-11-8
 
-# Install cuDNN
+# 安装 cuDNN
 sudo apt install -y libcudnn8 libcudnn8-dev
 
-# Verify installation
+# 验证安装
 nvcc --version
 ```
 
-**Docker Installation**:
+**Docker 安装**：
 ```bash
-# Add Docker repository
+# 添加 Docker 软件源
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
     sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
@@ -262,118 +262,118 @@ https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
 sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
-# Add user to docker group
+# 将用户添加到 docker 组
 sudo usermod -aG docker $USER
 
-# Verify
+# 验证
 docker --version
 ```
 
-### YUM/DNF - RHEL/CentOS Package Manager
+### YUM/DNF - RHEL/CentOS 包管理器
 
-**DNF** is the modern replacement for YUM (same commands work for both).
+**DNF** 是 YUM 的现代替代品（两种命令都适用）。
 
-#### Basic YUM/DNF Commands
+#### 基本 YUM/DNF 命令
 
-**Update and Upgrade**:
+**更新和升级**：
 ```bash
-# Update package cache
+# 更新包缓存
 sudo dnf check-update
 
-# Upgrade all packages
+# 升级所有包
 sudo dnf upgrade
 
-# Upgrade without prompts
+# 无提示升级
 sudo dnf upgrade -y
 ```
 
-**Installing Packages**:
+**安装包**：
 ```bash
-# Install package
+# 安装包
 sudo dnf install nginx
 
-# Install multiple packages
+# 安装多个包
 sudo dnf install python3 python3-pip python3-devel
 
-# Install specific version
+# 安装特定版本
 sudo dnf install nginx-1.20.1
 
-# Install group
+# 安装组
 sudo dnf groupinstall "Development Tools"
 
-# Reinstall package
+# 重新安装包
 sudo dnf reinstall nginx
 ```
 
-**Removing Packages**:
+**删除包**：
 ```bash
-# Remove package
+# 删除包
 sudo dnf remove nginx
 
-# Remove with dependencies
+# 连带依赖删除
 sudo dnf autoremove nginx
 
-# Clean cache
+# 清理缓存
 sudo dnf clean all
 ```
 
-**Searching and Information**:
+**搜索和信息**：
 ```bash
-# Search packages
+# 搜索包
 dnf search python
 
-# Show package info
+# 显示包信息
 dnf info python3-pip
 
-# List installed
+# 列出已安装
 dnf list installed
 
-# List available
+# 列出可用
 dnf list available | grep cuda
 
-# Find which package provides file
+# 查找哪个包提供了文件
 dnf provides /usr/bin/python3
 
-# Show dependencies
+# 显示依赖
 dnf deplist python3-pip
 ```
 
-#### Managing Repositories
+#### 管理软件源
 
 ```bash
-# List enabled repositories
+# 列出启用的软件源
 dnf repolist
 
-# List all repositories
+# 列出所有软件源
 dnf repolist all
 
-# Enable repository
+# 启用软件源
 sudo dnf config-manager --set-enabled powertools
 
-# Disable repository
+# 禁用软件源
 sudo dnf config-manager --set-disabled epel
 
-# Add repository
+# 添加软件源
 sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
-# Install EPEL (Extra Packages for Enterprise Linux)
+# 安装 EPEL（企业版 Linux 额外包）
 sudo dnf install -y epel-release
 ```
 
-#### AI/ML on RHEL/CentOS
+#### RHEL/CentOS 上的 AI/ML
 
 ```bash
-# Development tools
+# 开发工具
 sudo dnf groupinstall -y "Development Tools"
 sudo dnf install -y python3 python3-pip python3-devel
 
-# ML dependencies
+# ML 依赖
 sudo dnf install -y \
     openblas-devel \
     lapack-devel \
     hdf5-devel
 
-# NVIDIA CUDA (RHEL 8)
+# NVIDIA CUDA（RHEL 8）
 sudo dnf config-manager --add-repo \
     https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/cuda-rhel8.repo
 sudo dnf install -y cuda-toolkit-11-8
@@ -386,83 +386,83 @@ sudo systemctl start docker
 sudo systemctl enable docker
 ```
 
-### Holding and Pinning Packages
+### 保持和锁定包
 
-Sometimes you need to prevent certain packages from being updated.
+有时你需要防止某些包被更新。
 
 ```bash
-# Hold package (prevent updates) - APT
+# 保持包（防止更新）- APT
 sudo apt-mark hold cuda-toolkit-11-8
 
-# Show held packages
+# 显示已保持的包
 apt-mark showhold
 
-# Unhold package
+# 解除保持
 sudo apt-mark unhold cuda-toolkit-11-8
 
-# Why hold packages?
-# - CUDA version compatibility with ML frameworks
-# - Prevent Docker updates during critical operations
-# - Kernel version pinning for driver compatibility
+# 为什么要保持包？
+# - CUDA 版本与 ML 框架的兼容性
+# - 在关键操作期间防止 Docker 更新
+# - 为驱动兼容性锁定内核版本
 ```
 
 ---
 
-## Service Management with systemd
+## 使用 systemd 进行服务管理
 
-Modern Linux systems use **systemd** as the init system and service manager.
+现代 Linux 系统使用 **systemd** 作为初始化系统和服务管理器。
 
-### Understanding systemd
+### 理解 systemd
 
-**systemd** manages:
-- System services (daemons)
-- Boot process
-- Device management
-- System logging (journald)
-- Timer-based activation (replaces cron)
+**systemd** 管理：
+- 系统服务（守护进程）
+- 启动过程
+- 设备管理
+- 系统日志（journald）
+- 基于定时器的激活（替代 cron）
 
-**Unit Files**: Configuration files defining services, stored in:
-- `/etc/systemd/system/` - System units (highest priority)
-- `/usr/lib/systemd/system/` - Package units (default)
-- `/run/systemd/system/` - Runtime units
+**单元文件**：定义服务的配置文件，存储在：
+- `/etc/systemd/system/` - 系统单元（最高优先级）
+- `/usr/lib/systemd/system/` - 包单元（默认）
+- `/run/systemd/system/` - 运行时单元
 
-### Essential systemctl Commands
+### 基本 systemctl 命令
 
 ```bash
-# Service status
+# 服务状态
 systemctl status nginx
 systemctl status ml-inference
 
-# Start/stop services
+# 启动/停止服务
 sudo systemctl start nginx
 sudo systemctl stop nginx
 sudo systemctl restart nginx
-sudo systemctl reload nginx      # Reload config without restart
+sudo systemctl reload nginx      # 不重启而是重新加载配置
 
-# Enable/disable at boot
-sudo systemctl enable nginx      # Start on boot
-sudo systemctl disable nginx     # Don't start on boot
-sudo systemctl enable --now nginx  # Enable and start immediately
+# 启用/禁用开机自启
+sudo systemctl enable nginx      # 开机时启动
+sudo systemctl disable nginx     # 开机时不启动
+sudo systemctl enable --now nginx  # 启用并立即启动
 
-# Check if enabled
+# 检查是否启用
 systemctl is-enabled nginx
 systemctl is-active nginx
 systemctl is-failed nginx
 
-# List all services
+# 列出所有服务
 systemctl list-units --type=service
 systemctl list-units --type=service --state=running
 systemctl list-units --type=service --state=failed
 
-# View service dependencies
+# 查看服务依赖
 systemctl list-dependencies nginx
 ```
 
-### Creating Custom Service Units
+### 创建自定义服务单元
 
-**Example: ML Inference Service**
+**示例：ML 推理服务**
 
-Create `/etc/systemd/system/ml-inference.service`:
+创建 `/etc/systemd/system/ml-inference.service`：
 
 ```ini
 [Unit]
@@ -483,7 +483,7 @@ RestartSec=10
 StandardOutput=journal
 StandardError=journal
 
-# Resource limits
+# 资源限制
 MemoryMax=8G
 CPUQuota=400%
 
@@ -491,70 +491,70 @@ CPUQuota=400%
 WantedBy=multi-user.target
 ```
 
-**Activate the service**:
+**激活服务**：
 ```bash
-# Reload systemd to recognize new service
+# 重新加载 systemd 以识别新服务
 sudo systemctl daemon-reload
 
-# Start and enable
+# 启动并启用
 sudo systemctl start ml-inference
 sudo systemctl enable ml-inference
 
-# Check status
+# 检查状态
 systemctl status ml-inference
 
-# View logs
+# 查看日志
 journalctl -u ml-inference -f
 ```
 
-### Service Unit File Sections
+### 服务单元文件部分
 
-**[Unit]** - General information:
-- `Description`: Service description
-- `After`: Start after these units
-- `Before`: Start before these units
-- `Requires`: Hard dependencies (fail if not available)
-- `Wants`: Soft dependencies (continue if not available)
+**[Unit]** - 常规信息：
+- `Description`：服务描述
+- `After`：在这些单元之后启动
+- `Before`：在这些单元之前启动
+- `Requires`：硬依赖（如果不可用则失败）
+- `Wants`：软依赖（如果不可用则继续）
 
-**[Service]** - Service behavior:
-- `Type`: simple, forking, oneshot, notify
-- `User/Group`: Run as specific user
-- `WorkingDirectory`: Working directory
-- `Environment`: Environment variables
-- `EnvironmentFile`: Load env vars from file
-- `ExecStart`: Command to start
-- `ExecStop`: Command to stop
-- `ExecReload`: Command to reload
-- `Restart`: Restart policy (no, always, on-failure, on-abnormal)
-- `RestartSec`: Wait before restart
-- `StandardOutput/StandardError`: Where to send output
+**[Service]** - 服务行为：
+- `Type`：simple、forking、oneshot、notify
+- `User/Group`：以特定用户身份运行
+- `WorkingDirectory`：工作目录
+- `Environment`：环境变量
+- `EnvironmentFile`：从文件加载环境变量
+- `ExecStart`：启动命令
+- `ExecStop`：停止命令
+- `ExecReload`：重新加载命令
+- `Restart`：重启策略（no、always、on-failure、on-abnormal）
+- `RestartSec`：重启前等待时间
+- `StandardOutput/StandardError`：输出发送到哪里
 
-**[Install]** - Installation information:
-- `WantedBy`: Target to attach to (usually multi-user.target)
+**[Install]** - 安装信息：
+- `WantedBy`：要附加的目标（通常是 multi-user.target）
 
-### Resource Limits in systemd
+### systemd 中的资源限制
 
 ```ini
 [Service]
-# CPU limits
-CPUQuota=200%                # 2 cores max
-CPUWeight=100                # Relative weight (1-10000)
+# CPU 限制
+CPUQuota=200%                # 最多 2 个核心
+CPUWeight=100                # 相对权重（1-10000）
 
-# Memory limits
-MemoryMax=8G                 # Hard limit
-MemoryHigh=6G                # Soft limit (throttle at this point)
+# 内存限制
+MemoryMax=8G                 # 硬限制
+MemoryHigh=6G                # 软限制（在此点节流）
 
-# I/O limits
+# I/O 限制
 IOReadBandwidthMax=/dev/sda 100M
 IOWriteBandwidthMax=/dev/sda 50M
 
-# Task limits
-TasksMax=500                 # Max number of tasks/threads
+# 任务限制
+TasksMax=500                 # 最大任务/线程数
 ```
 
-### Example: Training Job Scheduler
+### 示例：训练作业调度器
 
-Create `/etc/systemd/system/ml-training@.service`:
+创建 `/etc/systemd/system/ml-training@.service`：
 
 ```ini
 [Unit]
@@ -577,251 +577,251 @@ TimeoutSec=48h
 WantedBy=multi-user.target
 ```
 
-**Usage**:
+**使用方式**：
 ```bash
-# Start training on GPU 0
+# 在 GPU 0 上开始训练
 sudo systemctl start ml-training@0
 
-# Start on multiple GPUs
+# 在多个 GPU 上开始训练
 sudo systemctl start ml-training@{0,1,2,3}
 
-# Check status
+# 检查状态
 systemctl status ml-training@0
 ```
 
-### Viewing Logs with journalctl
+### 使用 journalctl 查看日志
 
 ```bash
-# View all logs
+# 查看所有日志
 journalctl
 
-# Service-specific logs
+# 特定服务的日志
 journalctl -u ml-inference
 
-# Follow logs (real-time)
+# 实时跟踪日志
 journalctl -u ml-inference -f
 
-# Recent logs
-journalctl -u ml-inference -n 100     # Last 100 lines
+# 最近日志
+journalctl -u ml-inference -n 100     # 最后 100 行
 journalctl -u ml-inference --since "1 hour ago"
 journalctl -u ml-inference --since "2024-01-15 14:00"
 journalctl -u ml-inference --since today
 
-# Priority levels
-journalctl -p err                     # Errors only
-journalctl -p warning                 # Warnings and above
+# 优先级级别
+journalctl -p err                     # 仅错误
+journalctl -p warning                 # 警告及以上
 
-# By boot
-journalctl -b                         # Current boot
-journalctl -b -1                      # Previous boot
+# 按启动次数
+journalctl -b                         # 当前启动
+journalctl -b -1                      # 上次启动
 
-# Output formats
+# 输出格式
 journalctl -u ml-inference -o json-pretty
-journalctl -u ml-inference -o cat     # No metadata
+journalctl -u ml-inference -o cat     # 无元数据
 
-# Disk usage
+# 磁盘使用量
 journalctl --disk-usage
 
-# Cleanup old logs
-sudo journalctl --vacuum-time=30d     # Keep 30 days
-sudo journalctl --vacuum-size=1G      # Keep 1GB
+# 清理旧日志
+sudo journalctl --vacuum-time=30d     # 保留 30 天
+sudo journalctl --vacuum-size=1G      # 保留 1GB
 ```
 
 ---
 
-## Process Management
+## 进程管理
 
-### Understanding Processes
+### 理解进程
 
-A **process** is a running instance of a program. Each process has:
-- **PID** (Process ID): Unique identifier
-- **PPID** (Parent Process ID): Process that created it
-- **UID/GID**: User and group ownership
-- **State**: Running, sleeping, stopped, zombie
-- **Memory**: Code, data, stack, heap
-- **Priority**: CPU scheduling priority
+**进程**是正在运行的程序实例。每个进程有：
+- **PID**（进程 ID）：唯一标识符
+- **PPID**（父进程 ID）：创建它的进程
+- **UID/GID**：用户和组所有权
+- **状态**：运行、睡眠、停止、僵尸
+- **内存**：代码、数据、栈、堆
+- **优先级**：CPU 调度优先级
 
-### Process States
+### 进程状态
 
-**R - Running/Runnable**: Executing or ready to execute
-**S - Sleeping (Interruptible)**: Waiting for event (I/O, timer)
-**D - Disk Sleep (Uninterruptible)**: Waiting for disk I/O
-**T - Stopped**: Suspended by signal (Ctrl+Z)
-**Z - Zombie**: Terminated but parent hasn't read exit status
-**I - Idle**: Kernel thread
+**R - 运行/可运行**：正在执行或准备执行
+**S - 睡眠（可中断）**：等待事件（I/O、定时器）
+**D - 磁盘睡眠（不可中断）**：等待磁盘 I/O
+**T - 停止**：被信号挂起（Ctrl+Z）
+**Z - 僵尸**：已终止但父进程尚未读取退出状态
+**I - 空闲**：内核线程
 
-### Viewing Processes with ps
+### 使用 ps 查看进程
 
 ```bash
-# Simple view (current terminal only)
+# 简单视图（仅当前终端）
 ps
 
-# All user's processes
+# 用户的所有进程
 ps -u alice
 ps -u $(whoami)
 
-# All processes (BSD style)
+# 所有进程（BSD 风格）
 ps aux
 
-# All processes (Unix style)
+# 所有进程（Unix 风格）
 ps -ef
 
-# Sort by CPU usage
+# 按 CPU 使用率排序
 ps aux --sort=-%cpu | head -10
 
-# Sort by memory usage
+# 按内存使用率排序
 ps aux --sort=-%mem | head -10
 
-# Find specific process
+# 查找特定进程
 ps aux | grep python
-ps aux | grep [p]ython          # Excludes grep itself
+ps aux | grep [p]ython          # 排除 grep 本身
 
-# Custom output format
+# 自定义输出格式
 ps -eo pid,ppid,cmd,%cpu,%mem --sort=-%cpu | head
 
-# Process tree (hierarchy)
-ps auxf                         # ASCII tree
-ps -ejH                         # Alternative tree format
-pstree                          # Dedicated tree command
-pstree -p                       # With PIDs
+# 进程树（层级）
+ps auxf                         # ASCII 树
+ps -ejH                         # 替代树格式
+pstree                          # 专用树命令
+pstree -p                       # 带 PID
 ```
 
-### AI/ML Process Queries
+### AI/ML 进程查询
 
 ```bash
-# Find all Python processes
+# 查找所有 Python 进程
 ps aux | grep python
 
-# Find GPU processes
+# 查找 GPU 进程
 ps aux | grep cuda
 ps aux | grep nvidia
 
-# Find training jobs
+# 查找训练作业
 ps aux | grep train
 
-# Jupyter notebook processes
+# Jupyter 笔记本进程
 ps aux | grep jupyter
 
-# Show processes using most memory
+# 显示使用最多内存的进程
 ps aux --sort=-%mem | head -20
 
-# Show processes using most CPU
+# 显示使用最多 CPU 的进程
 ps aux --sort=-%cpu | head -20
 ```
 
-### Monitoring with top and htop
+### 使用 top 和 htop 监控
 
-**top** - Real-time process monitoring:
+**top** - 实时进程监控：
 
 ```bash
 top
 
-# Interactive commands:
-# P - Sort by CPU usage
-# M - Sort by memory usage
-# T - Sort by running time
-# k - Kill a process
-# r - Renice a process
-# u - Show specific user's processes
-# 1 - Toggle individual CPU cores
-# q - Quit
+# 交互式命令：
+# P - 按 CPU 使用率排序
+# M - 按内存使用率排序
+# T - 按运行时间排序
+# k - 终止进程
+# r - 调整进程优先级
+# u - 显示特定用户的进程
+# 1 - 切换单个 CPU 核心
+# q - 退出
 ```
 
-**htop** - Enhanced version:
+**htop** - 增强版：
 
 ```bash
-# Install htop
+# 安装 htop
 sudo apt install htop        # Ubuntu/Debian
 sudo yum install htop        # RHEL/CentOS
 
-# Run
+# 运行
 htop
 
-# Features:
-# - Color-coded display
-# - Mouse support
-# - Horizontal/vertical scrolling
-# - Visual CPU and memory meters
-# - Tree view by default
-# - Easier process killing
+# 特性：
+# - 颜色编码显示
+# - 鼠标支持
+# - 水平/垂直滚动
+# - 可视化的 CPU 和内存仪表
+# - 默认树形视图
+# - 更容易的进程终止
 
-# Function keys:
-# F1 - Help
-# F3 - Search process
-# F4 - Filter processes
-# F5 - Tree view
-# F6 - Sort by column
-# F9 - Kill process
-# F10 - Quit
+# 功能键：
+# F1 - 帮助
+# F3 - 搜索进程
+# F4 - 过滤进程
+# F5 - 树形视图
+# F6 - 按列排序
+# F9 - 终止进程
+# F10 - 退出
 ```
 
-### Managing Processes with Signals
+### 使用信号管理进程
 
-**Common Signals**:
-- **SIGTERM (15)**: Polite termination request (default)
-- **SIGKILL (9)**: Immediate termination (cannot be caught)
-- **SIGHUP (1)**: Hangup (reload configuration)
-- **SIGINT (2)**: Interrupt (Ctrl+C)
-- **SIGSTOP (19)**: Pause process
-- **SIGCONT (18)**: Resume process
+**常见信号**：
+- **SIGTERM（15）**：礼貌终止请求（默认）
+- **SIGKILL（9）**：立即终止（无法捕获）
+- **SIGHUP（1）**：挂起（重新加载配置）
+- **SIGINT（2）**：中断（Ctrl+C）
+- **SIGSTOP（19）**：暂停进程
+- **SIGCONT（18）**：恢复进程
 
 ```bash
-# List all signals
+# 列出所有信号
 kill -l
 
-# Graceful termination (allows cleanup)
+# 优雅终止（允许清理）
 kill 1234
 kill -15 1234
-kill -SIGTERM 1234              # All equivalent
+kill -SIGTERM 1234              # 全部等效
 
-# Force termination (immediate, no cleanup)
+# 强制终止（立即，无清理）
 kill -9 1234
 kill -SIGKILL 1234
 
-# Reload configuration
+# 重新加载配置
 kill -HUP 1234
 
-# Pause process
+# 暂停进程
 kill -STOP 1234
 
-# Resume process
+# 恢复进程
 kill -CONT 1234
 ```
 
-### killall and pkill
+### killall 和 pkill
 
 ```bash
-# Kill all processes with name
+# 按名称终止所有进程
 killall python
-killall -9 python               # Force kill
+killall -9 python               # 强制终止
 
-# Kill specific user's processes
+# 终止特定用户的进程
 killall -u alice python
 
-# Kill by pattern matching
-pkill python                    # Kill all python processes
-pkill -f train.py               # Kill processes with 'train.py' in command
-pkill -u alice                  # Kill all alice's processes
-pkill -9 -f "experiment_*"      # Force kill experimental processes
+# 按模式匹配终止
+pkill python                    # 终止所有 python 进程
+pkill -f train.py               # 终止命令中包含 'train.py' 的进程
+pkill -u alice                  # 终止 alice 的所有进程
+pkill -9 -f "experiment_*"      # 强制终止实验进程
 
-# Combined criteria
-pkill -u alice -f python        # Alice's python processes
+# 组合条件
+pkill -u alice -f python        # Alice 的 python 进程
 ```
 
-### pgrep - Find Process IDs
+### pgrep - 查找进程 ID
 
 ```bash
-# Find PIDs by name
+# 按名称查找 PID
 pgrep python
 
-# Find with full command line
+# 使用完整命令行查找
 pgrep -f train.py
 
-# Get detailed info
-pgrep -l python                 # With process name
-pgrep -a python                 # With full command
+# 获取详细信息
+pgrep -l python                 # 带进程名
+pgrep -a python                 # 带完整命令
 
-# Use in scripts
+# 在脚本中使用
 TRAINING_PID=$(pgrep -f train.py)
 if [ -n "$TRAINING_PID" ]; then
     echo "Training job running: $TRAINING_PID"
@@ -829,124 +829,124 @@ if [ -n "$TRAINING_PID" ]; then
 fi
 ```
 
-### Job Control
+### 作业控制
 
-**Foreground vs Background**:
-- **Foreground**: Process controls terminal, receives keyboard input
-- **Background**: Process runs independently, terminal available
+**前台与后台**：
+- **前台**：进程控制终端，接收键盘输入
+- **后台**：进程独立运行，终端可用
 
 ```bash
-# Start in background with &
+# 使用 & 在后台启动
 python train.py &
-# [1] 5678                     # Job number and PID
+# [1] 5678                     # 作业编号和 PID
 
-# Check job status
+# 检查作业状态
 jobs
 
-# Suspend foreground job
-# Press Ctrl+Z
+# 挂起前台作业
+# 按 Ctrl+Z
 
-# Resume in background
+# 在后台恢复
 bg
 
-# Resume in foreground
+# 在前台恢复
 fg
 
-# Resume specific job
-fg %1                           # Bring job 1 to foreground
-bg %2                           # Continue job 2 in background
+# 恢复特定作业
+fg %1                           # 将作业 1 带到前台
+bg %2                           # 在后台继续作业 2
 
-# Kill specific job
-kill %1                         # Kill job 1
+# 终止特定作业
+kill %1                         # 终止作业 1
 ```
 
-### nohup - Immune to Hangups
+### nohup - 不受挂断影响
 
 ```bash
-# Basic nohup
+# 基本 nohup
 nohup python train.py &
-# Output goes to nohup.out
+# 输出进入 nohup.out
 
-# Redirect output
+# 重定向输出
 nohup python train.py > training.log 2>&1 &
 
-# Alternative: disown
+# 替代方案：disown
 python train.py &
-disown                          # Detach from shell
+disown                          # 从 shell 分离
 ```
 
-### Process Priorities (nice/renice)
+### 进程优先级（nice/renice）
 
-**Nice** values control process priority:
-- Range: -20 (highest priority) to +19 (lowest priority)
-- Default: 0
-- Lower nice value = higher priority = more CPU time
-- Only root can set negative nice values
+**Nice** 值控制进程优先级：
+- 范围：-20（最高优先级）到 +19（最低优先级）
+- 默认：0
+- 较低的 nice 值 = 较高优先级 = 更多 CPU 时间
+- 只有 root 可以设置负 nice 值
 
 ```bash
-# Start with lower priority (nice value +10)
+# 以较低优先级启动（nice 值 +10）
 nice -n 10 python train.py
 
-# Start with higher priority (requires sudo)
+# 以较高优先级启动（需要 sudo）
 sudo nice -n -10 python priority_job.py
 
-# Check nice values
+# 检查 nice 值
 ps -eo pid,ppid,ni,comm
 
-# Change priority of running process
-renice +10 5678                 # Set nice value to 10
-sudo renice -10 5678            # Set nice value to -10 (requires sudo)
+# 更改运行中进程的优先级
+renice +10 5678                 # 设置 nice 值为 10
+sudo renice -10 5678            # 设置 nice 值为 -10（需要 sudo）
 
-# Renice by user
+# 按用户调整优先级
 sudo renice +5 -u alice
 
-# AI Infrastructure use cases:
-# Experimental training (low priority)
+# AI 基础设施用例：
+# 实验性训练（低优先级）
 nice -n 15 python experimental_training.py &
 
-# Production inference (high priority)
+# 生产推理（高优先级）
 sudo nice -n -5 python production_inference.py &
 ```
 
 ---
 
-## System Monitoring
+## 系统监控
 
-### CPU Monitoring
+### CPU 监控
 
-**top/htop** - Real-time monitoring:
+**top/htop** - 实时监控：
 ```bash
-# View CPU usage
+# 查看 CPU 使用率
 top
 htop
 
-# Check load average
+# 检查负载平均值
 uptime
 # 14:32:15 up 5 days, 2:15, 3 users, load average: 4.52, 3.87, 2.91
 
-# Load average explained:
-# 4.52 = 1-minute average
-# 3.87 = 5-minute average
-# 2.91 = 15-minute average
-# Value > number of CPUs = system overloaded
+# 负载平均值解释：
+# 4.52 = 1 分钟平均值
+# 3.87 = 5 分钟平均值
+# 2.91 = 15 分钟平均值
+# 值 > CPU 核心数 = 系统过载
 ```
 
-**mpstat** - Detailed CPU statistics:
+**mpstat** - 详细 CPU 统计：
 ```bash
-# Install sysstat package
+# 安装 sysstat 包
 sudo apt install sysstat
 
-# Show CPU usage
-mpstat 1 5                      # 1 second intervals, 5 reports
+# 显示 CPU 使用率
+mpstat 1 5                      # 1 秒间隔，5 次报告
 
-# Show all CPUs
+# 显示所有 CPU
 mpstat -P ALL 1
 ```
 
-**Example monitoring script**:
+**示例监控脚本**：
 ```bash
 #!/bin/bash
-# Monitor CPU during training
+# 训练期间监控 CPU
 
 while true; do
     echo "=== $(date) ==="
@@ -955,136 +955,136 @@ while true; do
 done
 ```
 
-### Memory Monitoring
+### 内存监控
 
-**free** - Memory usage:
+**free** - 内存使用情况：
 ```bash
-# Show memory usage
-free -h                         # Human-readable
+# 显示内存使用情况
+free -h                         # 人类可读
 
-# Output:
+# 输出：
 #               total        used        free      shared  buff/cache   available
 # Mem:           62Gi        30Gi       8.0Gi       2.0Gi        24Gi        28Gi
 # Swap:         8.0Gi       0.0Gi       8.0Gi
 
-# What each column means:
-# total: Total physical RAM
-# used: RAM used by programs
-# free: Completely unused RAM
-# shared: RAM used by tmpfs
-# buff/cache: RAM used for disk caching (can be freed if needed)
-# available: RAM available for new programs (free + reclaimable cache)
+# 每列的含义：
+# total：物理 RAM 总量
+# used：程序使用的 RAM
+# free：完全未使用的 RAM
+# shared：tmpfs 使用的 RAM
+# buff/cache：用于磁盘缓存的 RAM（需要时可以释放）
+# available：新程序可用的 RAM（空闲 + 可回收缓存）
 ```
 
-**vmstat** - Virtual memory statistics:
+**vmstat** - 虚拟内存统计：
 ```bash
-# Show memory and CPU stats
-vmstat 1 5                      # 1 second intervals, 5 reports
+# 显示内存和 CPU 统计
+vmstat 1 5                      # 1 秒间隔，5 次报告
 
-# Output columns:
-# r: Running processes
-# b: Blocked processes
-# swpd: Virtual memory used
-# free: Idle memory
-# buff: Buffer memory
-# cache: Cache memory
-# si: Memory swapped in from disk
-# so: Memory swapped out to disk
+# 输出列：
+# r：运行中的进程
+# b：阻塞的进程
+# swpd：使用的虚拟内存
+# free：空闲内存
+# buff：缓冲区内存
+# cache：缓存内存
+# si：从磁盘换入的内存
+# so：换出到磁盘的内存
 ```
 
-**Monitoring OOM (Out of Memory) events**:
+**监控 OOM（内存不足）事件**：
 ```bash
-# Check for OOM killer activity
+# 检查 OOM killer 活动
 dmesg | grep -i "out of memory"
 dmesg | grep -i "oom"
 
-# View OOM score for processes (higher = more likely to be killed)
+# 查看进程的 OOM 评分（越高 = 越可能被杀死）
 cat /proc/1234/oom_score
 ```
 
-### Disk Monitoring
+### 磁盘监控
 
-**df** - Disk space usage:
+**df** - 磁盘空间使用情况：
 ```bash
-# Show disk usage
-df -h                           # Human-readable
+# 显示磁盘使用情况
+df -h                           # 人类可读
 
-# Show specific filesystem
+# 显示特定文件系统
 df -h /data
 
-# Show inodes
-df -i                           # Inode usage
+# 显示 inode
+df -i                           # Inode 使用情况
 
-# Example output:
+# 示例输出：
 # Filesystem      Size  Used Avail Use% Mounted on
 # /dev/sda1       100G   45G   50G  48% /
 # /dev/sdb1       1.0T  800G  200G  80% /data
 ```
 
-**du** - Directory disk usage:
+**du** - 目录磁盘使用情况：
 ```bash
-# Show directory size
+# 显示目录大小
 du -sh /data/models
 
-# Show subdirectory sizes
+# 显示子目录大小
 du -h --max-depth=1 /data
 
-# Find largest directories
+# 查找最大目录
 du -h /data | sort -rh | head -20
 
-# Find large files
+# 查找大文件
 find /data -type f -size +1G -exec ls -lh {} \;
 ```
 
-**iostat** - I/O statistics:
+**iostat** - I/O 统计：
 ```bash
-# Install sysstat
+# 安装 sysstat
 sudo apt install sysstat
 
-# Show I/O stats
-iostat -x 1 5                   # Extended stats, 1s intervals
+# 显示 I/O 统计
+iostat -x 1 5                   # 扩展统计，1s 间隔
 
-# Key metrics:
-# %util: Percentage of time device was busy
-# r/s: Reads per second
-# w/s: Writes per second
-# rkB/s: KB read per second
-# wkB/s: KB written per second
+# 关键指标：
+# %util：设备忙碌时间百分比
+# r/s：每秒读取次数
+# w/s：每秒写入次数
+# rkB/s：每秒读取 KB
+# wkB/s：每秒写入 KB
 ```
 
-**iotop** - Real-time I/O monitoring:
+**iotop** - 实时 I/O 监控：
 ```bash
-# Install iotop
+# 安装 iotop
 sudo apt install iotop
 
-# Run iotop
+# 运行 iotop
 sudo iotop
 
-# Show only active I/O
+# 仅显示活动 I/O
 sudo iotop -o
 ```
 
-### GPU Monitoring
+### GPU 监控
 
-**nvidia-smi** - NVIDIA GPU monitoring:
+**nvidia-smi** - NVIDIA GPU 监控：
 ```bash
-# Show GPU status
+# 显示 GPU 状态
 nvidia-smi
 
-# Watch GPU usage (update every second)
+# 监视 GPU 使用情况（每秒更新）
 watch -n 1 nvidia-smi
 
-# Query specific information
+# 查询特定信息
 nvidia-smi --query-gpu=index,name,temperature.gpu,utilization.gpu,memory.used,memory.total \
     --format=csv
 
-# Query compute processes
+# 查询计算进程
 nvidia-smi --query-compute-apps=pid,name,used_memory --format=csv
 
-# Find which process is using GPU
+# 查找哪个进程正在使用 GPU
 nvidia-smi pmon
 
-# Log GPU metrics to file
+# 将 GPU 指标记录到文件
 while true; do
     nvidia-smi --query-gpu=timestamp,temperature.gpu,utilization.gpu,memory.used \
         --format=csv >> gpu_metrics.log
@@ -1092,11 +1092,11 @@ while true; do
 done
 ```
 
-### Comprehensive System Monitoring Script
+### 综合系统监控脚本
 
 ```bash
 #!/bin/bash
-# system-health.sh - Monitor system resources
+# system-health.sh - 监控系统资源
 
 LOG_FILE="/var/log/system-health.log"
 
@@ -1108,27 +1108,27 @@ echo "--- CPU ---" | tee -a "$LOG_FILE"
 uptime | tee -a "$LOG_FILE"
 mpstat 1 1 | tail -1 | tee -a "$LOG_FILE"
 
-# Memory
+# 内存
 echo "" | tee -a "$LOG_FILE"
 echo "--- Memory ---" | tee -a "$LOG_FILE"
 free -h | tee -a "$LOG_FILE"
 
-# Disk
+# 磁盘
 echo "" | tee -a "$LOG_FILE"
 echo "--- Disk ---" | tee -a "$LOG_FILE"
 df -h | grep -v tmpfs | grep -v loop | tee -a "$LOG_FILE"
 
-# Top processes by CPU
+# CPU 消耗最高的进程
 echo "" | tee -a "$LOG_FILE"
 echo "--- Top CPU Processes ---" | tee -a "$LOG_FILE"
 ps aux --sort=-%cpu | head -6 | tee -a "$LOG_FILE"
 
-# Top processes by memory
+# 内存消耗最高的进程
 echo "" | tee -a "$LOG_FILE"
 echo "--- Top Memory Processes ---" | tee -a "$LOG_FILE"
 ps aux --sort=-%mem | head -6 | tee -a "$LOG_FILE"
 
-# GPU (if available)
+# GPU（如果可用）
 if command -v nvidia-smi &> /dev/null; then
     echo "" | tee -a "$LOG_FILE"
     echo "--- GPU ---" | tee -a "$LOG_FILE"
@@ -1141,338 +1141,338 @@ echo "" | tee -a "$LOG_FILE"
 
 ---
 
-## Log Files and Analysis
+## 日志文件和分析
 
-### Understanding Linux Logging
+### 理解 Linux 日志
 
-**System Logs Location**: `/var/log/`
+**系统日志位置**：`/var/log/`
 
-**Common Log Files**:
-- `/var/log/syslog` - General system logs (Debian/Ubuntu)
-- `/var/log/messages` - General system logs (RHEL/CentOS)
-- `/var/log/auth.log` - Authentication logs
-- `/var/log/kern.log` - Kernel logs
-- `/var/log/dmesg` - Boot messages
-- `/var/log/nginx/` - Nginx web server logs
-- `/var/log/apache2/` - Apache web server logs
+**常见日志文件**：
+- `/var/log/syslog` - 通用系统日志（Debian/Ubuntu）
+- `/var/log/messages` - 通用系统日志（RHEL/CentOS）
+- `/var/log/auth.log` - 认证日志
+- `/var/log/kern.log` - 内核日志
+- `/var/log/dmesg` - 启动消息
+- `/var/log/nginx/` - Nginx web 服务器日志
+- `/var/log/apache2/` - Apache web 服务器日志
 
-### Viewing Log Files
+### 查看日志文件
 
 ```bash
-# View entire log
+# 查看整个日志
 cat /var/log/syslog
 
-# View last lines
+# 查看最后几行
 tail /var/log/syslog
 
-# Follow log in real-time
+# 实时跟踪日志
 tail -f /var/log/syslog
 
-# View with pager
+# 使用分页器查看
 less /var/log/syslog
 
-# View specific number of lines
+# 查看特定行数
 tail -n 100 /var/log/syslog
 head -n 50 /var/log/syslog
 ```
 
-### Searching Logs
+### 搜索日志
 
 ```bash
-# Search for errors
+# 搜索错误
 grep "ERROR" /var/log/syslog
-grep -i "error" /var/log/syslog        # Case-insensitive
+grep -i "error" /var/log/syslog        # 不区分大小写
 
-# Search for failed authentication
+# 搜索失败认证
 grep "Failed password" /var/log/auth.log
 
-# Search multiple files
+# 搜索多个文件
 grep "cuda" /var/log/*.log
 
-# Show context around matches
-grep -A 5 "ERROR" /var/log/syslog      # 5 lines after
-grep -B 5 "ERROR" /var/log/syslog      # 5 lines before
-grep -C 5 "ERROR" /var/log/syslog      # 5 lines around
+# 显示匹配周围上下文
+grep -A 5 "ERROR" /var/log/syslog      # 之后 5 行
+grep -B 5 "ERROR" /var/log/syslog      # 之前 5 行
+grep -C 5 "ERROR" /var/log/syslog      # 前后各 5 行
 
-# Count occurrences
+# 计数出现次数
 grep -c "ERROR" /var/log/syslog
 
-# Search with line numbers
+# 带行号搜索
 grep -n "ERROR" /var/log/syslog
 ```
 
-### journalctl - systemd Journal
+### journalctl - systemd 日志
 
-Modern systems use systemd's journal for logging.
+现代系统使用 systemd 的日志进行日志记录。
 
 ```bash
-# View all logs
+# 查看所有日志
 journalctl
 
-# View logs for specific service
+# 查看特定服务的日志
 journalctl -u nginx
 journalctl -u ml-inference
 
-# Follow logs in real-time
+# 实时跟踪日志
 journalctl -f
 journalctl -u ml-inference -f
 
-# View logs since specific time
+# 查看特定时间以来的日志
 journalctl --since "2024-01-15 14:00"
 journalctl --since "1 hour ago"
 journalctl --since today
 journalctl --since yesterday
 
-# View logs between times
+# 查看时间之间的日志
 journalctl --since "2024-01-15 14:00" --until "2024-01-15 15:00"
 
-# Filter by priority
-journalctl -p err                      # Errors only
-journalctl -p warning                  # Warnings and above
-# Priorities: emerg, alert, crit, err, warning, notice, info, debug
+# 按优先级过滤
+journalctl -p err                      # 仅错误
+journalctl -p warning                  # 警告及以上
+# 优先级：emerg、alert、crit、err、warning、notice、info、debug
 
-# View kernel messages
+# 查看内核消息
 journalctl -k
 journalctl --dmesg
 
-# View logs from specific boot
-journalctl -b                          # Current boot
-journalctl -b -1                       # Previous boot
-journalctl --list-boots                # List all boots
+# 查看特定启动的日志
+journalctl -b                          # 当前启动
+journalctl -b -1                       # 上次启动
+journalctl --list-boots                # 列出所有启动
 
-# Reverse order (newest first)
+# 反向顺序（最新的在前）
 journalctl -r
 
-# Limit output
-journalctl -n 50                       # Last 50 lines
-journalctl -u nginx -n 100             # Last 100 lines from nginx
+# 限制输出
+journalctl -n 50                       # 最后 50 行
+journalctl -u nginx -n 100             # nginx 的最后 100 行
 
-# Output formats
-journalctl -o json-pretty              # JSON format
-journalctl -o cat                      # Just messages, no metadata
-journalctl -o short-iso                # ISO timestamps
+# 输出格式
+journalctl -o json-pretty              # JSON 格式
+journalctl -o cat                      # 仅消息，无元数据
+journalctl -o short-iso                # ISO 时间戳
 
-# Disk usage
+# 磁盘使用量
 journalctl --disk-usage
 
-# Cleanup old logs
-sudo journalctl --vacuum-time=2weeks   # Keep 2 weeks
-sudo journalctl --vacuum-size=500M     # Keep 500MB
+# 清理旧日志
+sudo journalctl --vacuum-time=2weeks   # 保留 2 周
+sudo journalctl --vacuum-size=500M     # 保留 500MB
 ```
 
-### Log Rotation
+### 日志轮转
 
-**logrotate** automatically rotates, compresses, and removes old logs.
+**logrotate** 自动轮转、压缩和删除旧日志。
 
-Configuration: `/etc/logrotate.conf` and `/etc/logrotate.d/`
+配置：`/etc/logrotate.conf` 和 `/etc/logrotate.d/`
 
-**Example configuration** (`/etc/logrotate.d/ml-training`):
+**示例配置**（`/etc/logrotate.d/ml-training`）：
 ```
 /var/log/ml-training/*.log {
-    daily                      # Rotate daily
-    rotate 7                   # Keep 7 days
-    compress                   # Compress old logs
-    delaycompress              # Delay compression for 1 rotation
-    missingok                  # Don't error if log is missing
-    notifempty                 # Don't rotate if empty
-    create 0640 mluser mlgroup # Create new log with these permissions
-    sharedscripts              # Run scripts once for all logs
+    daily                      # 每日轮转
+    rotate 7                   # 保留 7 天
+    compress                   # 压缩旧日志
+    delaycompress              # 延迟压缩 1 次轮转
+    missingok                  # 日志缺失时不报错
+    notifempty                 # 为空时不轮转
+    create 0640 mluser mlgroup # 以这些权限创建新日志
+    sharedscripts              # 为所有日志运行一次脚本
     postrotate
         systemctl reload ml-training > /dev/null 2>&1 || true
     endscript
 }
 ```
 
-**Test logrotate**:
+**测试 logrotate**：
 ```bash
-# Test configuration
+# 测试配置
 sudo logrotate -d /etc/logrotate.d/ml-training
 
-# Force rotation
+# 强制轮转
 sudo logrotate -f /etc/logrotate.d/ml-training
 ```
 
-### AI Infrastructure Log Analysis Examples
+### AI 基础设施日志分析示例
 
-**Find training errors**:
+**查找训练错误**：
 ```bash
-# Search for CUDA errors
+# 搜索 CUDA 错误
 journalctl -u ml-training | grep -i "cuda"
 
-# Search for out-of-memory errors
+# 搜索内存不足错误
 journalctl -u ml-training | grep -i "out of memory"
 dmesg | grep -i "oom"
 
-# Find failed model loads
+# 查找失败的模型加载
 grep "Failed to load model" /var/log/ml-inference/*.log
 
-# Check GPU errors
+# 检查 GPU 错误
 nvidia-smi --query-gpu=index,name,ecc.errors.corrected.aggregate.total \
     --format=csv
 ```
 
-**Analyze training performance**:
+**分析训练性能**：
 ```bash
-# Extract epoch times from training logs
+# 从训练日志中提取 epoch 时间
 grep "Epoch" /var/log/ml-training/training.log | \
     awk '{print $NF}' | \
     awk '{sum+=$1; count++} END {print "Avg:", sum/count}'
 
-# Find longest inference times
+# 查找最长的推理时间
 grep "inference_time" /var/log/ml-api/api.log | \
     sort -k5 -n -r | head -20
 
-# Count API requests per hour
+# 统计每小时的 API 请求数
 grep "$(date +%Y-%m-%d)" /var/log/nginx/access.log | \
     cut -d: -f2 | sort | uniq -c
 ```
 
-**Security monitoring**:
+**安全监控**：
 ```bash
-# Failed SSH attempts
+# 失败的 SSH 尝试
 grep "Failed password" /var/log/auth.log | \
     awk '{print $(NF-5)}' | sort | uniq -c | sort -rn
 
-# Successful root logins
+# 成功的 root 登录
 grep "session opened for user root" /var/log/auth.log
 
-# Sudo usage
+# Sudo 使用情况
 grep "sudo" /var/log/auth.log | tail -20
 ```
 
 ---
 
-## Summary and Key Takeaways
+## 总结和要点
 
-### Commands Mastered
+### 掌握的命令
 
-**Package Management**:
-- `apt update` / `apt upgrade` - Update and upgrade packages
-- `apt install` / `apt remove` - Install and remove packages
-- `apt search` / `apt show` - Search and show package info
-- `dnf install` / `dnf remove` - RHEL/CentOS package management
+**包管理**：
+- `apt update` / `apt upgrade` - 更新和升级包
+- `apt install` / `apt remove` - 安装和删除包
+- `apt search` / `apt show` - 搜索和显示包信息
+- `dnf install` / `dnf remove` - RHEL/CentOS 包管理
 
-**Service Management**:
-- `systemctl start/stop/restart` - Control services
-- `systemctl enable/disable` - Configure boot behavior
-- `systemctl status` - Check service status
-- `journalctl -u service` - View service logs
+**服务管理**：
+- `systemctl start/stop/restart` - 控制服务
+- `systemctl enable/disable` - 配置启动行为
+- `systemctl status` - 检查服务状态
+- `journalctl -u service` - 查看服务日志
 
-**Process Management**:
-- `ps aux` - View all processes
-- `top` / `htop` - Interactive monitoring
-- `kill` / `pkill` / `killall` - Terminate processes
-- `nice` / `renice` - Control process priority
-- `pgrep` - Find process IDs
+**进程管理**：
+- `ps aux` - 查看所有进程
+- `top` / `htop` - 交互式监控
+- `kill` / `pkill` / `killall` - 终止进程
+- `nice` / `renice` - 控制进程优先级
+- `pgrep` - 查找进程 ID
 
-**System Monitoring**:
-- `free -h` - Memory usage
-- `df -h` - Disk usage
-- `du -sh` - Directory sizes
-- `uptime` - Load average
-- `nvidia-smi` - GPU monitoring
+**系统监控**：
+- `free -h` - 内存使用情况
+- `df -h` - 磁盘使用情况
+- `du -sh` - 目录大小
+- `uptime` - 负载平均值
+- `nvidia-smi` - GPU 监控
 
-**Log Analysis**:
-- `journalctl` - systemd logs
-- `tail -f` - Follow log files
-- `grep` - Search logs
-- `logrotate` - Automatic log rotation
+**日志分析**：
+- `journalctl` - systemd 日志
+- `tail -f` - 跟踪日志文件
+- `grep` - 搜索日志
+- `logrotate` - 自动日志轮转
 
-### Key Concepts
+### 关键概念
 
-1. **Package Management**: Automate software installation with apt/dnf
-2. **Service Control**: Manage long-running services with systemd
-3. **Process Monitoring**: Track and control running programs
-4. **Resource Tracking**: Monitor CPU, memory, disk, and GPU usage
-5. **Log Analysis**: Troubleshoot issues through system logs
-6. **Automation**: Systemd timers and cron for scheduled tasks
+1. **包管理**：使用 apt/dnf 自动化软件安装
+2. **服务控制**：使用 systemd 管理长时间运行的服务
+3. **进程监控**：跟踪和控制运行中的程序
+4. **资源跟踪**：监控 CPU、内存、磁盘和 GPU 使用情况
+5. **日志分析**：通过系统日志排查问题
+6. **自动化**：用于计划任务的 systemd timers 和 cron
 
-### AI Infrastructure Best Practices
+### AI 基础设施最佳实践
 
-✅ **Pin dependency versions** for reproducibility
-✅ **Use systemd services** for production ML applications
-✅ **Set resource limits** to prevent resource exhaustion
-✅ **Monitor GPU usage** continuously during training
-✅ **Implement log rotation** to manage disk space
-✅ **Use nice values** to prioritize production workloads
-✅ **Regular system updates** for security patches
-✅ **Automate health checks** with systemd timers
+✅ **锁定依赖版本**以实现可重现性
+✅ **使用 systemd 服务**用于生产 ML 应用程序
+✅ **设置资源限制**以防止资源耗尽
+✅ **持续监控 GPU 使用情况**在训练期间
+✅ **实施日志轮转**以管理磁盘空间
+✅ **使用 nice 值**来优先处理生产工作负载
+✅ **定期系统更新**以获得安全补丁
+✅ **使用 systemd timers**自动化健康检查
 
-### Troubleshooting Checklist
+### 故障排查检查清单
 
-When things go wrong, check:
-1. Service status: `systemctl status service-name`
-2. Service logs: `journalctl -u service-name -n 100`
-3. Process list: `ps aux | grep service`
-4. Resource usage: `top`, `free -h`, `df -h`
-5. System logs: `journalctl -p err --since "1 hour ago"`
-6. GPU status: `nvidia-smi` (if applicable)
-7. Disk space: `df -h`, `du -sh /var/log`
+当出现问题时，检查：
+1. 服务状态：`systemctl status service-name`
+2. 服务日志：`journalctl -u service-name -n 100`
+3. 进程列表：`ps aux | grep service`
+4. 资源使用情况：`top`、`free -h`、`df -h`
+5. 系统日志：`journalctl -p err --since "1 hour ago"`
+6. GPU 状态：`nvidia-smi`（如适用）
+7. 磁盘空间：`df -h`、`du -sh /var/log`
 
-### Common Issues and Solutions
+### 常见问题和解决方案
 
-**Service won't start**:
+**服务无法启动**：
 ```bash
 systemctl status ml-inference
 journalctl -u ml-inference -n 50
-# Check: permissions, missing files, port conflicts
+# 检查：权限、缺失文件、端口冲突
 ```
 
-**High CPU usage**:
+**CPU 使用率高**：
 ```bash
 top -o %CPU
-# Identify process, check if expected, renice if needed
+# 识别进程，检查是否预期，必要时调整优先级
 ```
 
-**Out of memory**:
+**内存不足**：
 ```bash
 free -h
 dmesg | grep -i oom
-# Check memory leaks, reduce batch size, add swap
+# 检查内存泄漏，减小批处理大小，添加 swap
 ```
 
-**Disk full**:
+**磁盘已满**：
 ```bash
 df -h
 du -h / | sort -rh | head -20
-# Clean logs, remove old models, compress data
+# 清理日志，删除旧模型，压缩数据
 ```
 
-### Next Steps
+### 下一步
 
-In **Lecture 05: Introduction to Shell Scripting**, you'll learn:
-- Writing bash scripts for automation
-- Variables, loops, and conditionals
-- Functions and argument processing
-- Error handling basics
-- Automating system administration tasks
+在**讲座 05：Shell 脚本入门**中，你将学习：
+- 编写用于自动化的 bash 脚本
+- 变量、循环和条件语句
+- 函数和参数处理
+- 错误处理基础
+- 自动化系统管理任务
 
-### Quick Reference Card
+### 快速参考卡
 
 ```bash
-# Package Management
+# 包管理
 sudo apt update && sudo apt upgrade -y
 sudo apt install package-name
 apt search keyword
 
-# Service Management
+# 服务管理
 sudo systemctl restart service-name
 systemctl status service-name
 journalctl -u service-name -f
 
-# Process Management
+# 进程管理
 ps aux --sort=-%cpu | head
 kill -9 PID
 nice -n 10 command
 
-# Monitoring
+# 监控
 top
 htop
 free -h
 df -h
 nvidia-smi
 
-# Logs
+# 日志
 journalctl -u service-name -f
 tail -f /var/log/syslog
 grep ERROR /var/log/syslog
@@ -1480,8 +1480,8 @@ grep ERROR /var/log/syslog
 
 ---
 
-**End of Lecture 04: System Administration Basics**
+**讲座 04：系统管理基础结束**
 
-You now have the foundational system administration skills needed to manage AI infrastructure. Practice these commands regularly to build muscle memory and confidence.
+你现在已经掌握了管理 AI 基础设施所需的基础系统管理技能。定期练习这些命令以建立肌肉记忆和信心。
 
-**Next**: Lecture 05 - Introduction to Shell Scripting
+**下一步**：讲座 05 - Shell 脚本入门

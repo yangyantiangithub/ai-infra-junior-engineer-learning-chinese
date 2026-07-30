@@ -2,149 +2,149 @@
 
 ## Exercise Overview
 
-**Objective**: Master Docker volume management including persistent storage, data sharing between containers, backup strategies, and volume drivers for ML workloads.
+**Objective**: 掌握 Docker volume 管理，包括持久化存储、container 间数据共享、备份策略以及适用于 ML 工作负载的 volume 驱动。
 
-**Difficulty**: Intermediate
-**Estimated Time**: 3-4 hours
+**Difficulty**: 中级
+**Estimated Time**: 3-4 小时
 **Prerequisites**:
 - Exercise 01-04 (Container Operations, Images, Compose, Networking)
 - Lecture 04 (Networking & Volumes)
 
 **What You'll Learn**:
-- Volume types (named volumes, bind mounts, tmpfs)
-- Data persistence strategies
-- Sharing data between containers
-- Volume backup and restore
-- Volume drivers and plugins
-- ML model and dataset management
-- Performance considerations
-- Production volume patterns
+- Volume 类型（命名 volume、bind mount、tmpfs）
+- 数据持久化策略
+- Container 间数据共享
+- Volume 备份和恢复
+- Volume 驱动和插件
+- ML 模型和数据集管理
+- 性能考量
+- 生产 volume 模式
 
 ---
 
-## Part 1: Understanding Volume Types
+## Part 1: 理解 Volume 类型
 
-### Step 1.1: Named Volumes
+### Step 1.1: 命名 Volume
 
 ```bash
-# Create project directory
+# 创建项目目录
 mkdir -p ~/docker-exercises/volumes
 cd ~/docker-exercises/volumes
 
-# Create a named volume
+# 创建命名 volume
 docker volume create my-data
 
-# Inspect it
+# 检查
 docker volume inspect my-data
 
-# Use the volume
+# 使用 volume
 docker run -d \
   --name app1 \
   -v my-data:/data \
   alpine sh -c "echo 'Hello from app1' > /data/message.txt && sleep 3600"
 
-# Check the file was created
+# 检查文件已创建
 docker exec app1 cat /data/message.txt
 
-# Stop and remove container
+# 停止并删除 container
 docker stop app1
 docker rm app1
 
-# Data persists! Start new container with same volume
+# 数据持久存在！使用相同 volume 启动新 container
 docker run -d \
   --name app2 \
   -v my-data:/data \
   alpine sleep 3600
 
-# File still exists!
+# 文件仍然存在！
 docker exec app2 cat /data/message.txt
 
-# Cleanup
+# 清理
 docker rm -f app2
 docker volume rm my-data
 ```
 
 **Key Points**:
-- Named volumes persist after container removal
-- Managed by Docker (stored in `/var/lib/docker/volumes/`)
-- Can be shared between containers
-- Best for production data
+- 命名 volume 在 container 删除后仍然存在
+- 由 Docker 管理（存储在 `/var/lib/docker/volumes/`）
+- 可在 container 之间共享
+- 最适合生产数据
 
-### Step 1.2: Bind Mounts
+### Step 1.2: Bind Mount
 
 ```bash
-# Create directory on host
+# 在主机上创建目录
 mkdir -p ~/docker-data/app
 
-# Create a file
+# 创建文件
 echo "Hello from host" > ~/docker-data/app/host-file.txt
 
-# Mount host directory into container
+# 将主机目录挂载到 container
 docker run -d \
   --name bind-test \
   -v ~/docker-data/app:/app \
   alpine sleep 3600
 
-# File is accessible in container
+# 文件在 container 中可访问
 docker exec bind-test cat /app/host-file.txt
 
-# Create file from container
+# 从 container 创建文件
 docker exec bind-test sh -c "echo 'From container' > /app/container-file.txt"
 
-# File appears on host!
+# 文件出现在主机上！
 cat ~/docker-data/app/container-file.txt
 
-# Cleanup
+# 清理
 docker rm -f bind-test
 ```
 
 **Use Cases**:
-- Development (hot reload source code)
-- Configuration files
-- Host-generated data
-- Direct file system access needed
+- 开发（热重载源代码）
+- 配置文件
+- 主机生成的数据
+- 需要直接文件系统访问
 
-### Step 1.3: tmpfs Mounts
+### Step 1.3: tmpfs Mount
 
 ```bash
-# Create tmpfs mount (memory-based, not persisted)
+# 创建 tmpfs mount（基于内存，不持久化）
 docker run -d \
   --name tmpfs-test \
   --tmpfs /tmp:rw,size=100m \
   alpine sleep 3600
 
-# Write to tmpfs
+# 写入 tmpfs
 docker exec tmpfs-test sh -c "echo 'Temporary data' > /tmp/temp.txt"
 docker exec tmpfs-test cat /tmp/temp.txt
 
-# Check mount
+# 检查挂载
 docker exec tmpfs-test df -h /tmp
 
-# Stop and remove container
+# 停止并删除 container
 docker rm -f tmpfs-test
 
-# Start new container - data is gone (tmpfs is not persistent)
+# 启动新 container — 数据消失（tmpfs 不持久化）
 docker run -d --name tmpfs-test2 --tmpfs /tmp alpine sleep 3600
 docker exec tmpfs-test2 ls /tmp
-# Empty!
+# 空！
 
 docker rm -f tmpfs-test2
 ```
 
 **Use Cases**:
-- Temporary cache
-- Sensitive data (passwords, tokens)
-- High-performance temporary storage
-- ML inference temporary files
+- 临时缓存
+- 敏感数据（密码、令牌）
+- 高性能临时存储
+- ML 推理临时文件
 
-### Step 1.4: Comparison
+### Step 1.4: 比较
 
 ```bash
-# Create test script
+# 创建测试脚本
 cat > test-volumes.sh << 'EOF'
 #!/bin/bash
 
-# Named volume
+# 命名 volume
 docker volume create test-named
 docker run --rm -v test-named:/data alpine sh -c "echo 'named' > /data/file.txt"
 
@@ -163,7 +163,7 @@ cat /tmp/test-bind/file.txt
 
 echo "tmpfs file: (not persisted)"
 
-# Cleanup
+# 清理
 docker volume rm test-named
 rm -rf /tmp/test-bind
 EOF
@@ -172,66 +172,66 @@ chmod +x test-volumes.sh
 ./test-volumes.sh
 ```
 
-✅ **Checkpoint**: You understand the three types of Docker volumes.
+✅ **Checkpoint**: 你理解了三种 Docker volume 类型。
 
 ---
 
-## Part 2: Volume Management Operations
+## Part 2: Volume 管理操作
 
-### Step 2.1: Basic Volume Commands
+### Step 2.1: 基本 Volume 命令
 
 ```bash
-# Create volumes
+# 创建 volume
 docker volume create app-data
 docker volume create db-data
 docker volume create cache-data
 
-# List volumes
+# 列出 volume
 docker volume ls
 
-# Inspect specific volume
+# 检查特定 volume
 docker volume inspect app-data
 
-# Find where volume is stored on host
+# 查找 volume 在主机上的存储位置
 docker volume inspect app-data --format '{{.Mountpoint}}'
 
-# Remove volume
+# 删除 volume
 docker volume rm cache-data
 
-# Remove all unused volumes
+# 删除所有未使用的 volume
 docker volume prune
 
-# Remove with force
+# 强制删除
 docker volume rm -f app-data db-data
 ```
 
-### Step 2.2: Volume Labels and Metadata
+### Step 2.2: Volume 标签和元数据
 
 ```bash
-# Create volume with labels
+# 创建带标签的 volume
 docker volume create \
   --label environment=production \
   --label app=myapp \
   --label version=1.0 \
   prod-data
 
-# List volumes with specific label
+# 列出具有特定标签的 volume
 docker volume ls --filter "label=environment=production"
 
-# Inspect labels
+# 检查标签
 docker volume inspect prod-data --format '{{json .Labels}}' | python -m json.tool
 
-# Cleanup
+# 清理
 docker volume rm prod-data
 ```
 
-### Step 2.3: Volume Drivers
+### Step 2.3: Volume 驱动
 
 ```bash
-# Default driver (local)
+# 默认驱动（local）
 docker volume create --driver local my-local-volume
 
-# Create volume with driver options
+# 使用驱动选项创建 volume
 docker volume create \
   --driver local \
   --opt type=tmpfs \
@@ -239,60 +239,60 @@ docker volume create \
   --opt o=size=100m,uid=1000 \
   tmpfs-volume
 
-# Inspect driver info
+# 检查驱动信息
 docker volume inspect tmpfs-volume
 
-# Cleanup
+# 清理
 docker volume rm my-local-volume tmpfs-volume
 ```
 
-✅ **Checkpoint**: You can manage volumes with Docker CLI.
+✅ **Checkpoint**: 你可以使用 Docker CLI 管理 volume。
 
 ---
 
-## Part 3: Sharing Data Between Containers
+## Part 3: Container 间共享数据
 
-### Step 3.1: Multiple Containers, One Volume
+### Step 3.1: 多个 Container，一个 Volume
 
 ```bash
-# Create shared volume
+# 创建共享 volume
 docker volume create shared-data
 
-# Container 1: Writer
+# Container 1：写入
 docker run -d \
   --name writer \
   -v shared-data:/data \
   alpine sh -c 'while true; do echo "$(date): Message" >> /data/log.txt; sleep 5; done'
 
-# Container 2: Reader
+# Container 2：读取
 docker run -d \
   --name reader \
   -v shared-data:/data \
   alpine sh -c 'while true; do tail -5 /data/log.txt; sleep 10; done'
 
-# View writer logs
+# 查看 writer 日志
 docker logs -f writer
 
-# View reader logs (in another terminal)
+# 查看 reader 日志（在另一个终端）
 docker logs -f reader
 
-# Both containers share the same data!
+# 两个 container 共享相同的数据！
 
-# Cleanup
+# 清理
 docker rm -f writer reader
 docker volume rm shared-data
 ```
 
-### Step 3.2: Data Container Pattern (Legacy)
+### Step 3.2: 数据 Container 模式（旧版）
 
 ```bash
-# Create data-only container (older pattern)
+# 创建纯数据 container（旧模式）
 docker create \
   --name data-container \
   -v /data \
   alpine
 
-# Use data from data container
+# 从数据 container 使用数据
 docker run -d \
   --name app1 \
   --volumes-from data-container \
@@ -303,31 +303,31 @@ docker run -d \
   --volumes-from data-container \
   alpine sh -c "echo 'App 2' > /data/app2.txt && sleep 3600"
 
-# Check both files exist
+# 检查两个文件都存在
 docker exec app1 ls /data
 docker exec app2 ls /data
 
-# Cleanup
+# 清理
 docker rm -f data-container app1 app2
 ```
 
-**Note**: Modern approach uses named volumes instead.
+**Note**: 现代方法改用命名 volume。
 
-### Step 3.3: Docker Compose Volume Sharing
+### Step 3.3: Docker Compose Volume 共享
 
 ```yaml
 cat > docker-compose.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Log generator
+  # 日志生成器
   app:
     image: alpine
     command: sh -c 'while true; do echo "$(date): Application log" >> /logs/app.log; sleep 2; done'
     volumes:
       - app-logs:/logs
 
-  # Log processor
+  # 日志处理器
   processor:
     image: alpine
     command: sh -c 'while true; do echo "=== Last 5 logs ===" && tail -5 /logs/app.log; sleep 10; done'
@@ -336,12 +336,12 @@ services:
     depends_on:
       - app
 
-  # Log analyzer
+  # 日志分析器
   analyzer:
     image: alpine
     command: sh -c 'while true; do wc -l /logs/app.log; sleep 15; done'
     volumes:
-      - app-logs:/logs:ro  # Read-only mount!
+      - app-logs:/logs:ro  # 只读挂载！
     depends_on:
       - app
 
@@ -351,36 +351,36 @@ EOF
 ```
 
 ```bash
-# Start services
+# 启动服务
 docker compose up -d
 
-# View logs
+# 查看日志
 docker compose logs -f processor
 
-# Verify analyzer has read-only access
+# 验证分析器有只读访问权限
 docker compose exec analyzer sh -c "echo 'test' >> /logs/app.log"
-# Should fail: Read-only file system
+# 应该失败：Read-only file system
 
-# Cleanup
+# 清理
 docker compose down -v
 ```
 
-✅ **Checkpoint**: You can share volumes between multiple containers.
+✅ **Checkpoint**: 你可以共享多个 container 之间的 volume。
 
 ---
 
-## Part 4: Database Persistence
+## Part 4: 数据库持久化
 
-### Step 4.1: PostgreSQL with Persistent Storage
+### Step 4.1: 带持久化存储的 PostgreSQL
 
 ```bash
 mkdir -p ~/docker-exercises/db-persistence
 cd ~/docker-exercises/db-persistence
 
-# Create volume for database
+# 创建数据库 volume
 docker volume create postgres-data
 
-# Run PostgreSQL with persistent volume
+# 使用持久化 volume 运行 PostgreSQL
 docker run -d \
   --name postgres \
   -e POSTGRES_PASSWORD=secret \
@@ -388,10 +388,10 @@ docker run -d \
   -v postgres-data:/var/lib/postgresql/data \
   postgres:15
 
-# Wait for startup
+# 等待启动
 sleep 10
 
-# Create table and insert data
+# 创建表并插入数据
 docker exec postgres psql -U postgres -d myapp -c "
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
@@ -403,14 +403,14 @@ INSERT INTO users (name, email) VALUES
     ('Bob', 'bob@example.com');
 "
 
-# Query data
+# 查询数据
 docker exec postgres psql -U postgres -d myapp -c "SELECT * FROM users;"
 
-# Stop and remove container
+# 停止并删除 container
 docker stop postgres
 docker rm postgres
 
-# Start new container with same volume
+# 使用相同 volume 启动新 container
 docker run -d \
   --name postgres-new \
   -e POSTGRES_PASSWORD=secret \
@@ -419,15 +419,15 @@ docker run -d \
 
 sleep 10
 
-# Data persists!
+# 数据持久存在！
 docker exec postgres-new psql -U postgres -d myapp -c "SELECT * FROM users;"
 
-# Cleanup
+# 清理
 docker rm -f postgres-new
 docker volume rm postgres-data
 ```
 
-### Step 4.2: Complete Database Stack with Compose
+### Step 4.2: 使用 Compose 的完整数据库栈
 
 ```yaml
 cat > docker-compose-db.yml << 'EOF'
@@ -474,7 +474,7 @@ EOF
 ```
 
 ```bash
-# Create init scripts
+# 创建初始化脚本
 mkdir -p init-db backups mongo-init
 
 cat > init-db/01-schema.sql << 'EOF'
@@ -490,53 +490,53 @@ INSERT INTO products (name, price) VALUES
     ('Gadget', 29.99);
 EOF
 
-# Start all databases
+# 启动所有数据库
 docker compose -f docker-compose-db.yml up -d
 
-# Wait for startup
+# 等待启动
 sleep 15
 
-# Verify data
+# 验证数据
 docker compose -f docker-compose-db.yml exec postgres \
   psql -U appuser -d appdb -c "SELECT * FROM products;"
 
-# Test MongoDB
+# 测试 MongoDB
 docker compose -f docker-compose-db.yml exec mongo \
   mongosh -u admin -p secret --eval "db.adminCommand('listDatabases')"
 
-# Test Redis persistence
+# 测试 Redis 持久化
 docker compose -f docker-compose-db.yml exec redis \
   redis-cli SET mykey "persistent value"
 
 docker compose -f docker-compose-db.yml exec redis \
   redis-cli GET mykey
 
-# Stop and restart - data persists
+# 停止并重启 — 数据持久存在
 docker compose -f docker-compose-db.yml down
 docker compose -f docker-compose-db.yml up -d
 
 sleep 15
 
-# Data still there!
+# 数据仍然存在！
 docker compose -f docker-compose-db.yml exec redis redis-cli GET mykey
 
-# Cleanup
+# 清理
 docker compose -f docker-compose-db.yml down -v
 ```
 
-✅ **Checkpoint**: You can implement persistent database storage.
+✅ **Checkpoint**: 你可以实现持久化数据库存储。
 
 ---
 
-## Part 5: Backup and Restore Strategies
+## Part 5: 备份和恢复策略
 
-### Step 5.1: Volume Backup
+### Step 5.1: Volume 备份
 
 ```bash
-# Create volume with data
+# 创建带数据的 volume
 docker volume create app-data
 
-# Add some data
+# 添加一些数据
 docker run --rm -v app-data:/data alpine sh -c "
   echo 'Important data' > /data/file1.txt
   echo 'More data' > /data/file2.txt
@@ -544,22 +544,22 @@ docker run --rm -v app-data:/data alpine sh -c "
   echo 'Nested data' > /data/subdir/file3.txt
 "
 
-# Backup volume to tar archive
+# 将 volume 备份为 tar 归档
 docker run --rm \
   -v app-data:/source:ro \
   -v $(pwd):/backup \
   alpine tar czf /backup/app-data-backup.tar.gz -C /source .
 
-# Verify backup
+# 验证备份
 ls -lh app-data-backup.tar.gz
 
-# List contents
+# 列出内容
 tar tzf app-data-backup.tar.gz
 
-# Delete volume
+# 删除 volume
 docker volume rm app-data
 
-# Restore from backup
+# 从备份恢复
 docker volume create app-data-restored
 
 docker run --rm \
@@ -567,15 +567,15 @@ docker run --rm \
   -v $(pwd):/backup \
   alpine tar xzf /backup/app-data-backup.tar.gz -C /target
 
-# Verify restored data
+# 验证恢复的数据
 docker run --rm -v app-data-restored:/data alpine ls -laR /data
 
-# Cleanup
+# 清理
 docker volume rm app-data-restored
 rm app-data-backup.tar.gz
 ```
 
-### Step 5.2: Database Backup Script
+### Step 5.2: 数据库备份脚本
 
 ```bash
 cat > backup-database.sh << 'EOF'
@@ -586,14 +586,14 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 CONTAINER_NAME="postgres"
 DB_NAME="myapp"
 
-# Create backup
+# 创建备份
 docker exec $CONTAINER_NAME pg_dump -U postgres $DB_NAME > \
   ${BACKUP_DIR}/backup_${TIMESTAMP}.sql
 
-# Compress
+# 压缩
 gzip ${BACKUP_DIR}/backup_${TIMESTAMP}.sql
 
-# Keep only last 7 days
+# 仅保留最近 7 天
 find ${BACKUP_DIR} -name "backup_*.sql.gz" -mtime +7 -delete
 
 echo "Backup completed: backup_${TIMESTAMP}.sql.gz"
@@ -602,7 +602,7 @@ EOF
 chmod +x backup-database.sh
 ```
 
-### Step 5.3: Automated Backup with Compose
+### Step 5.3: 使用 Compose 自动备份
 
 ```yaml
 cat > docker-compose-backup.yml << 'EOF'
@@ -631,7 +631,7 @@ services:
         pg_dump -h db -U postgres myapp > /backups/backup_$${TIMESTAMP}.sql
         gzip /backups/backup_$${TIMESTAMP}.sql
         echo "Backup created: backup_$${TIMESTAMP}.sql.gz"
-        sleep 86400  # Daily backups
+        sleep 86400  # 每天备份
       done
       '
     environment:
@@ -646,21 +646,21 @@ EOF
 mkdir -p backups
 docker compose -f docker-compose-backup.yml up -d
 
-# Manual backup trigger
+# 手动触发备份
 docker compose -f docker-compose-backup.yml exec backup \
   sh -c 'pg_dump -h db -U postgres myapp | gzip > /backups/manual_backup.sql.gz'
 
-# List backups
+# 列出备份
 ls -lh backups/
 
-# Cleanup
+# 清理
 docker compose -f docker-compose-backup.yml down -v
 ```
 
-### Step 5.4: Restore from Backup
+### Step 5.4: 从备份恢复
 
 ```bash
-# Create database
+# 创建数据库
 docker run -d \
   --name postgres-restore \
   -e POSTGRES_PASSWORD=secret \
@@ -670,85 +670,85 @@ docker run -d \
 
 sleep 10
 
-# Restore from backup
+# 从备份恢复
 gunzip -c backups/manual_backup.sql.gz | \
   docker exec -i postgres-restore psql -U postgres -d myapp
 
-# Verify data
+# 验证数据
 docker exec postgres-restore psql -U postgres -d myapp -c "\dt"
 
-# Cleanup
+# 清理
 docker rm -f postgres-restore
 docker volume rm postgres-restore-data
 ```
 
-✅ **Checkpoint**: You can backup and restore Docker volumes.
+✅ **Checkpoint**: 你可以备份和恢复 Docker volume。
 
 ---
 
-## Part 6: ML Model and Dataset Management
+## Part 6: ML 模型和数据集管理
 
-### Step 6.1: Model Storage Volume
+### Step 6.1: 模型存储 Volume
 
 ```bash
 mkdir -p ~/docker-exercises/ml-volumes
 cd ~/docker-exercises/ml-volumes
 
-# Create model storage
+# 创建模型存储
 docker volume create model-store
 
-# Download and store model
+# 下载并存储模型
 cat > download_model.py << 'EOF'
 import torch
 import torchvision.models as models
 import os
 
-# Download model
+# 下载模型
 print("Downloading ResNet18...")
 model = models.resnet18(pretrained=True)
 
-# Save to volume
+# 保存到 volume
 model_path = '/models/resnet18.pth'
 torch.save(model.state_dict(), model_path)
 print(f"Model saved to {model_path}")
 
-# Verify
+# 验证
 size = os.path.getsize(model_path)
 print(f"Model size: {size / 1024 / 1024:.2f} MB")
 EOF
 
-# Run download
+# 运行下载
 docker run --rm \
   -v model-store:/models \
   pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime \
   sh -c "pip install torchvision && python -c \"$(cat download_model.py)\""
 
-# Verify model exists
+# 验证模型存在
 docker run --rm \
   -v model-store:/models \
   alpine ls -lh /models
 ```
 
-### Step 6.2: Dataset Management
+### Step 6.2: 数据集管理
 
 ```yaml
 cat > docker-compose-ml.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Data preprocessing
+  # 数据预处理
   preprocessor:
     image: python:3.11
     volumes:
-      - raw-data:/data/raw:ro  # Read-only
-      - processed-data:/data/processed  # Write
+      - raw-data:/data/raw:ro  # 只读
+      - processed-data:/data/processed  # 写入
       - ./scripts:/scripts
     command: python /scripts/preprocess.py
     environment:
       - INPUT_DIR=/data/raw
       - OUTPUT_DIR=/data/processed
 
-  # Training
+  # 训练
   trainer:
     image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
     volumes:
@@ -760,11 +760,11 @@ services:
       - DATA_DIR=/data
       - MODEL_DIR=/models
 
-  # Inference server
+  # 推理服务器
   inference:
     image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
     volumes:
-      - models:/models:ro  # Read-only models
+      - models:/models:ro  # 只读模型
       - inference-cache:/cache
     ports:
       - "8000:8000"
@@ -785,14 +785,14 @@ volumes:
 EOF
 ```
 
-### Step 6.3: Shared Model Registry
+### Step 6.3: 共享模型注册中心
 
 ```yaml
 cat > docker-compose-registry.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Model registry storage
+  # 模型注册中心存储
   registry:
     image: postgres:15
     environment:
@@ -801,7 +801,7 @@ services:
     volumes:
       - registry-db:/var/lib/postgresql/data
 
-  # Model file storage
+  # 模型文件存储
   minio:
     image: minio/minio
     command: server /data --console-address ":9001"
@@ -814,7 +814,7 @@ services:
       - MINIO_ROOT_USER=admin
       - MINIO_ROOT_PASSWORD=secretkey
 
-  # Model version tracking
+  # 模型版本追踪
   mlflow:
     image: ghcr.io/mlflow/mlflow:latest
     ports:
@@ -835,33 +835,33 @@ EOF
 ```
 
 ```bash
-# Start model registry
+# 启动模型注册中心
 docker compose -f docker-compose-registry.yml up -d
 
-# Access MLflow UI
+# 访问 MLflow UI
 echo "MLflow: http://localhost:5000"
 echo "MinIO: http://localhost:9001"
 
-# Cleanup
+# 清理
 docker compose -f docker-compose-registry.yml down -v
 ```
 
-✅ **Checkpoint**: You can manage ML models and datasets with volumes.
+✅ **Checkpoint**: 你可以使用 volume 管理 ML 模型和数据集。
 
 ---
 
-## Part 7: Performance Considerations
+## Part 7: 性能考量
 
-### Step 7.1: Volume Performance Comparison
+### Step 7.1: Volume 性能比较
 
 ```bash
-# Create test script
+# 创建测试脚本
 cat > volume-performance.sh << 'EOF'
 #!/bin/bash
 
 echo "Testing volume performance..."
 
-# Test 1: Named volume
+# 测试 1：命名 volume
 echo "1. Named volume:"
 docker volume create perf-named
 time docker run --rm \
@@ -869,7 +869,7 @@ time docker run --rm \
   alpine sh -c "dd if=/dev/zero of=/data/test bs=1M count=100"
 docker volume rm perf-named
 
-# Test 2: Bind mount
+# 测试 2：Bind mount
 echo "2. Bind mount:"
 mkdir -p /tmp/perf-bind
 time docker run --rm \
@@ -877,7 +877,7 @@ time docker run --rm \
   alpine sh -c "dd if=/dev/zero of=/data/test bs=1M count=100"
 rm -rf /tmp/perf-bind
 
-# Test 3: tmpfs
+# 测试 3：tmpfs
 echo "3. tmpfs:"
 time docker run --rm \
   --tmpfs /data:rw,size=200m \
@@ -890,32 +890,32 @@ chmod +x volume-performance.sh
 ./volume-performance.sh
 ```
 
-### Step 7.2: Read-Only Mounts for Performance
+### Step 7.2: 用于性能的只读挂载
 
 ```yaml
 cat > docker-compose-readonly.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Web server serving static files
+  # 提供静态文件的 Web 服务器
   web:
     image: nginx:alpine
     volumes:
-      # Static files read-only (better performance)
+      # 静态文件只读（更好的性能）
       - ./static:/usr/share/nginx/html:ro
-      # Config read-only
+      # 配置只读
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      # Logs writable
+      # 日志可写
       - logs:/var/log/nginx
     ports:
       - "80:80"
 
-  # ML inference with read-only models
+  # 使用只读模型的 ML 推理
   inference:
     image: pytorch/pytorch
     volumes:
-      - models:/models:ro  # Models never change
-      - cache:/cache  # Writable cache
+      - models:/models:ro  # 模型从不更改
+      - cache:/cache  # 可写缓存
     environment:
       - MODEL_DIR=/models
 
@@ -931,10 +931,10 @@ volumes:
 EOF
 ```
 
-### Step 7.3: Volume Options for Performance
+### Step 7.3: 用于性能的 Volume 选项
 
 ```bash
-# Create volume with performance options
+# 使用性能选项创建 volume
 docker volume create \
   --driver local \
   --opt type=tmpfs \
@@ -942,7 +942,7 @@ docker volume create \
   --opt o=size=1g,uid=1000 \
   fast-cache
 
-# Create volume with specific mount options
+# 使用特定挂载选项创建 volume
 docker volume create \
   --driver local \
   --opt type=none \
@@ -950,31 +950,31 @@ docker volume create \
   --opt o=bind \
   ssd-storage
 
-# Use in container
+# 在 container 中使用
 docker run -d \
   --name perf-app \
   -v fast-cache:/cache \
   -v ssd-storage:/data \
   alpine sleep 3600
 
-# Cleanup
+# 清理
 docker rm -f perf-app
 docker volume rm fast-cache ssd-storage
 ```
 
-✅ **Checkpoint**: You understand volume performance characteristics.
+✅ **Checkpoint**: 你理解了 volume 性能特性。
 
 ---
 
-## Part 8: Volume Drivers and Plugins
+## Part 8: Volume 驱动和插件
 
-### Step 8.1: NFS Volume Driver
+### Step 8.1: NFS Volume 驱动
 
 ```bash
-# Install NFS utilities (if needed)
+# 安装 NFS 工具（如果需要）
 # sudo apt-get install nfs-common
 
-# Create NFS volume (requires NFS server)
+# 创建 NFS volume（需要 NFS 服务器）
 docker volume create \
   --driver local \
   --opt type=nfs \
@@ -982,38 +982,38 @@ docker volume create \
   --opt device=:/path/to/nfs/share \
   nfs-volume
 
-# Use NFS volume
+# 使用 NFS volume
 docker run -d \
   --name nfs-app \
   -v nfs-volume:/data \
   alpine sleep 3600
 
-# Multiple containers can share NFS volume across hosts
+# 多个 container 可以在跨主机共享 NFS volume
 ```
 
-### Step 8.2: Cloud Storage Volume (Conceptual)
+### Step 8.2: 云存储 Volume（概念）
 
 ```bash
-# AWS EFS volume (example)
-# Requires docker-volume-efs plugin
+# AWS EFS volume（示例）
+# 需要 docker-volume-efs 插件
 
-# Install plugin
+# 安装插件
 # docker plugin install rexray/efs EFS_REGION=us-east-1
 
-# Create EFS volume
+# 创建 EFS volume
 # docker volume create \
 #   --driver rexray/efs \
 #   --name efs-volume \
 #   --opt fileSystemId=fs-12345678
 
-# Use in container
+# 在 container 中使用
 # docker run -v efs-volume:/data myapp
 ```
 
-### Step 8.3: Custom Volume Plugin
+### Step 8.3: 自定义 Volume 插件
 
 ```yaml
-# Example: Using third-party volume plugin for distributed storage
+# 示例：使用第三方 volume 插件实现分布式存储
 cat > docker-compose-distributed.yml << 'EOF'
 version: '3.8'
 
@@ -1032,21 +1032,21 @@ services:
 
 volumes:
   shared-storage:
-    driver: local  # In production, use distributed driver
-    # Examples:
+    driver: local  # 在生产中使用分布式驱动
+    # 示例：
     # driver: rexray/efs  # AWS EFS
     # driver: pxd  # Portworx
     # driver: netshare:nfs  # NFS
 EOF
 ```
 
-✅ **Checkpoint**: You understand volume drivers and plugins.
+✅ **Checkpoint**: 你理解了 volume 驱动和插件。
 
 ---
 
-## Part 9: Production Patterns
+## Part 9: 生产模式
 
-### Step 9.1: Volume Lifecycle Management
+### Step 9.1: Volume 生命周期管理
 
 ```yaml
 cat > docker-compose-lifecycle.yml << 'EOF'
@@ -1056,13 +1056,13 @@ services:
   app:
     image: myapp
     volumes:
-      # Application data (persisted)
+      # 应用数据（持久化）
       - app-data:/data
-      # Configuration (external)
+      # 配置（外部）
       - ./config:/config:ro
-      # Logs (managed externally)
+      # 日志（外部管理）
       - /var/log/app:/logs
-      # Cache (ephemeral)
+      # 缓存（临时）
       - type: tmpfs
         target: /cache
         tmpfs:
@@ -1077,10 +1077,10 @@ volumes:
 EOF
 ```
 
-### Step 9.2: Multi-Environment Volume Strategy
+### Step 9.2: 多环境 Volume 策略
 
 ```yaml
-# Development
+# 开发环境
 cat > docker-compose.dev.yml << 'EOF'
 version: '3.8'
 
@@ -1088,17 +1088,17 @@ services:
   app:
     image: myapp
     volumes:
-      # Bind mount for hot reload
+      # 用于热重载的 bind mount
       - ./src:/app/src
       - ./tests:/app/tests
-      # Named volume for dependencies
+      # 用于依赖的命名 volume
       - node_modules:/app/node_modules
 
 volumes:
   node_modules:
 EOF
 
-# Production
+# 生产环境
 cat > docker-compose.prod.yml << 'EOF'
 version: '3.8'
 
@@ -1106,7 +1106,7 @@ services:
   app:
     image: myapp
     volumes:
-      # Only named volumes (no bind mounts)
+      # 仅命名 volume（无 bind mount）
       - app-data:/app/data
       - app-logs:/app/logs
     deploy:
@@ -1114,16 +1114,16 @@ services:
 
 volumes:
   app-data:
-    driver: rexray/efs  # Distributed storage
+    driver: rexray/efs  # 分布式存储
   app-logs:
     driver: syslog
 EOF
 ```
 
-### Step 9.3: Disaster Recovery Setup
+### Step 9.3: 灾难恢复设置
 
 ```bash
-# Create disaster recovery script
+# 创建灾难恢复脚本
 cat > dr-backup.sh << 'EOF'
 #!/bin/bash
 
@@ -1142,7 +1142,7 @@ for vol in "${VOLUMES[@]}"; do
         alpine \
         tar czf /backup/${vol}_${TIMESTAMP}.tar.gz -C /source .
 
-    # Upload to S3 or remote storage
+    # 上传到 S3 或远程存储
     # aws s3 cp ${BACKUP_PATH}/${vol}_${TIMESTAMP}.tar.gz s3://my-backups/
 done
 
@@ -1152,46 +1152,46 @@ EOF
 chmod +x dr-backup.sh
 ```
 
-✅ **Checkpoint**: You can implement production volume patterns.
+✅ **Checkpoint**: 你可以实现生产 volume 模式。
 
 ---
 
-## Part 10: Troubleshooting and Best Practices
+## Part 10: 排错和最佳实践
 
-### Step 10.1: Common Issues
+### Step 10.1: 常见问题
 
 ```bash
-# Issue 1: Permission denied
-# Solution: Check file ownership
+# 问题 1：权限被拒绝
+# 解决方案：检查文件所有权
 
-# Create volume
+# 创建 volume
 docker volume create test-perms
 
-# Run as non-root user
+# 以非 root 用户运行
 docker run --rm \
   -u 1000:1000 \
   -v test-perms:/data \
   alpine sh -c "echo 'test' > /data/file.txt"
 
-# If permission denied, fix ownership:
+# 如果权限被拒绝，修复所有权：
 docker run --rm \
   -v test-perms:/data \
   alpine chown -R 1000:1000 /data
 
-# Issue 2: Volume not found
+# 问题 2：Volume 未找到
 docker volume ls
 docker volume inspect volume-name
 
-# Issue 3: Volume full
+# 问题 3：Volume 已满
 docker system df -v
 docker volume ls -qf dangling=true | xargs docker volume rm
 
-# Issue 4: Slow performance
-# Check volume driver and mount options
+# 问题 4：性能慢
+# 检查 volume 驱动和挂载选项
 docker volume inspect volume-name --format '{{.Driver}}'
 ```
 
-### Step 10.2: Volume Best Practices
+### Step 10.2: Volume 最佳实践
 
 ```yaml
 cat > docker-compose-best-practices.yml << 'EOF'
@@ -1201,32 +1201,32 @@ services:
   app:
     image: myapp
     volumes:
-      # ✓ Use named volumes for data
+      # ✓ 使用命名 volume 存储数据
       - app-data:/app/data
 
-      # ✓ Read-only when possible
+      # ✓ 尽可能使用只读
       - ./config:/config:ro
 
-      # ✓ tmpfs for temporary files
+      # ✓ tmpfs 用于临时文件
       - type: tmpfs
         target: /tmp
         tmpfs:
           size: 100m
 
-      # ✓ Specific paths, not root
+      # ✓ 指定具体路径，而非根目录
       - logs:/app/logs
 
-      # ✗ Avoid bind mounting root
-      # - ./:/app  # Bad practice!
+      # ✗ 避免 bind mount 根目录
+      # - ./:/app  # 不好的做法！
 
 volumes:
   app-data:
-    # ✓ Add labels for management
+    # ✓ 添加标签以便管理
     labels:
       com.example.backup: "true"
       com.example.environment: "production"
   logs:
-    # ✓ Set driver options
+    # ✓ 设置驱动选项
     driver: local
     driver_opts:
       type: none
@@ -1235,10 +1235,10 @@ volumes:
 EOF
 ```
 
-### Step 10.3: Monitoring Volume Usage
+### Step 10.3: 监控 Volume 使用
 
 ```bash
-# Create monitoring script
+# 创建监控脚本
 cat > monitor-volumes.sh << 'EOF'
 #!/bin/bash
 
@@ -1246,7 +1246,7 @@ echo "Docker Volume Usage Report"
 echo "=========================="
 echo
 
-# Overall system usage
+# 总体系统使用
 echo "System Overview:"
 docker system df
 
@@ -1270,68 +1270,68 @@ chmod +x monitor-volumes.sh
 ./monitor-volumes.sh
 ```
 
-✅ **Checkpoint**: You can troubleshoot and follow volume best practices.
+✅ **Checkpoint**: 你可以排错并遵循 volume 最佳实践。
 
 ---
 
-## Practical Challenges
+## 实际挑战
 
-### Challenge 1: Complete Backup System
-
-**Requirements**:
-- Automated daily backups of all volumes
-- Retention policy (keep last 7 days)
-- Backup verification
-- Restore procedure documented
-- Off-site backup to S3/cloud storage
-
-### Challenge 2: ML Pipeline Storage
+### Challenge 1: 完整的备份系统
 
 **Requirements**:
-- Raw data volume (read-only for pipeline)
-- Processed data volume
-- Model storage with versioning
-- Experiment tracking storage
-- Cache for inference
-- All with appropriate performance settings
+- 所有 volume 的自动每日备份
+- 保留策略（保留最近 7 天）
+- 备份验证
+- 记录恢复过程
+- 异地备份到 S3/云存储
 
-### Challenge 3: Multi-Region Deployment
+### Challenge 2: ML Pipeline 存储
 
 **Requirements**:
-- Replicated database volumes across regions
-- Shared read-only configuration
-- Region-specific cache
-- Centralized logging storage
-- Disaster recovery strategy
+- 原始数据 volume（pipeline 只读）
+- 处理后数据 volume
+- 带版本管理的模型存储
+- 实验追踪存储
+- 推理缓存
+- 所有内容具有适当的性能设置
+
+### Challenge 3: 多区域部署
+
+**Requirements**:
+- 跨区域复制的数据库 volume
+- 共享只读配置
+- 区域特定缓存
+- 集中式日志存储
+- 灾难恢复策略
 
 ---
 
 ## Summary
 
 **What You Accomplished**:
-✅ Mastered three volume types (named, bind mounts, tmpfs)
-✅ Managed volume lifecycle operations
-✅ Implemented data sharing between containers
-✅ Created persistent database storage
-✅ Built backup and restore strategies
-✅ Managed ML models and datasets
-✅ Optimized volume performance
-✅ Used volume drivers and plugins
-✅ Applied production volume patterns
-✅ Troubleshooted volume issues
+✅ 掌握了三种 volume 类型（命名、bind mount、tmpfs）
+✅ 管理了 volume 生命周期操作
+✅ 实现了 container 之间数据共享
+✅ 创建了持久化数据库存储
+✅ 构建了备份和恢复策略
+✅ 管理了 ML 模型和数据集
+✅ 优化了 volume 性能
+✅ 使用了 volume 驱动和插件
+✅ 应用了生产 volume 模式
+✅ 排错了 volume 问题
 
 **Key Concepts Mastered**:
-- Volume types and use cases
-- Data persistence strategies
-- Backup and disaster recovery
-- Performance optimization
-- Production best practices
-- ML-specific volume patterns
+- Volume 类型和用例
+- 数据持久化策略
+- 备份和灾难恢复
+- 性能优化
+- 生产最佳实践
+- ML 特定 volume 模式
 
 **Volume Strategy**:
-- **Development**: Bind mounts for hot reload
-- **Staging**: Named volumes with backups
-- **Production**: Distributed volumes with replication
+- **Development**: 用于热重载的 bind mount
+- **Staging**: 带备份的命名 volume
+- **Production**: 带复制的分布式 volume
 
 ---
 
@@ -1345,5 +1345,5 @@ chmod +x monitor-volumes.sh
 
 **Exercise Version**: 1.0
 **Last Updated**: October 2025
-**Estimated Time**: 3-4 hours
-**Difficulty**: Intermediate
+**Estimated Time**: 3-4 小时
+**Difficulty**: 中级

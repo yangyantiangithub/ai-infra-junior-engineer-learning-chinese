@@ -1,65 +1,65 @@
-# Lecture 04: Advanced API Patterns and Production Strategies
+# 讲座 04：高级 API 模式和生产策略
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [API Versioning Strategies](#api-versioning-strategies)
-3. [GraphQL for ML APIs](#graphql-for-ml-apis)
-4. [gRPC for High-Performance APIs](#grpc-for-high-performance-apis)
-5. [Rate Limiting and Throttling](#rate-limiting-and-throttling)
-6. [Caching Strategies](#caching-strategies)
-7. [API Gateways](#api-gateways)
-8. [Async and Background Tasks](#async-and-background-tasks)
-9. [Webhooks and Event-Driven APIs](#webhooks-and-event-driven-apis)
-10. [API Monitoring and Observability](#api-monitoring-and-observability)
-11. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [介绍](#介绍)
+2. [API 版本化策略](#api-版本化策略)
+3. [ML API 的 GraphQL](#ml-api-的-graphql)
+4. [用于高性能 API 的 gRPC](#用于高性能-api-的-grpc)
+5. [速率限制和节流](#速率限制和节流)
+6. [缓存策略](#缓存策略)
+7. [API 网关](#api-网关)
+8. [异步和后台任务](#异步和后台任务)
+9. [Webhook 和事件驱动 API](#webhook-和事件驱动-api)
+10. [API 监控和可观测性](#api-监控和可观测性)
+11. [总结和关键要点](#总结和关键要点)
 
-## Introduction
+## 介绍
 
-As ML APIs grow in complexity and scale, basic REST patterns may not be sufficient. You'll need advanced techniques to handle:
-- **Breaking changes** without disrupting existing clients
-- **High-throughput** inference workloads (100k+ requests/sec)
-- **Complex queries** across multiple models or data sources
-- **Long-running** training or batch processing jobs
-- **Real-time updates** when models are retrained
+随着 ML API 的复杂性和规模的增长，基本的 REST 模式可能不够用。你需要高级技术来处理：
+- **破坏性变更**而不中断现有客户端
+- **高吞吐量**推理工作负载（10 万+ 请求/秒）
+- 跨多个模型或数据源的 **复杂查询**
+- **长时间运行**的训练或批量处理任务
+- 模型重新训练时的 **实时更新**
 
-This lecture covers advanced API patterns and production strategies specifically for AI infrastructure.
+本讲座涵盖专门针对 AI 基础设施的高级 API 模式和生产策略。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Implement API versioning to manage breaking changes
-- Understand when to use GraphQL vs REST vs gRPC
-- Build high-performance gRPC services for ML inference
-- Implement rate limiting to protect API resources
-- Design effective caching strategies for ML predictions
-- Use API gateways for routing and management
-- Handle long-running tasks with async patterns
-- Monitor APIs with proper observability
+在本讲座结束时，你将：
+- 实现 API 版本化以管理破坏性变更
+- 理解何时使用 GraphQL vs REST vs gRPC
+- 为 ML 推理构建高性能 gRPC 服务
+- 实现速率限制以保护 API 资源
+- 为 ML 预测设计有效的缓存策略
+- 使用 API 网关进行路由和管理
+- 使用异步模式处理长时间运行的任务
+- 通过适当的可观测性监控 API
 
-### Prerequisites
-- Lectures 01-03 in this module (REST, FastAPI, Authentication)
-- Understanding of HTTP and APIs
-- Basic Python and FastAPI knowledge
+### 先决条件
+- 本模块的讲座 01-03（REST、FastAPI、认证）
+- 理解 HTTP 和 API
+- 基本的 Python 和 FastAPI 知识
 
-**Duration**: 90 minutes
-**Difficulty**: Intermediate to Advanced
+**时长**：90 分钟
+**难度**：中级到高级
 
 ---
 
-## 1. API Versioning Strategies
+## 1. API 版本化策略
 
-### Why Version APIs?
+### 为什么需要版本化 API？
 
 ```
-Scenario: You need to change your ML model output format
+场景：你需要更改 ML 模型输出格式
 
-Old Response:
+旧响应：
 {
   "prediction": "cat",
   "confidence": 0.95
 }
 
-New Response (incompatible):
+新响应（不兼容）：
 {
   "predictions": [
     {"label": "cat", "score": 0.95},
@@ -68,21 +68,21 @@ New Response (incompatible):
   "model_version": "v2.0"
 }
 
-❌ If you deploy this without versioning:
-   - Existing clients break immediately
-   - Mobile apps crash
-   - Dashboards show errors
-   - Users complain
+❌ 如果不上版本化就部署：
+   - 现有客户端立即崩溃
+   - 移动应用崩溃
+   - 仪表盘显示错误
+   - 用户投诉
 
-✅ With versioning:
-   - /v1/predict → old format (still works)
-   - /v2/predict → new format (opt-in)
-   - Gradual migration over months
+✅ 有了版本化：
+   - /v1/predict → 旧格式（仍然可用）
+   - /v2/predict → 新格式（选择加入）
+   - 数月内逐步迁移
 ```
 
-### Versioning Strategies
+### 版本化策略
 
-#### 1. URL Path Versioning (Recommended)
+#### 1. URL 路径版本化（推荐）
 
 ```python
 from fastapi import FastAPI, APIRouter
@@ -112,15 +112,15 @@ async def predict_v2(input_data: dict):
 app.include_router(v1_router)
 app.include_router(v2_router)
 
-# Both endpoints available:
+# 两个 endpoint 都可用：
 # POST /v1/predict
 # POST /v2/predict
 ```
 
-**Pros**: Clear, simple, widely understood
-**Cons**: Duplicates URL structure
+**优点**：清晰、简单、广泛理解
+**缺点**：重复 URL 结构
 
-#### 2. Header Versioning
+#### 2. 头部版本化
 
 ```python
 from fastapi import FastAPI, Header, HTTPException
@@ -142,14 +142,14 @@ async def predict(
     else:
         raise HTTPException(400, f"Unsupported API version: {api_version}")
 
-# Usage:
+# 用法：
 # curl -H "API-Version: v2" POST /predict
 ```
 
-**Pros**: Clean URLs, more flexible
-**Cons**: Not visible in URL, harder to discover
+**优点**：URL 干净，更灵活
+**缺点**：在 URL 中不可见，难以发现
 
-#### 3. Query Parameter Versioning
+#### 3. 查询参数版本化
 
 ```python
 @app.post("/predict")
@@ -160,54 +160,54 @@ async def predict(input_data: dict, version: str = "v1"):
         return new_format()
 ```
 
-**Usage**: `POST /predict?version=v2`
+**用法**：`POST /predict?version=v2`
 
-**Pros**: Simple, compatible with caching
-**Cons**: Pollutes query params, easy to forget
+**优点**：简单，与缓存兼容
+**缺点**：污染查询参数，容易忘记
 
-### Versioning Best Practices
+### 版本化最佳实践
 
-1. **Use Semantic Versioning**
-   - `v1`, `v2`, `v3` for major versions
-   - `/v1.1/` for minor updates (non-breaking)
+1. **使用语义化版本控制**
+   - 主要版本使用 `v1`、`v2`、`v3`
+   - 次要更新（非破坏性）使用 `/v1.1/`
 
-2. **Deprecate gradually**
+2. **逐步弃用**
    ```python
    @v1_router.post("/predict", deprecated=True)
    async def predict_v1(input_data: dict):
        """
-       Deprecated: Use /v2/predict instead.
-       This endpoint will be removed on 2024-12-31.
+       已弃用：请改用 /v2/predict。
+       此 endpoint 将于 2024-12-31 移除。
        """
-       # Add deprecation header
+       # 添加弃用头部
        response.headers["X-API-Deprecated"] = "true"
        response.headers["X-API-Sunset-Date"] = "2024-12-31"
        return old_format()
    ```
 
-3. **Maintain old versions for 6-12 months**
-4. **Document migration guides**
-5. **Alert clients about deprecation**
+3. **旧版本维护 6-12 个月**
+4. **记录迁移指南**
+5. **向客户端告警弃用**
 
 ---
 
-## 2. GraphQL for ML APIs
+## 2. ML API 的 GraphQL
 
 ### GraphQL vs REST
 
-**REST Problems for ML:**
+**REST 对 ML 的问题：**
 ```
-# Scenario: Get user recommendations
+# 场景：获取用户推荐
 
-# REST: Multiple requests (N+1 problem)
-GET /user/123                    # User info
-GET /user/123/preferences        # User preferences
-GET /models/recommend?user=123   # Recommendations
-GET /models/123/metadata         # Model metadata
+# REST：多个请求（N+1 问题）
+GET /user/123                    # 用户信息
+GET /user/123/preferences        # 用户偏好
+GET /models/recommend?user=123   # 推荐
+GET /models/123/metadata         # 模型元数据
 
-# 4 requests, overfetching data
+# 4 个请求，过度获取数据
 
-# GraphQL: Single request
+# GraphQL：单个请求
 query {
   user(id: 123) {
     name
@@ -221,26 +221,26 @@ query {
 }
 ```
 
-### When to Use GraphQL for ML
+### 何时为 ML 使用 GraphQL
 
-✅ **Good for:**
-- Complex, nested data queries
-- Dashboards with flexible data needs
-- Mobile apps (reduce bandwidth)
-- Batch predictions across multiple models
+✅ **适用于：**
+- 复杂的嵌套数据查询
+- 具有灵活数据需求的仪表盘
+- 移动应用（减少带宽）
+- 跨多个模型的批量预测
 
-❌ **Not good for:**
-- High-throughput, simple inference (REST/gRPC better)
-- Real-time streaming (WebSockets/gRPC streaming better)
+❌ **不适用于：**
+- 高吞吐量、简单的推理（REST/gRPC 更好）
+- 实时流式传输（WebSocket/gRPC 流式传输更好）
 
-### GraphQL Example with Strawberry (FastAPI)
+### 使用 Strawberry (FastAPI) 的 GraphQL 示例
 
 ```python
 from fastapi import FastAPI
 import strawberry
 from strawberry.fastapi import GraphQLRouter
 
-# Define types
+# 定义类型
 @strawberry.type
 class Prediction:
     label: str
@@ -256,12 +256,12 @@ class ModelPrediction:
     model: Model
     predictions: list[Prediction]
 
-# Define queries
+# 定义查询
 @strawberry.type
 class Query:
     @strawberry.field
     async def predict(self, input_data: str) -> ModelPrediction:
-        # Run inference
+        # 运行推理
         predictions = await run_model(input_data)
         return ModelPrediction(
             model=Model(name="bert-classifier", version="v1.0"),
@@ -275,22 +275,22 @@ class Query:
     async def batch_predict(
         self, inputs: list[str], models: list[str]
     ) -> list[ModelPrediction]:
-        # Run predictions across multiple models
+        # 跨多个模型运行预测
         results = []
         for model_name in models:
             model_predictions = await run_model_batch(model_name, inputs)
             results.append(model_predictions)
         return results
 
-# Create schema
+# 创建 schema
 schema = strawberry.Schema(query=Query)
 
-# Add to FastAPI
+# 添加到 FastAPI
 app = FastAPI()
 graphql_app = GraphQLRouter(schema)
 app.include_router(graphql_app, prefix="/graphql")
 
-# Query:
+# 查询：
 # {
 #   predict(inputData: "This is great!") {
 #     model { name version }
@@ -301,44 +301,44 @@ app.include_router(graphql_app, prefix="/graphql")
 
 ---
 
-## 3. gRPC for High-Performance APIs
+## 3. 用于高性能 API 的 gRPC
 
-### Why gRPC for ML Inference?
+### 为什么 ML 推理使用 gRPC？
 
 ```
-Performance Comparison:
+性能对比：
 ┌──────────────────────────────────────┐
-│  Metric       │ REST  │ gRPC  │ Δ    │
-│──────────────────────────────────────│
-│  Latency      │ 50ms  │ 10ms  │ 5x ↓ │
-│  Throughput   │ 10k/s │ 100k/s│ 10x ↑│
-│  Bandwidth    │ 1MB/s │ 0.2MB │ 5x ↓ │
-│  CPU usage    │ 40%   │ 15%   │ 2.7x↓│
+│  指标        │ REST  │ gRPC  │ Δ    │
+│─────────────────────────────────────│
+│  延迟        │ 50ms  │ 10ms  │ 5x ↓ │
+│  吞吐量      │ 10k/s │ 100k/s│ 10x ↑│
+│  带宽        │ 1MB/s │ 0.2MB │ 5x ↓ │
+│  CPU 使用率  │ 40%   │ 15%   │ 2.7x↓│
 └──────────────────────────────────────┘
 
-Why?
-- Binary protocol (Protobuf) vs JSON
-- HTTP/2 multiplexing vs HTTP/1.1
-- Code generation vs manual serialization
-- Built-in streaming
+为什么？
+- 二进制协议 (Protobuf) vs JSON
+- HTTP/2 多路复用 vs HTTP/1.1
+- 代码生成 vs 手动序列化
+- 内置流式传输
 ```
 
-### When to Use gRPC
+### 何时使用 gRPC
 
-✅ **Use gRPC for:**
-- Microservice-to-microservice communication
-- High-throughput ML inference (>1000 req/s)
-- Streaming predictions (video, audio)
-- Model serving backends (TensorFlow Serving, TorchServe)
+✅ **在以下情况使用 gRPC：**
+- 微服务到微服务通信
+- 高吞吐量 ML 推理（>1000 req/s）
+- 流式预测（视频、音频）
+- 模型服务后端（TensorFlow Serving、TorchServe）
 
-❌ **Don't use gRPC for:**
-- Public-facing APIs (browser support limited)
-- Simple CRUD operations
-- When clients can't use Protobuf
+❌ **不要将 gRPC 用于：**
+- 面向公众的 API（浏览器支持有限）
+- 简单的 CRUD 操作
+- 当客户端无法使用 Protobuf 时
 
-### gRPC Example for ML Inference
+### ML 推理的 gRPC 示例
 
-**1. Define protocol buffer (`.proto` file):**
+**1. 定义 protocol buffer（`.proto` 文件）：**
 
 ```protobuf
 // inference.proto
@@ -347,13 +347,13 @@ syntax = "proto3";
 package ml_inference;
 
 service InferenceService {
-  // Single prediction
+  // 单次预测
   rpc Predict(PredictRequest) returns (PredictResponse);
 
-  // Batch prediction
+  // 批量预测
   rpc BatchPredict(BatchPredictRequest) returns (BatchPredictResponse);
 
-  // Streaming predictions
+  // 流式预测
   rpc StreamPredict(stream PredictRequest) returns (stream PredictResponse);
 }
 
@@ -384,7 +384,7 @@ message BatchPredictResponse {
 }
 ```
 
-**2. Generate Python code:**
+**2. 生成 Python 代码：**
 
 ```bash
 python -m grpc_tools.protoc \
@@ -394,7 +394,7 @@ python -m grpc_tools.protoc \
   inference.proto
 ```
 
-**3. Implement server:**
+**3. 实现服务器：**
 
 ```python
 import grpc
@@ -405,15 +405,15 @@ import numpy as np
 
 class InferenceService(inference_pb2_grpc.InferenceServiceServicer):
     def __init__(self):
-        # Load model
+        # 加载模型
         self.model = load_model("bert-classifier")
 
     def Predict(self, request, context):
-        # Run inference
+        # 运行推理
         features = np.array(request.features)
         predictions = self.model.predict(features)
 
-        # Build response
+        # 构建响应
         response = inference_pb2.PredictResponse(
             model_version="v1.0",
             latency_ms=12.5
@@ -427,7 +427,7 @@ class InferenceService(inference_pb2_grpc.InferenceServiceServicer):
         return response
 
     def StreamPredict(self, request_iterator, context):
-        # Stream predictions
+        # 流式预测
         for request in request_iterator:
             response = self.Predict(request, context)
             yield response
@@ -446,7 +446,7 @@ if __name__ == '__main__':
     serve()
 ```
 
-**4. Implement client:**
+**4. 实现客户端：**
 
 ```python
 import grpc
@@ -469,25 +469,25 @@ def run_inference():
 
 ---
 
-## 4. Rate Limiting and Throttling
+## 4. 速率限制和节流
 
-### Why Rate Limit ML APIs?
+### 为什么对 ML API 进行速率限制？
 
 ```
-Scenario: Public ML API without rate limits
+场景：没有速率限制的公共 ML API
 
-User sends 1,000,000 requests/min
+用户每分钟发送 1,000,000 个请求
 ↓
-GPU resources exhausted
+GPU 资源耗尽
 ↓
-API down for everyone
+所有人 API 宕机
 ↓
-$10,000 cloud bill
+$10,000 云账单
 ```
 
-### Rate Limiting Strategies
+### 速率限制策略
 
-#### 1. Fixed Window
+#### 1. 固定窗口
 
 ```python
 from fastapi import FastAPI, Request, HTTPException
@@ -496,24 +496,24 @@ import time
 
 app = FastAPI()
 
-# Storage: {user_id: [(timestamp, count)]}
+# 存储：{user_id: [(timestamp, count)]}
 request_counts = defaultdict(list)
 
-RATE_LIMIT = 100  # requests per minute
-WINDOW = 60  # seconds
+RATE_LIMIT = 100  # 每分钟请求数
+WINDOW = 60  # 秒
 
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
     user_id = request.headers.get("X-User-ID", "anonymous")
     current_time = time.time()
 
-    # Clean old requests
+    # 清理旧请求
     request_counts[user_id] = [
         (ts, count) for ts, count in request_counts[user_id]
         if current_time - ts < WINDOW
     ]
 
-    # Count requests in current window
+    # 计算当前窗口中的请求数
     total_requests = sum(count for _, count in request_counts[user_id])
 
     if total_requests >= RATE_LIMIT:
@@ -522,7 +522,7 @@ async def rate_limit_middleware(request: Request, call_next):
             detail=f"Rate limit exceeded. Max {RATE_LIMIT} requests per minute."
         )
 
-    # Record request
+    # 记录请求
     request_counts[user_id].append((current_time, 1))
 
     response = await call_next(request)
@@ -531,9 +531,9 @@ async def rate_limit_middleware(request: Request, call_next):
     return response
 ```
 
-#### 2. Token Bucket (Recommended)
+#### 2. 令牌桶（推荐）
 
-Better handling of bursts:
+更好地处理突发流量：
 
 ```python
 import time
@@ -541,14 +541,14 @@ from fastapi import FastAPI, Request, HTTPException
 
 class TokenBucket:
     def __init__(self, rate: int, capacity: int):
-        self.rate = rate  # tokens per second
-        self.capacity = capacity  # max tokens
+        self.rate = rate  # 每秒令牌数
+        self.capacity = capacity  # 最大令牌数
         self.tokens = capacity
         self.last_update = time.time()
 
     def consume(self, tokens: int = 1) -> bool:
         current_time = time.time()
-        # Refill tokens
+        # 补充令牌
         elapsed = current_time - self.last_update
         self.tokens = min(
             self.capacity,
@@ -556,13 +556,13 @@ class TokenBucket:
         )
         self.last_update = current_time
 
-        # Check if enough tokens
+        # 检查是否有足够令牌
         if self.tokens >= tokens:
             self.tokens -= tokens
             return True
         return False
 
-# Per-user buckets
+# 每个用户的桶
 buckets = {}
 
 @app.middleware("http")
@@ -570,7 +570,7 @@ async def token_bucket_middleware(request: Request, call_next):
     user_id = request.headers.get("X-User-ID", "anonymous")
 
     if user_id not in buckets:
-        # 10 requests/sec, burst up to 50
+        # 10 请求/秒，突发上限 50
         buckets[user_id] = TokenBucket(rate=10, capacity=50)
 
     if not buckets[user_id].consume():
@@ -579,7 +579,7 @@ async def token_bucket_middleware(request: Request, call_next):
     return await call_next(request)
 ```
 
-#### 3. Redis-Based Rate Limiting (Production)
+#### 3. 基于 Redis 的速率限制（生产环境）
 
 ```python
 import aioredis
@@ -598,29 +598,29 @@ async def redis_rate_limit(request: Request, call_next):
     user_id = request.headers.get("X-User-ID", "anonymous")
     key = f"rate_limit:{user_id}"
 
-    # Increment counter
+    # 递增计数器
     current = await redis.incr(key)
 
-    # Set expiry on first request
+    # 首次请求设置过期
     if current == 1:
-        await redis.expire(key, 60)  # 60 second window
+        await redis.expire(key, 60)  # 60 秒窗口
 
-    # Check limit
+    # 检查限制
     if current > 100:
         raise HTTPException(429, "Rate limit exceeded")
 
     return await call_next(request)
 ```
 
-### Cost-Based Rate Limiting
+### 基于成本的速率限制
 
-Different endpoints have different costs:
+不同 endpoint 有不同的成本：
 
 ```python
 COST_PER_ENDPOINT = {
-    "/predict/small-model": 1,      # 1 token
-    "/predict/large-model": 10,     # 10 tokens
-    "/batch-predict": 50,           # 50 tokens
+    "/predict/small-model": 1,      # 1 个令牌
+    "/predict/large-model": 10,     # 10 个令牌
+    "/batch-predict": 50,           # 50 个令牌
 }
 
 @app.middleware("http")
@@ -638,29 +638,29 @@ async def cost_based_rate_limit(request: Request, call_next):
 
 ---
 
-## 5. Caching Strategies
+## 5. 缓存策略
 
-### Why Cache ML Predictions?
+### 为什么缓存 ML 预测？
 
 ```
-Scenario: Image classification API
+场景：图像分类 API
 
-Same image uploaded multiple times
-├── User 1 uploads cat.jpg → Prediction: "cat" (100ms)
-├── User 2 uploads cat.jpg → Prediction: "cat" (100ms) ← Wasted!
-└── User 3 uploads cat.jpg → Prediction: "cat" (100ms) ← Wasted!
+同一张图片被上传多次
+├── 用户 1 上传 cat.jpg → 预测："cat" (100ms)
+├── 用户 2 上传 cat.jpg → 预测："cat" (100ms) ← 浪费！
+└── 用户 3 上传 cat.jpg → 预测："cat" (100ms) ← 浪费！
 
-With caching:
-├── User 1 uploads cat.jpg → Prediction: "cat" (100ms, cache MISS)
-├── User 2 uploads cat.jpg → Prediction: "cat" (2ms, cache HIT) ✓
-└── User 3 uploads cat.jpg → Prediction: "cat" (2ms, cache HIT) ✓
+使用缓存：
+├── 用户 1 上传 cat.jpg → 预测："cat" (100ms, 缓存 MISS)
+├── 用户 2 上传 cat.jpg → 预测："cat" (2ms, 缓存 HIT) ✓
+└── 用户 3 上传 cat.jpg → 预测："cat" (2ms, 缓存 HIT) ✓
 
-Savings: 98ms × 2 = 196ms saved, 2× less GPU usage
+节省：98ms × 2 = 196ms 节省，2× 更少的 GPU 使用
 ```
 
-### Caching Strategies
+### 缓存策略
 
-#### 1. In-Memory Cache (LRU)
+#### 1. 内存缓存 (LRU)
 
 ```python
 from functools import lru_cache
@@ -669,21 +669,21 @@ import json
 
 @lru_cache(maxsize=1000)
 def predict_cached(input_hash: str):
-    # This function is cached
+    # 此函数被缓存
     return run_model(input_hash)
 
 @app.post("/predict")
 async def predict(input_data: dict):
-    # Hash input for cache key
+    # 对输入进行哈希以获取缓存键
     input_json = json.dumps(input_data, sort_keys=True)
     input_hash = hashlib.md5(input_json.encode()).hexdigest()
 
-    # Try cache
+    # 尝试缓存
     result = predict_cached(input_hash)
     return result
 ```
 
-#### 2. Redis Cache
+#### 2. Redis 缓存
 
 ```python
 import aioredis
@@ -693,19 +693,19 @@ import hashlib
 redis = await aioredis.from_url("redis://localhost")
 
 async def get_cached_prediction(input_data: dict):
-    # Create cache key
+    # 创建缓存键
     input_json = json.dumps(input_data, sort_keys=True)
     cache_key = f"pred:{hashlib.md5(input_json.encode()).hexdigest()}"
 
-    # Try cache
+    # 尝试缓存
     cached = await redis.get(cache_key)
     if cached:
         return json.loads(cached)
 
-    # Cache miss - run inference
+    # 缓存未命中 - 运行推理
     result = await run_model(input_data)
 
-    # Store in cache (TTL: 1 hour)
+    # 存入缓存（TTL：1 小时）
     await redis.setex(cache_key, 3600, json.dumps(result))
 
     return result
@@ -715,50 +715,50 @@ async def predict(input_data: dict):
     return await get_cached_prediction(input_data)
 ```
 
-### Cache Invalidation
+### 缓存失效
 
 ```python
-# Invalidate cache when model updates
+# 模型更新时使缓存失效
 @app.post("/admin/update-model")
 async def update_model(model_version: str):
-    # Deploy new model
+    # 部署新模型
     deploy_model(model_version)
 
-    # Clear prediction cache
-    await redis.flushdb()  # Or use pattern: redis.delete("pred:*")
+    # 清除预测缓存
+    await redis.flushdb()  # 或使用模式：redis.delete("pred:*")
 
     return {"status": "Model updated, cache cleared"}
 ```
 
 ---
 
-## 6. API Gateways
+## 6. API 网关
 
-### What is an API Gateway?
+### 什么是 API 网关？
 
 ```
-Without Gateway:
-Client → ML API 1
-Client → ML API 2
-Client → ML API 3
-(Each client implements: auth, rate limiting, logging, retry)
+没有网关：
+客户端 → ML API 1
+客户端 → ML API 2
+客户端 → ML API 3
+（每个客户端实现：认证、速率限制、日志、重试）
 
-With Gateway:
-Client → Gateway → ML API 1
-                 → ML API 2
-                 → ML API 3
-(Gateway handles: auth, rate limiting, logging, routing)
+有网关：
+客户端 → 网关 → ML API 1
+               → ML API 2
+               → ML API 3
+（网关处理：认证、速率限制、日志、路由）
 ```
 
-### Popular API Gateways
+### 流行的 API 网关
 
-- **Kong** - Open source, plugin-based
-- **AWS API Gateway** - Managed, serverless
-- **NGINX** - High performance, flexible
-- **Traefik** - Kubernetes-native
-- **Envoy** - Service mesh
+- **Kong** - 开源、基于插件
+- **AWS API Gateway** - 托管、无服务器
+- **NGINX** - 高性能、灵活
+- **Traefik** - Kubernetes 原生
+- **Envoy** - 服务网格
 
-### Kong Example for ML APIs
+### ML API 的 Kong 示例
 
 ```yaml
 # kong.yml
@@ -784,16 +784,16 @@ services:
 ```
 
 ```bash
-# Apply configuration
+# 应用配置
 curl -X POST http://localhost:8001/config \
   --data @kong.yml
 ```
 
 ---
 
-## 7. Async and Background Tasks
+## 7. 异步和后台任务
 
-### Long-Running ML Tasks
+### 长时间运行的 ML 任务
 
 ```python
 from fastapi import FastAPI, BackgroundTasks
@@ -803,14 +803,14 @@ import uuid
 app = FastAPI()
 celery_app = Celery('tasks', broker='redis://localhost:6379')
 
-# In-memory job storage (use Redis in production)
+# 内存中的任务存储（生产环境使用 Redis）
 jobs = {}
 
 @celery_app.task
 def train_model_task(job_id: str, config: dict):
     jobs[job_id] = {"status": "running"}
     try:
-        # Train model (takes hours)
+        # 训练模型（需要数小时）
         model = train_model(config)
         save_model(model)
         jobs[job_id] = {"status": "completed", "model_path": "models/model.pt"}
@@ -836,66 +836,66 @@ async def get_job_status(job_id: str):
 
 ---
 
-## 8. Summary and Key Takeaways
+## 8. 总结和关键要点
 
-### Core Concepts
+### 核心概念
 
-1. **API Versioning** prevents breaking changes
-   - Use URL path versioning (`/v1/`, `/v2/`)
-   - Deprecate gradually with sunset dates
-   - Maintain old versions for 6-12 months
+1. **API 版本化**防止破坏性变更
+   - 使用 URL 路径版本化（`/v1/`、`/v2/`）
+   - 逐步弃用并提供停止日期
+   - 旧版本维护 6-12 个月
 
-2. **Choose the right protocol**
-   - REST: Public APIs, simple CRUD
-   - GraphQL: Complex queries, flexible clients
-   - gRPC: High-performance, microservices
+2. **选择正确的协议**
+   - REST：公共 API、简单 CRUD
+   - GraphQL：复杂查询、灵活客户端
+   - gRPC：高性能、微服务
 
-3. **Rate limiting** protects resources
-   - Use token bucket algorithm
-   - Implement cost-based limits for ML
-   - Store state in Redis for production
+3. **速率限制**保护资源
+   - 使用令牌桶算法
+   - 为 ML 实现基于成本的限制
+   - 生产环境在 Redis 中存储状态
 
-4. **Caching** saves compute
-   - Cache predictions by input hash
-   - Use Redis for distributed caching
-   - Invalidate on model updates
+4. **缓存**节省计算资源
+   - 按输入哈希缓存预测
+   - 使用 Redis 进行分布式缓存
+   - 模型更新时失效
 
-5. **API Gateways** centralize cross-cutting concerns
-   - Authentication, rate limiting, logging
-   - Reduces client complexity
-   - Simplifies monitoring
+5. **API 网关**集中处理横切关注点
+   - 认证、速率限制、日志
+   - 减少客户端复杂性
+   - 简化监控
 
-6. **Async tasks** handle long-running jobs
-   - Use Celery or similar task queue
-   - Return job ID immediately
-   - Provide status endpoint
+6. **异步任务**处理长时间运行的任务
+   - 使用 Celery 或类似任务队列
+   - 立即返回任务 ID
+   - 提供状态 endpoint
 
-### Practical Skills Gained
+### 获得的实践技能
 
-✅ Version APIs to manage breaking changes
-✅ Implement high-performance gRPC services
-✅ Add rate limiting to protect ML resources
-✅ Cache predictions to reduce latency and cost
-✅ Use API gateways for centralized management
-✅ Handle long-running training jobs asynchronously
+✅ 版本化 API 以管理破坏性变更
+✅ 实现高性能 gRPC 服务
+✅ 添加速率限制以保护 ML 资源
+✅ 缓存预测以降低延迟和成本
+✅ 使用 API 网关进行集中管理
+✅ 异步处理长时间运行的训练任务
 
-### Next Steps
+### 下一步
 
-- **Practice**: Add versioning to an existing API
-- **Experiment**: Compare REST vs gRPC performance
-- **Implement**: Add Redis-based rate limiting
-- **Deploy**: Set up Kong gateway for an ML API
+- **练习**：为现有 API 添加版本化
+- **实验**：比较 REST vs gRPC 性能
+- **实现**：添加基于 Redis 的速率限制
+- **部署**：为 ML API 设置 Kong 网关
 
-### Additional Resources
+### 附加资源
 
-- [API Versioning Best Practices](https://www.troyhunt.com/your-api-versioning-is-wrong-which-is/)
-- [GraphQL Official Docs](https://graphql.org/)
-- [gRPC Python Quickstart](https://grpc.io/docs/languages/python/quickstart/)
-- [Kong API Gateway](https://konghq.com/)
-- [FastAPI Background Tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/)
+- [API 版本化最佳实践](https://www.troyhunt.com/your-api-versioning-is-wrong-which-is/)
+- [GraphQL 官方文档](https://graphql.org/)
+- [gRPC Python 快速入门](https://grpc.io/docs/languages/python/quickstart/)
+- [Kong API 网关](https://konghq.com/)
+- [FastAPI 后台任务](https://fastapi.tiangolo.com/tutorial/background-tasks/)
 
 ---
 
-**Congratulations!** You now understand advanced API patterns and production strategies for building scalable, high-performance ML APIs.
+**恭喜！** 你现在了解了构建可扩展、高性能 ML API 的高级 API 模式和生产策略。
 
-**Next Lecture**: Module 008 - Databases & SQL
+**下一讲**：模块 008 - 数据库和 SQL

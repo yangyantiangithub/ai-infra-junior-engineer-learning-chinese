@@ -1,171 +1,171 @@
-# Deployment Guide: Production ML System
+# 部署指南：生产 ML 系统
 
-**Last Updated:** October 18, 2025
-**Version:** 1.0
-
----
-
-## Table of Contents
-
-1. [Prerequisites](#prerequisites)
-2. [Local Development Setup](#local-development-setup)
-3. [Staging Deployment](#staging-deployment)
-4. [Production Deployment](#production-deployment)
-5. [Rollback Procedures](#rollback-procedures)
-6. [Troubleshooting](#troubleshooting)
+**最后更新：** 2025年10月18日
+**版本：** 1.0
 
 ---
 
-## Prerequisites
+## 目录
 
-### Required Tools
+1. [前置条件](#prerequisites)
+2. [本地开发环境设置](#local-development-setup)
+3. [预发布部署](#staging-deployment)
+4. [生产部署](#production-deployment)
+5. [回滚流程](#rollback-procedures)
+6. [故障排查](#troubleshooting)
 
-Install the following tools before deploying:
+---
+
+## 前置条件
+
+### 必需工具
+
+部署前请安装以下工具：
 
 ```bash
-# kubectl (Kubernetes CLI)
+# kubectl（Kubernetes CLI）
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin/
 
-# Helm (Kubernetes package manager)
+# Helm（Kubernetes 包管理器）
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-# kustomize (optional, built into kubectl)
+# kustomize（可选，内置于 kubectl）
 kubectl version --client
 
 # Docker
-# Follow instructions at: https://docs.docker.com/get-docker/
+# 按照以下说明进行操作：https://docs.docker.com/get-docker/
 ```
 
-### Required Access
+### 必需权限
 
-Ensure you have:
+请确保具备：
 
-- [ ] Kubernetes cluster access (kubeconfig file)
-- [ ] Container registry credentials (ghcr.io, ECR, GCR)
-- [ ] Domain name configured (for production)
-- [ ] DNS access (to create A records)
-- [ ] GitHub repository access
-- [ ] Secrets (API keys, credentials)
+- [ ] Kubernetes 集群访问权限（kubeconfig 文件）
+- [ ] 容器仓库凭据（ghcr.io、ECR、GCR）
+- [ ] 已配置域名（用于生产环境）
+- [ ] DNS 访问权限（用于创建 A 记录）
+- [ ] GitHub 仓库访问权限
+- [ ] 密钥（API 密钥、凭据）
 
-### Infrastructure Requirements
+### 基础设施需求
 
-**Development:**
-- Minikube or kind
-- 8GB RAM minimum
-- 20GB disk space
+**开发环境：**
+- Minikube 或 kind
+- 最低 8GB 内存
+- 20GB 磁盘空间
 
-**Staging:**
-- Kubernetes cluster (3 nodes)
-- Node size: 8GB RAM, 4 CPU
-- LoadBalancer support
-- Persistent storage (50GB)
+**预发布环境：**
+- Kubernetes 集群（3 个节点）
+- 节点规格：8GB 内存，4 CPU
+- 支持 LoadBalancer
+- 持久化存储（50GB）
 
-**Production:**
-- Kubernetes cluster (5+ nodes)
-- Node size: 16GB RAM, 8 CPU
-- Multi-zone deployment
-- LoadBalancer with DDoS protection
-- Persistent storage (200GB)
+**生产环境：**
+- Kubernetes 集群（5 个以上节点）
+- 节点规格：16GB 内存，8 CPU
+- 多可用区部署
+- 带 DDoS 保护的 LoadBalancer
+- 持久化存储（200GB）
 
 ---
 
-## Local Development Setup
+## 本地开发环境设置
 
-### Step 1: Start Local Kubernetes
+### 步骤 1：启动本地 Kubernetes
 
 ```bash
-# Using Minikube
+# 使用 Minikube
 minikube start --memory=8192 --cpus=4
 
-# Using kind
+# 使用 kind
 kind create cluster --config kind-config.yaml
 ```
 
-### Step 2: Build Docker Image
+### 步骤 2：构建 Docker 镜像
 
 ```bash
-# Build image
+# 构建镜像
 docker build -t ml-api:dev .
 
-# Load image into Minikube (if using Minikube)
+# 将镜像加载到 Minikube（如果使用 Minikube）
 minikube image load ml-api:dev
 
-# Or push to registry
+# 或推送到仓库
 docker tag ml-api:dev ghcr.io/your-org/ml-api:dev
 docker push ghcr.io/your-org/ml-api:dev
 ```
 
-### Step 3: Deploy to Local Kubernetes
+### 步骤 3：部署到本地 Kubernetes
 
 ```bash
-# Deploy using kustomize
+# 使用 kustomize 部署
 kubectl apply -k kubernetes/overlays/dev/
 
-# Verify deployment
+# 验证部署
 kubectl get pods -n ml-system-dev
 kubectl get svc -n ml-system-dev
 
-# Wait for pods to be ready
+# 等待 Pod 就绪
 kubectl wait --for=condition=Ready pods -l app=ml-api -n ml-system-dev --timeout=5m
 ```
 
-### Step 4: Access Local Application
+### 步骤 4：访问本地应用
 
 ```bash
-# Port forward to access locally
+# 端口转发以在本地访问
 kubectl port-forward -n ml-system-dev svc/ml-api 5000:80
 
-# Test in another terminal
+# 在另一个终端中测试
 curl http://localhost:5000/health
 ```
 
-### Step 5: View Logs
+### 步骤 5：查看日志
 
 ```bash
-# View pod logs
+# 查看 Pod 日志
 kubectl logs -n ml-system-dev -l app=ml-api --tail=100 -f
 
-# Describe pod for troubleshooting
+# 描述 Pod 以进行故障排查
 kubectl describe pod -n ml-system-dev -l app=ml-api
 ```
 
 ---
 
-## Staging Deployment
+## 预发布部署
 
-Staging deployment is **automatic** via CI/CD when code is merged to the `develop` branch.
+预发布部署通过 CI/CD **自动**执行，当代码合并到 `develop` 分支时触发。
 
-### Manual Staging Deployment
+### 手动预发布部署
 
-If you need to deploy manually:
+如果需要手动部署：
 
-#### Step 1: Configure Access
+#### 步骤 1：配置访问权限
 
 ```bash
-# Set kubeconfig for staging cluster
+# 设置预发布集群的 kubeconfig
 export KUBECONFIG=/path/to/staging-kubeconfig.yaml
 
-# Verify cluster access
+# 验证集群访问
 kubectl cluster-info
 kubectl get nodes
 ```
 
-#### Step 2: Create Namespace
+#### 步骤 2：创建命名空间
 
 ```bash
-# Create namespace (if not exists)
+# 创建命名空间（如果不存在）
 kubectl create namespace ml-system-staging
 
-# Verify
+# 验证
 kubectl get namespace ml-system-staging
 ```
 
-#### Step 3: Create Secrets
+#### 步骤 3：创建密钥
 
 ```bash
-# Create secrets (DO NOT commit to Git!)
+# 创建密钥（不要提交到 Git！）
 kubectl create secret generic api-keys \
   --from-literal=API_KEY=staging-api-key-here \
   -n ml-system-staging
@@ -175,26 +175,26 @@ kubectl create secret generic mlflow-credentials \
   -n ml-system-staging
 ```
 
-**Better approach: Use SealedSecrets**
+**更好的方法：使用 SealedSecrets**
 
 ```bash
-# Install SealedSecrets controller
+# 安装 SealedSecrets 控制器
 kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.24.0/controller.yaml
 
-# Create sealed secret
+# 创建密封密钥
 kubectl create secret generic api-keys \
   --from-literal=API_KEY=staging-api-key-here \
   --dry-run=client -o yaml | \
   kubeseal -o yaml > sealed-secret.yaml
 
-# Commit sealed-secret.yaml to Git (it's encrypted)
+# 将 sealed-secret.yaml 提交到 Git（已加密）
 kubectl apply -f sealed-secret.yaml
 ```
 
-#### Step 4: Install Dependencies
+#### 步骤 4：安装依赖
 
 ```bash
-# Install NGINX Ingress Controller
+# 安装 NGINX Ingress Controller
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
@@ -202,7 +202,7 @@ helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
   --create-namespace \
   --set controller.service.type=LoadBalancer
 
-# Install cert-manager
+# 安装 cert-manager
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
 helm upgrade --install cert-manager jetstack/cert-manager \
@@ -210,60 +210,60 @@ helm upgrade --install cert-manager jetstack/cert-manager \
   --create-namespace \
   --set installCRDs=true
 
-# Verify installations
+# 验证安装
 kubectl get pods -n ingress-nginx
 kubectl get pods -n cert-manager
 ```
 
-#### Step 5: Configure DNS
+#### 步骤 5：配置 DNS
 
 ```bash
-# Get LoadBalancer IP
+# 获取 LoadBalancer IP
 kubectl get svc ingress-nginx-controller -n ingress-nginx
 
-# Create DNS A record pointing staging.example.com to LoadBalancer IP
-# (Do this in your DNS provider: GoDaddy, Cloudflare, Route53, etc.)
+# 创建指向 LoadBalancer IP 的 DNS A 记录 staging.example.com
+# （在你的 DNS 提供商处操作：GoDaddy、Cloudflare、Route53 等）
 ```
 
-#### Step 6: Deploy Application
+#### 步骤 6：部署应用
 
 ```bash
-# Deploy using kustomize
+# 使用 kustomize 部署
 kubectl apply -k kubernetes/overlays/staging/
 
-# Watch rollout
+# 查看推出状态
 kubectl rollout status deployment/ml-api -n ml-system-staging
 
-# Verify pods
+# 验证 Pod
 kubectl get pods -n ml-system-staging
 ```
 
-#### Step 7: Verify Certificate
+#### 步骤 7：验证证书
 
 ```bash
-# Wait for certificate to be ready
+# 等待证书就绪
 kubectl wait --for=condition=Ready certificate/staging-tls \
   -n ml-system-staging --timeout=5m
 
-# Check certificate status
+# 检查证书状态
 kubectl get certificate -n ml-system-staging
 kubectl describe certificate staging-tls -n ml-system-staging
 
-# Check ingress
+# 检查 Ingress
 kubectl get ingress -n ml-system-staging
 ```
 
-#### Step 8: Test Deployment
+#### 步骤 8：测试部署
 
 ```bash
-# Test health endpoint
+# 测试健康检查端点
 curl https://staging.example.com/health
 
-# Test with API key
+# 使用 API 密钥测试
 curl -H "X-API-Key: staging-api-key-here" \
   https://staging.example.com/info
 
-# Run integration tests
+# 运行集成测试
 export API_URL=https://staging.example.com
 export API_KEY=staging-api-key-here
 pytest tests/integration/test_e2e.py -v
@@ -271,105 +271,105 @@ pytest tests/integration/test_e2e.py -v
 
 ---
 
-## Production Deployment
+## 生产部署
 
-Production deployment requires **manual approval** and uses a **canary deployment** strategy.
+生产部署需要**手动审批**，并使用**金丝雀部署**策略。
 
-### Pre-Deployment Checklist
+### 部署前检查清单
 
-Before deploying to production:
+在部署到生产环境之前：
 
-- [ ] All tests passing in staging
-- [ ] Security scan completed (no critical/high vulnerabilities)
-- [ ] Load testing completed successfully
-- [ ] Rollback procedure tested
-- [ ] Disaster recovery plan reviewed
-- [ ] Monitoring and alerts configured
-- [ ] On-call team notified
-- [ ] Change request approved (if required)
-- [ ] Backup of current production verified
-- [ ] Team ready for deployment window
+- [ ] 预发布环境所有测试通过
+- [ ] 安全扫描完成（无关键/高危漏洞）
+- [ ] 负载测试成功完成
+- [ ] 回滚流程已测试
+- [ ] 灾难恢复计划已审查
+- [ ] 监控和告警已配置
+- [ ] 已通知值班团队
+- [ ] 变更申请已批准（如果需要）
+- [ ] 当前生产备份已验证
+- [ ] 团队已为部署窗口做好准备
 
-### Production Deployment Steps
+### 生产部署步骤
 
-#### Step 1: Trigger CD Pipeline
+#### 步骤 1：触发 CD 流水线
 
-Production deployment is triggered via GitHub Actions workflow:
+生产部署通过 GitHub Actions 工作流触发：
 
 ```bash
-# Navigate to GitHub Actions in your repository
-# Select "CD Pipeline" workflow
-# Click "Run workflow"
-# Choose:
+# 进入仓库的 GitHub Actions
+# 选择"CD Pipeline"工作流
+# 点击"Run workflow"
+# 选择：
 #   - environment: production
-#   - image_tag: v1.2.3 (specific version, never 'latest')
-# Click "Run workflow"
+#   - image_tag: v1.2.3（特定版本，不要用'latest'）
+# 点击"Run workflow"
 ```
 
-**Manual Approval Required:**
-- GitHub will pause and request approval
-- Team lead/manager must approve
-- Approval gates ensure production safety
+**需要手动审批：**
+- GitHub 将暂停并要求审批
+- 团队负责人/经理必须批准
+- 审批门确保生产安全
 
-#### Step 2: Monitor Canary Deployment
+#### 步骤 2：监控金丝雀部署
 
-Once approved, the pipeline:
+审批通过后，流水线将：
 
-1. Deploys canary pods (10% of traffic)
-2. Monitors for 10 minutes:
-   - Error rate < 0.1%
-   - Latency P95 < 500ms
-   - No crashes
+1. 部署金丝雀 Pod（10% 流量）
+2. 监控 10 分钟：
+   - 错误率 < 0.1%
+   - 延迟 P95 < 500ms
+   - 无崩溃
 
-#### Step 3: Promote or Rollback
+#### 步骤 3：推进或回滚
 
-If canary is healthy:
-- Traffic gradually shifts: 10% → 25% → 50% → 100%
-- Full rollout completes
+如果金丝雀健康：
+- 流量逐步切换：10% → 25% → 50% → 100%
+- 完成完整推出
 
-If canary is unhealthy:
-- Automatic rollback
-- Alert sent to team
-- Incident created
+如果金丝雀不健康：
+- 自动回滚
+- 向团队发送告警
+- 创建事件
 
-### Manual Production Deployment
+### 手动生产部署
 
-If you need to deploy manually (emergency):
+如果需要手动部署（紧急情况）：
 
-#### Step 1: Configure Access
+#### 步骤 1：配置访问权限
 
 ```bash
-# Set kubeconfig for production cluster
+# 设置生产集群的 kubeconfig
 export KUBECONFIG=/path/to/production-kubeconfig.yaml
 
-# Verify cluster access
+# 验证集群访问
 kubectl cluster-info
 kubectl get nodes
 ```
 
-#### Step 2: Backup Current State
+#### 步骤 2：备份当前状态
 
-**CRITICAL: Always backup before production changes!**
+**关键：生产变更前务必进行备份！**
 
 ```bash
-# Backup current deployment
+# 备份当前部署
 kubectl get all -n ml-system-production -o yaml > \
   backup-production-$(date +%Y%m%d-%H%M%S).yaml
 
-# Backup ConfigMaps and Secrets
+# 备份 ConfigMap 和 Secret
 kubectl get configmap -n ml-system-production -o yaml >> \
   backup-production-$(date +%Y%m%d-%H%M%S).yaml
 kubectl get secret -n ml-system-production -o yaml >> \
   backup-production-$(date +%Y%m%d-%H%M%S).yaml
 
-# Store backup in safe location
+# 将备份存储到安全位置
 aws s3 cp backup-production-*.yaml s3://your-backup-bucket/
 ```
 
-#### Step 3: Deploy Canary
+#### 步骤 3：部署金丝雀
 
 ```bash
-# Deploy canary (10% traffic)
+# 部署金丝雀（10% 流量）
 helm upgrade ml-system ./helm/ml-system \
   --namespace ml-system-production \
   --values ./helm/ml-system/values-production.yaml \
@@ -380,29 +380,29 @@ helm upgrade ml-system ./helm/ml-system \
   --timeout 10m
 ```
 
-#### Step 4: Monitor Canary
+#### 步骤 4：监控金丝雀
 
 ```bash
-# Watch canary pod logs
+# 查看金丝雀 Pod 日志
 kubectl logs -n ml-system-production -l version=canary -f
 
-# Monitor Grafana dashboards
-# Check error rate, latency, throughput
+# 监控 Grafana 仪表盘
+# 检查错误率、延迟、吞吐量
 
-# Query Prometheus for error rate
-# Error rate should be < 0.1%
+# 查询 Prometheus 的错误率
+# 错误率应 < 0.1%
 ```
 
-**Monitor for 10-15 minutes**
+**监控 10-15 分钟**
 
-If error rate increases or latency spikes, **ROLLBACK IMMEDIATELY**.
+如果错误率增加或延迟飙升，请**立即回滚**。
 
-#### Step 5: Promote Canary
+#### 步骤 5：推进金丝雀
 
-If metrics are healthy:
+如果指标健康：
 
 ```bash
-# Full rollout
+# 完整推出
 helm upgrade ml-system ./helm/ml-system \
   --namespace ml-system-production \
   --values ./helm/ml-system/values-production.yaml \
@@ -411,208 +411,208 @@ helm upgrade ml-system ./helm/ml-system \
   --wait \
   --timeout 15m
 
-# Verify rollout
+# 验证推出
 kubectl rollout status deployment/ml-api -n ml-system-production
 ```
 
-#### Step 6: Verify Production
+#### 步骤 6：验证生产环境
 
 ```bash
-# Run smoke tests
+# 运行冒烟测试
 curl https://api.example.com/health
 
 export API_URL=https://api.example.com
 export API_KEY=$PRODUCTION_API_KEY
 pytest tests/integration/test_e2e.py -v --skip-slow
 
-# Monitor for 1 hour minimum
-# Watch Grafana, check logs, verify metrics
+# 至少监控 1 小时
+# 查看 Grafana，检查日志，验证指标
 ```
 
-#### Step 7: Tag Deployment
+#### 步骤 7：标记部署
 
 ```bash
-# Tag Git commit
-git tag -a "prod-v1.2.3" -m "Production deployment v1.2.3"
+# 标记 Git 提交
+git tag -a "prod-v1.2.3" -m "生产部署 v1.2.3"
 git push origin "prod-v1.2.3"
 
-# Update MLflow (tag model as Production)
-# (Run your model tagging script)
+# 更新 MLflow（将模型标记为 Production）
+# （运行你的模型标记脚本）
 ```
 
 ---
 
-## Rollback Procedures
+## 回滚流程
 
-### When to Rollback
+### 何时回滚
 
-Rollback immediately if:
-- Error rate > 1%
-- P95 latency > 1 second
-- Pod crashes
-- Critical functionality broken
-- Security issue discovered
+在以下情况下立即回滚：
+- 错误率 > 1%
+- P95 延迟 > 1 秒
+- Pod 崩溃
+- 关键功能损坏
+- 发现安全问题
 
-### Automatic Rollback
+### 自动回滚
 
-The CD pipeline automatically rolls back if canary deployment fails.
+如果金丝雀部署失败，CD 流水线会自动回滚。
 
-### Manual Rollback (Helm)
+### 手动回滚（Helm）
 
 ```bash
-# List releases
+# 列出发布版本
 helm list -n ml-system-production
 
-# Rollback to previous release
+# 回滚到上一个版本
 helm rollback ml-system -n ml-system-production
 
-# Rollback to specific revision
+# 回滚到特定修订版本
 helm rollback ml-system 5 -n ml-system-production
 
-# Verify rollback
+# 验证回滚
 kubectl rollout status deployment/ml-api -n ml-system-production
 ```
 
-### Manual Rollback (kubectl)
+### 手动回滚（kubectl）
 
 ```bash
-# Rollback deployment
+# 回滚部署
 kubectl rollout undo deployment/ml-api -n ml-system-production
 
-# Rollback to specific revision
+# 回滚到特定修订版本
 kubectl rollout undo deployment/ml-api --to-revision=3 -n ml-system-production
 
-# Check rollout history
+# 检查推出历史
 kubectl rollout history deployment/ml-api -n ml-system-production
 ```
 
-### Rollback from Backup
+### 从备份回滚
 
-If Helm/kubectl rollback fails:
+如果 Helm/kubectl 回滚失败：
 
 ```bash
-# Restore from backup
+# 从备份恢复
 kubectl apply -f backup-production-YYYYMMDD-HHMMSS.yaml
 
-# Verify restoration
+# 验证恢复
 kubectl get pods -n ml-system-production
 ```
 
-### Post-Rollback
+### 回滚后操作
 
-After rollback:
+回滚后：
 
-1. **Notify team** - Alert via Slack/PagerDuty
-2. **Create incident** - Document the issue
-3. **Check logs** - Identify root cause
-4. **Fix issue** - Address the problem
-5. **Test in staging** - Verify fix
-6. **Plan re-deployment** - Schedule next attempt
+1. **通知团队** — 通过 Slack/PagerDuty 发送告警
+2. **创建事件** — 记录问题
+3. **检查日志** — 确定根因
+4. **修复问题** — 解决问题
+5. **在预发布环境中测试** — 验证修复
+6. **计划重新部署** — 安排下一次尝试
 
 ---
 
-## Troubleshooting
+## 故障排查
 
-### Pods Not Starting
+### Pod 无法启动
 
 ```bash
-# Check pod status
+# 检查 Pod 状态
 kubectl get pods -n ml-system-production
 
-# Describe pod
+# 描述 Pod
 kubectl describe pod <pod-name> -n ml-system-production
 
-# Check events
+# 检查事件
 kubectl get events -n ml-system-production --sort-by='.lastTimestamp'
 ```
 
-**Common causes:**
-- Image pull errors (wrong tag, registry auth)
-- Resource limits (not enough CPU/memory)
-- Configuration errors (wrong environment variables)
-- Secrets missing
+**常见原因：**
+- 镜像拉取错误（错误的标签、仓库认证）
+- 资源限制（CPU/内存不足）
+- 配置错误（环境变量错误）
+- Secret 缺失
 
-### Certificate Not Issuing
+### 证书未签发
 
 ```bash
-# Check certificate status
+# 检查证书状态
 kubectl describe certificate <cert-name> -n ml-system-production
 
-# Check cert-manager logs
+# 检查 cert-manager 日志
 kubectl logs -n cert-manager deploy/cert-manager -f
 
-# Check challenges
+# 检查挑战
 kubectl get challenges -n ml-system-production
 ```
 
-**Common causes:**
-- DNS not pointing to LoadBalancer
-- Firewall blocking port 80 (HTTP-01 challenge)
-- Rate limits (use staging first!)
+**常见原因：**
+- DNS 未指向 LoadBalancer
+- 防火墙阻止了 80 端口（HTTP-01 挑战）
+- 速率限制（先在预发布环境测试！）
 
-### High Error Rate
+### 高错误率
 
 ```bash
-# Check application logs
+# 检查应用日志
 kubectl logs -n ml-system-production -l app=ml-api --tail=200
 
-# Check Grafana dashboards
-# Open browser to Grafana URL
+# 检查 Grafana 仪表盘
+# 在浏览器中打开 Grafana URL
 
-# Query Prometheus
+# 查询 Prometheus
 kubectl port-forward -n monitoring svc/prometheus 9090:9090
-# Open http://localhost:9090
+# 打开 http://localhost:9090
 ```
 
-**Common causes:**
-- Model loading failure
-- Database connection issues
-- Resource exhaustion
-- Dependency unavailable
+**常见原因：**
+- 模型加载失败
+- 数据库连接问题
+- 资源耗尽
+- 依赖不可用
 
-### Deployment Stuck
+### 部署卡住
 
 ```bash
-# Check rollout status
+# 检查推出状态
 kubectl rollout status deployment/ml-api -n ml-system-production
 
-# Force rollback if stuck
+# 如果卡住则强制回滚
 kubectl rollout undo deployment/ml-api -n ml-system-production
 
-# Delete stuck pods
+# 删除卡住的 Pod
 kubectl delete pod <pod-name> -n ml-system-production --force --grace-period=0
 ```
 
 ---
 
-## Best Practices
+## 最佳实践
 
-1. **Never deploy on Friday** (or before long weekend)
-2. **Always backup** before production changes
-3. **Test in staging** before production
-4. **Monitor continuously** during and after deployment
-5. **Have rollback plan ready** before deploying
-6. **Use canary or blue/green** for production
-7. **Tag deployments** in Git
-8. **Document changes** in release notes
-9. **Notify team** before deployment
-10. **Review metrics** for 24 hours post-deployment
-
----
-
-## Support
-
-**For issues during deployment:**
-- Check #ml-infrastructure Slack channel
-- Page on-call engineer (PagerDuty)
-- Review runbooks in `/docs/runbooks/`
-
-**For urgent production issues:**
-- Follow incident response procedure
-- Contact: incidents@example.com
+1. **不要周五部署**（或长周末前）
+2. **生产变更前务必备份**
+3. **先在预发布环境测试**
+4. **部署期间和部署后持续监控**
+5. **部署前准备好回滚计划**
+6. **生产环境使用金丝雀或蓝绿部署**
+7. **在 Git 中标记部署**
+8. **在发布说明中记录变更**
+9. **部署前通知团队**
+10. **部署后审查指标 24 小时**
 
 ---
 
-**Document Version:** 1.0
-**Last Reviewed:** October 18, 2025
-**Next Review:** January 18, 2026
+## 支持
+
+**部署期间的问题：**
+- 查看 #ml-infrastructure Slack 频道
+- 呼叫值班工程师（PagerDuty）
+- 查看 `/docs/runbooks/` 中的 Runbook
+
+**紧急生产问题：**
+- 遵循事件响应流程
+- 联系：incidents@example.com
+
+---
+
+**文档版本：** 1.0
+**最后审阅：** 2025年10月18日
+**下次审阅：** 2026年1月18日

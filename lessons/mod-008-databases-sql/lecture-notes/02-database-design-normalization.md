@@ -1,106 +1,106 @@
-# Lecture 02: Database Design & Normalization
+# Lecture 02: 数据库设计与范式
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Database Design Principles](#database-design-principles)
-3. [Entity-Relationship (ER) Modeling](#entity-relationship-er-modeling)
-4. [Types of Relationships](#types-of-relationships)
-5. [From ER Diagram to Tables](#from-er-diagram-to-tables)
-6. [Data Normalization](#data-normalization)
-7. [First Normal Form (1NF)](#first-normal-form-1nf)
-8. [Second Normal Form (2NF)](#second-normal-form-2nf)
-9. [Third Normal Form (3NF)](#third-normal-form-3nf)
-10. [Boyce-Codd Normal Form (BCNF)](#boyce-codd-normal-form-bcnf)
-11. [Denormalization](#denormalization)
-12. [Designing ML Database Schemas](#designing-ml-database-schemas)
-13. [Schema Migration Strategies](#schema-migration-strategies)
-14. [Best Practices](#best-practices)
-15. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [引言](#introduction)
+2. [数据库设计原则](#database-design-principles)
+3. [实体-关系（ER）建模](#entity-relationship-er-modeling)
+4. [关系类型](#types-of-relationships)
+5. [从 ER 图到表](#from-er-diagram-to-tables)
+6. [数据范式化](#data-normalization)
+7. [第一范式（1NF）](#first-normal-form-1nf)
+8. [第二范式（2NF）](#second-normal-form-2nf)
+9. [第三范式（3NF）](#third-normal-form-3nf)
+10. [巴科斯-科德范式（BCNF）](#boyce-codd-normal-form-bcnf)
+11. [反范式化](#denormalization)
+12. [设计 ML 数据库 Schema](#designing-ml-database-schemas)
+13. [Schema 迁移策略](#schema-migration-strategies)
+14. [最佳实践](#best-practices)
+15. [总结与关键要点](#summary-and-key-takeaways)
 
-## Introduction
+## 引言
 
-Good database design is crucial for building scalable, maintainable, and efficient applications. Poor design leads to data redundancy, inconsistencies, and performance problems. This lecture teaches you the principles and techniques for designing robust database schemas, with a focus on normalization and ML use cases.
+良好的数据库设计对于构建可扩展、可维护且高效的应用程序至关重要。糟糕的设计会导致数据冗余、不一致和性能问题。本讲座将教你设计健壮数据库 schema 的原理和技术，重点介绍范式化和 ML 使用场景。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Understand database design principles
-- Create Entity-Relationship diagrams
-- Identify and implement different relationship types
-- Apply normalization forms (1NF through BCNF)
-- Know when to denormalize for performance
-- Design database schemas for ML systems
-- Plan and execute schema migrations
+在本讲座结束时，你将：
+- 理解数据库设计原则
+- 创建实体-关系图
+- 识别并实现不同的关系类型
+- 应用范式化形式（1NF 到 BCNF）
+- 知道何时为了性能而反范式化
+- 为 ML 系统设计数据库 schema
+- 规划并执行 schema 迁移
 
-### Prerequisites
-- Lecture 01: Database Fundamentals & SQL Basics
-- Understanding of relational database concepts
-- Basic SQL knowledge (CREATE, SELECT, etc.)
+### 前置条件
+- 讲座 01：数据库基础与 SQL 入门
+- 理解关系型数据库概念
+- 基本 SQL 知识（CREATE、SELECT 等）
 
-### Estimated Time
-4-5 hours (including design exercises)
+### 预计时间
+4-5 小时（包括设计练习）
 
-## Database Design Principles
+## 数据库设计原则
 
-### 1. Data Integrity
+### 1. 数据完整性
 
-Ensure data is accurate and consistent:
+确保数据准确且一致：
 
-**Example of Poor Integrity:**
+**完整性差的示例：**
 ```
-Users table:
+Users 表：
 user_id | email             | email_verified
 --------|-------------------|---------------
 1       | alice@example.com | true
-1       | bob@example.com   | false  ← Same user_id, different email!
+1       | bob@example.com   | false  ← 相同的 user_id，不同的 email！
 ```
 
-**Good Integrity:**
+**良好的完整性：**
 ```sql
 CREATE TABLE users (
-    user_id INTEGER PRIMARY KEY,           -- Unique
-    email VARCHAR(255) NOT NULL UNIQUE,    -- Must exist, must be unique
+    user_id INTEGER PRIMARY KEY,           -- 唯一
+    email VARCHAR(255) NOT NULL UNIQUE,    -- 必须存在，必须唯一
     email_verified BOOLEAN DEFAULT FALSE
 );
 ```
 
-### 2. Minimize Redundancy
+### 2. 最小化冗余
 
-Don't store the same data in multiple places:
+不要在同一数据存储在多个地方：
 
-**Bad (Redundant):**
+**不好（冗余）：**
 ```
-experiments table:
+experiments 表：
 exp_id | model_name | model_framework | model_version | accuracy
 -------|------------|-----------------|---------------|----------
 1      | BERT-base  | PyTorch         | 1.0.0         | 0.92
 2      | BERT-base  | PyTorch         | 1.0.0         | 0.93
 3      | BERT-base  | PyTorch         | 1.0.0         | 0.94
-       ↑ Repeated model info in every experiment
+        ↑ 每次实验中重复的模型信息
 ```
 
-**Good (Normalized):**
+**好（范式化）：**
 ```
-models table:
+models 表：
 model_id | name      | framework | version
 ---------|-----------|-----------|--------
 1        | BERT-base | PyTorch   | 1.0.0
 
-experiments table:
+experiments 表：
 exp_id | model_id | accuracy
 -------|----------|----------
 1      | 1        | 0.92
 2      | 1        | 0.93
 3      | 1        | 0.94
-       ↑ Reference to model, no duplication
+        ↑ 引用模型，无重复
 ```
 
-### 3. Logical Organization
+### 3. 逻辑组织
 
-Group related data together:
+将相关数据分组在一起：
 
 ```sql
--- GOOD: Related data in one table
+-- 好：相关数据放在一个表中
 CREATE TABLE user_profiles (
     user_id INTEGER PRIMARY KEY,
     username VARCHAR(50),
@@ -109,94 +109,94 @@ CREATE TABLE user_profiles (
     created_at TIMESTAMP
 );
 
--- AVOID: Splitting unnecessarily
+-- 避免：不必要地拆分
 CREATE TABLE usernames (user_id INT, username VARCHAR(50));
 CREATE TABLE emails (user_id INT, email VARCHAR(255));
 CREATE TABLE names (user_id INT, full_name VARCHAR(100));
 ```
 
-### 4. Scalability
+### 4. 可扩展性
 
-Design for growth:
+为增长而设计：
 
 ```sql
--- Use appropriate data types
+-- 使用适当的数据类型
 CREATE TABLE predictions (
-    prediction_id BIGINT PRIMARY KEY,  -- Handles billions of records
+    prediction_id BIGINT PRIMARY KEY,  -- 处理数十亿条记录
     model_id INTEGER,
-    confidence DECIMAL(5,4),           -- Precise numbers
+    confidence DECIMAL(5,4),           -- 精确数字
     created_at TIMESTAMP
 );
 
--- Add indexes for performance
+-- 为性能添加索引
 CREATE INDEX idx_predictions_model_id ON predictions(model_id);
 CREATE INDEX idx_predictions_created_at ON predictions(created_at);
 ```
 
-### 5. Flexibility
+### 5. 灵活性
 
-Design for future changes:
+为未来变更而设计：
 
 ```sql
--- Flexible: Use separate table for tags
+-- 灵活：使用单独的表存储标签
 CREATE TABLE model_tags (
     tag_id INTEGER PRIMARY KEY,
     model_id INTEGER,
     tag_name VARCHAR(50),
     FOREIGN KEY (model_id) REFERENCES models(model_id)
 );
--- Easy to add/remove tags without changing schema
+-- 无需更改 schema 即可轻松添加/删除标签
 
--- Inflexible: Store as comma-separated string
+-- 不灵活：存储为逗号分隔的字符串
 CREATE TABLE models (
     model_id INTEGER PRIMARY KEY,
     tags VARCHAR(255)  -- 'nlp,transformer,bert'
-    -- Hard to query, maintain, and modify
+    -- 难以查询、维护和修改
 );
 ```
 
-## Entity-Relationship (ER) Modeling
+## 实体-关系（ER）建模
 
-### What is an ER Diagram?
+### 什么是 ER 图？
 
-An **Entity-Relationship diagram** visually represents the structure of a database:
-- **Entities**: Things we want to store (tables)
-- **Attributes**: Properties of entities (columns)
-- **Relationships**: How entities connect
+**实体-关系图**直观表示数据库的结构：
+- **实体**：我们要存储的事物（表）
+- **属性**：实体的属性（列）
+- **关系**：实体的连接方式
 
-### ER Diagram Components
+### ER 图组成部分
 
-**Entities (Rectangles):**
+**实体（矩形）：**
 ```
 ┌─────────────┐
-│   Models    │  ← Entity
+│   Models    │  ← 实体
 └─────────────┘
 ```
 
-**Attributes (Ovals):**
+**属性（椭圆）：**
 ```
-    ┌──────────┐
-    │model_name│  ← Attribute
-    └────┬─────┘
-         │
-    ┌────┴────┐
-    │ Models  │
-    └─────────┘
-```
-
-**Primary Key (Underlined):**
-```
-model_id (underlined) = primary key
+     ┌──────────┐
+     │model_name│  ← 属性
+     └────┬─────┘
+          │
+     ┌────┴────┐
+     │ Models  │
+     └─────────┘
 ```
 
-**Relationships (Diamonds):**
+**主键（下划线）：**
+```
+model_id（下划线）= 主键
+```
+
+**关系（菱形）：**
 ```
 ┌─────────┐       ┌──────────┐       ┌────────────┐
 │ Models  │───────│  trains  │───────│Experiments │
 └─────────┘       └──────────┘       └────────────┘
 ```
 
-### Example: ML Model Registry ER Diagram
+### 示例：ML 模型注册 ER 图
 
 ```
                   1                     N
@@ -233,33 +233,33 @@ model_id (underlined) = primary key
       created by
 ```
 
-### Cardinality Notations
+### 基数表示法
 
-**One-to-One (1:1)**
+**一对一（1:1）**
 ```
 User ────── Profile
   1            1
 ```
 
-**One-to-Many (1:N)**
+**一对多（1:N）**
 ```
 Model ────── Experiments
   1              N
 ```
 
-**Many-to-Many (M:N)**
+**多对多（M:N）**
 ```
 Models ────── Tags
   M              N
 ```
 
-## Types of Relationships
+## 关系类型
 
-### 1. One-to-One (1:1)
+### 1. 一对一（1:1）
 
-One entity relates to exactly one other entity.
+一个实体恰好与另一个实体相关联。
 
-**Example: User and User Profile**
+**示例：用户与用户档案**
 
 ```sql
 CREATE TABLE users (
@@ -270,7 +270,7 @@ CREATE TABLE users (
 
 CREATE TABLE user_profiles (
     profile_id INTEGER PRIMARY KEY,
-    user_id INTEGER UNIQUE NOT NULL,  -- UNIQUE makes it 1:1
+    user_id INTEGER UNIQUE NOT NULL,  -- UNIQUE 使其成为 1:1
     bio TEXT,
     avatar_url VARCHAR(255),
     preferences JSON,
@@ -278,16 +278,16 @@ CREATE TABLE user_profiles (
 );
 ```
 
-**When to use:**
-- Separate sensitive data (e.g., billing info)
-- Optional extended information
-- Large binary data (photos, documents)
+**何时使用：**
+- 分离敏感数据（如账单信息）
+- 可选的扩展信息
+- 大型二进制数据（照片、文档）
 
-### 2. One-to-Many (1:N)
+### 2. 一对多（1:N）
 
-One entity relates to many other entities.
+一个实体与多个其他实体相关联。
 
-**Example: Model has Many Experiments**
+**示例：模型有多个实验**
 
 ```sql
 CREATE TABLE models (
@@ -297,14 +297,14 @@ CREATE TABLE models (
 
 CREATE TABLE experiments (
     experiment_id INTEGER PRIMARY KEY,
-    model_id INTEGER NOT NULL,  -- Many experiments → one model
+    model_id INTEGER NOT NULL,  -- 多个实验 → 一个模型
     accuracy DECIMAL(5,4),
     created_at TIMESTAMP,
     FOREIGN KEY (model_id) REFERENCES models(model_id)
 );
 ```
 
-**Visual:**
+**可视化：**
 ```
 Model (id=1, name='BERT')
     ├─ Experiment (id=101, model_id=1, accuracy=0.92)
@@ -312,20 +312,20 @@ Model (id=1, name='BERT')
     └─ Experiment (id=103, model_id=1, accuracy=0.94)
 ```
 
-**When to use:**
-- Parent-child relationships
-- Most common relationship type
-- Examples: User→Orders, Model→Predictions, Dataset→Samples
+**何时使用：**
+- 父子关系
+- 最常见的关系类型
+- 示例：用户→订单、模型→预测、数据集→样本
 
-### 3. Many-to-Many (M:N)
+### 3. 多对多（M:N）
 
-Many entities relate to many other entities.
+多个实体与多个其他实体相关联。
 
-**Example: Models and Tags**
+**示例：模型与标签**
 
-**Problem:** Can't directly represent M:N in relational databases.
+**问题：** 无法在关系型数据库中直接表示 M:N。
 
-**Solution:** Use a **junction table** (also called: bridge table, linking table, associative table)
+**解决方案：** 使用**连接表**（也称为：桥接表、链接表、关联表）
 
 ```sql
 CREATE TABLE models (
@@ -338,58 +338,58 @@ CREATE TABLE tags (
     tag_name VARCHAR(50) UNIQUE
 );
 
--- Junction table
+-- 连接表
 CREATE TABLE model_tags (
     model_id INTEGER,
     tag_id INTEGER,
-    PRIMARY KEY (model_id, tag_id),  -- Composite key
+    PRIMARY KEY (model_id, tag_id),  -- 组合键
     FOREIGN KEY (model_id) REFERENCES models(model_id),
     FOREIGN KEY (tag_id) REFERENCES tags(tag_id)
 );
 ```
 
-**Visual:**
+**可视化：**
 ```
 Models:                      Tags:
 1: BERT                      A: NLP
 2: ResNet                    B: Vision
 3: GPT-2                     C: Transformer
 
-model_tags (junction):
+model_tags（连接表）：
 model_id | tag_id
 ---------|--------
-1        | A       ← BERT has tag NLP
-1        | C       ← BERT has tag Transformer
-2        | B       ← ResNet has tag Vision
-3        | A       ← GPT-2 has tag NLP
-3        | C       ← GPT-2 has tag Transformer
+1        | A       ← BERT 有标签 NLP
+1        | C       ← BERT 有标签 Transformer
+2        | B       ← ResNet 有标签 Vision
+3        | A       ← GPT-2 有标签 NLP
+3        | C       ← GPT-2 有标签 Transformer
 ```
 
-**Query example:**
+**查询示例：**
 ```sql
--- Get all tags for BERT
+-- 获取 BERT 的所有标签
 SELECT t.tag_name
 FROM tags t
 JOIN model_tags mt ON t.tag_id = mt.tag_id
 JOIN models m ON mt.model_id = m.model_id
 WHERE m.name = 'BERT';
 
--- Result: NLP, Transformer
+-- 结果：NLP, Transformer
 ```
 
-**When to use:**
-- Students↔Courses
-- Products↔Categories
-- Models↔Tags
-- Users↔Roles
+**何时使用：**
+- 学生↔课程
+- 产品↔类别
+- 模型↔标签
+- 用户↔角色
 
-## From ER Diagram to Tables
+## 从 ER 图到表
 
-### Step 1: Each Entity → Table
+### 步骤 1：每个实体 → 表
 
 ```
-Entity: Model
-Attributes: model_id, name, framework
+实体：Model
+属性：model_id, name, framework
 
 →
 
@@ -400,7 +400,7 @@ CREATE TABLE models (
 );
 ```
 
-### Step 2: One-to-Many → Foreign Key
+### 步骤 2：一对多 → 外键
 
 ```
 Model (1) → (N) Experiments
@@ -409,13 +409,13 @@ Model (1) → (N) Experiments
 
 CREATE TABLE experiments (
     experiment_id INTEGER PRIMARY KEY,
-    model_id INTEGER,  -- Foreign key
+    model_id INTEGER,  -- 外键
     accuracy DECIMAL(5,4),
     FOREIGN KEY (model_id) REFERENCES models(model_id)
 );
 ```
 
-### Step 3: Many-to-Many → Junction Table
+### 步骤 3：多对多 → 连接表
 
 ```
 Models (M) ↔ (N) Tags
@@ -431,7 +431,7 @@ CREATE TABLE model_tags (
 );
 ```
 
-### Complete Example: ML Platform Schema
+### 完整示例：ML 平台 Schema
 
 ```sql
 -- Users
@@ -442,17 +442,17 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Models (1:N with Experiments, M:N with Tags)
+-- Models（1:N 与 Experiments，M:N 与 Tags）
 CREATE TABLE models (
     model_id INTEGER PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     framework VARCHAR(50),
-    created_by INTEGER,  -- FK to users
+    created_by INTEGER,  -- FK 到 users
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES users(user_id)
 );
 
--- Experiments (N:1 with Models)
+-- Experiments（N:1 与 Models）
 CREATE TABLE experiments (
     experiment_id INTEGER PRIMARY KEY,
     model_id INTEGER NOT NULL,
@@ -468,7 +468,7 @@ CREATE TABLE tags (
     tag_name VARCHAR(50) UNIQUE NOT NULL
 );
 
--- Model-Tags junction (M:N)
+-- Model-Tags 连接表（M:N）
 CREATE TABLE model_tags (
     model_id INTEGER,
     tag_id INTEGER,
@@ -478,21 +478,21 @@ CREATE TABLE model_tags (
 );
 ```
 
-## Data Normalization
+## 数据范式化
 
-### What is Normalization?
+### 什么是范式化？
 
-**Normalization** is the process of organizing data to:
-1. Eliminate redundancy
-2. Ensure data dependencies make sense
-3. Reduce anomalies during INSERT, UPDATE, DELETE
+**范式化**是组织数据的过程，旨在：
+1. 消除冗余
+2. 确保数据依赖关系合理
+3. 减少 INSERT、UPDATE、DELETE 期间的数据异常
 
-### Why Normalize?
+### 为什么要范式化？
 
-**Problems with Unnormalized Data:**
+**非范式化数据的问题：**
 
 ```
-experiments_bad table:
+experiments_bad 表：
 ┌────┬───────────┬──────────┬───────────┬──────────┬─────────────┐
 │ id │model_name │ framework│ dataset   │ accuracy │ model_author│
 ├────┼───────────┼──────────┼───────────┼──────────┼─────────────┤
@@ -502,35 +502,35 @@ experiments_bad table:
 └────┴───────────┴──────────┴───────────┴──────────┴─────────────┘
 ```
 
-**Issues:**
+**问题：**
 
-1. **Update Anomaly**: Change BERT's framework requires updating multiple rows
-2. **Insertion Anomaly**: Can't add a model without an experiment
-3. **Deletion Anomaly**: Deleting all ResNet experiments loses model info
-4. **Space Waste**: Duplicate data (BERT-base repeated)
+1. **更新异常**：更改 BERT 的 framework 需要更新多行
+2. **插入异常**：无法添加没有实验的模型
+3. **删除异常**：删除所有 ResNet 实验会丢失模型信息
+4. **空间浪费**：重复数据（BERT-base 重复出现）
 
-### Normalization Forms Overview
+### 范式化形式概述
 
-- **1NF**: Atomic values, no repeating groups
-- **2NF**: 1NF + no partial dependencies
-- **3NF**: 2NF + no transitive dependencies
-- **BCNF**: Stricter version of 3NF
+- **1NF**：原子值，无重复组
+- **2NF**：1NF + 无部分依赖
+- **3NF**：2NF + 无传递依赖
+- **BCNF**：3NF 的更严格版本
 
-## First Normal Form (1NF)
+## 第一范式（1NF）
 
-### Rules
+### 规则
 
-1. Each column contains atomic (indivisible) values
-2. Each column contains values of the same type
-3. Each column has a unique name
-4. Order doesn't matter
+1. 每列包含原子（不可分割）值
+2. 每列包含相同类型的值
+3. 每列有唯一名称
+4. 顺序无关紧要
 
-### Violations
+### 违反示例
 
-**Violation 1: Non-atomic values**
+**违反 1：非原子值**
 
 ```sql
--- ❌ VIOLATES 1NF (tags is a list)
+-- ❌ 违反 1NF（tags 是一个列表）
 CREATE TABLE models_bad (
     model_id INTEGER,
     name VARCHAR(100),
@@ -538,9 +538,9 @@ CREATE TABLE models_bad (
 );
 ```
 
-**Fix:**
+**修复：**
 ```sql
--- ✓ 1NF Compliant
+-- ✓ 符合 1NF
 CREATE TABLE models (
     model_id INTEGER PRIMARY KEY,
     name VARCHAR(100)
@@ -553,10 +553,10 @@ CREATE TABLE model_tags (
 );
 ```
 
-**Violation 2: Repeating groups**
+**违反 2：重复组**
 
 ```sql
--- ❌ VIOLATES 1NF (repeating columns)
+-- ❌ 违反 1NF（重复列）
 CREATE TABLE experiments_bad (
     model_id INTEGER,
     metric1_name VARCHAR(50),
@@ -568,9 +568,9 @@ CREATE TABLE experiments_bad (
 );
 ```
 
-**Fix:**
+**修复：**
 ```sql
--- ✓ 1NF Compliant
+-- ✓ 符合 1NF
 CREATE TABLE experiment_metrics (
     experiment_id INTEGER,
     metric_name VARCHAR(50),
@@ -579,21 +579,21 @@ CREATE TABLE experiment_metrics (
 );
 ```
 
-### 1NF Example
+### 1NF 示例
 
-**Before 1NF:**
+**1NF 之前：**
 ```
 ┌────────┬───────────────┬─────────────────────┐
 │model_id│ name          │ frameworks          │
 ├────────┼───────────────┼─────────────────────┤
-│ 1      │ BERT          │ PyTorch,TensorFlow  │  ← Not atomic
+│ 1      │ BERT          │ PyTorch,TensorFlow  │  ← 非原子
 │ 2      │ ResNet        │ TensorFlow          │
 └────────┴───────────────┴─────────────────────┘
 ```
 
-**After 1NF:**
+**1NF 之后：**
 ```
-models:
+models：
 ┌────────┬───────────┐
 │model_id│ name      │
 ├────────┼───────────┤
@@ -601,7 +601,7 @@ models:
 │ 2      │ ResNet    │
 └────────┴───────────┘
 
-model_frameworks:
+model_frameworks：
 ┌────────┬────────────┐
 │model_id│ framework  │
 ├────────┼────────────┤
@@ -611,60 +611,60 @@ model_frameworks:
 └────────┴────────────┘
 ```
 
-## Second Normal Form (2NF)
+## 第二范式（2NF）
 
-### Rules
+### 规则
 
-1. Must be in 1NF
-2. No **partial dependencies** on composite keys
+1. 必须满足 1NF
+2. 无**部分依赖**于组合键
 
-### What is Partial Dependency?
+### 什么是部分依赖？
 
-When a non-key attribute depends on only part of a composite primary key.
+当一个非键属性仅依赖于组合主键的一部分。
 
-### Example Violation
+### 违反示例
 
 ```sql
--- Composite key: (experiment_id, dataset_id)
+-- 组合键：(experiment_id, dataset_id)
 CREATE TABLE experiment_datasets_bad (
     experiment_id INTEGER,
     dataset_id INTEGER,
-    dataset_name VARCHAR(100),  -- ❌ Depends only on dataset_id
-    dataset_size INTEGER,       -- ❌ Depends only on dataset_id
-    accuracy DECIMAL(5,4),      -- ✓ Depends on both
+    dataset_name VARCHAR(100),  -- ❌ 仅依赖于 dataset_id
+    dataset_size INTEGER,       -- ❌ 仅依赖于 dataset_id
+    accuracy DECIMAL(5,4),      -- ✓ 依赖于两者
     PRIMARY KEY (experiment_id, dataset_id)
 );
 ```
 
-**Problem:** `dataset_name` and `dataset_size` depend only on `dataset_id`, not on the full key.
+**问题：** `dataset_name` 和 `dataset_size` 仅依赖于 `dataset_id`，而不依赖于完整键。
 
-### Fix: Separate Tables
+### 修复：分离表
 
 ```sql
--- ✓ 2NF Compliant
+-- ✓ 符合 2NF
 
--- Datasets (dataset attributes separate)
+-- Datasets（数据集属性单独存放）
 CREATE TABLE datasets (
     dataset_id INTEGER PRIMARY KEY,
     dataset_name VARCHAR(100),
     dataset_size INTEGER
 );
 
--- Experiment-Dataset relationship
+-- Experiment-Dataset 关系
 CREATE TABLE experiment_datasets (
     experiment_id INTEGER,
     dataset_id INTEGER,
-    accuracy DECIMAL(5,4),  -- Depends on both keys
+    accuracy DECIMAL(5,4),  -- 依赖于两个键
     PRIMARY KEY (experiment_id, dataset_id),
     FOREIGN KEY (dataset_id) REFERENCES datasets(dataset_id)
 );
 ```
 
-### 2NF Example
+### 2NF 示例
 
-**Before 2NF:**
+**2NF 之前：**
 ```
-experiment_results (composite key: experiment_id, metric_name):
+experiment_results（组合键：experiment_id, metric_name）：
 ┌──────────────┬─────────────┬──────────────┬─────────┐
 │experiment_id │ metric_name │ metric_type  │ value   │
 ├──────────────┼─────────────┼──────────────┼─────────┤
@@ -672,12 +672,12 @@ experiment_results (composite key: experiment_id, metric_name):
 │ 1            │ f1_score    │ performance  │ 0.88    │
 │ 2            │ accuracy    │ performance  │ 0.90    │
 └──────────────┴─────────────┴──────────────┴─────────┘
-               ↑ metric_type depends only on metric_name (partial dependency)
+                ↑ metric_type 仅依赖于 metric_name（部分依赖）
 ```
 
-**After 2NF:**
+**2NF 之后：**
 ```
-metrics:
+metrics：
 ┌─────────────┬──────────────┐
 │ metric_name │ metric_type  │
 ├─────────────┼──────────────┤
@@ -686,7 +686,7 @@ metrics:
 │ loss        │ training     │
 └─────────────┴──────────────┘
 
-experiment_results:
+experiment_results：
 ┌──────────────┬─────────────┬─────────┐
 │experiment_id │ metric_name │ value   │
 ├──────────────┼─────────────┼─────────┤
@@ -696,44 +696,44 @@ experiment_results:
 └──────────────┴─────────────┴─────────┘
 ```
 
-## Third Normal Form (3NF)
+## 第三范式（3NF）
 
-### Rules
+### 规则
 
-1. Must be in 2NF
-2. No **transitive dependencies**
+1. 必须满足 2NF
+2. 无**传递依赖**
 
-### What is Transitive Dependency?
+### 什么是传递依赖？
 
-When a non-key attribute depends on another non-key attribute.
+当一个非键属性依赖于另一个非键属性。
 
 ```
-A → B → C  (A determines B, B determines C)
-Therefore: A → C transitively
+A → B → C  （A 决定 B，B 决定 C）
+因此：A → C 是传递依赖
 ```
 
-### Example Violation
+### 违反示例
 
 ```sql
--- ❌ Violates 3NF
+-- ❌ 违反 3NF
 CREATE TABLE models_bad (
     model_id INTEGER PRIMARY KEY,
     name VARCHAR(100),
     framework VARCHAR(50),
-    framework_creator VARCHAR(100),  -- ❌ Depends on framework, not model_id
-    framework_year INTEGER           -- ❌ Depends on framework, not model_id
+    framework_creator VARCHAR(100),  -- ❌ 依赖于 framework，而非 model_id
+    framework_year INTEGER           -- ❌ 依赖于 framework，而非 model_id
 );
 
--- Transitive dependency:
+-- 传递依赖：
 -- model_id → framework → framework_creator
 ```
 
-**Problem:** If we change PyTorch's creator, we must update all PyTorch models.
+**问题：** 如果更改 PyTorch 的创建者，必须更新所有 PyTorch 模型。
 
-### Fix: Separate Framework Info
+### 修复：分离框架信息
 
 ```sql
--- ✓ 3NF Compliant
+-- ✓ 符合 3NF
 
 CREATE TABLE frameworks (
     framework_name VARCHAR(50) PRIMARY KEY,
@@ -749,30 +749,30 @@ CREATE TABLE models (
 );
 ```
 
-### 3NF Example
+### 3NF 示例
 
-**Before 3NF:**
+**3NF 之前：**
 ```
-experiments:
+experiments：
 ┌────────────┬──────────┬────────────┬─────────────────┬─────────────┐
 │experiment_id│ model_id │ model_name │ model_framework │ accuracy    │
 ├────────────┼──────────┼────────────┼─────────────────┼─────────────┤
 │ 1          │ 10       │ BERT-base  │ PyTorch         │ 0.92        │
 │ 2          │ 10       │ BERT-base  │ PyTorch         │ 0.93        │
 └────────────┴──────────┴────────────┴─────────────────┴─────────────┘
-            ↑ experiment_id → model_id → model_name (transitive)
+             ↑ experiment_id → model_id → model_name（传递依赖）
 ```
 
-**After 3NF:**
+**3NF 之后：**
 ```
-models:
+models：
 ┌──────────┬────────────┬─────────────────┐
 │ model_id │ model_name │ model_framework │
 ├──────────┼────────────┼─────────────────┤
 │ 10       │ BERT-base  │ PyTorch         │
 └──────────┴────────────┴─────────────────┘
 
-experiments:
+experiments：
 ┌────────────┬──────────┬──────────┐
 │experiment_id│ model_id │ accuracy │
 ├────────────┼──────────┼──────────┤
@@ -781,38 +781,38 @@ experiments:
 └────────────┴──────────┴──────────┘
 ```
 
-## Boyce-Codd Normal Form (BCNF)
+## 巴科斯-科德范式（BCNF）
 
-### Rules
+### 规则
 
-1. Must be in 3NF
-2. For every functional dependency X → Y, X must be a superkey
+1. 必须满足 3NF
+2. 对于每个函数依赖 X → Y，X 必须是超键
 
-**Simplified:** Every determinant must be a candidate key.
+**简化：** 每个决定因素必须是候选键。
 
-### Example (Rare Edge Case)
+### 示例（罕见边缘情况）
 
 ```sql
--- Student-Course-Instructor
--- Rules:
--- - Each student takes one course from one instructor
--- - Each instructor teaches only one course
--- - Multiple instructors can teach the same course
+-- 学生-课程-教师
+-- 规则：
+-- - 每个学生跟随一位教师修读一门课程
+-- - 每位教师只教一门课程
+-- - 多位教师可以教同一门课程
 
 CREATE TABLE enrollment (
     student_id INTEGER,
     course VARCHAR(50),
     instructor VARCHAR(50),
     PRIMARY KEY (student_id, course),
-    -- Functional dependency: instructor → course
-    -- But instructor is not a superkey
-    -- VIOLATES BCNF
+    -- 函数依赖：instructor → course
+    -- 但 instructor 不是超键
+    -- 违反 BCNF
 );
 ```
 
-**Fix:**
+**修复：**
 ```sql
--- Split into two tables
+-- 拆分为两个表
 CREATE TABLE instructors (
     instructor VARCHAR(50) PRIMARY KEY,
     course VARCHAR(50)
@@ -826,26 +826,26 @@ CREATE TABLE enrollment (
 );
 ```
 
-**Note:** BCNF is rarely needed in practice. 3NF is usually sufficient.
+**注意：** BCNF 在实践中很少需要。3NF 通常就足够了。
 
-## Denormalization
+## 反范式化
 
-### What is Denormalization?
+### 什么是反范式化？
 
-Intentionally introducing redundancy to improve read performance.
+有意引入冗余以提高读取性能。
 
-### When to Denormalize?
+### 何时反范式化？
 
-1. **Read-heavy workloads**: More reads than writes
-2. **Performance critical**: Response time matters more than storage
-3. **Complex joins**: Queries join many tables
-4. **Reporting/Analytics**: Pre-computed aggregates
+1. **读密集型工作负载**：读取多于写入
+2. **性能关键**：响应时间比存储更重要
+3. **复杂连接**：查询连接多个表
+4. **报表/分析**：预计算聚合
 
-### Example: Prediction Logging
+### 示例：预测日志记录
 
-**Normalized (3NF):**
+**范式化（3NF）：**
 ```sql
--- Fast writes, slow reads
+-- 写入快，读取慢
 CREATE TABLE predictions (
     prediction_id BIGINT PRIMARY KEY,
     model_id INTEGER,
@@ -856,7 +856,7 @@ CREATE TABLE predictions (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
--- Query requires joins
+-- 查询需要连接
 SELECT p.prediction, m.name, u.username
 FROM predictions p
 JOIN models m ON p.model_id = m.model_id
@@ -864,36 +864,36 @@ JOIN users u ON p.user_id = u.user_id
 WHERE p.created_at > '2024-10-01';
 ```
 
-**Denormalized (for reads):**
+**反范式化（用于读取）：**
 ```sql
--- Duplicate model_name and username for faster queries
+-- 重复 model_name 和 username 以加快查询
 CREATE TABLE predictions_denorm (
     prediction_id BIGINT PRIMARY KEY,
     model_id INTEGER,
-    model_name VARCHAR(100),     -- ← Redundant (from models table)
+    model_name VARCHAR(100),     -- ← 冗余（来自 models 表）
     user_id INTEGER,
-    username VARCHAR(50),        -- ← Redundant (from users table)
+    username VARCHAR(50),        -- ← 冗余（来自 users 表）
     prediction TEXT,
     created_at TIMESTAMP
 );
 
--- No joins needed!
+-- 无需连接！
 SELECT prediction, model_name, username
 FROM predictions_denorm
 WHERE created_at > '2024-10-01';
 ```
 
-**Tradeoffs:**
-- ✅ **Faster reads** (no joins)
-- ✅ **Simpler queries**
-- ❌ **More storage** (duplicate data)
-- ❌ **Update complexity** (must update multiple places)
-- ❌ **Data inconsistency risk**
+**权衡：**
+- ✅ **读取更快**（无需连接）
+- ✅ **查询更简单**
+- ❌ **存储更多**（重复数据）
+- ❌ **更新复杂性**（必须更新多个位置）
+- ❌ **数据不一致风险**
 
-### Materialized Views (Better Alternative)
+### 物化视图（更好的替代方案）
 
 ```sql
--- PostgreSQL materialized view
+-- PostgreSQL 物化视图
 CREATE MATERIALIZED VIEW prediction_summary AS
 SELECT
     p.prediction_id,
@@ -905,25 +905,25 @@ FROM predictions p
 JOIN models m ON p.model_id = m.model_id
 JOIN users u ON p.user_id = u.user_id;
 
--- Refresh periodically
+-- 定期刷新
 REFRESH MATERIALIZED VIEW prediction_summary;
 
--- Query is fast
+-- 查询快速
 SELECT * FROM prediction_summary
 WHERE created_at > '2024-10-01';
 ```
 
-**Benefits:**
-- Original tables stay normalized
-- View is denormalized for performance
-- Automatic updates (can be scheduled)
+**优势：**
+- 原始表保持范式化
+- 视图为性能而反范式化
+- 自动更新（可定时）
 
-## Designing ML Database Schemas
+## 设计 ML 数据库 Schema
 
-### Use Case 1: ML Model Registry
+### 使用场景 1：ML 模型注册
 
 ```sql
--- Core tables
+-- 核心表
 CREATE TABLE models (
     model_id SERIAL PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL,
@@ -960,7 +960,7 @@ CREATE TABLE model_metrics (
 );
 ```
 
-### Use Case 2: Experiment Tracking
+### 使用场景 2：实验跟踪
 
 ```sql
 CREATE TABLE experiments (
@@ -995,7 +995,7 @@ CREATE TABLE experiment_results (
 );
 ```
 
-### Use Case 3: Dataset Management
+### 使用场景 3：数据集管理
 
 ```sql
 CREATE TABLE datasets (
@@ -1028,9 +1028,9 @@ CREATE TABLE dataset_features (
 );
 ```
 
-## Schema Migration Strategies
+## Schema 迁移策略
 
-### 1. Version Control Your Schema
+### 1. 版本控制你的 Schema
 
 ```sql
 -- migrations/001_create_models_table.sql
@@ -1048,9 +1048,9 @@ ALTER TABLE models
 ADD COLUMN accuracy DECIMAL(5,4);
 ```
 
-### 2. Use Migration Tools
+### 2. 使用迁移工具
 
-**Alembic (Python):**
+**Alembic（Python）：**
 ```python
 # alembic/versions/001_create_models.py
 def upgrade():
@@ -1064,7 +1064,7 @@ def downgrade():
     op.drop_table('models')
 ```
 
-**Flyway (Java):**
+**Flyway（Java）：**
 ```sql
 -- V1__create_models_table.sql
 CREATE TABLE models (
@@ -1073,164 +1073,164 @@ CREATE TABLE models (
 );
 ```
 
-### 3. Safe Migration Practices
+### 3. 安全迁移实践
 
 ```sql
--- ❌ DANGEROUS: Can't roll back
+-- ❌ 危险：无法回滚
 ALTER TABLE models DROP COLUMN old_column;
 
--- ✓ SAFER: Multi-step migration
--- Step 1: Add new column
+-- ✓ 更安全：多步迁移
+-- 步骤 1：添加新列
 ALTER TABLE models ADD COLUMN new_column VARCHAR(100);
 
--- Step 2: Migrate data
+-- 步骤 2：迁移数据
 UPDATE models SET new_column = old_column;
 
--- Step 3: (Later) Drop old column
+-- 步骤 3：（稍后）删除旧列
 -- ALTER TABLE models DROP COLUMN old_column;
 ```
 
-### 4. Zero-Downtime Migrations
+### 4. 零停机迁移
 
 ```sql
--- Add column with default (instant in most databases)
+-- 添加带默认值的列（大多数数据库即时完成）
 ALTER TABLE models
 ADD COLUMN status VARCHAR(20) DEFAULT 'active';
 
--- Create index concurrently (PostgreSQL)
+-- 并发创建索引（PostgreSQL）
 CREATE INDEX CONCURRENTLY idx_models_status ON models(status);
 
--- Add foreign key with NOT VALID (PostgreSQL)
+-- 添加带有 NOT VALID 的外键（PostgreSQL）
 ALTER TABLE experiments
 ADD CONSTRAINT fk_model
 FOREIGN KEY (model_id) REFERENCES models(model_id)
 NOT VALID;
 
--- Validate later (can be done during low traffic)
+-- 稍后验证（可在低流量时进行）
 ALTER TABLE experiments
 VALIDATE CONSTRAINT fk_model;
 ```
 
-## Best Practices
+## 最佳实践
 
-### 1. Name Things Clearly
+### 1. 清晰命名
 
 ```sql
--- GOOD
+-- 好
 CREATE TABLE models (...);
 CREATE TABLE model_versions (...);
 CREATE TABLE experiment_results (...);
 
--- AVOID
+-- 避免
 CREATE TABLE tbl1 (...);
 CREATE TABLE data (...);
 CREATE TABLE temp_stuff (...);
 ```
 
-### 2. Use Appropriate Data Types
+### 2. 使用适当的数据类型
 
 ```sql
--- GOOD
-model_id BIGINT           -- Can handle billions of records
-accuracy DECIMAL(5,4)     -- Precise: 0.9234
-created_at TIMESTAMP      -- Date and time
-is_active BOOLEAN         -- True/False
+-- 好
+model_id BIGINT           -- 可处理数十亿条记录
+accuracy DECIMAL(5,4)     -- 精确：0.9234
+created_at TIMESTAMP      -- 日期和时间
+is_active BOOLEAN         -- 真/假
 
--- AVOID
-model_id VARCHAR(50)      -- Waste of space, slower
-accuracy VARCHAR(10)      -- Can't do math operations
-created_at VARCHAR(50)    -- Can't do date operations
-is_active VARCHAR(5)      -- 'true' vs TRUE vs 1 confusion
+-- 避免
+model_id VARCHAR(50)      -- 浪费空间，更慢
+accuracy VARCHAR(10)      -- 无法进行数学运算
+created_at VARCHAR(50)    -- 无法进行日期运算
+is_active VARCHAR(5)      -- 'true' vs TRUE vs 1 混淆
 ```
 
-### 3. Document Your Schema
+### 3. 记录你的 Schema
 
 ```sql
--- Add comments
-COMMENT ON TABLE models IS 'Registry of all ML models';
-COMMENT ON COLUMN models.accuracy IS 'Model accuracy on test set (0-1)';
+-- 添加注释
+COMMENT ON TABLE models IS '所有 ML 模型的注册表';
+COMMENT ON COLUMN models.accuracy IS '模型在测试集上的准确率（0-1）';
 
--- Or in migration files
--- Migration: Add model versioning
--- Purpose: Track multiple versions of the same model
--- Author: Alice
--- Date: 2024-10-18
+-- 或者在迁移文件中
+-- 迁移：添加模型版本控制
+-- 目的：跟踪同一模型的多个版本
+-- 作者：Alice
+-- 日期：2024-10-18
 ```
 
-### 4. Plan for Auditing
+### 4. 规划审计功能
 
 ```sql
 CREATE TABLE models (
     model_id SERIAL PRIMARY KEY,
     name VARCHAR(100),
-    created_by INTEGER,           -- Who created?
-    created_at TIMESTAMP,         -- When created?
-    updated_by INTEGER,           -- Who last updated?
-    updated_at TIMESTAMP,         -- When last updated?
-    deleted_at TIMESTAMP          -- Soft delete (NULL = not deleted)
+    created_by INTEGER,           -- 谁创建的？
+    created_at TIMESTAMP,         -- 何时创建？
+    updated_by INTEGER,           -- 最后更新者？
+    updated_at TIMESTAMP,         -- 最后更新时间？
+    deleted_at TIMESTAMP          -- 软删除（NULL = 未删除）
 );
 ```
 
-### 5. Index Strategic Columns
+### 5. 为策略性列建立索引
 
 ```sql
--- Index foreign keys
+-- 为外键建立索引
 CREATE INDEX idx_experiments_model_id ON experiments(model_id);
 
--- Index frequently queried columns
+-- 为频繁查询的列建立索引
 CREATE INDEX idx_models_framework ON models(framework);
 CREATE INDEX idx_predictions_created_at ON predictions(created_at);
 
--- Composite index for common query pattern
+-- 为常见查询模式的复合索引
 CREATE INDEX idx_models_status_accuracy ON models(status, accuracy);
 ```
 
-## Summary and Key Takeaways
+## 总结与关键要点
 
-### Core Concepts
+### 核心概念
 
-1. **ER Diagrams** visually represent database structure
-2. **Relationships** connect entities (1:1, 1:N, M:N)
-3. **Normalization** reduces redundancy and anomalies
-4. **Denormalization** trades redundancy for performance
+1. **ER 图**直观表示数据库结构
+2. **关系**连接实体（1:1、1:N、M:N）
+3. **范式化**减少冗余和异常
+4. **反范式化**用冗余换取性能
 
-### Normalization Forms
+### 范式化形式
 
-| Form | Rule | Purpose |
+| 形式 | 规则 | 目的 |
 |------|------|---------|
-| 1NF  | Atomic values | No repeating groups |
-| 2NF  | No partial dependencies | Depends on full key |
-| 3NF  | No transitive dependencies | Non-keys don't depend on non-keys |
-| BCNF | Determinants are keys | Stricter 3NF |
+| 1NF  | 原子值 | 无重复组 |
+| 2NF  | 无部分依赖 | 依赖于完整键 |
+| 3NF  | 无传递依赖 | 非键不依赖于非键 |
+| BCNF | 决定因素必须是键 | 更严格的 3NF |
 
-### Design Principles
+### 设计原则
 
-1. **Start normalized** (3NF)
-2. **Denormalize only when needed** (with evidence)
-3. **Use foreign keys** for referential integrity
-4. **Index strategically** for query performance
-5. **Version control** your schema
-6. **Plan migrations** carefully
+1. **从范式化开始**（3NF）
+2. **仅在需要时反范式化**（有证据支持）
+3. **使用外键**维护引用完整性
+4. **策略性地使用索引**以提高查询性能
+5. **版本控制**你的 schema
+6. **仔细规划**迁移
 
-### ML-Specific Patterns
+### ML 特定模式
 
-- **Model Registry**: Models + Versions + Metrics
-- **Experiment Tracking**: Experiments + Hyperparameters + Results
-- **Dataset Management**: Datasets + Splits + Features
-- **Prediction Logging**: Predictions + Models + Users
+- **模型注册**：模型 + 版本 + 指标
+- **实验跟踪**：实验 + 超参数 + 结果
+- **数据集管理**：数据集 + 拆分 + 特征
+- **预测日志记录**：预测 + 模型 + 用户
 
-### Next Steps
+### 后续步骤
 
-In the next lecture, we'll cover:
-- Advanced SQL queries (JOINs, subqueries, CTEs)
-- Aggregations and GROUP BY
-- Window functions
-- Query optimization techniques
-- Indexing strategies
-- Query execution plans
+在下一讲中，我们将涵盖：
+- 高级 SQL 查询（JOIN、子查询、CTE）
+- 聚合与 GROUP BY
+- 窗口函数
+- 查询优化技术
+- 索引策略
+- 查询执行计划
 
 ---
 
-**Estimated Study Time:** 4-5 hours
-**Hands-on Practice:** Complete Exercise 02: Database Design
-**Assessment:** Quiz questions cover ER diagrams and normalization
+**预计学习时间：** 4-5 小时
+**动手练习：** 完成练习 02：数据库设计
+**评估：** 测验问题涵盖 ER 图和范式

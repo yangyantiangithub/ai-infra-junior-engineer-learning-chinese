@@ -1,111 +1,103 @@
-# Exercise 01: Linux Navigation and File System Mastery
+# 练习 01：Linux 导航和文件系统掌握
 
-## Overview
+## 概述
 
-This exercise builds practical skills in Linux file system navigation, file operations, and directory management. You'll create a complete ML project structure, navigate efficiently, and manage files like a professional AI infrastructure engineer.
+本练习旨在建立 Linux 文件系统导航、文件操作和目录管理的实用技能。你将创建一个完整的 ML 项目结构，高效地导航，并像专业 AI 基础设施工程师一样管理文件。
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
-- Navigate the Linux file system confidently using cd, ls, pwd
-- Create directory structures for ML projects
-- Perform file operations (copy, move, delete) safely
-- Use find and locate to search for files
-- Create and manage symbolic links
-- Apply best practices for ML project organization
+完成本练习后，你将能够：
+- 使用 cd、ls、pwd 自信地导航 Linux 文件系统
+- 为 ML 项目创建目录结构
+- 安全地执行文件操作（复制、移动、删除）
+- 使用 find 和 locate 搜索文件
+- 创建和管理符号链接
+- 应用 ML 项目组织的最佳实践
 
-## Prerequisites
+## 先决条件
 
-- Completed Lecture 01: Introduction to Linux and Command Line
-- Completed Lecture 02: File System and Navigation
-- Access to a Linux system (VM, WSL, or cloud instance)
-- Terminal emulator
-- At least 1GB free disk space
+- 已完成讲座 01：Linux 和命令行简介
+- 已完成讲座 02：文件系统和导航
+- 可访问 Linux 系统（VM、WSL 或云实例）
+- 终端模拟器
+- 至少 1GB 可用磁盘空间
 
-## Time Required
+## 所需时间
 
-- Estimated: 60-90 minutes
-- Difficulty: Beginner
+- 预计：60-90 分钟
+- 难度：初级
 
-## Part 1: Setup and Environment Exploration
+## 第 1 部分：设置和环境探索
 
-### Step 1: Verify Your Environment
+### 步骤 1：验证你的环境
 
 ```bash
-# Check your current location
+# 检查当前位置
 pwd
 
-# List your home directory contents
+# 列出主目录内容
 ls -la ~
 
-# Check available disk space
+# 检查可用磁盘空间
 df -h ~
 
-# Verify you have necessary permissions
+# 验证你有必要的权限
 touch /tmp/test_file && rm /tmp/test_file && echo "Permissions OK" || echo "Permission issue"
 ```
 
-**Expected Output**:
-- Current working directory path
-- List of files in home directory
-- Available disk space
-- "Permissions OK" message
+**预期输出**：
+- 当前工作目录路径
+- 主目录中的文件列表
+- 可用磁盘空间
+- "Permissions OK" 消息
 
-**Validation**:
-- [ ] pwd shows your current directory
-- [ ] ls shows files and hidden files (starting with .)
-- [ ] df shows at least 1GB free space
-- [ ] Permission test succeeds
+**验证**：
+- [ ] pwd 显示当前目录
+- [ ] ls 显示文件和隐藏文件（以 . 开头）
+- [ ] df 显示至少 1GB 可用空间
+- [ ] 权限测试成功
 
-### Step 2: Explore the File System
+### 步骤 2：探索文件系统
 
 ```bash
-# View the root directory structure
+# 查看根目录结构
 ls -l /
 
-# Explore common directories
-ls -l /etc       # Configuration files
-ls -l /var/log   # Log files
-ls -l /usr/bin   # User binaries
-ls -l /opt       # Optional software
+# 探索常用目录
+ls -l /etc       # 配置文件
+ls -l /var/log   # 日志文件
+ls -l /usr/bin   # 用户二进制文件
+ls -l /opt       # 可选软件
 
-# Find your home directory in the hierarchy
+# 在层级中找到你的主目录
 cd ~
 pwd
 echo $HOME
 ```
 
-**Questions to Answer**:
-1. What is the full path to your home directory?
-2. How many directories are in the root (/) directory?
-3. What user owns the files in /etc?
-4. What is the total size of /var/log?
+**要回答的问题**：
+1. 你的主目录的完整路径是什么？
+2. 根（/）目录中有多少个目录？
+3. /etc 中的文件由哪个用户拥有？
+4. /var/log 的总大小是多少？
 
-**Answers** (record in notebook):
-```
-1. Home directory: _______________
-2. Number of root directories: ___
-3. Owner of /etc files: __________
-4. Size of /var/log: ______________
-```
+## 第 2 部分：创建 ML 项目结构
 
-## Part 2: Creating ML Project Structure
+### 步骤 3：构建标准 ML 项目布局
 
-### Step 3: Build Standard ML Project Layout
-
-Create a professional ML project structure:
+创建一个专业的 ML 项目结构：
 
 ```bash
-# Navigate to home directory
+# 导航到主目录
 cd ~
 
-# Create project root
+# 创建项目根目录
 mkdir -p projects/ml-image-classifier
 
-# Navigate into project
+# 进入项目
 cd projects/ml-image-classifier
 
-# Create complete directory structure
+# 创建完整目录结构
 mkdir -p data/{raw,processed,external}
 mkdir -p models/{checkpoints,final,experiments}
 mkdir -p notebooks
@@ -116,13 +108,13 @@ mkdir -p configs
 mkdir -p scripts
 mkdir -p docs
 
-# Verify structure
+# 验证结构
 tree -L 2
-# or if tree not installed:
+# 或如果 tree 未安装：
 find . -type d | sort
 ```
 
-**Expected Structure**:
+**预期结构**：
 ```
 ml-image-classifier/
 ├── configs/
@@ -147,30 +139,16 @@ ml-image-classifier/
 └── tests/
 ```
 
-**Validation**:
-```bash
-# Count directories created
-find . -type d | wc -l
-# Should be 19 (including root directory)
-
-# Verify specific directories exist
-test -d data/raw && echo "✓ data/raw exists" || echo "✗ Missing data/raw"
-test -d src/training && echo "✓ src/training exists" || echo "✗ Missing src/training"
-test -d models/checkpoints && echo "✓ models/checkpoints exists" || echo "✗ Missing"
-```
-
-**Checkpoint**: You should have 18 subdirectories plus the root directory.
-
-### Step 4: Create Project Files
+### 步骤 4：创建项目文件
 
 ```bash
-# Create README files
+# 创建 README 文件
 echo "# ML Image Classifier Project" > README.md
 echo "Raw dataset storage - immutable" > data/raw/README.md
 echo "Processed datasets ready for training" > data/processed/README.md
 echo "Training checkpoints - autosaved during training" > models/checkpoints/README.md
 
-# Create Python package markers
+# 创建 Python 包标记
 touch src/__init__.py
 touch src/data/__init__.py
 touch src/models/__init__.py
@@ -178,7 +156,7 @@ touch src/training/__init__.py
 touch src/evaluation/__init__.py
 touch src/utils/__init__.py
 
-# Create configuration files
+# 创建配置文件
 cat > configs/default.yaml << 'EOF'
 # Default configuration
 model:
@@ -197,7 +175,7 @@ data:
   test_path: data/processed/test
 EOF
 
-# Create .gitignore
+# 创建 .gitignore
 cat > .gitignore << 'EOF'
 # Python
 __pycache__/
@@ -231,13 +209,13 @@ logs/*.log
 *.swp
 EOF
 
-# Create placeholder files
+# 创建占位文件
 touch data/raw/.gitkeep
 touch data/processed/.gitkeep
 touch models/checkpoints/.gitkeep
 touch logs/.gitkeep
 
-# Create requirements.txt
+# 创建 requirements.txt
 cat > requirements.txt << 'EOF'
 numpy==1.24.3
 pandas==2.0.3
@@ -249,146 +227,40 @@ tqdm==4.66.1
 EOF
 ```
 
-**Validation**:
-```bash
-# Verify files created
-ls -1
-# README.md, configs/, data/, docs/, etc.
+## 第 3 部分：导航练习
 
-# Count all files (not directories)
-find . -type f | wc -l
-# Should be at least 15 files
+### 步骤 5：高效导航
 
-# Verify specific files
-test -f README.md && echo "✓ README.md exists"
-test -f configs/default.yaml && echo "✓ Config exists"
-test -f requirements.txt && echo "✓ Requirements exists"
-test -f .gitignore && echo "✓ .gitignore exists"
-```
-
-## Part 3: Navigation Practice
-
-### Step 5: Efficient Navigation
-
-Practice moving around your project structure efficiently.
+练习在你的项目结构中高效移动。
 
 ```bash
-# Return to project root
+# 返回项目根目录
 cd ~/projects/ml-image-classifier
 
-# Navigate to specific directories using absolute paths
+# 使用绝对路径导航到特定目录
 cd /home/$USER/projects/ml-image-classifier/src/training
 pwd
 
-# Navigate using relative paths
+# 使用相对路径导航
 cd ../../data/raw
 pwd
 
-# Use shortcuts
-cd ~                    # Home directory
-cd -                    # Previous directory (toggle)
-cd ../processed         # Parent, then sibling
-cd ../../..             # Up 3 levels
-
-# Practice navigation challenge:
-cd ~/projects/ml-image-classifier
-cd notebooks
-cd ../src/models
-cd ../../configs
-cd ../logs
-pwd                     # Should be in logs/
+# 使用快捷方式
+cd ~                    # 主目录
+cd -                    # 上一个目录（切换）
+cd ../processed         # 父目录，然后同级别
+cd ../../..             # 上 3 级
 ```
 
-**Navigation Quiz**:
+## 第 4 部分：文件操作
 
-Starting from `~/projects/ml-image-classifier/src/training/`:
-
-1. Navigate to `data/raw` using relative path:
-   ```bash
-   cd _______________
-   ```
-
-2. Navigate to `models/final` using relative path:
-   ```bash
-   cd _______________
-   ```
-
-3. Return to project root using absolute path:
-   ```bash
-   cd _______________
-   ```
-
-**Answers**:
-```bash
-1. cd ../../data/raw
-2. cd ../../models/final  (from data/raw)
-3. cd ~/projects/ml-image-classifier
-```
-
-### Step 6: Advanced Listing
-
-Master the `ls` command with various options:
+### 步骤 6：复制和移动文件
 
 ```bash
-# Return to project root
+# 返回项目根目录
 cd ~/projects/ml-image-classifier
 
-# List all files including hidden
-ls -la
-
-# List with human-readable sizes
-ls -lh
-
-# List sorted by modification time (newest first)
-ls -lt
-
-# List sorted by size (largest first)
-ls -lhS
-
-# Recursive list of all files
-ls -R
-
-# List only directories
-ls -d */
-
-# List with file type indicators
-ls -F
-# / = directory, * = executable, @ = link
-
-# Combine options
-ls -lhSr               # Long, human-readable, by size, reversed
-
-# Practice: Find the largest file in your project
-find . -type f -exec ls -lh {} \; | sort -k5 -hr | head -5
-```
-
-**Validation Tasks**:
-1. List all `.yaml` files:
-   ```bash
-   ls **/*.yaml
-   # or
-   find . -name "*.yaml"
-   ```
-
-2. List all Python files with details:
-   ```bash
-   ls -lh **/*.py
-   ```
-
-3. Count total files in project:
-   ```bash
-   find . -type f | wc -l
-   ```
-
-## Part 4: File Operations
-
-### Step 7: Copying and Moving Files
-
-```bash
-# Return to project root
-cd ~/projects/ml-image-classifier
-
-# Create sample training script
+# 创建示例训练脚本
 cat > src/training/train.py << 'EOF'
 #!/usr/bin/env python3
 """Training script for ML model"""
@@ -405,217 +277,87 @@ if __name__ == "__main__":
     main()
 EOF
 
-# Make it executable
+# 使其可执行
 chmod +x src/training/train.py
 
-# Copy configuration for experiments
+# 复制配置用于实验
 cp configs/default.yaml configs/experiment_001.yaml
-
-# Modify experiment config
+cp configs/experiment_001.yaml configs/experiment_002.yaml
 sed -i 's/resnet50/vgg16/' configs/experiment_001.yaml
 sed -i 's/epochs: 100/epochs: 50/' configs/experiment_001.yaml
-
-# Create more experiment configs
-cp configs/experiment_001.yaml configs/experiment_002.yaml
-sed -i 's/vgg16/inception_v3/' configs/experiment_002.yaml
-
-# Copy training script for different experiment
-cp src/training/train.py src/training/train_distributed.py
-
-# Move to scripts directory for deployment
-cp src/training/train.py scripts/deploy_training.py
-
-# Backup configuration
-mkdir -p configs/backups
-cp configs/*.yaml configs/backups/
-
-# Create versioned backup
-cp configs/default.yaml configs/backups/default_$(date +%Y%m%d).yaml
 ```
 
-**Validation**:
-```bash
-# Verify copies
-ls -l configs/
-ls -l configs/backups/
-ls -l src/training/
-ls -l scripts/
-
-# Count config files
-ls configs/*.yaml | wc -l
-# Should be 3 (default, experiment_001, experiment_002)
-
-# Verify experiment configs are different
-diff configs/default.yaml configs/experiment_001.yaml
-```
-
-### Step 8: Safe Deletion
+### 步骤 7：安全删除
 
 ```bash
-# Create temporary files for practice
+# 创建用于练习的临时文件
 mkdir -p /tmp/ml-practice
 cd /tmp/ml-practice
 
-# Create test files
+# 创建测试文件
 touch file1.txt file2.txt file3.log
 mkdir test_dir
 touch test_dir/nested.txt
 
-# Safe deletion with confirmation
+# 带确认的安全删除
 rm -i file1.txt
-# Prompts: remove regular empty file 'file1.txt'? y
+# 提示：remove regular empty file 'file1.txt'? y
 
-# Delete files by pattern
+# 按模式删除文件
 rm *.log
 
-# Delete directory and contents
+# 删除目录及其内容
 rm -r test_dir
-
-# PRACTICE SAFE DELETION IN YOUR PROJECT
-cd ~/projects/ml-image-classifier
-
-# Create temporary experiment
-mkdir -p models/experiments/failed_experiment_001
-touch models/experiments/failed_experiment_001/model.h5
-
-# Verify before deleting
-ls -R models/experiments/
-
-# Delete failed experiment
-rm -rf models/experiments/failed_experiment_001
-
-# Verify deletion
-ls models/experiments/
 ```
 
-**Safety Exercise**:
-```bash
-# Create a "recycle bin" instead of direct deletion
-mkdir -p ~/.trash
+## 第 5 部分：查找文件
 
-# Create alias for safer deletion
-alias trash='mv --target-directory=$HOME/.trash'
-
-# Use trash instead of rm
-cd ~/projects/ml-image-classifier
-touch temp_file.txt
-trash temp_file.txt
-
-# Verify it's in trash
-ls ~/.trash/
-
-# Restore if needed
-mv ~/.trash/temp_file.txt .
-
-# Periodically clean trash
-find ~/.trash -mtime +30 -delete
-```
-
-## Part 5: Finding Files
-
-### Step 9: Using find
+### 步骤 8：使用 find
 
 ```bash
 cd ~/projects/ml-image-classifier
 
-# Find all Python files
+# 查找所有 Python 文件
 find . -name "*.py"
 
-# Find all YAML files
+# 查找所有 YAML 文件
 find . -name "*.yaml"
 
-# Find all README files
-find . -name "README.md"
-
-# Find empty directories
+# 查找空目录
 find . -type d -empty
 
-# Find files modified in last day
+# 查找最近一天内修改的文件
 find . -type f -mtime -1
 
-# Find large files (>1MB)
+# 查找大文件（>1MB）
 find . -type f -size +1M
 
-# Find and execute command
-find . -name "*.py" -exec wc -l {} \;
-
-# Find Python files and count lines
-find . -name "*.py" -exec cat {} \; | wc -l
-
-# Find and delete __pycache__ directories
+# 查找并删除 __pycache__ 目录
 find . -type d -name "__pycache__" -exec rm -rf {} +
-
-# Find files with specific permissions
-find . -type f -perm 644
 ```
 
-**Practice Tasks**:
-
-1. Find all `.md` files and list with sizes:
-   ```bash
-   find . -name "*.md" -exec ls -lh {} \;
-   ```
-
-2. Find all files in `src/` directory:
-   ```bash
-   find src/ -type f
-   ```
-
-3. Count total Python files:
-   ```bash
-   find . -name "*.py" -type f | wc -l
-   ```
-
-### Step 10: Working with Links
+### 步骤 9：使用链接
 
 ```bash
 cd ~/projects/ml-image-classifier
 
-# Create symlink to current best model (initially empty)
+# 创建指向当前最佳模型的符号链接
 ln -s models/final/resnet50_best.h5 current_model.h5
 
-# Create symlink to data directory for quick access
+# 创建指向数据目录的符号链接以便快速访问
 ln -s data/processed ~/ml-data
 
-# Create symlink to configs
-ln -s ~/projects/ml-image-classifier/configs ~/ml-configs
-
-# Verify links
+# 验证链接
 ls -l current_model.h5
 ls -l ~/ml-data
-ls -l ~/ml-configs
 
-# Test link functionality
-ls ~/ml-data/
-# Should show contents of data/processed/
-
-# Update link to point to new model
-rm current_model.h5
-ln -s models/final/vgg16_best.h5 current_model.h5
-
-# Create link to latest experiment config
-ln -s configs/experiment_002.yaml latest_config.yaml
-
-# List all symbolic links in project
+# 列出项目中所有符号链接
 find . -type l -ls
 ```
 
-**Validation**:
-```bash
-# Verify links work
-test -L current_model.h5 && echo "✓ current_model.h5 is a link"
-test -L ~/ml-data && echo "✓ ~/ml-data is a link"
+## 第 6 部分：高级挑战
 
-# Show link targets
-readlink current_model.h5
-readlink ~/ml-data
-```
-
-## Part 6: Advanced Challenges
-
-### Challenge 1: Project Statistics
-
-Write a script to gather project statistics:
+### 挑战 1：项目统计
 
 ```bash
 cat > scripts/project_stats.sh << 'EOF'
@@ -638,9 +380,7 @@ chmod +x scripts/project_stats.sh
 ./scripts/project_stats.sh
 ```
 
-### Challenge 2: Backup Script
-
-Create a backup script:
+### 挑战 2：备份脚本
 
 ```bash
 cat > scripts/backup_project.sh << 'EOF'
@@ -673,9 +413,7 @@ chmod +x scripts/backup_project.sh
 ./scripts/backup_project.sh
 ```
 
-### Challenge 3: Cleanup Script
-
-Create a cleanup script for temporary files:
+### 挑战 3：清理脚本
 
 ```bash
 cat > scripts/cleanup.sh << 'EOF'
@@ -708,92 +446,48 @@ chmod +x scripts/cleanup.sh
 ./scripts/cleanup.sh
 ```
 
-## Final Validation
-
-### Verification Checklist
-
-Run these commands to verify your work:
+## 最终验证
 
 ```bash
 cd ~/projects/ml-image-classifier
 
-# 1. Check directory structure
+# 1. 检查目录结构
 echo "=== Directory Structure ==="
 tree -L 2 || find . -type d | sort
 
-# 2. Check file count
+# 2. 检查文件统计
 echo "=== File Statistics ==="
 echo "Total files: $(find . -type f | wc -l)"
 echo "Python files: $(find . -name "*.py" | wc -l)"
 echo "Config files: $(find . -name "*.yaml" | wc -l)"
 
-# 3. Check scripts are executable
+# 3. 检查脚本是否可执行
 echo "=== Executable Scripts ==="
 ls -l scripts/*.sh
 
-# 4. Check symlinks
+# 4. 检查符号链接
 echo "=== Symbolic Links ==="
 find . -type l -ls
 
-# 5. Verify backups
+# 5. 验证备份
 echo "=== Backups ==="
 ls -lh ~/backups/
 
-# 6. Test navigation
+# 6. 测试导航
 echo "=== Navigation Test ==="
 cd src/training && echo "✓ Can access src/training"
 cd ../../data/raw && echo "✓ Can access data/raw"
 cd ~/projects/ml-image-classifier && echo "✓ Returned to root"
 ```
 
-**Expected Results**:
-- [ ] 18+ subdirectories created
-- [ ] 15+ files created
-- [ ] 3+ scripts executable
-- [ ] 2+ symbolic links created
-- [ ] 1+ backup created
-- [ ] All navigation tests pass
-
-## Troubleshooting
-
-**Problem**: Permission denied when creating directories
-- **Solution**: Check you're in your home directory: `cd ~`
-- Verify permissions: `ls -ld ~/projects`
-
-**Problem**: tree command not found
-- **Solution**: Install tree: `sudo apt install tree` or use `find` alternative
-
-**Problem**: Symlink broken
-- **Solution**: Check target exists: `ls -l symlink_name`
-- Recreate with correct path: `ln -sf /correct/path linkname`
-
-**Problem**: Can't find created files
-- **Solution**: Verify you're in correct directory: `pwd`
-- List all files including hidden: `ls -la`
-
-## Reflection Questions
-
-1. Why is a consistent directory structure important for ML projects?
-2. When would you use absolute vs relative paths?
-3. What's the advantage of using symlinks for dataset paths?
-4. How do you safely delete files you might need later?
-5. What's the benefit of creating backup scripts?
-
-## Next Steps
-
-After completing this exercise:
-- **Exercise 02**: File Permissions - Learn to secure your ML project
-- **Exercise 03**: Process Management - Monitor training jobs
-- **Exercise 04**: Shell Scripting - Automate ML workflows
-
-## Additional Practice
-
-1. Create a second ML project with different structure
-2. Write a script to compare two directory structures
-3. Create a script to find and archive old experiment results
-4. Set up a watch script to monitor file changes
-5. Create a template generator script for new projects
+**预期结果**：
+- [ ] 创建了 18+ 个子目录
+- [ ] 创建了 15+ 个文件
+- [ ] 3+ 个可执行脚本
+- [ ] 创建了 2+ 个符号链接
+- [ ] 创建了 1+ 个备份
+- [ ] 所有导航测试通过
 
 ---
 
-**Congratulations!** You've mastered Linux navigation and file management for ML projects. These skills form the foundation for all your infrastructure work.
+**恭喜！** 你已经掌握了 ML 项目的 Linux 导航和文件管理。这些技能是你所有基础设施工作的基础。

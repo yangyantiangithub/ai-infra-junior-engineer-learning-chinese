@@ -1,19 +1,19 @@
-# Load Testing — Project 02
+# 负载测试 — Project 02
 
-This directory contains the load-test plan for the Model API. The goal of each test is to surface a specific characteristic of the deployment, not just to "send lots of requests."
+本目录包含 Model API 的负载测试计划。每个测试的目标是发现部署的特定特征，而不仅仅是"发送大量请求"。
 
-## Test plans
+## 测试计划
 
-| Plan | Users | Duration | Goal |
+| 计划 | 用户数 | 时长 | 目标 |
 |---|---|---|---|
-| **Smoke** | 5 | 1 min | Confirm the deployment responds and basic endpoints work |
-| **Ramp** | 0 → 200 over 3 min, hold 5 min | 8 min | Find the comfortable steady-state RPS and identify when latency degrades |
-| **Soak** | 100 | 60 min | Catch memory leaks, GC pauses, slow log accumulation |
-| **Spike** | 50 → 500 in 30s, hold 2 min | 3 min | Validate HPA reacts and there's no cascading failure |
+| **冒烟测试** | 5 | 1 分钟 | 确认部署响应且基本端点正常工作 |
+| **爬坡测试** | 3 分钟内从 0 到 200，保持 5 分钟 | 8 分钟 | 找到舒适的稳态 RPS 并识别延迟何时恶化 |
+| **浸泡测试** | 100 | 60 分钟 | 捕捉内存泄漏、GC 暂停、缓慢的日志累积 |
+| **尖峰测试** | 30 秒内从 50 到 500，保持 2 分钟 | 3 分钟 | 验证 HPA 响应且无级联故障 |
 
-## Running
+## 运行
 
-### Smoke
+### 冒烟测试
 
 ```bash
 locust -f loadtest/locustfile.py \
@@ -22,7 +22,7 @@ locust -f loadtest/locustfile.py \
   --csv loadtest/results/smoke
 ```
 
-### Ramp
+### 爬坡测试
 
 ```bash
 locust -f loadtest/locustfile.py \
@@ -31,7 +31,7 @@ locust -f loadtest/locustfile.py \
   --csv loadtest/results/ramp
 ```
 
-### Soak
+### 浸泡测试
 
 ```bash
 locust -f loadtest/locustfile.py \
@@ -40,7 +40,7 @@ locust -f loadtest/locustfile.py \
   --csv loadtest/results/soak
 ```
 
-### Spike
+### 尖峰测试
 
 ```bash
 locust -f loadtest/locustfile.py \
@@ -49,32 +49,32 @@ locust -f loadtest/locustfile.py \
   --csv loadtest/results/spike
 ```
 
-## Acceptance criteria
+## 验收标准
 
-A passing load test for this project should show:
+本项目通过负载测试应显示：
 
-- **Smoke:** 100% success, p95 < 500ms.
-- **Ramp:** sustained 100 RPS with p95 < 800ms, no 5xx errors.
-- **Soak:** memory growth < 10% over 60 min, no error rate drift.
-- **Spike:** HPA scales replicas up within 60s, no requests dropped after the first 30s, p99 < 2s during the spike.
+- **冒烟测试：** 100% 成功率，p95 < 500ms。
+- **爬坡测试：** 持续 100 RPS，p95 < 800ms，无 5xx 错误。
+- **浸泡测试：** 60 分钟内内存增长 < 10%，错误率无漂移。
+- **尖峰测试：** HPA 在 60 秒内扩容副本，前 30 秒后无请求丢失，尖峰期间 p99 < 2s。
 
-## Recording results
+## 记录结果
 
-Each run writes CSV summaries under `loadtest/results/<run-name>_*.csv`:
+每次运行将 CSV 汇总写入 `loadtest/results/<运行名称>_*.csv`：
 
-- `*_stats.csv` — per-endpoint request count, failure count, latency percentiles
-- `*_failures.csv` — error breakdown
-- `*_stats_history.csv` — time-series for plotting
+- `*_stats.csv` — 每个端点的请求数、失败数、延迟百分位数
+- `*_failures.csv` — 错误分类
+- `*_stats_history.csv` — 用于绘图的时间序列
 
-Plot the time series with the included notebook (`loadtest/analyze.ipynb`, optional) or with any plotting tool. Attach the screenshots to your project submission.
+使用附带的 notebook（`loadtest/analyze.ipynb`，可选）或任何绘图工具绘制时间序列。将截图附到你的项目提交中。
 
-## Tunable env vars
+## 可配置的环境变量
 
-| Variable | Default | Description |
+| 变量 | 默认值 | 描述 |
 |---|---|---|
-| `FEATURE_COUNT` | `10` | Number of features per `/predict` request |
-| `MODEL_VERSIONS` | `latest` | Comma-separated model versions to round-robin |
+| `FEATURE_COUNT` | `10` | 每个 `/predict` 请求的特征数量 |
+| `MODEL_VERSIONS` | `latest` | 逗号分隔的模型版本，用于轮询 |
 
-## Note on test environment
+## 关于测试环境的说明
 
-Always run load tests against a dedicated test environment with the same shape as production (same instance types, same HPA limits, same model). Tests against shared environments are misleading and risk impacting other teams.
+始终在与生产环境相同配置的专用测试环境中运行负载测试（相同的实例类型、相同的 HPA 限制、相同的模型）。在共享环境中进行测试会产生误导，并可能影响其他团队。

@@ -1,137 +1,137 @@
-# Exercise 01: Creating Your First ML Project Repository
+# 练习 01：创建你的第一个 ML 项目仓库
 
-## Overview
+## 概述
 
-**Difficulty**: Beginner
-**Estimated Time**: 60-90 minutes
-**Prerequisites**: Lecture 01 - Git Fundamentals
+**难度**：入门
+**预计时间**：60-90 分钟
+**前置条件**：讲座 01 - Git 基础
 
-In this exercise, you'll create your first Git repository for a machine learning project from scratch. You'll learn proper repository initialization, file organization, `.gitignore` configuration, and making your first commits. This exercise simulates starting a new ML inference API project.
+在本练习中，你将从头开始为机器学习项目创建你的第一个 Git 仓库。你将学习正确的仓库初始化、文件组织、`.gitignore` 配置以及制作你的第一个 commit。本练习模拟启动一个新的 ML 推理 API 项目。
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
+完成本练习后，你将：
 
-- Initialize a Git repository correctly
-- Configure Git with appropriate settings for ML projects
-- Create a proper `.gitignore` file for Python and ML projects
-- Organize a repository structure for an ML project
-- Make atomic, well-documented commits
-- Understand the three-state Git workflow in practice
-- Use `git status` and `git diff` effectively
-- Write professional commit messages
+- 正确初始化 Git 仓库
+- 为 ML 项目配置合适的 Git 设置
+- 为 Python 和 ML 项目创建合适的 `.gitignore` 文件
+- 为 ML 项目组织仓库结构
+- 制作原子性、文档良好的 commit
+- 在实践中理解 Git 三态工作流
+- 有效使用 `git status` 和 `git diff`
+- 编写专业的 commit 消息
 
-## Scenario
+## 场景
 
-You've been tasked with creating a new machine learning inference API that will serve predictions from a pre-trained image classification model. The project is starting from scratch, and you need to set up the repository properly from day one.
+你的任务是创建一个新的机器学习推理 API，该 API 将使用预训练的图像分类模型提供预测服务。该项目从头开始，你需要从一开始就正确设置仓库。
 
-The API will:
-- Accept image uploads via REST API
-- Run inference using a PyTorch model
-- Return classification results with confidence scores
-- Log predictions for monitoring
-- Support multiple model versions
+该 API 将：
+- 通过 REST API 接受图像上传
+- 使用 PyTorch 模型运行推理
+- 返回带有置信度分数的分类结果
+- 记录预测以进行监控
+- 支持多个模型版本
 
-## Prerequisites
+## 前置条件
 
-Before starting, ensure you have:
+开始之前，确保你有：
 
 ```bash
-# Git installed
+# 安装 Git
 git --version
-# Should show: git version 2.x.x or higher
+# 应显示：git version 2.x.x or higher
 
-# Python 3.11+ installed
+# 安装 Python 3.11+
 python3 --version
 
-# A text editor (VS Code, vim, nano, etc.)
+# 文本编辑器（VS Code、vim、nano 等）
 ```
 
 ---
 
-## Part 1: Initial Setup and Configuration
+## 第一部分：初始设置与配置
 
-### Task 1.1: Configure Git Identity
+### 任务 1.1：配置 Git 身份
 
-Before creating your first repository, configure your Git identity.
+在创建你的第一个仓库之前，配置你的 Git 身份。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Set your name (use your real name or GitHub username)
+# 设置你的姓名（使用真实姓名或 GitHub 用户名）
 git config --global user.name "Your Name"
 
-# Set your email (use your email)
+# 设置你的邮箱（使用你的邮箱）
 git config --global user.email "your.email@example.com"
 
-# Verify configuration
+# 验证配置
 git config --list --show-origin
 ```
 
-**Expected Output:**
+**预期输出：**
 ```text
 file:/home/user/.gitconfig    user.name=Your Name
 file:/home/user/.gitconfig    user.email=your.email@example.com
 ```
 
-**Checkpoint Question:**
-- Why is it important to set user.name and user.email before making commits?
+**检查点问题：**
+- 为什么在制作 commit 之前设置 user.name 和 user.email 很重要？
 
 ---
 
-### Task 1.2: Create Project Directory and Initialize Repository
+### 任务 1.2：创建项目目录并初始化仓库
 
-Create the project directory and initialize it as a Git repository.
+创建项目目录并将其初始化为 Git 仓库。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create project directory
+# 创建项目目录
 mkdir ml-inference-api
 cd ml-inference-api
 
-# Initialize Git repository
+# 初始化 Git 仓库
 git init
 
-# Verify repository was created
+# 验证仓库已创建
 ls -la
 ```
 
-**Expected Output:**
+**预期输出：**
 ```text
 Initialized empty Git repository in /path/to/ml-inference-api/.git/
 ```
 
-You should see a `.git` directory (it's hidden, hence `ls -la`).
+你应该看到 `.git` 目录（它是隐藏的，所以使用 `ls -la`）。
 
-**Checkpoint Questions:**
-- What does the `.git` directory contain?
-- What command shows you the current status of the repository?
+**检查点问题：**
+- `.git` 目录包含什么？
+- 什么命令显示仓库的当前状态？
 
-Run `git status` now. What does it say?
+现在运行 `git status`。它显示什么？
 
 ---
 
-### Task 1.3: Configure Repository-Specific Settings
+### 任务 1.3：配置仓库特定设置
 
-Set up ML project-specific Git configurations.
+设置 ML 项目特定的 Git 配置。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Set default branch name to 'main' (modern convention)
+# 将默认分支名称设置为 'main'（现代约定）
 git config init.defaultBranch main
 
-# Configure line endings (important for cross-platform teams)
-# Linux/Mac:
+# 配置换行符（对跨平台团队很重要）
+# Linux/Mac：
 git config core.autocrlf input
-# Windows:
+# Windows：
 # git config core.autocrlf true
 
-# Increase buffer size for large files
+# 为大文件增加缓冲区大小
 git config http.postBuffer 524288000
 
-# Create useful aliases
+# 创建有用的别名
 git config alias.st status
 git config alias.co checkout
 git config alias.br branch
@@ -139,36 +139,36 @@ git config alias.ci commit
 git config alias.unstage 'reset HEAD --'
 git config alias.last 'log -1 HEAD --stat'
 
-# Verify repository configuration
+# 验证仓库配置
 git config --local --list
 ```
 
-**Checkpoint:**
-Test an alias:
+**检查点：**
+测试一个别名：
 ```bash
 git st
-# Should show: On branch main, No commits yet, nothing to commit
+# 应显示：On branch main, No commits yet, nothing to commit
 ```
 
 ---
 
-## Part 2: Creating Project Structure
+## 第二部分：创建项目结构
 
-### Task 2.1: Create Directory Structure
+### 任务 2.1：创建目录结构
 
-Create a professional directory structure for the ML project.
+为 ML 项目创建专业的目录结构。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create directory structure
+# 创建目录结构
 mkdir -p src/{api,models,preprocessing,utils}
 mkdir -p tests/{unit,integration}
 mkdir -p configs
 mkdir -p scripts
 mkdir -p docs
 
-# Create initial files
+# 创建初始文件
 touch README.md
 touch requirements.txt
 touch requirements-dev.txt
@@ -177,7 +177,7 @@ touch .env.example
 touch .gitignore
 touch .gitattributes
 
-# Create source code files
+# 创建源代码文件
 touch src/__init__.py
 touch src/api/__init__.py
 touch src/api/app.py
@@ -188,25 +188,25 @@ touch src/preprocessing/image.py
 touch src/utils/__init__.py
 touch src/utils/logging.py
 
-# Create test files
+# 创建测试文件
 touch tests/__init__.py
 touch tests/unit/__init__.py
 touch tests/unit/test_classifier.py
 touch tests/integration/__init__.py
 
-# Create configuration files
+# 创建配置文件
 touch configs/default.yaml
 touch configs/production.yaml
 
-# Create scripts
+# 创建脚本
 touch scripts/download_model.sh
 touch scripts/run_server.sh
 
-# Verify structure
+# 验证结构
 tree -L 2
 ```
 
-**Expected Structure:**
+**预期结构：**
 ```text
 ml-inference-api/
 ├── .env.example
@@ -235,18 +235,18 @@ ml-inference-api/
     └── unit/
 ```
 
-**Checkpoint:**
-Run `git status`. What files does it show?
+**检查点：**
+运行 `git status`。它显示了哪些文件？
 
 ---
 
-### Task 2.2: Create .gitignore File
+### 任务 2.2：创建 .gitignore 文件
 
-Create a comprehensive `.gitignore` file for ML projects.
+为 ML 项目创建全面的 `.gitignore` 文件。
 
-**Instructions:**
+**说明：**
 
-Create `.gitignore` with this content:
+创建 `.gitignore` 并写入以下内容：
 
 ```gitignore
 # Python
@@ -378,24 +378,24 @@ site/
 .cache/
 ```
 
-**Save the file.**
+**保存文件。**
 
-**Checkpoint:**
+**检查点：**
 ```bash
 git status
 ```
 
-Notice that `data/`, `models/`, and other ignored directories don't appear in the status.
+注意 `data/`、`models/` 和其他被忽略的目录不会出现在状态中。
 
 ---
 
-### Task 2.3: Create .gitattributes File
+### 任务 2.3：创建 .gitattributes 文件
 
-Configure file handling for ML projects.
+为 ML 项目配置文件处理。
 
-**Instructions:**
+**说明：**
 
-Create `.gitattributes` with this content:
+创建 `.gitattributes` 并写入以下内容：
 
 ```gitattributes
 # Auto detect text files and perform LF normalization
@@ -444,19 +444,19 @@ Create `.gitattributes` with this content:
 *.rar binary
 ```
 
-**Save the file.**
+**保存文件。**
 
 ---
 
-## Part 3: Creating Initial Content
+## 第三部分：创建初始内容
 
-### Task 3.1: Create README.md
+### 任务 3.1：创建 README.md
 
-Create a professional README for the project.
+为项目创建专业的 README。
 
-**Instructions:**
+**说明：**
 
-Edit `README.md`:
+编辑 `README.md`：
 
 ```markdown
 # ML Inference API
@@ -575,17 +575,17 @@ MIT License - see LICENSE file for details
 - FastAPI for the excellent web framework
 ```
 
-**Save the file.**
+**保存文件。**
 
 ---
 
-### Task 3.2: Create requirements.txt
+### 任务 3.2：创建 requirements.txt
 
-Create dependency file for the project.
+为项目创建依赖文件。
 
-**Instructions:**
+**说明：**
 
-Edit `requirements.txt`:
+编辑 `requirements.txt`：
 
 ```text
 # Web Framework
@@ -612,7 +612,7 @@ prometheus-client==0.19.0
 httpx==0.25.1
 ```
 
-Edit `requirements-dev.txt`:
+编辑 `requirements-dev.txt`：
 
 ```text
 -r requirements.txt
@@ -632,17 +632,17 @@ isort==5.12.0
 pre-commit==3.5.0
 ```
 
-**Save both files.**
+**保存两个文件。**
 
 ---
 
-### Task 3.3: Create Configuration Files
+### 任务 3.3：创建配置文件
 
-Create initial configuration files.
+创建初始配置文件。
 
-**Instructions:**
+**说明：**
 
-Edit `configs/default.yaml`:
+编辑 `configs/default.yaml`：
 
 ```yaml
 # Default Configuration for ML Inference API
@@ -683,7 +683,7 @@ monitoring:
   metrics_port: 9090
 ```
 
-Edit `configs/production.yaml`:
+编辑 `configs/production.yaml`：
 
 ```yaml
 # Production Configuration Overrides
@@ -705,17 +705,17 @@ monitoring:
   enable_metrics: true
 ```
 
-**Save both files.**
+**保存两个文件。**
 
 ---
 
-### Task 3.4: Create .env.example
+### 任务 3.4：创建 .env.example
 
-Create template for environment variables.
+创建环境变量模板。
 
-**Instructions:**
+**说明：**
 
-Edit `.env.example`:
+编辑 `.env.example`：
 
 ```bash
 # Environment Variables Template
@@ -747,37 +747,37 @@ MODEL_CACHE_SIZE=1000
 # SENTRY_DSN=your-sentry-dsn
 ```
 
-**Save the file.**
+**保存文件。**
 
-**Important:** Never create an actual `.env` file in this exercise. The `.gitignore` will prevent it from being tracked.
+**重要：** 在本练习中不要创建实际的 `.env` 文件。`.gitignore` 会阻止它被跟踪。
 
 ---
 
-## Part 4: Making Your First Commits
+## 第四部分：制作你的第一个 Commit
 
-### Task 4.1: Stage and Review Changes
+### 任务 4.1：暂存并审查变更
 
-Now that we have content, let's prepare our first commit.
+现在我们有了内容，让我们准备我们的第一个 commit。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Check status
+# 检查状态
 git status
 
-# You should see many "Untracked files"
+# 你应该会看到许多"Untracked files"
 
-# Add all files to staging area
+# 将所有文件添加到暂存区
 git add .
 
-# Check status again
+# 再次检查状态
 git status
 
-# Review what's been staged
+# 审查已暂存的内容
 git diff --staged
 ```
 
-**Expected Output:**
+**预期输出：**
 ```text
 On branch main
 
@@ -792,20 +792,20 @@ Changes to be committed:
         ... (many more files)
 ```
 
-**Checkpoint Questions:**
-- What's the difference between `git diff` and `git diff --staged`?
-- Why don't we see `data/` or `models/` directories in the staging area?
+**检查点问题：**
+- `git diff` 和 `git diff --staged` 之间的区别是什么？
+- 为什么我们在暂存区中看不到 `data/` 或 `models/` 目录？
 
 ---
 
-### Task 4.2: Make First Commit
+### 任务 4.2：制作第一个 Commit
 
-Create your first commit with a proper message.
+使用合适的消息创建你的第一个 commit。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Commit with a descriptive message
+# 使用描述性消息提交
 git commit -m "Initial project structure
 
 Set up ML inference API project with:
@@ -820,17 +820,17 @@ Set up ML inference API project with:
 
 This establishes the foundation for the image classification API."
 
-# View commit
+# 查看 commit
 git log
 
-# View commit with details
+# 查看 commit 详情
 git show
 
-# View commit statistics
+# 查看 commit 统计信息
 git show --stat
 ```
 
-**Expected Output:**
+**预期输出：**
 ```text
 [main (root-commit) abc123] Initial project structure
  25 files changed, 350 insertions(+)
@@ -839,18 +839,18 @@ git show --stat
  ... (list of files)
 ```
 
-**Checkpoint:**
-Your repository now has one commit! Run `git log --oneline` to see it.
+**检查点：**
+你的仓库现在有一个 commit 了！运行 `git log --oneline` 查看它。
 
 ---
 
-### Task 4.3: Add Source Code Files
+### 任务 4.3：添加源代码文件
 
-Now let's add some actual code to the project.
+现在让我们向项目添加一些实际代码。
 
-**Instructions:**
+**说明：**
 
-Edit `src/api/app.py`:
+编辑 `src/api/app.py`：
 
 ```python
 """
@@ -970,9 +970,9 @@ async def list_models() -> Dict[str, str]:
     }
 ```
 
-**Save the file.**
+**保存文件。**
 
-Edit `src/models/classifier.py`:
+编辑 `src/models/classifier.py`：
 
 ```python
 """
@@ -1055,27 +1055,27 @@ class ImageClassifier:
         return predictions
 ```
 
-**Save the file.**
+**保存文件。**
 
 ---
 
-### Task 4.4: Commit Code Changes
+### 任务 4.4：提交代码变更
 
-Make a separate commit for the code.
+为代码制作一个单独的 commit。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Check what changed
+# 检查什么发生了变化
 git status
 
-# Stage the files
+# 暂存文件
 git add src/api/app.py src/models/classifier.py
 
-# Review changes before committing
+# 提交前审查变更
 git diff --staged
 
-# Commit
+# 提交
 git commit -m "Add FastAPI app and image classifier
 
 Implemented:
@@ -1088,11 +1088,11 @@ Implemented:
 The API can now accept image uploads and return
 classification predictions using ResNet-50."
 
-# View log
+# 查看日志
 git log --oneline
 ```
 
-**Expected Output:**
+**预期输出：**
 ```text
 abc123 Add FastAPI app and image classifier
 def456 Initial project structure
@@ -1100,13 +1100,13 @@ def456 Initial project structure
 
 ---
 
-### Task 4.5: Add More Files and Practice Selective Staging
+### 任务 4.5：添加更多文件并练习选择性暂存
 
-Add preprocessing code, but stage files selectively.
+添加预处理代码，但选择性暂存文件。
 
-**Instructions:**
+**说明：**
 
-Edit `src/preprocessing/image.py`:
+编辑 `src/preprocessing/image.py`：
 
 ```python
 """
@@ -1186,7 +1186,7 @@ def validate_image(image_bytes: bytes) -> bool:
         return False
 ```
 
-Edit `src/utils/logging.py`:
+编辑 `src/utils/logging.py`：
 
 ```python
 """
@@ -1233,19 +1233,19 @@ def configure_logging(level: str = "INFO", format_type: str = "json"):
     )
 ```
 
-**Now practice selective staging:**
+**现在练习选择性暂存：**
 
 ```bash
-# Check status
+# 检查状态
 git status
 
-# Stage only the preprocessing file
+# 只暂存预处理文件
 git add src/preprocessing/image.py
 
-# Check status - logging.py should still be unstaged
+# 检查状态 - logging.py 应该仍未暂存
 git status
 
-# Commit preprocessing
+# 提交预处理
 git commit -m "Add image preprocessing module
 
 Implemented preprocessing pipeline:
@@ -1258,7 +1258,7 @@ Implemented preprocessing pipeline:
 Preprocessing follows standard ImageNet transform pipeline
 for compatibility with pre-trained models."
 
-# Now stage and commit logging
+# 现在暂存并提交 logging
 git add src/utils/logging.py
 
 git commit -m "Add structured logging configuration
@@ -1272,11 +1272,11 @@ Implemented logging setup with:
 This provides consistent, parseable logs for production
 monitoring and debugging."
 
-# View log
+# 查看日志
 git log --oneline
 ```
 
-**Expected Output:**
+**预期输出：**
 ```text
 ghi789 Add structured logging configuration
 abc123 Add image preprocessing module
@@ -1286,140 +1286,140 @@ jkl012 Initial project structure
 
 ---
 
-## Part 5: Working with Git History
+## 第五部分：使用 Git 历史
 
-### Task 5.1: Explore Your Commits
+### 任务 5.1：探索你的 Commit
 
-Learn to navigate your commit history.
+学习浏览你的 commit 历史。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# View commit history (full)
+# 查看 commit 历史（完整）
 git log
 
-# View commit history (one line per commit)
+# 查看 commit 历史（每行一个 commit）
 git log --oneline
 
-# View last commit with details
+# 查看最后一个 commit 的详情
 git show
 
-# View specific commit
-git show def456  # Use actual hash from your log
+# 查看特定 commit
+git show def456  # 使用日志中的实际哈希
 
-# View only commit message
+# 只查看 commit 消息
 git log --oneline -1
 
-# View commits with statistics
+# 查看带有统计信息的 commit
 git log --stat
 
-# View commits with actual changes
+# 查看带有实际变更的 commit
 git log -p
 
-# View last 2 commits
+# 查看最近 2 个 commit
 git log -2
 ```
 
-**Checkpoint Question:**
-What information does each commit contain?
+**检查点问题：**
+每个 commit 包含哪些信息？
 
 ---
 
-### Task 5.2: Check Repository Status
+### 任务 5.2：检查仓库状态
 
-Practice using `git status` at different stages.
+练习在不同阶段使用 `git status`。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Current status (should be clean)
+# 当前状态（应为干净）
 git status
 
-# Create a new file
+# 创建一个新文件
 echo "# TODO: Add deployment documentation" > docs/deployment.md
 
-# Check status - untracked file
+# 检查状态 - 未跟踪文件
 git status
 
-# Add the file
+# 添加文件
 git add docs/deployment.md
 
-# Check status - staged file
+# 检查状态 - 已暂存文件
 git status
 
-# Modify the file
+# 修改文件
 echo "## Prerequisites" >> docs/deployment.md
 
-# Check status - modified staged file
+# 检查状态 - 已修改的已暂存文件
 git status
 
-# See the difference
+# 查看差异
 git diff
 git diff --staged
 ```
 
-**Checkpoint Questions:**
-- What's the difference between what `git diff` and `git diff --staged` show?
-- How do you unstage a file?
+**检查点问题：**
+- `git diff` 和 `git diff --staged` 显示的有什么区别？
+- 如何取消暂存一个文件？
 
 ---
 
-### Task 5.3: Practice Unstaging
+### 任务 5.3：练习取消暂存
 
-Learn to unstage files if you change your mind.
+学习在改变主意时取消暂存文件。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# File is currently staged
+# 文件当前已暂存
 git status
 
-# Unstage it
+# 取消暂存
 git restore --staged docs/deployment.md
 
-# Check status
+# 检查状态
 git status
 
-# File should be in working directory, not staged
+# 文件应在工作目录中，不在暂存区
 ```
 
 ---
 
-### Task 5.4: Discard Changes
+### 任务 5.4：丢弃变更
 
-Practice discarding unwanted changes.
+练习丢弃不需要的变更。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# File has unstaged changes
+# 文件有未暂存的变更
 git status
 
-# Discard changes (BE CAREFUL - this is permanent!)
+# 丢弃变更（小心 - 这是永久性的！）
 git restore docs/deployment.md
 
-# Check status
+# 检查状态
 git status
 
-# File should be gone (was untracked after unstaging)
+# 文件应该已消失（在取消暂存后变为未跟踪）
 ```
 
-**Warning:** `git restore` discards changes permanently. There's no undo!
+**警告：** `git restore` 会永久丢弃变更。无法撤销！
 
 ---
 
-## Part 6: Viewing Differences
+## 第六部分：查看差异
 
-### Task 6.1: Make Changes and Compare
+### 任务 6.1：进行变更并比较
 
-Practice using `git diff` effectively.
+练习有效使用 `git diff`。
 
-**Instructions:**
+**说明：**
 
-Create a test script:
+创建一个测试脚本：
 
 ```bash
-# Create new file
+# 创建新文件
 cat > scripts/test_api.sh << 'EOF'
 #!/bin/bash
 # Test script for ML Inference API
@@ -1435,90 +1435,90 @@ curl http://localhost:8000/
 echo "Tests complete"
 EOF
 
-# Make it executable
+# 使其可执行
 chmod +x scripts/test_api.sh
 
-# Add and commit
+# 添加并提交
 git add scripts/test_api.sh
 git commit -m "Add API testing script"
 ```
 
-Now modify it:
+现在修改它：
 
 ```bash
-# Modify the file
+# 修改文件
 cat >> scripts/test_api.sh << 'EOF'
 
 # Test models endpoint
 curl http://localhost:8000/models
 EOF
 
-# View changes
+# 查看变更
 git diff
 
-# View with color highlighting
+# 带有颜色高亮查看
 git diff --color-words
 
-# Stage the changes
+# 暂存变更
 git add scripts/test_api.sh
 
-# View staged changes
+# 查看已暂存的变更
 git diff --staged
 
-# Commit
+# 提交
 git commit -m "Add models endpoint test to testing script"
 ```
 
 ---
 
-## Validation and Testing
+## 验证与测试
 
-### Task 7.1: Verify Repository State
+### 任务 7.1：验证仓库状态
 
-Run these commands to verify your repository is correct:
+运行这些命令以验证你的仓库是否正确：
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Should show clean working tree
+# 应显示干净的工作树
 git status
 
-# Should show ~6 commits
+# 应显示约 6 个 commit
 git log --oneline
 
-# Verify .gitignore is working
+# 验证 .gitignore 是否生效
 mkdir data
 echo "test" > data/test.csv
 git status
-# data/test.csv should NOT appear
+# data/test.csv 应不出现
 
-# Verify directory structure
+# 验证目录结构
 tree -L 2
 
-# Verify files exist
+# 验证文件存在
 ls -la src/api/
 ls -la src/models/
 ls -la configs/
 ```
 
-**Expected Results:**
-- Clean working directory
-- Multiple commits in history
-- Proper directory structure
-- `.gitignore` preventing unwanted files from being tracked
+**预期结果：**
+- 干净的工作目录
+- 历史中有多个 commit
+- 正确的目录结构
+- `.gitignore` 阻止不需要的文件被跟踪
 
 ---
 
-## Challenge Tasks (Optional)
+## 挑战任务（可选）
 
-Ready for more? Try these additional challenges:
+准备好更多挑战了吗？试试以下附加任务：
 
-### Challenge 1: Add Tests
+### 挑战 1：添加测试
 
-Create test files and commit them:
+创建测试文件并提交：
 
 ```bash
-# Create test file
+# 创建测试文件
 cat > tests/unit/test_classifier.py << 'EOF'
 import pytest
 from src.models.classifier import ImageClassifier
@@ -1540,21 +1540,21 @@ git add tests/unit/test_classifier.py
 git commit -m "Add unit tests for classifier initialization"
 ```
 
-### Challenge 2: Fix a "Bug"
+### 挑战 2：修复一个"Bug"
 
-Simulate finding and fixing a bug:
+模拟发现并修复一个 bug：
 
 ```bash
-# Create a "bug" by modifying a file
+# 通过修改文件创建一个"bug"
 echo "# FIXME: Handle CUDA out of memory errors" >> src/models/classifier.py
 
-# Stage and commit
+# 暂存并提交
 git add src/models/classifier.py
 git commit -m "Add FIXME note for CUDA OOM handling"
 
-# Now "fix" it
-# Edit the file to add proper error handling
-# Then commit the fix
+# 现在"修复"它
+# 编辑文件添加适当的错误处理
+# 然后提交修复
 git add src/models/classifier.py
 git commit -m "Fix: Add CUDA OOM error handling
 
@@ -1564,81 +1564,81 @@ falling back to CPU inference when GPU memory is exhausted.
 Fixes #1"
 ```
 
-### Challenge 3: Write Better Commit Messages
+### 挑战 3：编写更好的 Commit 消息
 
-Practice writing detailed commit messages:
+练习编写详细的 commit 消息：
 
 ```bash
-# Make a change
+# 进行变更
 echo "strict = true" >> setup.cfg
 
 git add setup.cfg
 git commit
-# Editor opens - write a detailed message following the format from lecture
+# 编辑器打开 - 按照讲座中的格式写一条详细消息
 ```
 
 ---
 
-## Reflection Questions
+## 反思问题
 
-Answer these questions to solidify your understanding:
+回答这些问题以巩固你的理解：
 
-1. **Why is `.gitignore` important for ML projects?**
-   - What happens if you accidentally commit a 5GB model file?
+1. **为什么 `.gitignore` 对 ML 项目很重要？**
+   - 如果你意外提交了一个 5GB 的模型文件会发生什么？
 
-2. **What's the difference between tracked and untracked files?**
-   - How does Git treat them differently?
+2. **跟踪和未跟踪文件的区别是什么？**
+   - Git 对它们有何不同处理？
 
-3. **Why make multiple small commits instead of one large commit?**
-   - What are the benefits?
+3. **为什么制作多个小 commit 而不是一个大 commit？**
+   - 有什么好处？
 
-4. **What does "atomic commit" mean?**
-   - Give an example from this exercise.
+4. **"原子性 commit"是什么意思？**
+   - 从本练习中举一个例子。
 
-5. **What information should a good commit message contain?**
-   - Review the commit message guidelines from Lecture 01.
+5. **好的 commit 消息应该包含哪些信息？**
+   - 回顾讲座 01 中的 commit 消息指南。
 
-6. **Why stage files before committing?**
-   - Why not commit directly from the working directory?
+6. **为什么在提交前要暂存文件？**
+   - 为什么不直接从工作目录提交？
 
-7. **How would you undo the last commit if you made a mistake?**
-   - (Hint: This is covered in Lecture 04, but think about what might work)
+7. **如果你犯了错误，如何撤销最后一个 commit？**
+   - （提示：这在讲座 04 中有涉及，但思考一下什么可能有效）
 
 ---
 
-## Summary
+## 总结
 
-Congratulations! You've completed Exercise 01. You learned:
+恭喜！你已经完成了练习 01。你学会了：
 
-- ✅ How to initialize a Git repository properly
-- ✅ Configure Git for ML projects
-- ✅ Create proper directory structures
-- ✅ Write comprehensive `.gitignore` files
-- ✅ Make atomic, well-documented commits
-- ✅ Use the three-state Git workflow
-- ✅ Navigate commit history
-- ✅ Stage and unstage files selectively
-- ✅ Use `git status` and `git diff` effectively
+- ✅ 如何正确初始化 Git 仓库
+- ✅ 为 ML 项目配置 Git
+- ✅ 创建正确的目录结构
+- ✅ 编写全面的 `.gitignore` 文件
+- ✅ 制作原子性、文档良好的 commit
+- ✅ 使用 Git 三态工作流
+- ✅ 浏览 commit 历史
+- ✅ 选择性暂存和取消暂存文件
+- ✅ 有效使用 `git status` 和 `git diff`
 
-### Key Commands Learned
+### 学会的关键命令
 
 ```bash
-git init                    # Initialize repository
-git config                  # Configure Git
-git status                  # Check repository status
-git add                     # Stage changes
-git commit                  # Create commit
-git log                     # View history
-git show                    # Show commit details
-git diff                    # View unstaged changes
-git diff --staged           # View staged changes
-git restore                 # Discard or unstage changes
+git init                    # 初始化仓库
+git config                  # 配置 Git
+git status                  # 检查仓库状态
+git add                     # 暂存变更
+git commit                  # 创建 commit
+git log                     # 查看历史
+git show                    # 显示 commit 详情
+git diff                    # 查看未暂存的变更
+git diff --staged           # 查看已暂存的变更
+git restore                 # 丢弃或取消暂存变更
 ```
 
-### Next Steps
+### 下一步
 
-- Complete Exercise 02 to learn more about commits and history
-- Review Lecture 01 if any concepts are unclear
-- Practice creating repositories for other projects
+- 完成练习 02，了解更多关于 commit 和历史的知识
+- 如有不清楚的概念，复习讲座 01
+- 练习为其他项目创建仓库
 
-**Great job!** You've taken your first steps into version control for ML projects.
+**做得很好！** 你已经迈出了 ML 项目版本控制的第一步。

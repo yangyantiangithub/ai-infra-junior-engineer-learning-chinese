@@ -1,58 +1,58 @@
-# Lecture 05: Introduction to Shell Scripting
+# 讲座 05：Shell 脚本入门
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Bash Script Basics](#bash-script-basics)
-3. [Variables and Data Types](#variables-and-data-types)
-4. [Basic Control Structures](#basic-control-structures)
-5. [Simple Functions](#simple-functions)
-6. [Command-Line Arguments](#command-line-arguments)
-7. [Basic Error Handling](#basic-error-handling)
-8. [Practical Examples](#practical-examples)
-9. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [简介](#简介)
+2. [Bash 脚本基础](#bash-脚本基础)
+3. [变量和数据类型](#变量和数据类型)
+4. [基本控制结构](#基本控制结构)
+5. [简单函数](#简单函数)
+6. [命令行参数](#命令行参数)
+7. [基本错误处理](#基本错误处理)
+8. [实际示例](#实际示例)
+9. [总结和要点](#总结和要点)
 
-## Introduction
+## 简介
 
-Shell scripting is the AI infrastructure engineer's superpower for automation. Whether deploying models, managing datasets, or orchestrating training pipelines, shell scripts turn repetitive manual tasks into reliable, repeatable processes.
+Shell 脚本是 AI 基础设施工程师实现自动化的超能力。无论是部署模型、管理数据集还是编排训练管道，shell 脚本都将重复的手动任务转变为可靠、可重复的流程。
 
-This lecture introduces you to Bash scripting fundamentals. You'll learn to write simple but powerful scripts that automate common AI infrastructure tasks.
+本讲座介绍 Bash 脚本基础。你将学习编写简单但强大的脚本来自动化常见的 AI 基础设施任务。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Write and execute basic Bash scripts
-- Use variables and command substitution
-- Implement simple control structures (if/else, for/while loops)
-- Create reusable functions
-- Process command-line arguments
-- Handle basic errors
-- Apply scripting to AI infrastructure automation
+完成本讲座后，你将能够：
+- 编写和执行基本 Bash 脚本
+- 使用变量和命令替换
+- 实现简单的控制结构（if/else、for/while 循环）
+- 创建可重用的函数
+- 处理命令行参数
+- 处理基本错误
+- 将脚本应用于 AI 基础设施自动化
 
-### Prerequisites
-- Lectures 01-04 (Linux fundamentals through system administration)
-- Comfort with command-line basics
-- Text editor familiarity (nano, vim, or VS Code)
+### 先决条件
+- 讲座 01-04（从 Linux 基础到系统管理）
+- 熟悉命令行基础
+- 熟悉文本编辑器（nano、vim 或 VS Code）
 
-### Why Shell Scripting for AI Infrastructure?
+### 为什么 AI 基础设施需要 Shell 脚本？
 
-**Automation**: Deploy models, provision environments, orchestrate training
-**Consistency**: Same process every time, no manual errors
-**Efficiency**: Automate repetitive tasks, save hours daily
-**Integration**: Glue together different tools and services
-**Documentation**: Scripts serve as executable documentation
+**自动化**：部署模型、预置环境、编排训练
+**一致性**：每次相同流程，无手动错误
+**效率**：自动化重复性任务，每天节省数小时
+**集成**：将不同工具和服务粘合在一起
+**文档**：脚本作为可执行的文档
 
-**Duration**: 90 minutes
-**Difficulty**: Beginner to Intermediate
+**时长**：90 分钟
+**难度**：初级到中级
 
 ---
 
-## Bash Script Basics
+## Bash 脚本基础
 
-### Creating Your First Script
+### 创建你的第一个脚本
 
 ```bash
 #!/bin/bash
-# hello.sh - My first script
+# hello.sh - 我的第一个脚本
 
 echo "Hello, AI Infrastructure!"
 echo "Current directory: $(pwd)"
@@ -60,249 +60,249 @@ echo "Current user: $(whoami)"
 echo "Date: $(date)"
 ```
 
-### The Shebang (#!)
+### Shebang（#!）
 
-The first line tells the system which interpreter to use:
+第一行告诉系统使用哪个解释器：
 
 ```bash
-#!/bin/bash              # Use bash
-#!/bin/sh                # Use sh (POSIX compatible)
-#!/usr/bin/env bash      # Use bash (portable - finds bash in PATH)
-#!/usr/bin/env python3   # Use python3
+#!/bin/bash              # 使用 bash
+#!/bin/sh                # 使用 sh（POSIX 兼容）
+#!/usr/bin/env bash      # 使用 bash（可移植 - 在 PATH 中查找 bash）
+#!/usr/bin/env python3   # 使用 python3
 ```
 
-**Best Practice**: Use `#!/bin/bash` for bash-specific features, `#!/bin/sh` for maximum portability.
+**最佳实践**：bash 特定特性使用 `#!/bin/bash`，最大可移植性使用 `#!/bin/sh`。
 
-### Making Scripts Executable
+### 使脚本可执行
 
 ```bash
-# Create script
+# 创建脚本
 cat > hello.sh << 'EOF'
 #!/bin/bash
 echo "Hello, World!"
 EOF
 
-# Make executable
+# 使其可执行
 chmod +x hello.sh
 
-# Run it
+# 运行
 ./hello.sh
-# Output: Hello, World!
+# 输出：Hello, World!
 
-# Or run with bash explicitly (doesn't need execute permission)
+# 或显式用 bash 运行（不需要执行权限）
 bash hello.sh
 ```
 
-**Important**: Scripts must be executable (`chmod +x`) to run with `./script.sh` syntax.
+**重要**：脚本必须可执行（`chmod +x`）才能使用 `./script.sh` 语法运行。
 
-### Script Structure
+### 脚本结构
 
-A well-organized script follows this structure:
+一个组织良好的脚本遵循以下结构：
 
 ```bash
 #!/bin/bash
 
 #############################################
-# Script Name: setup-ml-env.sh
-# Description: Set up ML development environment
-# Author: Your Name
-# Date: 2024-10-28
-# Version: 1.0
+# 脚本名称：setup-ml-env.sh
+# 描述：设置 ML 开发环境
+# 作者：你的名字
+# 日期：2024-10-28
+# 版本：1.0
 #############################################
 
-# Global variables
+# 全局变量
 MODEL_PATH="/models/production"
 LOG_FILE="/var/log/setup.log"
 
-# Functions
+# 函数
 function log_message() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
 function setup_environment() {
     log_message "Setting up environment..."
-    # Setup logic here
+    # 设置逻辑在此
 }
 
-# Main execution
+# 主执行
 main() {
     log_message "Starting setup"
     setup_environment
     log_message "Setup complete"
 }
 
-# Run main function
+# 运行主函数
 main "$@"
 ```
 
-### Comments
+### 注释
 
 ```bash
-# Single line comment
-# This is ignored by the shell
+# 单行注释
+# 这一行被 shell 忽略
 
-echo "Output"  # Inline comment
+echo "Output"  # 行内注释
 
 : '
-Multi-line comment
-Everything between these quotes is ignored
-Useful for documenting larger blocks
+多行注释
+这些引号之间的所有内容都被忽略
+适用于记录较大的代码块
 '
 
-# TODO: Add error handling
-# FIXME: This needs optimization
-# NOTE: Important information
+# TODO：添加错误处理
+# FIXME：这需要优化
+# NOTE：重要信息
 ```
 
 ---
 
-## Variables and Data Types
+## 变量和数据类型
 
-### Variable Assignment
+### 变量赋值
 
-**Basic assignment** (no spaces around =):
+**基本赋值**（= 两边不能有空格）：
 
 ```bash
-# Correct
+# 正确
 NAME="Alice"
 AGE=25
 MODEL_PATH="/models/resnet50.h5"
 
-# Wrong (will cause errors)
-NAME = "Alice"      # Spaces around = not allowed
-AGE =25             # Space before = not allowed
+# 错误（会导致错误）
+NAME = "Alice"      # = 两边不允许有空格
+AGE =25             # = 前不允许有空格
 ```
 
-**Using variables**:
+**使用变量**：
 
 ```bash
-# Reference with $
+# 使用 $ 引用
 echo $NAME
 echo "My name is $NAME"
 
-# Better: Use braces (recommended)
+# 更好：使用大括号（推荐）
 echo "Model: ${MODEL_PATH}"
 echo "Age next year: $((AGE + 1))"
 ```
 
-### Command Substitution
+### 命令替换
 
-Capture command output in variables:
+将命令输出捕获到变量中：
 
 ```bash
-# Modern syntax (preferred)
+# 现代语法（推荐）
 CURRENT_DATE=$(date +%Y-%m-%d)
 NUM_FILES=$(ls | wc -l)
 GPU_COUNT=$(nvidia-smi --list-gpus | wc -l)
 
-# Old syntax (backticks - avoid)
+# 旧语法（反引号 - 避免）
 HOSTNAME=`hostname`
 
-# Use in strings
+# 在字符串中使用
 echo "Today is ${CURRENT_DATE}"
 echo "Found ${NUM_FILES} files"
 ```
 
-### Arithmetic Operations
+### 算术运算
 
 ```bash
-# Arithmetic expansion
+# 算术扩展
 COUNT=5
-COUNT=$((COUNT + 1))        # COUNT is now 6
-TOTAL=$((5 * 10))           # TOTAL is 50
-RESULT=$((100 / 3))         # RESULT is 33 (integer division)
+COUNT=$((COUNT + 1))        # COUNT 现在是 6
+TOTAL=$((5 * 10))           # TOTAL 是 50
+RESULT=$((100 / 3))         # RESULT 是 33（整除）
 
-# Common operations
-X=$((10 + 5))               # Addition
-X=$((10 - 5))               # Subtraction
-X=$((10 * 5))               # Multiplication
-X=$((10 / 5))               # Division
-X=$((10 % 3))               # Modulo (remainder)
+# 常见运算
+X=$((10 + 5))               # 加法
+X=$((10 - 5))               # 减法
+X=$((10 * 5))               # 乘法
+X=$((10 / 5))               # 除法
+X=$((10 % 3))               # 模运算（余数）
 
-# Increment/decrement
-COUNT=$((COUNT + 1))        # Increment
-COUNT=$((COUNT - 1))        # Decrement
+# 递增/递减
+COUNT=$((COUNT + 1))        # 递增
+COUNT=$((COUNT - 1))        # 递减
 
-# Use in practice
+# 实际应用
 BATCH_SIZE=32
 NUM_BATCHES=$((1000 / BATCH_SIZE))
 echo "Will process ${NUM_BATCHES} batches"
 ```
 
-### String Operations
+### 字符串操作
 
 ```bash
-# String length
+# 字符串长度
 NAME="Alice"
 echo ${#NAME}               # 5
 
-# Substring extraction
+# 子串提取
 TEXT="Hello, World!"
-echo ${TEXT:0:5}            # Hello (start at 0, length 5)
-echo ${TEXT:7}              # World! (start at 7, to end)
+echo ${TEXT:0:5}            # Hello（从 0 开始，长度 5）
+echo ${TEXT:7}              # World!（从 7 开始，到结尾）
 
-# String replacement
+# 字符串替换
 FILENAME="model_v1.h5"
-echo ${FILENAME/v1/v2}      # model_v2.h5 (replace first)
-echo ${FILENAME//v1/v2}     # Replace all occurrences
+echo ${FILENAME/v1/v2}      # model_v2.h5（替换第一个）
+echo ${FILENAME//v1/v2}     # 替换所有
 
-# Change extension
+# 更改扩展名
 echo ${FILENAME/.h5/.pt}    # model_v1.pt
 
-# Default values
-echo ${VAR:-default}        # Use 'default' if VAR is unset
-VAR=${VAR:-default}         # Set VAR to 'default' if unset
+# 默认值
+echo ${VAR:-default}        # 如果 VAR 未设置，使用 'default'
+VAR=${VAR:-default}         # 如果 VAR 未设置，将其设置为 'default'
 
-# Example: Configuration with defaults
+# 示例：带默认值的配置
 MODEL_NAME=${MODEL_NAME:-resnet50}
 BATCH_SIZE=${BATCH_SIZE:-32}
 echo "Training ${MODEL_NAME} with batch size ${BATCH_SIZE}"
 ```
 
-### Quoting Rules
+### 引用规则
 
-**Single quotes** - Literal strings (no variable expansion):
+**单引号** - 字面字符串（无变量扩展）：
 ```bash
 NAME="Alice"
-echo 'Hello $NAME'          # Output: Hello $NAME
+echo 'Hello $NAME'          # 输出：Hello $NAME
 ```
 
-**Double quotes** - Allow variable expansion:
+**双引号** - 允许变量扩展：
 ```bash
 NAME="Alice"
-echo "Hello $NAME"          # Output: Hello Alice
+echo "Hello $NAME"          # 输出：Hello Alice
 ```
 
-**No quotes** - Word splitting and globbing:
+**无引号** - 单词分割和通配：
 ```bash
 FILES=$(ls *.txt)
-echo $FILES                 # Words split by spaces
-echo "$FILES"               # Preserved with newlines
+echo $FILES                 # 按空格分割单词
+echo "$FILES"               # 保留换行符
 ```
 
-**Best Practice**: Always quote variables unless you specifically need word splitting.
+**最佳实践**：始终引用变量，除非你特别需要单词分割。
 
 ```bash
-# Good
+# 好
 echo "Processing file: $FILENAME"
 
-# Bad (can break with spaces in filename)
+# 不好（文件名中有空格时会出错）
 echo Processing file: $FILENAME
 
-# Good (preserve spaces and special characters)
+# 好（保留空格和特殊字符）
 cp "$SOURCE" "$DEST"
 
-# Bad (breaks with spaces)
+# 不好（有空格时会出错）
 cp $SOURCE $DEST
 ```
 
-### Variable Scope
+### 变量作用域
 
 ```bash
-# Global variable
+# 全局变量
 GLOBAL_VAR="I am global"
 
-# Function with local variable
+# 带局部变量的函数
 function test_scope() {
     local LOCAL_VAR="I am local"
     echo "Inside function: $GLOBAL_VAR"
@@ -311,23 +311,23 @@ function test_scope() {
 
 test_scope
 echo "Outside function: $GLOBAL_VAR"
-echo "Outside function: $LOCAL_VAR"  # Empty - LOCAL_VAR not accessible
+echo "Outside function: $LOCAL_VAR"  # 空 - LOCAL_VAR 不可访问
 ```
 
 ---
 
-## Basic Control Structures
+## 基本控制结构
 
-### If Statements
+### If 语句
 
-**Basic if**:
+**基本 if**：
 ```bash
 if [ -f "model.h5" ]; then
     echo "Model file exists"
 fi
 ```
 
-**If-else**:
+**If-else**：
 ```bash
 if [ -d "/data/imagenet" ]; then
     echo "Dataset found"
@@ -337,7 +337,7 @@ else
 fi
 ```
 
-**If-elif-else**:
+**If-elif-else**：
 ```bash
 GPU_COUNT=2
 
@@ -350,20 +350,20 @@ else
 fi
 ```
 
-### Test Operators
+### 测试操作符
 
-**File tests**:
+**文件测试**：
 ```bash
-[ -e file ]         # Exists
-[ -f file ]         # Is regular file
-[ -d dir ]          # Is directory
-[ -L link ]         # Is symbolic link
-[ -r file ]         # Is readable
-[ -w file ]         # Is writable
-[ -x file ]         # Is executable
-[ -s file ]         # File size > 0
+[ -e file ]         # 存在
+[ -f file ]         # 是普通文件
+[ -d dir ]          # 是目录
+[ -L link ]         # 是符号链接
+[ -r file ]         # 可读
+[ -w file ]         # 可写
+[ -x file ]         # 可执行
+[ -s file ]         # 文件大小 > 0
 
-# Examples
+# 示例
 if [ -f "config.yaml" ]; then
     echo "Config file found"
 fi
@@ -373,14 +373,14 @@ if [ ! -d "logs" ]; then
 fi
 ```
 
-**String tests**:
+**字符串测试**：
 ```bash
-[ -z "$str" ]       # String is empty
-[ -n "$str" ]       # String is not empty
-[ "$s1" = "$s2" ]   # Strings are equal
-[ "$s1" != "$s2" ]  # Strings are not equal
+[ -z "$str" ]       # 字符串为空
+[ -n "$str" ]       # 字符串不为空
+[ "$s1" = "$s2" ]   # 字符串相等
+[ "$s1" != "$s2" ]  # 字符串不相等
 
-# Examples
+# 示例
 if [ -z "$MODEL_NAME" ]; then
     echo "Error: MODEL_NAME is not set"
     exit 1
@@ -391,16 +391,16 @@ if [ "$ENV" = "production" ]; then
 fi
 ```
 
-**Numeric tests**:
+**数字测试**：
 ```bash
-[ $a -eq $b ]       # Equal
-[ $a -ne $b ]       # Not equal
-[ $a -lt $b ]       # Less than
-[ $a -le $b ]       # Less than or equal
-[ $a -gt $b ]       # Greater than
-[ $a -ge $b ]       # Greater than or equal
+[ $a -eq $b ]       # 等于
+[ $a -ne $b ]       # 不等于
+[ $a -lt $b ]       # 小于
+[ $a -le $b ]       # 小于或等于
+[ $a -gt $b ]       # 大于
+[ $a -ge $b ]       # 大于或等于
 
-# Examples
+# 示例
 EPOCHS=100
 if [ $EPOCHS -gt 50 ]; then
     echo "Long training job"
@@ -411,7 +411,7 @@ if [ $GPU_COUNT -ge 2 ]; then
 fi
 ```
 
-**Combining conditions**:
+**组合条件**：
 ```bash
 # AND
 if [ -f "model.h5" ] && [ -f "config.yaml" ]; then
@@ -423,22 +423,22 @@ if [ ! -f "model.h5" ] || [ ! -f "config.yaml" ]; then
     echo "Missing required files"
 fi
 
-# Complex conditions with [[ ]]
+# 使用 [[ ]] 的复杂条件
 if [[ -f "model.h5" && -f "config.yaml" ]]; then
     echo "Both files found"
 fi
 ```
 
-### For Loops
+### For 循环
 
-**Iterate over list**:
+**遍历列表**：
 ```bash
-# Simple list
+# 简单列表
 for model in resnet50 vgg16 inception; do
     echo "Processing $model"
 done
 
-# Iterate array
+# 遍历数组
 MODELS=("resnet50" "vgg16" "inception")
 for model in "${MODELS[@]}"; do
     echo "Training $model"
@@ -446,40 +446,40 @@ for model in "${MODELS[@]}"; do
 done
 ```
 
-**Iterate over files**:
+**遍历文件**：
 ```bash
-# Process all .h5 files
+# 处理所有 .h5 文件
 for file in *.h5; do
     echo "Found model: $file"
 done
 
-# Process files in directory
+# 处理目录中的文件
 for file in /data/images/*.jpg; do
     echo "Processing image: $file"
 done
 ```
 
-**Numeric ranges**:
+**数字范围**：
 ```bash
-# Range with brace expansion
+# 使用大括号扩展的范围
 for i in {1..5}; do
     echo "Iteration $i"
 done
 
-# Range with step
+# 带步长的范围
 for i in {0..10..2}; do
     echo "Even number: $i"
 done
 
-# C-style for loop
+# C 风格 for 循环
 for ((i=0; i<10; i++)); do
     echo "Count: $i"
 done
 ```
 
-**Practical examples**:
+**实际示例**：
 ```bash
-# Train models on different GPUs
+# 在不同 GPU 上训练模型
 MODELS=("resnet50" "vgg16" "mobilenet")
 GPU=0
 
@@ -488,18 +488,18 @@ for model in "${MODELS[@]}"; do
     CUDA_VISIBLE_DEVICES=$GPU python train.py --model "$model" &
     GPU=$((GPU + 1))
 done
-wait  # Wait for all background jobs
+wait  # 等待所有后台作业
 
-# Process dataset batches
+# 处理数据集批次
 for batch in {1..100}; do
     echo "Processing batch $batch"
     python process.py --batch $batch
 done
 ```
 
-### While Loops
+### While 循环
 
-**Basic while**:
+**基本 while**：
 ```bash
 COUNT=0
 while [ $COUNT -lt 5 ]; do
@@ -508,34 +508,34 @@ while [ $COUNT -lt 5 ]; do
 done
 ```
 
-**Read file line by line**:
+**逐行读取文件**：
 ```bash
 while IFS= read -r line; do
     echo "Line: $line"
 done < file.txt
 
-# Process CSV file
+# 处理 CSV 文件
 while IFS=, read -r name age city; do
     echo "Name: $name, Age: $age, City: $city"
 done < data.csv
 ```
 
-**Infinite loop with break**:
+**带 break 的无限循环**：
 ```bash
 while true; do
     echo "Checking system health..."
 
-    # Check if service is running
+    # 检查服务是否在运行
     if ! systemctl is-active ml-api; then
         echo "Service is down! Restarting..."
         systemctl restart ml-api
     fi
 
-    sleep 60  # Wait 60 seconds
+    sleep 60  # 等待 60 秒
 done
 ```
 
-**Until loop** (runs until condition is true):
+**Until 循环**（一直运行直到条件为真）：
 ```bash
 COUNT=0
 until [ $COUNT -ge 5 ]; do
@@ -544,66 +544,66 @@ until [ $COUNT -ge 5 ]; do
 done
 ```
 
-### Break and Continue
+### Break 和 Continue
 
 ```bash
-# Break - exit loop
+# Break - 退出循环
 for i in {1..10}; do
     if [ $i -eq 5 ]; then
-        break  # Stop loop at 5
+        break  # 在第 5 次停止循环
     fi
     echo $i
 done
-# Output: 1 2 3 4
+# 输出：1 2 3 4
 
-# Continue - skip to next iteration
+# Continue - 跳到下一次迭代
 for i in {1..10}; do
     if [ $i -eq 5 ]; then
-        continue  # Skip 5
+        continue  # 跳过 5
     fi
     echo $i
 done
-# Output: 1 2 3 4 6 7 8 9 10
+# 输出：1 2 3 4 6 7 8 9 10
 ```
 
 ---
 
-## Simple Functions
+## 简单函数
 
-### Defining Functions
+### 定义函数
 
-**Method 1** (with function keyword):
+**方法 1**（带 function 关键字）：
 ```bash
 function greet() {
     echo "Hello, $1!"
 }
 
 greet "Alice"
-# Output: Hello, Alice!
+# 输出：Hello, Alice!
 ```
 
-**Method 2** (POSIX style):
+**方法 2**（POSIX 风格）：
 ```bash
 greet() {
     echo "Hello, $1!"
 }
 
 greet "Bob"
-# Output: Hello, Bob!
+# 输出：Hello, Bob!
 ```
 
-### Function Arguments
+### 函数参数
 
-Functions access arguments through special variables:
-- `$1`, `$2`, `$3`, ... - Individual arguments
-- `$@` - All arguments as separate words
-- `$#` - Number of arguments
+函数通过特殊变量访问参数：
+- `$1`、`$2`、`$3`、... - 各个参数
+- `$@` - 所有参数作为独立单词
+- `$#` - 参数数量
 
 ```bash
 function train_model() {
     local model_name=$1
     local epochs=$2
-    local gpu_id=${3:-0}  # Default to 0 if not provided
+    local gpu_id=${3:-0}  # 如果未提供，默认为 0
 
     echo "Training $model_name"
     echo "Epochs: $epochs"
@@ -612,25 +612,25 @@ function train_model() {
     python train.py --model "$model_name" --epochs "$epochs" --gpu "$gpu_id"
 }
 
-# Call function
+# 调用函数
 train_model "resnet50" 100 2
 ```
 
-### Return Values
+### 返回值
 
-**Exit codes** (0-255):
+**退出码**（0-255）：
 ```bash
 function check_file() {
     local file=$1
 
     if [ -f "$file" ]; then
-        return 0  # Success
+        return 0  # 成功
     else
-        return 1  # Failure
+        return 1  # 失败
     fi
 }
 
-# Use return value
+# 使用返回值
 if check_file "model.h5"; then
     echo "File exists"
 else
@@ -638,7 +638,7 @@ else
 fi
 ```
 
-**Return strings via echo**:
+**通过 echo 返回字符串**：
 ```bash
 function get_model_name() {
     local path=$1
@@ -649,9 +649,9 @@ MODEL_NAME=$(get_model_name "/models/resnet50.h5")
 echo $MODEL_NAME  # resnet50
 ```
 
-### Local Variables
+### 局部变量
 
-Use `local` to keep variables function-scoped:
+使用 `local` 使变量限制在函数作用域内：
 
 ```bash
 GLOBAL_VAR="I am global"
@@ -668,13 +668,13 @@ function test_local() {
 test_local
 
 echo "Outside function:"
-echo "  GLOBAL_VAR: $GLOBAL_VAR"    # Modified global
-echo "  LOCAL_VAR: $LOCAL_VAR"      # Empty - not accessible
+echo "  GLOBAL_VAR: $GLOBAL_VAR"    # 修改后的全局
+echo "  LOCAL_VAR: $LOCAL_VAR"      # 空 - 不可访问
 ```
 
-### Practical Function Examples
+### 实际函数示例
 
-**Logging function**:
+**日志函数**：
 ```bash
 function log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $@"
@@ -685,20 +685,20 @@ log "Epoch 1 complete"
 log "Training finished"
 ```
 
-**Error handling function**:
+**错误处理函数**：
 ```bash
 function die() {
     echo "ERROR: $@" >&2
     exit 1
 }
 
-# Usage
+# 用法
 if [ ! -f "config.yaml" ]; then
     die "Config file not found"
 fi
 ```
 
-**Check if command exists**:
+**检查命令是否存在**：
 ```bash
 function command_exists() {
     command -v "$1" &> /dev/null
@@ -712,11 +712,11 @@ fi
 
 ---
 
-## Command-Line Arguments
+## 命令行参数
 
-### Positional Parameters
+### 位置参数
 
-Scripts access arguments through special variables:
+脚本通过特殊变量访问参数：
 
 ```bash
 #!/bin/bash
@@ -728,9 +728,9 @@ echo "Second argument: $2"
 echo "All arguments: $@"
 echo "Number of arguments: $#"
 
-# Example usage:
+# 示例用法：
 # ./script.sh model.h5 config.yaml
-# Output:
+# 输出：
 # Script name: ./script.sh
 # First argument: model.h5
 # Second argument: config.yaml
@@ -738,9 +738,9 @@ echo "Number of arguments: $#"
 # Number of arguments: 2
 ```
 
-### Processing Arguments
+### 处理参数
 
-**Basic argument handling**:
+**基本参数处理**：
 ```bash
 #!/bin/bash
 # train.sh
@@ -752,19 +752,19 @@ fi
 
 MODEL_NAME=$1
 EPOCHS=$2
-GPU=${3:-0}  # Optional third argument, default to 0
+GPU=${3:-0}  # 可选的第三个参数，默认为 0
 
 echo "Training $MODEL_NAME for $EPOCHS epochs on GPU $GPU"
 python train.py --model "$MODEL_NAME" --epochs "$EPOCHS" --gpu "$GPU"
 ```
 
-### Simple Options with getopts
+### 使用 getopts 进行简单选项解析
 
-`getopts` is a built-in for parsing options:
+`getopts` 是一个用于解析选项的内置命令：
 
 ```bash
 #!/bin/bash
-# train.sh - Training script with options
+# train.sh - 带选项的训练脚本
 
 usage() {
     echo "Usage: $0 [-m MODEL] [-e EPOCHS] [-g GPU] [-h]"
@@ -775,12 +775,12 @@ usage() {
     exit 1
 }
 
-# Defaults
+# 默认值
 MODEL="resnet50"
 EPOCHS=100
 GPU=0
 
-# Parse options
+# 解析选项
 while getopts "m:e:g:h" opt; do
     case $opt in
         m) MODEL="$OPTARG" ;;
@@ -791,7 +791,7 @@ while getopts "m:e:g:h" opt; do
     esac
 done
 
-# Shift past processed options
+# 跳过已处理的选项
 shift $((OPTIND - 1))
 
 echo "Model: $MODEL"
@@ -799,33 +799,33 @@ echo "Epochs: $EPOCHS"
 echo "GPU: $GPU"
 echo "Remaining args: $@"
 
-# Run training
+# 运行训练
 python train.py --model "$MODEL" --epochs "$EPOCHS" --gpu "$GPU"
 
-# Example usage:
+# 示例用法：
 # ./train.sh -m vgg16 -e 50 -g 2
 # ./train.sh -h
 ```
 
 ---
 
-## Basic Error Handling
+## 基本错误处理
 
-### Exit Codes
+### 退出码
 
-Every command returns an exit code:
-- `0` = Success
-- Non-zero = Error
+每个命令返回一个退出码：
+- `0` = 成功
+- 非零 = 错误
 
 ```bash
-# Check last command exit code
+# 检查上一条命令的退出码
 ls /tmp
-echo $?   # 0 (success)
+echo $?   # 0（成功）
 
 ls /nonexistent
-echo $?   # Non-zero (error)
+echo $?   # 非零（错误）
 
-# Use in conditionals
+# 在条件语句中使用
 if ls /data; then
     echo "Directory exists"
 else
@@ -833,58 +833,58 @@ else
 fi
 ```
 
-### Exit on Error
+### 出错时退出
 
-Use `set -e` to exit script on any error:
+使用 `set -e` 在任何错误时退出脚本：
 
 ```bash
 #!/bin/bash
-set -e  # Exit on error
+set -e  # 出错时退出
 
 echo "Step 1"
 command1
 
 echo "Step 2"
-command2  # If this fails, script exits immediately
+command2  # 如果此命令失败，脚本立即退出
 
 echo "Step 3"
-command3  # This won't run if command2 failed
+command3  # 如果 command2 失败，此行不会运行
 ```
 
-### Exit on Undefined Variable
+### 未定义变量时退出
 
-Use `set -u` to exit on undefined variables:
+使用 `set -u` 在未定义变量时退出：
 
 ```bash
 #!/bin/bash
-set -u  # Exit on undefined variable
+set -u  # 未定义变量时退出
 
-echo $UNDEFINED_VAR  # Script exits with error
+echo $UNDEFINED_VAR  # 脚本退出并报错
 ```
 
-### Combining Options
+### 组合选项
 
 ```bash
 #!/bin/bash
-# Strict mode
+# 严格模式
 set -euo pipefail
 
-# -e: Exit on error
-# -u: Exit on undefined variable
-# -o pipefail: Exit if any command in a pipeline fails
+# -e：出错时退出
+# -u：未定义变量时退出
+# -o pipefail：如果管道中任何命令失败则退出
 
-# This is safer:
+# 这更安全：
 command1 | command2 | command3
-# If command2 fails, script exits (due to pipefail)
+# 如果 command2 失败，脚本退出（由于 pipefail）
 ```
 
-### Temporarily Disable Error Exit
+### 临时禁用错误退出
 
 ```bash
 #!/bin/bash
 set -e
 
-# This command might fail, and that's OK
+# 此命令可能失败，没关系
 set +e
 optional_command_that_might_fail
 EXIT_CODE=$?
@@ -894,17 +894,17 @@ if [ $EXIT_CODE -ne 0 ]; then
     echo "Optional command failed, but continuing"
 fi
 
-# Continue with script
+# 继续脚本
 ```
 
-### Error Messages
+### 错误消息
 
-**Print to stderr**:
+**打印到 stderr**：
 ```bash
-# Redirect to stderr with >&2
+# 使用 >&2 重定向到 stderr
 echo "ERROR: File not found" >&2
 
-# Better: Create error function
+# 更好：创建错误函数
 function error() {
     echo "ERROR: $@" >&2
 }
@@ -914,17 +914,17 @@ error "Configuration file missing"
 
 ---
 
-## Practical Examples
+## 实际示例
 
-### Example 1: Environment Setup Script
+### 示例 1：环境搭建脚本
 
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-# setup-ml-env.sh - Set up ML development environment
+# setup-ml-env.sh - 设置 ML 开发环境
 
-# Colors for output
+# 颜色输出
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
@@ -945,26 +945,26 @@ function check_command() {
     return 0
 }
 
-# Main setup
+# 主要设置
 log "Setting up ML environment..."
 
-# Check prerequisites
+# 检查先决条件
 log "Checking prerequisites..."
 check_command python3 || exit 1
 check_command pip || exit 1
 
-# Create virtual environment
+# 创建虚拟环境
 log "Creating virtual environment..."
 python3 -m venv ml-env
 
-# Activate virtual environment
+# 激活虚拟环境
 source ml-env/bin/activate
 
-# Upgrade pip
+# 升级 pip
 log "Upgrading pip..."
 pip install --upgrade pip
 
-# Install packages
+# 安装包
 log "Installing ML packages..."
 pip install numpy pandas scikit-learn tensorflow torch
 
@@ -972,19 +972,19 @@ log "Setup complete!"
 log "To activate: source ml-env/bin/activate"
 ```
 
-### Example 2: Model Training Automation
+### 示例 2：模型训练自动化
 
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-# train-models.sh - Train multiple models
+# train-models.sh - 训练多个模型
 
 MODELS=("resnet50" "vgg16" "mobilenet")
 EPOCHS=10
 LOG_DIR="logs"
 
-# Create log directory
+# 创建日志目录
 mkdir -p "$LOG_DIR"
 
 function log() {
@@ -993,7 +993,7 @@ function log() {
 
 log "Starting training pipeline"
 
-# Train each model
+# 训练每个模型
 for model in "${MODELS[@]}"; do
     log "Training $model..."
 
@@ -1010,12 +1010,12 @@ done
 log "All models trained successfully"
 ```
 
-### Example 3: System Health Check
+### 示例 3：系统健康检查
 
 ```bash
 #!/bin/bash
 
-# health-check.sh - Check system health
+# health-check.sh - 检查系统健康
 
 WARN_CPU=80
 WARN_MEM=85
@@ -1055,7 +1055,7 @@ function check_disk() {
     return 0
 }
 
-# Run checks
+# 运行检查
 echo "=== System Health Check $(date) ==="
 echo ""
 
@@ -1074,13 +1074,13 @@ fi
 exit $STATUS
 ```
 
-### Example 4: Backup Script
+### 示例 4：备份脚本
 
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-# backup-models.sh - Backup ML models
+# backup-models.sh - 备份 ML 模型
 
 SOURCE_DIR="/models/production"
 BACKUP_DIR="/backups/models"
@@ -1091,20 +1091,20 @@ function log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $@"
 }
 
-# Check if source exists
+# 检查源是否存在
 if [ ! -d "$SOURCE_DIR" ]; then
     log "ERROR: Source directory not found: $SOURCE_DIR"
     exit 1
 fi
 
-# Create backup directory
+# 创建备份目录
 mkdir -p "$BACKUP_DIR"
 
-# Create backup
+# 创建备份
 log "Creating backup: $BACKUP_NAME"
 tar -czf "${BACKUP_DIR}/${BACKUP_NAME}" -C "$(dirname $SOURCE_DIR)" "$(basename $SOURCE_DIR)"
 
-# Verify backup
+# 验证备份
 if [ -f "${BACKUP_DIR}/${BACKUP_NAME}" ]; then
     SIZE=$(du -h "${BACKUP_DIR}/${BACKUP_NAME}" | cut -f1)
     log "Backup created successfully: ${BACKUP_NAME} (${SIZE})"
@@ -1113,7 +1113,7 @@ else
     exit 1
 fi
 
-# Keep only last 7 days of backups
+# 仅保留最近 7 天的备份
 log "Cleaning old backups..."
 find "$BACKUP_DIR" -name "models_backup_*.tar.gz" -mtime +7 -delete
 
@@ -1122,113 +1122,113 @@ log "Backup complete"
 
 ---
 
-## Summary and Key Takeaways
+## 总结和要点
 
-### Commands and Syntax Mastered
+### 掌握的命令和语法
 
-**Script Basics**:
-- `#!/bin/bash` - Shebang line
-- `chmod +x script.sh` - Make executable
-- `./script.sh` - Run script
+**脚本基础**：
+- `#!/bin/bash` - Shebang 行
+- `chmod +x script.sh` - 使其可执行
+- `./script.sh` - 运行脚本
 
-**Variables**:
-- `VAR=value` - Assignment (no spaces!)
-- `$VAR` or `${VAR}` - Reference variable
-- `$(command)` - Command substitution
-- `$((expression))` - Arithmetic
+**变量**：
+- `VAR=value` - 赋值（无空格！）
+- `$VAR` 或 `${VAR}` - 引用变量
+- `$(command)` - 命令替换
+- `$((expression))` - 算术运算
 
-**Control Flow**:
-- `if [ condition ]; then ... fi` - Conditional
-- `for item in list; do ... done` - For loop
-- `while [ condition ]; do ... done` - While loop
+**控制流**：
+- `if [ condition ]; then ... fi` - 条件语句
+- `for item in list; do ... done` - For 循环
+- `while [ condition ]; do ... done` - While 循环
 
-**Functions**:
-- `function name() { ... }` - Define function
-- `$1, $2, $3` - Function arguments
-- `return` - Exit code
-- `local VAR` - Local variable
+**函数**：
+- `function name() { ... }` - 定义函数
+- `$1, $2, $3` - 函数参数
+- `return` - 退出码
+- `local VAR` - 局部变量
 
-**Error Handling**:
-- `set -e` - Exit on error
-- `set -u` - Exit on undefined variable
-- `set -o pipefail` - Exit on pipe failures
-- `$?` - Last exit code
+**错误处理**：
+- `set -e` - 出错时退出
+- `set -u` - 未定义变量时退出
+- `set -o pipefail` - 管道失败时退出
+- `$?` - 上一次退出码
 
-### Key Concepts
+### 关键概念
 
-1. **Scripts are programs**: Write scripts like any other program with structure and documentation
-2. **Variables store data**: Use variables to make scripts flexible and maintainable
-3. **Control flow guides execution**: if/for/while determine what code runs
-4. **Functions promote reuse**: Write once, use many times
-5. **Error handling prevents disasters**: Always handle errors gracefully
+1. **脚本即程序**：像编写任何其他程序一样编写脚本，包含结构和文档
+2. **变量存储数据**：使用变量使脚本灵活且可维护
+3. **控制流指导执行**：if/for/while 决定运行哪些代码
+4. **函数促进重用**：编写一次，多次使用
+5. **错误处理防止灾难**：始终优雅地处理错误
 
-### Best Practices Learned
+### 最佳实践
 
-✅ **Always use shebang**: `#!/bin/bash`
-✅ **Quote variables**: `"$VAR"` not `$VAR`
-✅ **Use local in functions**: Prevents variable conflicts
-✅ **Check exit codes**: Verify commands succeeded
-✅ **Add comments**: Explain what and why
-✅ **Use meaningful names**: `model_name` not `x`
-✅ **Handle errors**: Use `set -e` or check return values
-✅ **Test scripts**: Run with test data before production
+✅ **始终使用 shebang**：`#!/bin/bash`
+✅ **引用变量**：`"$VAR"` 而不是 `$VAR`
+✅ **在函数中使用 local**：防止变量冲突
+✅ **检查退出码**：验证命令是否成功
+✅ **添加注释**：解释做了什么和为什么
+✅ **使用有意义的名称**：`model_name` 而不是 `x`
+✅ **处理错误**：使用 `set -e` 或检查返回值
+✅ **测试脚本**：在生产前使用测试数据运行
 
-### Common Patterns for AI Infrastructure
+### AI 基础设施的常见模式
 
 ```bash
-# Check if file exists before using
+# 使用前检查文件是否存在
 if [ ! -f "model.h5" ]; then
     echo "Model not found"
     exit 1
 fi
 
-# Loop over models
+# 遍历模型
 for model in resnet50 vgg16 inception; do
     python train.py --model "$model"
 done
 
-# Create timestamp for logs
+# 为日志创建时间戳
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 LOG_FILE="training_${TIMESTAMP}.log"
 
-# Run with GPU selection
+# 带 GPU 选择运行
 for gpu in 0 1 2 3; do
     CUDA_VISIBLE_DEVICES=$gpu python train.py --gpu $gpu &
 done
 wait
 
-# Simple error handling
+# 简单错误处理
 if ! python train.py; then
     echo "Training failed"
     exit 1
 fi
 ```
 
-### Next Steps
+### 下一步
 
-In **Lecture 06: Advanced Shell Scripting**, you'll learn:
-- Advanced control structures (case statements)
-- Arrays and associative arrays
-- String manipulation and regex
-- Advanced argument processing
-- Complex error handling and debugging
-- Script templates and best practices
+在**讲座 06：高级 Shell 脚本**中，你将学习：
+- 高级控制结构（case 语句）
+- 数组和关联数组
+- 字符串操作和正则表达式
+- 高级参数处理
+- 复杂错误处理和调试
+- 脚本模板和最佳实践
 
-### Quick Reference
+### 快速参考
 
 ```bash
-# Variables
+# 变量
 VAR="value"
 echo "$VAR"
 RESULT=$(command)
 NUM=$((5 + 3))
 
-# Conditionals
+# 条件语句
 if [ condition ]; then
     # code
 fi
 
-# Loops
+# 循环
 for item in list; do
     # code
 done
@@ -1237,20 +1237,20 @@ while [ condition ]; do
     # code
 done
 
-# Functions
+# 函数
 function name() {
     local var=$1
     echo "result"
     return 0
 }
 
-# Arguments
-$0  # Script name
-$1  # First arg
-$#  # Arg count
-$@  # All args
+# 参数
+$0  # 脚本名
+$1  # 第一个参数
+$#  # 参数个数
+$@  # 所有参数
 
-# Error handling
+# 错误处理
 set -e
 if ! command; then
     echo "Error" >&2
@@ -1260,8 +1260,8 @@ fi
 
 ---
 
-**End of Lecture 05: Introduction to Shell Scripting**
+**讲座 05：Shell 脚本入门结束**
 
-You now have the foundation to write simple but powerful shell scripts for AI infrastructure automation. Practice writing scripts for your daily tasks to build confidence and fluency.
+你现在已经具备了为 AI 基础设施自动化编写简单但强大的 shell 脚本的基础。练习为日常任务编写脚本，以建立信心和熟练度。
 
-**Next**: Lecture 06 - Advanced Shell Scripting
+**下一步**：讲座 06 - 高级 Shell 脚本

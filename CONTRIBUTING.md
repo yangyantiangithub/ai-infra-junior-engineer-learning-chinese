@@ -1,216 +1,216 @@
-# Contributing to AI Infrastructure Junior Engineer Learning Repository
+# 贡献指南 — AI Infrastructure Junior Engineer 学习资料库
 
-Thank you for your interest in contributing to the AI Infrastructure Curriculum! This repository is designed to help aspiring AI Infrastructure Engineers learn the foundational skills needed to start their careers. Your contributions help make this learning resource better for everyone.
+感谢你对 AI Infrastructure 课程的兴趣！本仓库旨在帮助有志成为 AI 基础设施工程师的学习者掌握入门所需的技能。你的贡献将帮助这个学习资源变得更好，惠及所有人。
 
-## Table of Contents
+## 目录
 
-- [Code of Conduct](#code-of-conduct)
-- [How Can I Contribute?](#how-can-i-contribute)
-- [Getting Started](#getting-started)
-- [Contribution Guidelines](#contribution-guidelines)
-- [Pull Request Process](#pull-request-process)
-- [Style Guides](#style-guides)
-- [Community](#community)
+- [行为准则](#行为准则)
+- [如何贡献？](#如何贡献)
+- [快速开始](#快速开始)
+- [贡献指南](#贡献指南)
+- [拉取请求流程](#拉取请求流程)
+- [风格指南](#风格指南)
+- [社区](#社区)
 
-## Code of Conduct
+## 行为准则
 
-This project and everyone participating in it is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to ai-infra-curriculum@joshua-ferguson.com.
+本项目及所有参与者均受我们的[行为准则](CODE_OF_CONDUCT.md)约束。参与即表示你同意遵守该准则。请将不可接受的行为报告至 ai-infra-curriculum@joshua-ferguson.com。
 
-## How Can I Contribute?
+## 如何贡献？
 
-### Reporting Bugs or Issues
+### 报告 Bug 或问题
 
-If you find a bug in the code, documentation, or learning materials:
+如果你在代码、文档或学习材料中发现错误：
 
-1. **Check existing issues** to see if it's already been reported
-2. If not, **create a new issue** using our bug report template
-3. Include:
-   - Clear, descriptive title
-   - Steps to reproduce the issue
-   - Expected behavior vs. actual behavior
-   - Your environment (OS, Python version, etc.)
-   - Screenshots or error messages if applicable
+1. **检查现有 Issues**，看是否已被报告
+2. 如果没有，**创建一个新的 Issue**，使用我们的 Bug 报告模板
+3. 包含：
+   - 清晰、描述性的标题
+   - 复现步骤
+   - 预期行为 vs 实际行为
+   - 你的环境（操作系统、Python 版本等）
+   - 截图或错误信息（如适用）
 
-### Suggesting Enhancements
+### 建议改进
 
-Have an idea to improve the learning experience?
+有改进学习体验的想法？
 
-1. **Check existing issues** to avoid duplicates
-2. **Create a new issue** using our feature request template
-3. Clearly describe:
-   - The problem or gap you've identified
-   - Your proposed solution
-   - Why this would benefit learners
-   - Any alternative solutions you've considered
+1. **检查现有 Issues**，避免重复
+2. **创建新的 Issue**，使用功能请求模板
+3. 清晰描述：
+   - 你发现的问题或差距
+   - 你建议的解决方案
+   - 为什么这对学习者有益
+   - 你考虑过的任何替代方案
 
-### Improving Documentation
+### 改进文档
 
-Documentation improvements are always welcome! This includes:
+文档改进始终受欢迎！包括：
 
-- Fixing typos or grammatical errors
-- Clarifying confusing explanations
-- Adding examples or diagrams
-- Improving code comments
-- Expanding the README or guides
+- 修正拼写或语法错误
+- 澄清令人困惑的说明
+- 添加示例或图表
+- 改进代码注释
+- 扩展 README 或指南
 
-For small fixes (typos, grammar), feel free to submit a PR directly. For larger changes, please open an issue first to discuss.
+对于小修正（拼写、语法），可以直接提交 PR。对于较大的更改，请先开启 Issue 进行讨论。
 
-### Contributing Code or Exercises
+### 贡献代码或练习
 
-We welcome contributions of:
+我们欢迎以下贡献：
 
-- Bug fixes to existing code stubs
-- Improvements to exercise clarity
-- Additional test cases
-- Better code examples
-- New resources or references
+- 修复现有代码框架中的 Bug
+- 改进练习的清晰度
+- 添加更多测试用例
+- 更好的代码示例
+- 新的资源或参考资料
 
-**Important**: This is a **learning repository**. Code stubs should remain incomplete with clear TODOs. Do not submit complete solutions to this repository (those belong in the solutions repository).
+**重要**：这是一个**学习仓库**。代码框架应保持不完整，并带有清晰的 TODO 标记。请勿向本仓库提交完整的解决方案（这些应放在解答仓库中）。
 
-### Improving Learning Materials
+### 改进学习材料
 
-Help make the lessons better by:
+通过以下方式帮助改进课程：
 
-- Clarifying difficult concepts
-- Adding real-world examples
-- Creating diagrams or visualizations
-- Suggesting additional resources
-- Improving exercise instructions
-- Adding practice problems
+- 澄清难懂的概念
+- 添加真实世界的示例
+- 创建图表或可视化
+- 建议更多资源
+- 改进练习说明
+- 添加练习题目
 
-## Getting Started
+## 快速开始
 
-### Prerequisites
+### 先决条件
 
-- Python 3.11 or higher
+- Python 3.11 或更高版本
 - Git
-- GitHub account
-- Basic understanding of AI/ML concepts (or willingness to learn!)
+- GitHub 账号
+- 对 AI/ML 概念有基本了解（或愿意学习！）
 
-### Setting Up Your Development Environment
+### 配置开发环境
 
-1. **Fork the repository** on GitHub
+1. **Fork 仓库**到你的 GitHub
 
-2. **Clone your fork** locally:
+2. **克隆你的 Fork**到本地：
    ```bash
-   git clone https://github.com/YOUR-USERNAME/ai-infra-junior-engineer-learning.git
+   git clone https://github.com/你的用户名/ai-infra-junior-engineer-learning.git
    cd ai-infra-junior-engineer-learning
    ```
 
-3. **Add the upstream repository**:
+3. **添加上游仓库**：
    ```bash
    git remote add upstream https://github.com/ai-infra-curriculum/ai-infra-junior-engineer-learning.git
    ```
 
-4. **Create a virtual environment**:
+4. **创建虚拟环境**：
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   source venv/bin/activate  # Windows: venv\Scripts\activate
    ```
 
-5. **Install dependencies**:
+5. **安装依赖**：
    ```bash
    pip install -r requirements.txt
-   pip install -e .  # Install in development mode
+   pip install -e .  # 以开发模式安装
    ```
 
-6. **Install pre-commit hooks** (optional but recommended):
+6. **安装预提交钩子**（可选但推荐）：
    ```bash
    pre-commit install
    ```
 
-### Running Tests
+### 运行测试
 
-Before submitting changes, ensure all tests pass:
+在提交更改前，确保所有测试通过：
 
 ```bash
-# Run all tests
+# 运行所有测试
 pytest
 
-# Run with coverage
+# 带覆盖率运行
 pytest --cov
 
-# Run specific test file
+# 运行特定测试文件
 pytest tests/test_specific.py
 ```
 
-### Code Quality Checks
+### 代码质量检查
 
-We use several tools to maintain code quality:
+我们使用多种工具来维护代码质量：
 
 ```bash
-# Format code with black
+# 使用 black 格式化代码
 black .
 
-# Sort imports
+# 排序导入
 isort .
 
-# Lint with flake8
+# 使用 flake8 进行代码检查
 flake8 .
 
-# Type checking with mypy
+# 使用 mypy 进行类型检查
 mypy .
 
-# Or run all checks at once with pre-commit
+# 或使用预提交一次性运行所有检查
 pre-commit run --all-files
 ```
 
-## Contribution Guidelines
+## 贡献指南
 
-### General Principles
+### 一般原则
 
-1. **Keep it Educational**: Remember this is a learning resource. Code should be clear and well-commented.
+1. **保持教育性**：记住这是一个学习资源。代码应清晰且注释完善。
 
-2. **Maintain Difficulty Level**: This is the Junior Engineer repository. Keep complexity appropriate for beginners.
+2. **维持难度级别**：这是初级工程师仓库。保持复杂度适合初学者。
 
-3. **Follow Existing Patterns**: Match the style and structure of existing content.
+3. **遵循现有模式**：与现有内容和结构保持一致。
 
-4. **Test Your Changes**: Ensure code works and tests pass.
+4. **测试你的更改**：确保代码可用且测试通过。
 
-5. **Document Everything**: Clear explanations help learners understand.
+5. **记录一切**：清晰的说明有助于学习者理解。
 
-### What Makes a Good Contribution?
+### 什么样的贡献是好的？
 
-Good contributions are:
+好的贡献是：
 
-- **Clear and focused**: One logical change per PR
-- **Well-tested**: Include or update tests as needed
-- **Well-documented**: Explain what changed and why
-- **Pedagogically sound**: Helps learners understand concepts
-- **Accessible**: Uses clear language and explains jargon
-- **Complete**: Includes all necessary files and updates
+- **清晰且专注**：每个 PR 一个逻辑变更
+- **经过充分测试**：根据需要包含或更新测试
+- **文档完善**：说明更改了什么以及为什么
+- **教学价值**：帮助学习者理解概念
+- **易于理解**：使用清晰的语言并解释行话
+- **完整**：包含所有必要的文件和更新
 
-### What We're NOT Looking For
+### 我们不想要的
 
-Please avoid:
+请避免：
 
-- Complete solutions to exercises (use the solutions repo instead)
-- Advanced topics beyond junior engineer scope
-- Large refactors without prior discussion
-- Changes that break existing functionality
-- Poorly documented or tested code
-- Plagiarized content
+- 练习的完整解答（请使用解答仓库）
+- 超出初级工程师范围的进阶主题
+- 未经事先讨论的大规模重构
+- 破坏现有功能的更改
+- 文档或测试不完善的代码
+- 抄袭内容
 
-## Pull Request Process
+## 拉取请求流程
 
-### Before You Submit
+### 提交之前
 
-1. **Create a new branch** for your changes:
+1. **为你的更改创建新分支**：
    ```bash
-   git checkout -b feature/your-feature-name
-   # or
-   git checkout -b fix/your-bug-fix
+   git checkout -b feature/你的功能名称
+   # 或
+   git checkout -b fix/你的修复名称
    ```
 
-2. **Keep your fork updated**:
+2. **保持你的 Fork 更新**：
    ```bash
    git fetch upstream
    git rebase upstream/main
    ```
 
-3. **Make your changes** following our guidelines
+3. **按照指南进行更改**
 
-4. **Run tests and quality checks**:
+4. **运行测试和质量检查**：
    ```bash
    pytest
    black .
@@ -218,70 +218,70 @@ Please avoid:
    mypy .
    ```
 
-5. **Commit your changes** with clear messages:
+5. **提交更改**，使用清晰的信息：
    ```bash
    git add .
    git commit -m "feat: add exercise for model deployment"
    ```
 
-   We follow [Conventional Commits](https://www.conventionalcommits.org/):
-   - `feat:` new features or exercises
-   - `fix:` bug fixes
-   - `docs:` documentation changes
-   - `test:` adding or updating tests
-   - `refactor:` code refactoring
-   - `style:` formatting changes
-   - `chore:` maintenance tasks
+   我们遵循[约定式提交](https://www.conventionalcommits.org/)：
+   - `feat:` 新功能或练习
+   - `fix:` Bug 修复
+   - `docs:` 文档更改
+   - `test:` 添加或更新测试
+   - `refactor:` 代码重构
+   - `style:` 格式化更改
+   - `chore:` 维护任务
 
-6. **Push to your fork**:
+6. **推送到你的 Fork**：
    ```bash
-   git push origin feature/your-feature-name
+   git push origin feature/你的功能名称
    ```
 
-### Submitting Your PR
+### 提交 PR
 
-1. Go to the original repository on GitHub
-2. Click "New Pull Request"
-3. Select your fork and branch
-4. Fill out the PR template completely
-5. Link any related issues
-6. Submit the PR
+1. 前往 GitHub 上的原始仓库
+2. 点击 "New Pull Request"
+3. 选择你的 Fork 和分支
+4. 完整填写 PR 模板
+5. 关联相关的 Issues
+6. 提交 PR
 
-### PR Review Process
+### PR 审查流程
 
-1. **Automated checks** will run (tests, linting, etc.)
-2. **Maintainers will review** your code (usually within 3-5 days)
-3. **Address feedback** by pushing new commits to your branch
-4. Once approved, a maintainer will **merge your PR**
+1. **自动化检查**将运行（测试、代码检查等）
+2. **维护者将审查**你的代码（通常在 3-5 天内）
+3. **处理反馈**：通过向你的分支推送新提交来解决
+4. 一旦获批，维护者将**合并你的 PR**
 
-### After Your PR is Merged
+### PR 合并后
 
-1. **Delete your branch**:
+1. **删除你的分支**：
    ```bash
-   git branch -d feature/your-feature-name
-   git push origin --delete feature/your-feature-name
+   git branch -d feature/你的功能名称
+   git push origin --delete feature/你的功能名称
    ```
 
-2. **Update your fork**:
+2. **更新你的 Fork**：
    ```bash
    git checkout main
    git pull upstream main
    git push origin main
    ```
 
-3. **Celebrate!** You've contributed to open source education!
+3. **庆祝！** 你为开源教育做出了贡献！
 
-## Style Guides
+## 风格指南
 
-### Python Code Style
+### Python 代码风格
 
-- Follow [PEP 8](https://pep8.org/)
-- Use [Black](https://black.readthedocs.io/) for formatting (line length: 88)
-- Use [isort](https://pycqa.github.io/isort/) for import sorting
-- Add type hints using Python 3.11+ syntax
-- Write docstrings in [Google style](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)
+- 遵循 [PEP 8](https://pep8.org/)
+- 使用 [Black](https://black.readthedocs.io/) 格式化（行长度：88）
+- 使用 [isort](https://pycqa.github.io/isort/) 排序导入
+- 使用 Python 3.11+ 语法添加类型提示
+- 使用 [Google 风格](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)编写文档字符串
 
-Example:
+示例：
 
 ```python
 from typing import List, Optional
@@ -292,155 +292,155 @@ def process_model_data(
     normalize: bool = True,
     scaling_factor: Optional[float] = None,
 ) -> List[float]:
-    """Process model input data with optional normalization.
+    """处理模型输入数据，可选归一化。
 
     Args:
-        data: Input data points to process
-        normalize: Whether to normalize the data
-        scaling_factor: Optional scaling factor to apply
+        data: 待处理的输入数据点
+        normalize: 是否对数据进行归一化
+        scaling_factor: 可选的比例因子
 
     Returns:
-        Processed data ready for model inference
+        已处理的数据，可用于模型推理
 
     Raises:
-        ValueError: If data is empty or scaling_factor is negative
+        ValueError: 如果数据为空或 scaling_factor 为负数
     """
-    # TODO: Implement data processing logic
+    # TODO: 实现数据处理逻辑
     pass
 ```
 
-### Documentation Style
+### 文档风格
 
-- Use clear, simple language
-- Define technical terms when first used
-- Include code examples
-- Use diagrams where helpful
-- Keep paragraphs short and scannable
-- Use headers to organize content
+- 使用清晰、简单的语言
+- 首次使用技术术语时给出定义
+- 包含代码示例
+- 在有助于理解时使用图表
+- 保持段落简短且易于浏览
+- 使用标题组织内容
 
-### Markdown Style
+### Markdown 风格
 
-- Use ATX-style headers (`#` not underlines)
-- One blank line before and after headers
-- Use fenced code blocks with language specification
-- Keep line length reasonable (80-100 characters)
-- Use relative links for internal references
+- 使用 ATX 风格标题（`#` 而非下划线）
+- 标题前后加一个空行
+- 使用带语言说明的围栏代码块
+- 行长度保持在合理范围（80-100 个字符）
+- 内部引用使用相对链接
 
-### Commit Message Style
+### 提交信息风格
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
+遵循[约定式提交](https://www.conventionalcommits.org/)：
 
 ```
-type(scope): brief description
+type(scope): 简要描述
 
-Longer explanation if needed. Wrap at 72 characters.
+更长的说明（如需要）。在 72 个字符处换行。
 
-- Bullet points are okay
-- Use present tense: "add" not "added"
-- Reference issues: "fixes #123"
+- 可以使用项目符号
+- 使用现在时："add" 而非 "added"
+- 引用 Issues："fixes #123"
 
-BREAKING CHANGE: description of breaking change if applicable
+BREAKING CHANGE: 如涉及破坏性更改，在此描述
 ```
 
-Types:
-- `feat`: New feature or exercise
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `test`: Test changes
-- `refactor`: Code refactoring
-- `style`: Formatting changes
-- `chore`: Maintenance
+类型：
+- `feat`：新功能或练习
+- `fix`：Bug 修复
+- `docs`：文档更改
+- `test`：测试更改
+- `refactor`：代码重构
+- `style`：格式化更改
+- `chore`：维护
 
-### Exercise and Lesson Guidelines
+### 练习和课程指南
 
-When creating or modifying exercises:
+创建或修改练习时：
 
-1. **Clear Learning Objective**: State what the learner will accomplish
-2. **Prerequisites**: List required knowledge or completed lessons
-3. **Step-by-Step Instructions**: Break complex tasks into manageable steps
-4. **Expected Outcomes**: Describe what success looks like
-5. **Common Pitfalls**: Warn about typical mistakes
-6. **Resources**: Link to relevant documentation or tutorials
-7. **Estimated Time**: Give realistic time expectations
+1. **明确的学习目标**：说明学习者将达成什么
+2. **先修要求**：列出所需的知识或已完成的课程
+3. **分步指导**：将复杂任务分解为可管理的步骤
+4. **预期结果**：描述成功的结果是什么
+5. **常见陷阱**：提醒典型的错误
+6. **资源**：链接到相关文档或教程
+7. **预计时间**：给出合理的时间预期
 
-Example structure:
+示例结构：
 
 ```markdown
-## Exercise: Deploy Your First Model
+## 练习：部署你的第一个模型
 
-**Learning Objective**: Deploy a trained scikit-learn model using FastAPI
+**学习目标**：使用 FastAPI 部署训练好的 scikit-learn 模型
 
-**Prerequisites**:
-- Completed Lesson 03: Model Training
-- Basic understanding of REST APIs
-- Python 3.11+ installed
+**先修要求**：
+- 已完成课程 03：模型训练
+- 基本了解 REST API
+- 已安装 Python 3.11+
 
-**Estimated Time**: 45 minutes
+**预计时间**：45 分钟
 
-### Instructions
+### 操作说明
 
-1. **Set up FastAPI application**
+1. **设置 FastAPI 应用**
    ```python
-   # TODO: Import required libraries
-   # TODO: Create FastAPI app instance
+   # TODO: 导入所需库
+   # TODO: 创建 FastAPI 应用实例
    ```
 
-2. **Load the trained model**
-   - Model file is located at `models/classifier.pkl`
-   - Use joblib to load the model
+2. **加载训练好的模型**
+   - 模型文件位于 `models/classifier.pkl`
+   - 使用 joblib 加载模型
 
-   [Continue with detailed steps...]
+   [继续详细的步骤...]
 
-### Expected Outcome
+### 预期结果
 
-You should have a running API that:
-- Accepts POST requests with feature data
-- Returns predictions in JSON format
-- Handles errors gracefully
+你应该有一个运行中的 API，能够：
+- 接收带有特征数据的 POST 请求
+- 以 JSON 格式返回预测结果
+- 优雅地处理错误
 
-### Common Pitfalls
+### 常见陷阱
 
-- **Model loading errors**: Ensure pickle compatibility
-- **Port conflicts**: Check if port 8000 is already in use
-- **Data validation**: Use Pydantic for input validation
+- **模型加载错误**：确保 pickle 兼容性
+- **端口冲突**：检查端口 8000 是否已被占用
+- **数据验证**：使用 Pydantic 进行输入验证
 
-### Resources
+### 资源
 
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [Model Serialization Guide](link)
+- [FastAPI 文档](https://fastapi.tiangolo.com/)
+- [模型序列化指南](link)
 ```
 
-## Community
+## 社区
 
-### Getting Help
+### 获取帮助
 
-- **Issues**: Browse existing issues or create a new one
-- **Discussions**: Use GitHub Discussions for questions
-- **Email**: ai-infra-curriculum@joshua-ferguson.com
+- **Issues**：浏览现有 Issues 或创建新的
+- **Discussions**：使用 GitHub Discussions 提问
+- **邮件**：ai-infra-curriculum@joshua-ferguson.com
 
-### Recognition
+### 认可
 
-Contributors will be:
-- Listed in our Contributors section
-- Credited in release notes
-- Mentioned in our community highlights
+贡献者将：
+- 被列入我们的贡献者名单
+- 在发布说明中被致谢
+- 在社区精选中被提及
 
-### Staying Connected
+### 保持联系
 
-- Watch the repository for updates
-- Star the repo to show support
-- Share your learning journey on social media with `#AIInfraCurriculum`
+- Watch 仓库获取更新
+- Star 仓库以示支持
+- 使用 `#AIInfraCurriculum` 在社交媒体上分享你的学习历程
 
-## Questions?
+## 有问题？
 
-Don't hesitate to ask! We're here to help:
+不要犹豫，随时提问！我们在这里提供帮助：
 
-- Open a GitHub Discussion
-- Comment on relevant issues
-- Email us at ai-infra-curriculum@joshua-ferguson.com
+- 开启 GitHub Discussion
+- 在相关 Issue 中评论
+- 发送邮件至 ai-infra-curriculum@joshua-ferguson.com
 
-Thank you for helping make AI Infrastructure education better for everyone!
+感谢你帮助让 AI 基础设施教育变得更好！
 
 ---
 
-**Remember**: This is a learning community. We value patience, kindness, and the desire to help others succeed. Every contribution, no matter how small, makes a difference.
+**记住**：这是一个学习社区。我们珍视耐心、善意以及帮助他人成功的意愿。每一份贡献，无论大小，都至关重要。

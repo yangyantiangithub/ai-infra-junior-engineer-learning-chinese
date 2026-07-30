@@ -1,53 +1,53 @@
-# Exercise 02: TensorFlow Model Inference
+# 练习 02：TensorFlow 模型推理
 
-## Exercise Overview
+## 练习概述
 
-**Objective**: Load pre-trained TensorFlow/Keras models, run inference on images, measure performance, and explore TensorFlow Serving basics.
+**目标**：加载预训练的 TensorFlow/Keras 模型，对图像运行推理，测量性能，并探索 TensorFlow Serving 基础。
 
-**Difficulty**: Beginner
-**Estimated Time**: 2-3 hours
-**Prerequisites**: Lecture 03 (TensorFlow Basics)
+**难度**：初级
+**预计时间**：2-3 小时
+**前置要求**：讲座 03（TensorFlow 基础）
 
-**What You'll Learn**:
-- Loading pre-trained models from keras.applications
-- Preprocessing images for TensorFlow models
-- Running inference with TensorFlow/Keras APIs
-- Measuring inference latency and throughput
-- Introduction to TensorFlow Serving
-- SavedModel format and model export
-
----
-
-## Learning Objectives
-
-By the end of this exercise, you will be able to:
-
-✅ Load pre-trained Keras models from keras.applications
-✅ Preprocess images using TensorFlow preprocessing functions
-✅ Run inference using both Keras and TensorFlow APIs
-✅ Measure and optimize TensorFlow inference performance
-✅ Export models in SavedModel format
-✅ Understand TensorFlow Serving fundamentals
-✅ Compare TensorFlow and PyTorch inference patterns
+**你将学到**：
+- 从 keras.applications 加载预训练模型
+- 为 TensorFlow 模型预处理图像
+- 使用 TensorFlow/Keras API 运行推理
+- 测量推理延迟和吞吐量
+- 了解 TensorFlow Serving
+- SavedModel 格式和模型导出
 
 ---
 
-## Part 1: Environment Setup
+## 学习目标
 
-### Step 1.1: Install Dependencies
+到本练习结束时，你将能够：
+
+✅ 从 keras.applications 加载预训练 Keras 模型
+✅ 使用 TensorFlow 预处理函数预处理图像
+✅ 使用 Keras 和 TensorFlow API 运行推理
+✅ 测量和优化 TensorFlow 推理性能
+✅ 以 SavedModel 格式导出模型
+✅ 理解 TensorFlow Serving 基础
+✅ 比较 TensorFlow 和 PyTorch 推理模式
+
+---
+
+## 第 1 部分：环境设置
+
+### 步骤 1.1：安装依赖
 
 ```bash
-# Create virtual environment
+# 创建虚拟环境
 python -m venv tensorflow_inference_env
-source tensorflow_inference_env/bin/activate  # On Windows: tensorflow_inference_env\Scripts\activate
+source tensorflow_inference_env/bin/activate  # Windows: tensorflow_inference_env\Scripts\activate
 
-# Install TensorFlow and dependencies
+# 安装 TensorFlow 和依赖
 pip install tensorflow pillow requests numpy matplotlib
 ```
 
-**Note**: TensorFlow 2.x includes Keras by default, so no separate Keras installation is needed.
+**注意**：TensorFlow 2.x 默认包含 Keras，因此无需单独安装 Keras。
 
-### Step 1.2: Verify Installation
+### 步骤 1.2：验证安装
 
 ```python
 # verify_installation.py
@@ -58,7 +58,7 @@ print(f"TensorFlow version: {tf.__version__}")
 print(f"Keras version: {tf.keras.__version__}")
 print(f"Numpy version: {np.__version__}")
 
-# Check for GPU
+# 检查 GPU
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
     print(f"GPU available: {len(gpus)} device(s)")
@@ -67,10 +67,10 @@ if gpus:
 else:
     print("Running on CPU")
 
-# Check GPU memory configuration
+# 检查 GPU 内存配置
 if gpus:
     try:
-        # Prevent TensorFlow from allocating all GPU memory
+        # 防止 TensorFlow 分配所有 GPU 内存
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
         print("GPU memory growth enabled")
@@ -78,7 +78,7 @@ if gpus:
         print(f"Memory growth setting error: {e}")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 TensorFlow version: 2.15.0
 Keras version: 2.15.0
@@ -88,17 +88,17 @@ GPU available: 1 device(s)
 GPU memory growth enabled
 ```
 
-### Step 1.3: Download Test Images
+### 步骤 1.3：下载测试图像
 
 ```python
 # download_images.py
 import urllib.request
 import os
 
-# Create images directory
+# 创建图像目录
 os.makedirs("test_images", exist_ok=True)
 
-# Download sample images
+# 下载样本图像
 images = {
     "elephant.jpg": "https://upload.wikimedia.org/wikipedia/commons/3/37/African_Bush_Elephant.jpg",
     "tiger.jpg": "https://upload.wikimedia.org/wikipedia/commons/5/56/Tiger.50.jpg",
@@ -118,24 +118,24 @@ print("\nAll images downloaded!")
 print(f"Images location: {os.path.abspath('test_images')}")
 ```
 
-✅ **Checkpoint**: You should have TensorFlow environment set up and 3 test images downloaded.
+✅ **检查点**：你应该已经设置好 TensorFlow 环境并下载了 3 张测试图像。
 
 ---
 
-## Part 2: Loading Pre-trained Models
+## 第 2 部分：加载预训练模型
 
-### Step 2.1: Load MobileNetV2 from keras.applications
+### 步骤 2.1：从 keras.applications 加载 MobileNetV2
 
 ```python
 # load_model.py
 import tensorflow as tf
 from tensorflow import keras
 
-# Load pre-trained MobileNetV2
+# 加载预训练 MobileNetV2
 print("Loading MobileNetV2...")
 model = keras.applications.MobileNetV2(
-    weights='imagenet',  # Use pre-trained ImageNet weights
-    include_top=True,    # Include classification head
+    weights='imagenet',  # 使用预训练的 ImageNet 权重
+    include_top=True,    # 包含分类头
     input_shape=(224, 224, 3)
 )
 
@@ -143,7 +143,7 @@ print(f"Model loaded: {model.name}")
 print(f"Input shape: {model.input_shape}")
 print(f"Output shape: {model.output_shape}")
 
-# Count parameters
+# 统计参数
 trainable_params = sum([tf.size(w).numpy() for w in model.trainable_weights])
 total_params = sum([tf.size(w).numpy() for w in model.weights])
 
@@ -151,7 +151,7 @@ print(f"Trainable parameters: {trainable_params:,}")
 print(f"Total parameters: {total_params:,}")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 Downloading data from https://storage.googleapis.com/tensorflow/keras-applications/mobilenet_v2/mobilenet_v2_weights_tf_dim_ordering_tf_kernels_1.0_224.h5
 14536120/14536120 [==============================] - 2s 0us/step
@@ -162,9 +162,9 @@ Trainable parameters: 3,538,984
 Total parameters: 3,538,984
 ```
 
-### Step 2.2: Understanding Model Architecture
+### 步骤 2.2：理解模型架构
 
-**Task**: Examine the model structure to understand its layers.
+**任务**：检查模型结构以理解其层。
 
 ```python
 # examine_model.py
@@ -173,13 +173,13 @@ from tensorflow import keras
 
 model = keras.applications.MobileNetV2(weights='imagenet')
 
-# Print model summary
+# 打印模型摘要
 print("Model Architecture Summary:")
 model.summary()
 
 print("\n" + "="*60)
 
-# Count layers by type
+# 按类型统计层数
 layer_counts = {}
 for layer in model.layers:
     layer_type = layer.__class__.__name__
@@ -189,7 +189,7 @@ print("\nLayer Counts:")
 for layer_type, count in sorted(layer_counts.items()):
     print(f"  {layer_type}: {count}")
 
-# Model input/output information
+# 模型输入/输出信息
 print("\nModel Expectations:")
 print(f"  Input shape: {model.input_shape}")
 print(f"  Input dtype: {model.input.dtype}")
@@ -197,7 +197,7 @@ print(f"  Output shape: {model.output_shape}")
 print(f"  Output classes: 1000 (ImageNet)")
 print(f"  Expected input range: [0, 255] or [0, 1] depending on preprocessing")
 
-# Get first and last few layers
+# 获取前几层和后几层
 print("\nFirst 5 layers:")
 for i, layer in enumerate(model.layers[:5]):
     print(f"  {i+1}. {layer.name} ({layer.__class__.__name__})")
@@ -207,19 +207,19 @@ for i, layer in enumerate(model.layers[-5:]):
     print(f"  {len(model.layers)-5+i+1}. {layer.name} ({layer.__class__.__name__})")
 ```
 
-**Questions to Answer** (write your answers):
-1. How many total layers does MobileNetV2 have?
-2. What is the expected input shape?
-3. What types of layers are used in MobileNetV2?
-4. How does this compare to ResNet50 in PyTorch?
+**要回答的问题**（写下你的答案）：
+1. MobileNetV2 总共有多少层？
+2. 预期的输入形状是什么？
+3. MobileNetV2 使用了哪些类型的层？
+4. 这与 PyTorch 中的 ResNet50 相比如何？
 
-✅ **Checkpoint**: Model loaded successfully and you understand its architecture.
+✅ **检查点**：模型加载成功，你理解了其架构。
 
 ---
 
-## Part 3: Image Preprocessing
+## 第 3 部分：图像预处理
 
-### Step 3.1: Implement Preprocessing Pipeline
+### 步骤 3.1：实现预处理管道
 
 ```python
 # preprocess.py
@@ -230,46 +230,46 @@ from PIL import Image
 
 def load_and_preprocess_image(image_path, target_size=(224, 224)):
     """
-    Load and preprocess an image for MobileNetV2.
+    加载并预处理图像用于 MobileNetV2。
 
     Args:
-        image_path: Path to image file
-        target_size: Target image size (height, width)
+        image_path: 图像文件路径
+        target_size: 目标图像大小（高度, 宽度）
 
     Returns:
-        preprocessed_image: Preprocessed image tensor ready for model
+        preprocessed_image: 预处理后的图像 tensor，可供模型使用
     """
-    # Method 1: Using keras.preprocessing (simpler)
+    # 方法 1：使用 keras.preprocessing（更简单）
     print(f"Loading image: {image_path}")
 
-    # Load image
+    # 加载图像
     img = keras.preprocessing.image.load_img(
         image_path,
         target_size=target_size
     )
     print(f"Original image size: {img.size}")
 
-    # Convert to array
+    # 转换为数组
     img_array = keras.preprocessing.image.img_to_array(img)
     print(f"Image array shape: {img_array.shape}")
     print(f"Array dtype: {img_array.dtype}")
     print(f"Value range: [{img_array.min():.1f}, {img_array.max():.1f}]")
 
-    # Add batch dimension: (224, 224, 3) -> (1, 224, 224, 3)
+    # 添加 batch 维度：(224, 224, 3) -> (1, 224, 224, 3)
     img_batch = np.expand_dims(img_array, axis=0)
     print(f"Batch shape: {img_batch.shape}")
 
-    # Apply model-specific preprocessing
+    # 应用模型特定的预处理
     preprocessed = keras.applications.mobilenet_v2.preprocess_input(img_batch)
     print(f"After preprocessing range: [{preprocessed.min():.3f}, {preprocessed.max():.3f}]")
 
     return preprocessed
 
-# Test preprocessing
+# 测试预处理
 preprocessed_image = load_and_preprocess_image("test_images/elephant.jpg")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 Loading image: test_images/elephant.jpg
 Original image size: (224, 224)
@@ -280,7 +280,7 @@ Batch shape: (1, 224, 224, 3)
 After preprocessing range: [-1.000, 1.000]
 ```
 
-### Step 3.2: Alternative Preprocessing with TensorFlow APIs
+### 步骤 3.2：使用 TensorFlow API 的替代预处理
 
 ```python
 # preprocess_tf.py
@@ -288,64 +288,63 @@ import tensorflow as tf
 
 def preprocess_with_tf(image_path, target_size=(224, 224)):
     """
-    Preprocess image using pure TensorFlow APIs (more flexible).
+    使用纯 TensorFlow API 预处理图像（更灵活）。
 
-    This approach is more suitable for production pipelines
-    and TensorFlow Serving.
+    这种方法更适合生产管道和 TensorFlow Serving。
     """
-    # Read image file
+    # 读取图像文件
     image_raw = tf.io.read_file(image_path)
 
-    # Decode image (automatically detects format)
+    # 解码图像（自动检测格式）
     image = tf.image.decode_image(image_raw, channels=3)
 
-    # Ensure shape is set (needed for some operations)
+    # 确保设置了形状（某些操作需要）
     image.set_shape([None, None, 3])
 
     print(f"Original shape: {image.shape}")
     print(f"Original dtype: {image.dtype}")
 
-    # Resize image
+    # 调整图像大小
     image = tf.image.resize(image, target_size)
     print(f"Resized shape: {image.shape}")
 
-    # Convert to float32 if needed
+    # 如有必要，转换为 float32
     image = tf.cast(image, tf.float32)
 
-    # Add batch dimension
+    # 添加 batch 维度
     image = tf.expand_dims(image, 0)
     print(f"Batch shape: {image.shape}")
 
-    # MobileNetV2 preprocessing: scale to [-1, 1]
+    # MobileNetV2 预处理：缩放到 [-1, 1]
     image = tf.keras.applications.mobilenet_v2.preprocess_input(image)
     print(f"Preprocessed range: [{tf.reduce_min(image):.3f}, {tf.reduce_max(image):.3f}]")
 
     return image
 
-# Test TensorFlow preprocessing
+# 测试 TensorFlow 预处理
 tf_preprocessed = preprocess_with_tf("test_images/elephant.jpg")
 ```
 
-### Step 3.3: Understand Preprocessing Differences
+### 步骤 3.3：理解预处理差异
 
-**Task**: Answer these questions about TensorFlow preprocessing:
+**任务**：回答这些关于 TensorFlow 预处理的问题：
 
-1. **What does `preprocess_input` do for MobileNetV2?**
-   - Hint: It scales pixel values from [0, 255] to [-1, 1]
+1. **`preprocess_input` 对 MobileNetV2 做了什么？**
+   - 提示：它将像素值从 [0, 255] 缩放到 [-1, 1]
 
-2. **Why does TensorFlow use channels-last format (H, W, C)?**
-   - Hint: Compare with PyTorch's channels-first (C, H, W)
+2. **为什么 TensorFlow 使用 channels-last 格式（H, W, C）？**
+   - 提示：与 PyTorch 的 channels-first（C, H, W）比较
 
-3. **When would you use pure TensorFlow APIs vs Keras utilities?**
-   - Hint: Consider deployment scenarios like TensorFlow Serving
+3. **什么时候你会使用纯 TensorFlow API 而不是 Keras 工具？**
+   - 提示：考虑 TensorFlow Serving 等部署场景
 
-✅ **Checkpoint**: You can preprocess images using multiple methods.
+✅ **检查点**：你能使用多种方法预处理图像了。
 
 ---
 
-## Part 4: Running Inference
+## 第 4 部分：运行推理
 
-### Step 4.1: Basic Inference with Keras
+### 步骤 4.1：使用 Keras 的基本推理
 
 ```python
 # inference.py
@@ -353,11 +352,11 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 
-# Load model
+# 加载模型
 print("Loading model...")
 model = keras.applications.MobileNetV2(weights='imagenet')
 
-# Load and preprocess image
+# 加载并预处理图像
 image_path = "test_images/elephant.jpg"
 img = keras.preprocessing.image.load_img(image_path, target_size=(224, 224))
 img_array = keras.preprocessing.image.img_to_array(img)
@@ -367,17 +366,17 @@ preprocessed = keras.applications.mobilenet_v2.preprocess_input(img_batch)
 print(f"Input shape: {preprocessed.shape}")
 print(f"Input dtype: {preprocessed.dtype}")
 
-# Run inference (Keras API - high level)
+# 运行推理（Keras API - 高级）
 print("\nRunning inference...")
 predictions = model.predict(preprocessed, verbose=0)
 
 print(f"Output shape: {predictions.shape}")
 print(f"Output dtype: {predictions.dtype}")
 print(f"Output sample (first 5 values): {predictions[0, :5]}")
-print(f"Predictions sum to: {predictions.sum():.6f}")  # Should be ~1 after softmax
+print(f"Predictions sum to: {predictions.sum():.6f}")  # softmax 后应约为 1
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 Loading model...
 Input shape: (1, 224, 224, 3)
@@ -390,7 +389,7 @@ Output sample (first 5 values): [1.234e-05 3.456e-06 2.345e-04 1.123e-05 4.567e-
 Predictions sum to: 1.000000
 ```
 
-### Step 4.2: Get Top Predictions with Labels
+### 步骤 4.2：获取带标签的 Top 预测
 
 ```python
 # get_predictions.py
@@ -400,46 +399,46 @@ import numpy as np
 import json
 import urllib.request
 
-# Download ImageNet class labels
+# 下载 ImageNet 类别标签
 print("Downloading ImageNet labels...")
 labels_url = "https://storage.googleapis.com/download.tensorflow.org/data/imagenet_class_index.json"
 urllib.request.urlretrieve(labels_url, "imagenet_class_index.json")
 
-# Load labels
+# 加载标签
 with open("imagenet_class_index.json") as f:
     class_idx = json.load(f)
-    # Convert to list of class names
+    # 转换为类别名称列表
     labels = [class_idx[str(i)][1] for i in range(len(class_idx))]
 
 print(f"Loaded {len(labels)} class labels")
 
-# Load model
+# 加载模型
 model = keras.applications.MobileNetV2(weights='imagenet')
 
-# Load and preprocess image
+# 加载并预处理图像
 image_path = "test_images/elephant.jpg"
 img = keras.preprocessing.image.load_img(image_path, target_size=(224, 224))
 img_array = keras.preprocessing.image.img_to_array(img)
 img_batch = np.expand_dims(img_array, axis=0)
 preprocessed = keras.applications.mobilenet_v2.preprocess_input(img_batch)
 
-# Run inference
+# 运行推理
 predictions = model.predict(preprocessed, verbose=0)
 
-# Decode predictions (TensorFlow/Keras provides a helper for this)
+# 解码预测结果（TensorFlow/Keras 提供了辅助函数）
 decoded_predictions = keras.applications.mobilenet_v2.decode_predictions(
     predictions,
     top=5
 )
 
-# Display results
+# 显示结果
 print(f"\nClassifying: {image_path}")
 print("Top 5 Predictions:")
 for i, (imagenet_id, class_name, probability) in enumerate(decoded_predictions[0]):
     print(f"  {i+1}. {class_name:<30} {probability*100:>6.2f}% (ID: {imagenet_id})")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 Downloading ImageNet labels...
 Loaded 1000 class labels
@@ -453,7 +452,7 @@ Top 5 Predictions:
   5. ram                         0.02% (ID: n02412080)
 ```
 
-### Step 4.3: Inference with TensorFlow's Functional API
+### 步骤 4.3：使用 TensorFlow 的函数式 API 进行推理
 
 ```python
 # inference_functional.py
@@ -461,17 +460,17 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 
-# Load model
+# 加载模型
 model = keras.applications.MobileNetV2(weights='imagenet')
 
-# Create a preprocessing + inference function
-@tf.function  # This decorator compiles the function to a graph for better performance
+# 创建预处理 + 推理函数
+@tf.function  # 该装饰器将函数编译为图以获得更好的性能
 def predict_image(image_path):
     """
-    Complete preprocessing + inference pipeline using tf.function.
-    This is closer to how TensorFlow Serving works.
+    使用 tf.function 的完整预处理 + 推理管道。
+    这更接近 TensorFlow Serving 的工作方式。
     """
-    # Read and preprocess
+    # 读取并预处理
     image_raw = tf.io.read_file(image_path)
     image = tf.image.decode_image(image_raw, channels=3)
     image.set_shape([None, None, 3])
@@ -480,18 +479,18 @@ def predict_image(image_path):
     image = tf.expand_dims(image, 0)
     image = keras.applications.mobilenet_v2.preprocess_input(image)
 
-    # Run inference
+    # 运行推理
     predictions = model(image, training=False)
 
     return predictions
 
-# Test the function
+# 测试函数
 print("Running tf.function inference...")
 predictions = predict_image("test_images/elephant.jpg")
 print(f"Predictions shape: {predictions.shape}")
 print(f"Top prediction probability: {tf.reduce_max(predictions).numpy():.4f}")
 
-# Get top 5 classes
+# 获取 top 5 类别
 top5_idx = tf.argsort(predictions[0], direction='DESCENDING')[:5]
 top5_probs = tf.gather(predictions[0], top5_idx)
 
@@ -500,19 +499,19 @@ for idx, prob in zip(top5_idx.numpy(), top5_probs.numpy()):
     print(f"  Class {idx}: {prob:.4f}")
 ```
 
-**Why use `@tf.function`?**
-- Compiles Python code to TensorFlow graph
-- Much faster for repeated calls
-- Essential for production deployments
-- Similar to TorchScript in PyTorch
+**为什么使用 `@tf.function`？**
+- 将 Python 代码编译为 TensorFlow 图
+- 重复调用时速度更快
+- 生产部署必不可少
+- 类似于 PyTorch 中的 TorchScript
 
-✅ **Checkpoint**: You can run inference using multiple TensorFlow APIs!
+✅ **检查点**：你能使用多种 TensorFlow API 运行推理了！
 
 ---
 
-## Part 5: Performance Measurement
+## 第 5 部分：性能测量
 
-### Step 5.1: Measure Inference Latency
+### 步骤 5.1：测量推理延迟
 
 ```python
 # measure_latency.py
@@ -521,22 +520,22 @@ from tensorflow import keras
 import numpy as np
 import time
 
-# Load model
+# 加载模型
 print("Loading model...")
 model = keras.applications.MobileNetV2(weights='imagenet')
 
-# Prepare test input
+# 准备测试输入
 dummy_input = np.random.rand(1, 224, 224, 3).astype(np.float32)
 dummy_input = keras.applications.mobilenet_v2.preprocess_input(dummy_input)
 
-# Warmup (first few runs are slower due to TensorFlow graph compilation)
+# 预热（前几次运行由于 TensorFlow 图编译而较慢）
 print("Warming up (this takes a moment)...")
 for _ in range(20):
     _ = model.predict(dummy_input, verbose=0)
 
 print("Warmup complete!")
 
-# Measure latency
+# 测量延迟
 print("\nMeasuring inference latency...")
 iterations = 100
 
@@ -552,7 +551,7 @@ print(f"Average latency: {avg_latency_ms:.2f} ms")
 print(f"Throughput: {throughput:.2f} images/second")
 ```
 
-### Step 5.2: Optimized Inference with tf.function
+### 步骤 5.2：使用 tf.function 的优化推理
 
 ```python
 # measure_latency_optimized.py
@@ -561,24 +560,24 @@ from tensorflow import keras
 import numpy as np
 import time
 
-# Load model
+# 加载模型
 model = keras.applications.MobileNetV2(weights='imagenet')
 
-# Create optimized inference function
+# 创建优化的推理函数
 @tf.function
 def predict_optimized(inputs):
     return model(inputs, training=False)
 
-# Prepare test input
+# 准备测试输入
 dummy_input = tf.random.normal([1, 224, 224, 3])
 dummy_input = keras.applications.mobilenet_v2.preprocess_input(dummy_input)
 
-# Warmup
+# 预热
 print("Warming up with @tf.function...")
 for _ in range(20):
     _ = predict_optimized(dummy_input)
 
-# Measure latency
+# 测量延迟
 iterations = 100
 start = time.time()
 for _ in range(iterations):
@@ -593,7 +592,7 @@ print(f"Optimized throughput: {throughput:.2f} images/second")
 print("\nNote: @tf.function should be significantly faster!")
 ```
 
-### Step 5.3: Batch Inference Performance
+### 步骤 5.3：批量推理性能
 
 ```python
 # batch_inference.py
@@ -602,29 +601,29 @@ from tensorflow import keras
 import numpy as np
 import time
 
-# Load model
+# 加载模型
 model = keras.applications.MobileNetV2(weights='imagenet')
 
-# Create optimized inference function
+# 创建优化的推理函数
 @tf.function
 def predict_batch(inputs):
     return model(inputs, training=False)
 
-# Test different batch sizes
+# 测试不同的批大小
 batch_sizes = [1, 4, 8, 16, 32]
 print(f"{'Batch Size':<12} {'Latency/Batch (ms)':<20} {'Latency/Image (ms)':<20} {'Throughput (img/s)':<20}")
 print("=" * 72)
 
 for batch_size in batch_sizes:
-    # Create dummy batch
+    # 创建虚拟批次
     dummy_input = tf.random.normal([batch_size, 224, 224, 3])
     dummy_input = keras.applications.mobilenet_v2.preprocess_input(dummy_input)
 
-    # Warmup
+    # 预热
     for _ in range(10):
         _ = predict_batch(dummy_input)
 
-    # Measure
+    # 测量
     iterations = 50
     start = time.time()
 
@@ -639,7 +638,7 @@ for batch_size in batch_sizes:
     print(f"{batch_size:<12} {latency_per_batch:<20.2f} {latency_per_image:<20.2f} {throughput:<20.2f}")
 ```
 
-**Expected Output (CPU)**:
+**预期输出（CPU）**：
 ```
 Batch Size   Latency/Batch (ms)   Latency/Image (ms)   Throughput (img/s)
 ========================================================================
@@ -650,15 +649,15 @@ Batch Size   Latency/Batch (ms)   Latency/Image (ms)   Throughput (img/s)
 32           672.89               21.03                47.55
 ```
 
-**Key Observation**: Larger batches improve throughput but increase per-batch latency.
+**关键观察**：更大的批次提高了吞吐量，但增加了每批次的延迟。
 
-✅ **Checkpoint**: You can measure and optimize TensorFlow inference performance.
+✅ **检查点**：你能测量和优化 TensorFlow 推理性能了。
 
 ---
 
-## Part 6: SavedModel Format and TensorFlow Serving Basics
+## 第 6 部分：SavedModel 格式和 TensorFlow Serving 基础
 
-### Step 6.1: Export Model in SavedModel Format
+### 步骤 6.1：以 SavedModel 格式导出模型
 
 ```python
 # export_savedmodel.py
@@ -666,21 +665,21 @@ import tensorflow as tf
 from tensorflow import keras
 import os
 
-# Load model
+# 加载模型
 print("Loading model...")
 model = keras.applications.MobileNetV2(weights='imagenet')
 
-# Define the export path
+# 定义导出路径
 export_path = "saved_models/mobilenetv2/1"
 os.makedirs(export_path, exist_ok=True)
 
-# Save in SavedModel format
+# 以 SavedModel 格式保存
 print(f"Saving model to {export_path}...")
 model.save(export_path, save_format='tf')
 
 print("Model saved successfully!")
 
-# Verify the saved model structure
+# 验证保存的模型结构
 print("\nSavedModel directory structure:")
 for root, dirs, files in os.walk("saved_models"):
     level = root.replace("saved_models", '').count(os.sep)
@@ -691,7 +690,7 @@ for root, dirs, files in os.walk("saved_models"):
         print(f"{subindent}{file}")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 Loading model...
 Saving model to saved_models/mobilenetv2/1...
@@ -710,7 +709,7 @@ saved_models/
       keras_metadata.pb
 ```
 
-### Step 6.2: Load and Use SavedModel
+### 步骤 6.2：加载并使用 SavedModel
 
 ```python
 # load_savedmodel.py
@@ -718,7 +717,7 @@ import tensorflow as tf
 import numpy as np
 from tensorflow import keras
 
-# Load the SavedModel
+# 加载 SavedModel
 print("Loading SavedModel...")
 loaded_model = tf.keras.models.load_model("saved_models/mobilenetv2/1")
 
@@ -726,7 +725,7 @@ print(f"Model loaded: {loaded_model.name}")
 print(f"Input shape: {loaded_model.input_shape}")
 print(f"Output shape: {loaded_model.output_shape}")
 
-# Test inference with loaded model
+# 使用加载的模型测试推理
 dummy_input = np.random.rand(1, 224, 224, 3).astype(np.float32)
 dummy_input = keras.applications.mobilenet_v2.preprocess_input(dummy_input)
 
@@ -738,20 +737,20 @@ print(f"Predictions sum: {predictions.sum():.6f}")
 print("\n✓ SavedModel works correctly!")
 ```
 
-### Step 6.3: Inspect SavedModel with CLI
+### 步骤 6.3：使用 CLI 检查 SavedModel
 
 ```python
 # inspect_savedmodel.py
 import subprocess
 import os
 
-# Use TensorFlow's saved_model_cli to inspect the model
+# 使用 TensorFlow 的 saved_model_cli 检查模型
 export_path = "saved_models/mobilenetv2/1"
 
 print("Inspecting SavedModel with saved_model_cli...")
 print("=" * 60)
 
-# Show all signatures
+# 显示所有签名
 result = subprocess.run(
     ['saved_model_cli', 'show', '--dir', export_path, '--all'],
     capture_output=True,
@@ -768,19 +767,19 @@ print("- inputs: Expected input tensors (name, shape, dtype)")
 print("- outputs: Output tensors")
 ```
 
-**Alternative: Python API Inspection**
+**替代方案：Python API 检查**
 
 ```python
 # inspect_savedmodel_python.py
 import tensorflow as tf
 
-# Load SavedModel
+# 加载 SavedModel
 loaded = tf.saved_model.load("saved_models/mobilenetv2/1")
 
 print("Available signatures:")
 print(list(loaded.signatures.keys()))
 
-# Get the default serving signature
+# 获取默认服务签名
 serving_fn = loaded.signatures['serving_default']
 
 print("\nServing signature details:")
@@ -788,35 +787,35 @@ print(f"Inputs: {serving_fn.structured_input_signature}")
 print(f"Outputs: {serving_fn.structured_outputs}")
 ```
 
-### Step 6.4: Introduction to TensorFlow Serving
+### 步骤 6.4：TensorFlow Serving 简介
 
-**Conceptual Overview** (No Docker required for this exercise)
+**概念概述**（本练习不需要 Docker）
 
-TensorFlow Serving is a production-grade model serving system. Key concepts:
+TensorFlow Serving 是一个生产级的模型服务系统。关键概念：
 
-**SavedModel Structure for Serving**:
+**用于服务的 SavedModel 结构**：
 ```
 saved_models/
-└── mobilenetv2/          # Model name
-    ├── 1/                # Version number
+└── mobilenetv2/          # 模型名称
+    ├── 1/                # 版本号
     │   ├── saved_model.pb
     │   ├── variables/
     │   └── assets/
-    └── 2/                # New version (for A/B testing, rollbacks)
+    └── 2/                # 新版本（用于 A/B 测试、回滚）
         ├── saved_model.pb
         ├── variables/
         └── assets/
 ```
 
-**How TensorFlow Serving Works**:
-1. Monitors a directory for model versions
-2. Loads the latest version automatically
-3. Serves predictions via REST API or gRPC
-4. Supports batching, model versioning, and hot-swapping
+**TensorFlow Serving 的工作方式**：
+1. 监控目录以发现模型版本
+2. 自动加载最新版本
+3. 通过 REST API 或 gRPC 提供预测服务
+4. 支持批处理、模型版本管理和热交换
 
-**Example REST API request** (conceptual):
+**REST API 请求示例**（概念性）：
 ```bash
-# If TensorFlow Serving was running on localhost:8501
+# 如果 TensorFlow Serving 在 localhost:8501 上运行
 curl -X POST http://localhost:8501/v1/models/mobilenetv2:predict \
   -H "Content-Type: application/json" \
   -d '{
@@ -828,20 +827,20 @@ curl -X POST http://localhost:8501/v1/models/mobilenetv2:predict \
   }'
 ```
 
-**Infrastructure Engineer Perspective**:
-- SavedModel is the deployment format (like ONNX or TorchScript)
-- Version management is built into the directory structure
-- REST API makes it language-agnostic (any client can use it)
-- Can scale horizontally (multiple TensorFlow Serving instances)
-- Integrates with Kubernetes, Docker, load balancers
+**基础设施工程师视角**：
+- SavedModel 是部署格式（类似 ONNX 或 TorchScript）
+- 版本管理内置在目录结构中
+- REST API 使其与语言无关（任何客户端都可使用）
+- 可以水平扩展（多个 TensorFlow Serving 实例）
+- 与 Kubernetes, Docker, 负载均衡器集成
 
-✅ **Checkpoint**: You understand SavedModel format and TensorFlow Serving concepts.
+✅ **检查点**：你理解了 SavedModel 格式和 TensorFlow Serving 概念。
 
 ---
 
-## Part 7: Complete Application
+## 第 7 部分：完整应用
 
-### Step 7.1: Build Image Classifier CLI
+### 步骤 7.1：构建图像分类器 CLI
 
 ```python
 # image_classifier.py
@@ -854,20 +853,20 @@ import os
 import json
 
 class TensorFlowImageClassifier:
-    """Production-ready TensorFlow image classifier"""
+    """生产就绪的 TensorFlow 图像分类器"""
 
     def __init__(self, model_name='MobileNetV2', use_saved_model=False, model_path=None):
         """
-        Initialize classifier.
+        初始化分类器。
 
         Args:
-            model_name: Name of keras.applications model
-            use_saved_model: If True, load from SavedModel path
-            model_path: Path to SavedModel (required if use_saved_model=True)
+            model_name: keras.applications 中的模型名称
+            use_saved_model: 如果为 True，则从 SavedModel 路径加载
+            model_path: SavedModel 路径（use_saved_model=True 时需要）
         """
         print(f"Initializing classifier...")
 
-        # Load model
+        # 加载模型
         if use_saved_model:
             if not model_path:
                 raise ValueError("model_path required when use_saved_model=True")
@@ -878,9 +877,9 @@ class TensorFlowImageClassifier:
             model_class = getattr(keras.applications, model_name)
             self.model = model_class(weights='imagenet')
 
-        # Get preprocessing function
+        # 获取预处理函数
         if use_saved_model:
-            # Assume MobileNetV2 preprocessing for saved models
+            # 对 saved models 假设使用 MobileNetV2 预处理
             self.preprocess_fn = keras.applications.mobilenet_v2.preprocess_input
         else:
             preprocess_module = getattr(
@@ -889,17 +888,17 @@ class TensorFlowImageClassifier:
             )
             self.preprocess_fn = preprocess_module.preprocess_input
 
-        # Load ImageNet labels
+        # 加载 ImageNet 标签
         self._load_labels()
 
-        # Create optimized inference function
+        # 创建优化的推理函数
         @tf.function
         def predict_fn(inputs):
             return self.model(inputs, training=False)
 
         self.predict_fn = predict_fn
 
-        # Warmup
+        # 预热
         print("Warming up model...")
         dummy_input = tf.random.normal([1, 224, 224, 3])
         for _ in range(5):
@@ -908,7 +907,7 @@ class TensorFlowImageClassifier:
         print("Classifier ready!\n")
 
     def _load_labels(self):
-        """Load ImageNet class labels"""
+        """加载 ImageNet 类别标签"""
         labels_path = "imagenet_class_index.json"
 
         if not os.path.exists(labels_path):
@@ -923,35 +922,35 @@ class TensorFlowImageClassifier:
 
     def predict(self, image_path, top_k=5):
         """
-        Predict image class.
+        预测图像类别。
 
         Args:
-            image_path: Path to image file
-            top_k: Number of top predictions to return
+            image_path: 图像文件路径
+            top_k: 返回的 top 预测数量
 
         Returns:
-            results: List of dicts with 'class', 'probability', 'class_id'
-            inference_time_ms: Inference time in milliseconds
+            results: 包含 'class', 'probability', 'class_id' 的字典列表
+            inference_time_ms: 推理时间（毫秒）
         """
-        # Load and preprocess image
+        # 加载并预处理图像
         img = keras.preprocessing.image.load_img(image_path, target_size=(224, 224))
         img_array = keras.preprocessing.image.img_to_array(img)
         img_batch = np.expand_dims(img_array, axis=0)
         preprocessed = self.preprocess_fn(img_batch)
 
-        # Convert to tensor
+        # 转换为 tensor
         input_tensor = tf.convert_to_tensor(preprocessed, dtype=tf.float32)
 
-        # Run inference with timing
+        # 运行推理并计时
         start = time.time()
         predictions = self.predict_fn(input_tensor)
         inference_time_ms = (time.time() - start) * 1000
 
-        # Get top k predictions
+        # 获取 top k 预测
         top_k_idx = tf.argsort(predictions[0], direction='DESCENDING')[:top_k]
         top_k_probs = tf.gather(predictions[0], top_k_idx)
 
-        # Format results
+        # 格式化结果
         results = []
         for idx, prob in zip(top_k_idx.numpy(), top_k_probs.numpy()):
             results.append({
@@ -974,7 +973,7 @@ def main():
 
     args = parser.parse_args()
 
-    # Create classifier
+    # 创建分类器
     use_saved = args.saved_model is not None
     classifier = TensorFlowImageClassifier(
         model_name=args.model,
@@ -982,12 +981,12 @@ def main():
         model_path=args.saved_model
     )
 
-    # Run prediction
+    # 运行预测
     print(f"Classifying: {args.image}")
     print("=" * 60)
     results, inference_time = classifier.predict(args.image, top_k=args.top_k)
 
-    # Print results
+    # 打印结果
     print(f"\nTop {args.top_k} Predictions (inference: {inference_time:.2f}ms):")
     for i, result in enumerate(results):
         print(f"  {i+1}. {result['class']:<30} {result['probability']*100:>6.2f}%")
@@ -997,42 +996,42 @@ if __name__ == "__main__":
     main()
 ```
 
-**Usage Examples**:
+**使用示例**：
 ```bash
-# Basic usage
+# 基本使用
 python image_classifier.py test_images/elephant.jpg
 
-# Different model
+# 不同模型
 python image_classifier.py test_images/tiger.jpg --model ResNet50
 
-# Use SavedModel
+# 使用 SavedModel
 python image_classifier.py test_images/airplane.jpg --saved-model saved_models/mobilenetv2/1
 
-# Get top 10 predictions
+# 获取 top 10 预测
 python image_classifier.py test_images/elephant.jpg --top-k 10
 ```
 
-✅ **Checkpoint**: You have a complete, production-ready image classifier!
+✅ **检查点**：你有了一个完整的、生产就绪的图像分类器！
 
 ---
 
-## Part 8: PyTorch vs TensorFlow Comparison
+## 第 8 部分：PyTorch vs TensorFlow 对比
 
-### Key Differences Summary
+### 关键差异总结
 
-| Aspect | PyTorch | TensorFlow/Keras |
+| 方面 | PyTorch | TensorFlow/Keras |
 |--------|---------|------------------|
-| **Image Format** | Channels-first (C, H, W) | Channels-last (H, W, C) |
-| **Model Loading** | `torch.hub.load()` | `keras.applications.ModelName()` |
-| **Eval Mode** | `model.eval()` required | Not required (but use `training=False`) |
-| **No Gradient** | `with torch.no_grad():` | Not required for inference |
-| **Preprocessing** | Manual transforms pipeline | Model-specific `preprocess_input()` |
-| **Batch Dimension** | `unsqueeze(0)` | `np.expand_dims(axis=0)` |
-| **Optimization** | TorchScript | `@tf.function` |
-| **Serving** | TorchServe | TensorFlow Serving |
-| **Export Format** | .pt, .pth, TorchScript | SavedModel (.pb) |
+| **图像格式** | Channels-first（C, H, W） | Channels-last（H, W, C） |
+| **模型加载** | `torch.hub.load()` | `keras.applications.ModelName()` |
+| **评估模式** | 需要 `model.eval()` | 不需要（但使用 `training=False`） |
+| **无梯度** | `with torch.no_grad():` | 推理时不需要 |
+| **预处理** | 手动 transforms 管道 | 模型特定的 `preprocess_input()` |
+| **Batch 维度** | `unsqueeze(0)` | `np.expand_dims(axis=0)` |
+| **优化** | TorchScript | `@tf.function` |
+| **服务** | TorchServe | TensorFlow Serving |
+| **导出格式** | .pt, .pth, TorchScript | SavedModel (.pb) |
 
-### Step 8.1: Side-by-Side Comparison
+### 步骤 8.1：并排对比
 
 ```python
 # framework_comparison.py
@@ -1043,7 +1042,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 
-# PyTorch (if available)
+# PyTorch（如果可用）
 try:
     import torch
     from torchvision import transforms, models
@@ -1053,7 +1052,7 @@ except ImportError:
     print("PyTorch not available, skipping comparison")
 
 def benchmark_tensorflow():
-    """Benchmark TensorFlow inference"""
+    """对 TensorFlow 推理进行基准测试"""
     model = keras.applications.MobileNetV2(weights='imagenet')
 
     @tf.function
@@ -1062,11 +1061,11 @@ def benchmark_tensorflow():
 
     dummy_input = tf.random.normal([1, 224, 224, 3])
 
-    # Warmup
+    # 预热
     for _ in range(10):
         _ = predict(dummy_input)
 
-    # Measure
+    # 测量
     iterations = 100
     start = time.time()
     for _ in range(iterations):
@@ -1076,7 +1075,7 @@ def benchmark_tensorflow():
     return (elapsed / iterations) * 1000
 
 def benchmark_pytorch():
-    """Benchmark PyTorch inference"""
+    """对 PyTorch 推理进行基准测试"""
     if not PYTORCH_AVAILABLE:
         return None
 
@@ -1087,12 +1086,12 @@ def benchmark_pytorch():
 
     dummy_input = torch.rand(1, 3, 224, 224).to(device)
 
-    # Warmup
+    # 预热
     with torch.no_grad():
         for _ in range(10):
             _ = model(dummy_input)
 
-    # Measure
+    # 测量
     iterations = 100
     start = time.time()
     with torch.no_grad():
@@ -1102,7 +1101,7 @@ def benchmark_pytorch():
 
     return (elapsed / iterations) * 1000
 
-# Run benchmarks
+# 运行基准测试
 print("Benchmarking MobileNetV2 on CPU...")
 print("=" * 60)
 
@@ -1125,68 +1124,68 @@ else:
 
 ---
 
-## Stretch Goals (Optional Challenges)
+## 拓展目标（可选挑战）
 
-### Challenge 1: Multi-Model Comparison
+### 挑战 1：多模型比较
 
-**Task**: Create a script that compares multiple Keras models on the same image.
+**任务**：创建一个脚本，在同一图像上比较多个 Keras 模型。
 
 ```python
 def compare_models(image_path, models_to_test):
     """
-    Compare multiple models on same image.
+    在同一图像上比较多个模型。
 
     Args:
-        image_path: Path to image
-        models_to_test: List of model names from keras.applications
+        image_path: 图像路径
+        models_to_test: keras.applications 中的模型名称列表
 
     Returns:
-        Comparison results
+        比较结果
     """
-    # TODO: Implement multi-model comparison
-    # Hint: Test MobileNetV2, ResNet50, EfficientNetB0
-    # Compare: latency, top-1 prediction, confidence
+    # TODO: 实现多模型比较
+    # 提示：测试 MobileNetV2, ResNet50, EfficientNetB0
+    # 比较：延迟、top-1 预测、置信度
     pass
 ```
 
-### Challenge 2: TensorFlow Serving with Docker
+### 挑战 2：使用 Docker 的 TensorFlow Serving
 
-**Task**: Deploy your SavedModel with TensorFlow Serving using Docker.
+**任务**：使用 Docker 将你的 SavedModel 部署到 TensorFlow Serving。
 
 ```bash
-# Pull TensorFlow Serving image
+# 拉取 TensorFlow Serving 镜像
 docker pull tensorflow/serving
 
-# Run TensorFlow Serving
+# 运行 TensorFlow Serving
 docker run -p 8501:8501 \
   --mount type=bind,source=/path/to/saved_models/mobilenetv2,target=/models/mobilenetv2 \
   -e MODEL_NAME=mobilenetv2 \
   -t tensorflow/serving
 
-# Test with curl
+# 使用 curl 测试
 curl -X POST http://localhost:8501/v1/models/mobilenetv2:predict \
   -H "Content-Type: application/json" \
   -d @request.json
 ```
 
-### Challenge 3: Mixed Precision Inference
+### 挑战 3：混合精度推理
 
-**Task**: Implement mixed precision (FP16) inference for faster GPU performance.
+**任务**：实现 FP16 混合精度推理以获得更快的 GPU 性能。
 
 ```python
-# Enable mixed precision
+# 启用混合精度
 from tensorflow.keras import mixed_precision
 policy = mixed_precision.Policy('mixed_float16')
 mixed_precision.set_global_policy(policy)
 
-# TODO: Test performance improvement on GPU
+# TODO: 在 GPU 上测试性能提升
 ```
 
 ---
 
-## Validation and Testing
+## 验证和测试
 
-### Test Your Implementation
+### 测试你的实现
 
 ```python
 # test_classifier.py
@@ -1194,15 +1193,15 @@ import os
 import tensorflow as tf
 
 def test_tensorflow_classifier():
-    """Test TensorFlow classifier implementation"""
+    """测试 TensorFlow 分类器实现"""
     from image_classifier import TensorFlowImageClassifier
 
-    # Test initialization
+    # 测试初始化
     classifier = TensorFlowImageClassifier(model_name='MobileNetV2')
     assert classifier.model is not None, "Model should be loaded"
     assert len(classifier.labels) == 1000, "Should have 1000 ImageNet labels"
 
-    # Test prediction
+    # 测试预测
     test_image = "test_images/elephant.jpg"
     if os.path.exists(test_image):
         results, latency = classifier.predict(test_image, top_k=5)
@@ -1211,7 +1210,7 @@ def test_tensorflow_classifier():
         assert results[0]['probability'] >= results[1]['probability'], "Should be sorted"
         assert latency > 0, "Latency should be positive"
 
-        # Check probability range
+        # 检查概率范围
         for result in results:
             assert 0 <= result['probability'] <= 1, "Probabilities should be in [0, 1]"
 
@@ -1225,66 +1224,66 @@ if __name__ == "__main__":
 
 ---
 
-## Reflection Questions
+## 反思问题
 
-Answer these questions to solidify your learning:
+回答这些问题以巩固你的学习：
 
-1. **How does TensorFlow's channels-last format differ from PyTorch's channels-first?**
-   - Your answer:
+1. **TensorFlow 的 channels-last 格式与 PyTorch 的 channels-first 有何不同？**
+   - 你的答案：
 
-2. **What is the purpose of `@tf.function` and how does it improve performance?**
-   - Your answer:
+2. **`@tf.function` 的目的是什么，它如何提高性能？**
+   - 你的答案：
 
-3. **Why is SavedModel format important for production deployments?**
-   - Your answer:
+3. **为什么 SavedModel 格式对生产部署很重要？**
+   - 你的答案：
 
-4. **What are the key differences between TensorFlow Serving and TorchServe?**
-   - Your answer:
+4. **TensorFlow Serving 和 TorchServe 之间有哪些关键区别？**
+   - 你的答案：
 
-5. **When would you choose TensorFlow over PyTorch for inference?**
-   - Your answer:
-
----
-
-## Summary
-
-**What You Accomplished**:
-✅ Loaded and used pre-trained Keras models
-✅ Preprocessed images using TensorFlow APIs
-✅ Ran inference with Keras and TensorFlow functional APIs
-✅ Measured and optimized inference performance with `@tf.function`
-✅ Exported models in SavedModel format
-✅ Understood TensorFlow Serving fundamentals
-✅ Built a complete, production-ready image classifier
-✅ Compared TensorFlow and PyTorch approaches
-
-**Key Skills Gained**:
-- Model loading from keras.applications
-- Image preprocessing with TensorFlow/Keras utilities
-- SavedModel export and inspection
-- Performance optimization with `@tf.function`
-- TensorFlow Serving concepts
-- Framework comparison (TensorFlow vs PyTorch)
-
-**Infrastructure Engineer Takeaways**:
-- SavedModel is TensorFlow's deployment format (language-agnostic)
-- TensorFlow Serving provides production-ready model serving
-- Version management is built into the directory structure
-- `@tf.function` compiles to graphs for better performance
-- TensorFlow integrates well with cloud platforms (GCP, AWS, Azure)
+5. **什么时候你会选择 TensorFlow 而不是 PyTorch 进行推理？**
+   - 你的答案：
 
 ---
 
-## Next Steps
+## 总结
 
-1. **Complete Both Exercises**: Compare your PyTorch and TensorFlow implementations
-2. **Try TensorFlow Serving**: Deploy a model with Docker (optional)
-3. **Experiment**: Test different keras.applications models
-4. **Move to Projects**: Apply these concepts in the module projects
+**你完成了什么**：
+✅ 加载并使用预训练 Keras 模型
+✅ 使用 TensorFlow API 预处理图像
+✅ 使用 Keras 和 TensorFlow 函数式 API 运行推理
+✅ 使用 `@tf.function` 测量和优化推理性能
+✅ 以 SavedModel 格式导出模型
+✅ 理解 TensorFlow Serving 基础
+✅ 构建了完整的、生产就绪的图像分类器
+✅ 比较了 TensorFlow 和 PyTorch 的方法
+
+**获得的关键技能**：
+- 从 keras.applications 加载模型
+- 使用 TensorFlow/Keras 工具进行图像预处理
+- SavedModel 导出和检查
+- 使用 `@tf.function` 进行性能优化
+- TensorFlow Serving 概念
+- 框架比较（TensorFlow vs PyTorch）
+
+**基础设施工程师要点**：
+- SavedModel 是 TensorFlow 的部署格式（与语言无关）
+- TensorFlow Serving 提供生产就绪的模型服务
+- 版本管理内置在目录结构中
+- `@tf.function` 编译为图以获得更好的性能
+- TensorFlow 与云平台（GCP, AWS, Azure）集成良好
 
 ---
 
-**Exercise Version**: 1.0
-**Last Updated**: October 2025
-**Estimated Time**: 2-3 hours
-**Difficulty**: Beginner
+## 下一步
+
+1. **完成两个练习**：比较你的 PyTorch 和 TensorFlow 实现
+2. **尝试 TensorFlow Serving**：使用 Docker 部署模型（可选）
+3. **实验**：测试不同的 keras.applications 模型
+4. **进入项目**：在模块项目中应用这些概念
+
+---
+
+**练习版本**: 1.0
+**最后更新**: 2025 年 10 月
+**预计时间**: 2-3 小时
+**难度**: 初级

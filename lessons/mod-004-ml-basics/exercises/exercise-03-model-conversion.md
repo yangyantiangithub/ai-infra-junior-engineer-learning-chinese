@@ -1,85 +1,85 @@
-# Exercise 03: Model Format Conversion with ONNX
+# 练习 03：使用 ONNX 进行模型格式转换
 
-## Exercise Overview
+## 练习概述
 
-**Objective**: Convert PyTorch and TensorFlow models to ONNX format, run inference with ONNX Runtime, and compare performance between native frameworks and ONNX.
+**目标**：将 PyTorch 和 TensorFlow 模型转换为 ONNX 格式，使用 ONNX Runtime 运行推理，并比较原生框架与 ONNX 之间的性能。
 
-**Difficulty**: Beginner-Intermediate
-**Estimated Time**: 3-4 hours
-**Prerequisites**: Lectures 02 (PyTorch Basics) and 03 (TensorFlow Basics), Exercise 01
+**难度**：初级-中级
+**预计时间**：3-4 小时
+**前置要求**：讲座 02（PyTorch 基础）和 03（TensorFlow 基础），练习 01
 
-**What You'll Learn**:
-- Converting PyTorch models to ONNX format
-- Converting TensorFlow models to ONNX format
-- Running inference with ONNX Runtime
-- Validating model conversions for accuracy
-- Comparing performance across frameworks
-- Understanding when and why to use ONNX
-
----
-
-## Learning Objectives
-
-By the end of this exercise, you will be able to:
-
-✅ Export PyTorch models to ONNX using `torch.onnx.export()`
-✅ Convert TensorFlow models to ONNX using `tf2onnx`
-✅ Run inference with ONNX Runtime
-✅ Validate converted models for numerical accuracy
-✅ Measure and compare performance across formats
-✅ Understand ONNX's role in AI infrastructure
-✅ Make informed decisions about when to use ONNX
+**你将学到**：
+- 将 PyTorch 模型转换为 ONNX 格式
+- 将 TensorFlow 模型转换为 ONNX 格式
+- 使用 ONNX Runtime 运行推理
+- 验证模型转换的准确性
+- 跨框架比较性能
+- 理解何时以及为何使用 ONNX
 
 ---
 
-## Background: Why ONNX Matters for Infrastructure Engineers
+## 学习目标
 
-### What is ONNX?
+到本练习结束时，你将能够：
 
-**ONNX (Open Neural Network Exchange)** is an open standard format for representing machine learning models. Think of it as a "universal translator" for ML models.
-
-### Why Infrastructure Engineers Care About ONNX
-
-1. **Framework Independence**: Deploy models without framework dependencies
-2. **Optimization**: ONNX Runtime provides hardware-specific optimizations
-3. **Interoperability**: Train in PyTorch, deploy with TensorFlow Serving, or vice versa
-4. **Performance**: Often faster than native frameworks, especially for inference
-5. **Deployment Flexibility**: One model format for multiple deployment targets
-6. **Reduced Dependencies**: Smaller deployment footprint without full training frameworks
-
-### Real-World Use Cases
-
-- **Edge Deployment**: Reduce model size and dependency footprint for IoT devices
-- **Multi-Framework Teams**: Standardize deployment regardless of training framework
-- **Performance Optimization**: Leverage ONNX Runtime's optimized execution
-- **Cloud Cost Reduction**: Faster inference = lower compute costs
-- **Cross-Platform**: Same model runs on Windows, Linux, ARM, mobile, web
+✅ 使用 `torch.onnx.export()` 将 PyTorch 模型导出为 ONNX
+✅ 使用 `tf2onnx` 将 TensorFlow 模型转换为 ONNX
+✅ 使用 ONNX Runtime 运行推理
+✅ 验证转换后的模型的数值精度
+✅ 跨格式测量和比较性能
+✅ 理解 ONNX 在 AI 基础设施中的角色
+✅ 对何时使用 ONNX 做出明智的决策
 
 ---
 
-## Part 1: Environment Setup
+## 背景：为什么基础设施工程师关心 ONNX
 
-### Step 1.1: Install Dependencies
+### 什么是 ONNX？
+
+**ONNX（Open Neural Network Exchange）** 是一种开放的机器学习模型表示标准格式。可以将其视为 ML 模型的"通用翻译器"。
+
+### 为什么基础设施工程师关心 ONNX
+
+1. **框架无关性**：部署模型无需框架依赖
+2. **优化**：ONNX Runtime 提供硬件特定的优化
+3. **互操作性**：在 PyTorch 中训练，用 TensorFlow Serving 部署，反之亦然
+4. **性能**：通常比原生框架更快，尤其是推理
+5. **部署灵活性**：一种模型格式用于多个部署目标
+6. **减少依赖**：部署占用更小，无需完整的训练框架
+
+### 实际用例
+
+- **边缘部署**：为 IoT 设备减少模型大小和依赖占用
+- **多框架团队**：标准化部署，无论训练框架如何
+- **性能优化**：利用 ONNX Runtime 的优化执行
+- **云成本降低**：更快的推理 = 更低的计算成本
+- **跨平台**：同一模型可在 Windows, Linux, ARM, 移动端, Web 上运行
+
+---
+
+## 第 1 部分：环境设置
+
+### 步骤 1.1：安装依赖
 
 ```bash
-# Create virtual environment
+# 创建虚拟环境
 python -m venv onnx_env
-source onnx_env/bin/activate  # On Windows: onnx_env\Scripts\activate
+source onnx_env/bin/activate  # Windows: onnx_env\Scripts\activate
 
-# Install PyTorch and TensorFlow
+# 安装 PyTorch 和 TensorFlow
 pip install torch torchvision
 pip install tensorflow
 
-# Install ONNX tools
+# 安装 ONNX 工具
 pip install onnx onnxruntime
 pip install tf2onnx
 pip install onnxconverter-common
 
-# Install utilities
+# 安装工具
 pip install pillow numpy matplotlib
 ```
 
-### Step 1.2: Verify Installation
+### 步骤 1.2：验证安装
 
 ```python
 # verify_installation.py
@@ -102,7 +102,7 @@ print(f"TensorFlow GPUs: {len(tf.config.list_physical_devices('GPU'))}")
 print(f"ONNX Runtime providers: {ort.get_available_providers()}")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 === Framework Versions ===
 PyTorch: 2.1.0
@@ -117,22 +117,22 @@ TensorFlow GPUs: 1
 ONNX Runtime providers: ['CUDAExecutionProvider', 'CPUExecutionProvider']
 ```
 
-### Step 1.3: Download Test Resources
+### 步骤 1.3：下载测试资源
 
 ```python
 # download_resources.py
 import urllib.request
 import os
 
-# Create directories
+# 创建目录
 os.makedirs("models", exist_ok=True)
 os.makedirs("test_images", exist_ok=True)
 
-# Download test image
+# 下载测试图像
 image_url = "https://github.com/pytorch/hub/raw/master/images/dog.jpg"
 urllib.request.urlretrieve(image_url, "test_images/dog.jpg")
 
-# Download ImageNet labels
+# 下载 ImageNet 标签
 labels_url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
 urllib.request.urlretrieve(labels_url, "imagenet_classes.txt")
 
@@ -142,13 +142,13 @@ print("  - imagenet_classes.txt")
 print("  - models/ directory created")
 ```
 
-✅ **Checkpoint**: Environment set up with all necessary tools installed.
+✅ **检查点**：环境已设置，所有必要工具已安装。
 
 ---
 
-## Part 2: Converting PyTorch Models to ONNX
+## 第 2 部分：将 PyTorch 模型转换为 ONNX
 
-### Step 2.1: Export Simple PyTorch Model
+### 步骤 2.1：导出简单 PyTorch 模型
 
 ```python
 # pytorch_to_onnx_basic.py
@@ -156,7 +156,7 @@ import torch
 import torch.nn as nn
 import onnx
 
-# Define a simple model
+# 定义一个简单模型
 class SimpleNet(nn.Module):
     def __init__(self):
         super(SimpleNet, self).__init__()
@@ -170,25 +170,25 @@ class SimpleNet(nn.Module):
         x = self.fc2(x)
         return x
 
-# Create model instance
+# 创建模型实例
 model = SimpleNet()
 model.eval()
 
-# Create dummy input matching expected input shape
+# 创建与预期输入形状匹配的虚拟输入
 dummy_input = torch.randn(1, 10)
 
-# Export to ONNX
+# 导出为 ONNX
 onnx_path = "models/simple_net.onnx"
 torch.onnx.export(
-    model,                          # Model being exported
-    dummy_input,                    # Example input for tracing
-    onnx_path,                      # Where to save ONNX file
-    export_params=True,             # Store trained parameters
-    opset_version=14,               # ONNX version
-    do_constant_folding=True,       # Optimize constants
-    input_names=['input'],          # Input tensor names
-    output_names=['output'],        # Output tensor names
-    dynamic_axes={                  # Variable dimensions
+    model,                          # 正在导出的模型
+    dummy_input,                    # 用于追踪的示例输入
+    onnx_path,                      # 保存 ONNX 文件的路径
+    export_params=True,             # 存储训练后的参数
+    opset_version=14,               # ONNX 版本
+    do_constant_folding=True,       # 优化常量
+    input_names=['input'],          # 输入 tensor 名称
+    output_names=['output'],        # 输出 tensor 名称
+    dynamic_axes={                  # 可变维度
         'input': {0: 'batch_size'},
         'output': {0: 'batch_size'}
     }
@@ -196,19 +196,19 @@ torch.onnx.export(
 
 print(f"✅ Model exported to {onnx_path}")
 
-# Verify the ONNX model
+# 验证 ONNX 模型
 onnx_model = onnx.load(onnx_path)
 onnx.checker.check_model(onnx_model)
 print("✅ ONNX model is valid!")
 
-# Print model information
+# 打印模型信息
 print(f"\nModel info:")
 print(f"  Inputs: {[inp.name for inp in onnx_model.graph.input]}")
 print(f"  Outputs: {[out.name for out in onnx_model.graph.output]}")
 print(f"  Operators: {len(onnx_model.graph.node)}")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 ✅ Model exported to models/simple_net.onnx
 ✅ ONNX model is valid!
@@ -219,9 +219,9 @@ Model info:
   Operators: 3
 ```
 
-### Step 2.2: Understanding Export Parameters
+### 步骤 2.2：理解导出参数
 
-Let's understand each parameter in `torch.onnx.export()`:
+让我们理解 `torch.onnx.export()` 中的每个参数：
 
 ```python
 # export_parameters_explained.py
@@ -242,41 +242,41 @@ torch.onnx.export(
     dummy_input,
     "models/explained.onnx",
 
-    # export_params=True: Include trained weights in ONNX file
-    # Set to False if you only want the model structure
+    # export_params=True: 在 ONNX 文件中包含训练后的权重
+    # 如果只需要模型结构，设为 False
     export_params=True,
 
-    # opset_version: ONNX operator set version
-    # Higher versions support more operations but may have less support
-    # Version 14+ is recommended for modern models
+    # opset_version: ONNX 算子集版本
+    # 更高的版本支持更多操作，但可能支持面更窄
+    # 推荐对现代模型使用版本 14+
     opset_version=14,
 
-    # do_constant_folding=True: Optimize constant expressions at export time
-    # Example: 2*3 becomes 6 directly in the graph
+    # do_constant_folding=True: 在导出时优化常量表达式
+    # 示例：2*3 直接在图中变为 6
     do_constant_folding=True,
 
-    # input_names/output_names: Human-readable names for tensors
-    # Crucial for identifying inputs/outputs when loading the model
+    # input_names/output_names: tensor 的人类可读名称
+    # 在加载模型时识别输入/输出至关重要
     input_names=['features'],
     output_names=['predictions'],
 
-    # dynamic_axes: Allow variable dimensions
-    # Dimension 0 (batch_size) can vary at runtime
+    # dynamic_axes: 允许可变维度
+    # 维度 0（batch_size）可以在运行时变化
     dynamic_axes={
         'features': {0: 'batch_size'},
         'predictions': {0: 'batch_size'}
     },
 
-    # verbose=True: Print detailed export information (useful for debugging)
+    # verbose=True: 打印详细导出信息（用于调试）
     verbose=False
 )
 
 print("✅ Model exported with all parameters explained!")
 ```
 
-### Step 2.3: Export ResNet50 to ONNX
+### 步骤 2.3：将 ResNet50 导出为 ONNX
 
-Now let's export a real pre-trained model:
+现在让我们导出一个真实的预训练模型：
 
 ```python
 # pytorch_resnet_to_onnx.py
@@ -289,11 +289,11 @@ print("Loading ResNet50...")
 model = models.resnet50(pretrained=True)
 model.eval()
 
-# Create example input (ImageNet size)
+# 创建示例输入（ImageNet 尺寸）
 batch_size = 1
 dummy_input = torch.randn(batch_size, 3, 224, 224)
 
-# Export to ONNX
+# 导出为 ONNX
 onnx_path = "models/resnet50.onnx"
 print(f"Exporting to {onnx_path}...")
 
@@ -314,13 +314,13 @@ torch.onnx.export(
 
 print("✅ Export complete!")
 
-# Verify ONNX model
+# 验证 ONNX 模型
 print("\nVerifying ONNX model...")
 onnx_model = onnx.load(onnx_path)
 onnx.checker.check_model(onnx_model)
 print("✅ ONNX model is valid!")
 
-# Model statistics
+# 模型统计
 file_size_mb = os.path.getsize(onnx_path) / (1024 * 1024)
 print(f"\nModel Statistics:")
 print(f"  File size: {file_size_mb:.2f} MB")
@@ -329,7 +329,7 @@ print(f"  Inputs: {[i.name for i in onnx_model.graph.input]}")
 print(f"  Outputs: {[o.name for o in onnx_model.graph.output]}")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 Loading ResNet50...
 Exporting to models/resnet50.onnx...
@@ -345,13 +345,13 @@ Model Statistics:
   Outputs: ['output']
 ```
 
-✅ **Checkpoint**: You can export PyTorch models to ONNX format.
+✅ **检查点**：你能将 PyTorch 模型导出为 ONNX 格式了。
 
 ---
 
-## Part 3: Converting TensorFlow Models to ONNX
+## 第 3 部分：将 TensorFlow 模型转换为 ONNX
 
-### Step 3.1: Export Keras Model to ONNX
+### 步骤 3.1：将 Keras 模型导出为 ONNX
 
 ```python
 # tensorflow_to_onnx_basic.py
@@ -359,7 +359,7 @@ import tensorflow as tf
 import tf2onnx
 import onnx
 
-# Create a simple Keras model
+# 创建一个简单的 Keras 模型
 model = tf.keras.Sequential([
     tf.keras.layers.Input(shape=(10,)),
     tf.keras.layers.Dense(20, activation='relu'),
@@ -369,8 +369,8 @@ model = tf.keras.Sequential([
 print("Model created:")
 model.summary()
 
-# Convert to ONNX
-# Method 1: Direct conversion from Keras model
+# 转换为 ONNX
+# 方法 1：直接从 Keras 模型转换
 onnx_path = "models/keras_model.onnx"
 
 spec = (tf.TensorSpec((None, 10), tf.float32, name="input"),)
@@ -383,13 +383,13 @@ model_proto, _ = tf2onnx.convert.from_keras(
 
 print(f"\n✅ Model exported to {onnx_path}")
 
-# Verify ONNX model
+# 验证 ONNX 模型
 onnx_model = onnx.load(onnx_path)
 onnx.checker.check_model(onnx_model)
 print("✅ ONNX model is valid!")
 ```
 
-### Step 3.2: Export TensorFlow SavedModel to ONNX
+### 步骤 3.2：将 TensorFlow SavedModel 导出为 ONNX
 
 ```python
 # tensorflow_savedmodel_to_onnx.py
@@ -405,12 +405,12 @@ model = tf.keras.applications.MobileNetV2(
     input_shape=(224, 224, 3)
 )
 
-# Save as TensorFlow SavedModel first
+# 首先保存为 TensorFlow SavedModel
 saved_model_dir = "models/mobilenet_saved"
 print(f"Saving to {saved_model_dir}...")
 model.save(saved_model_dir)
 
-# Convert SavedModel to ONNX
+# 将 SavedModel 转换为 ONNX
 onnx_path = "models/mobilenet_v2.onnx"
 print(f"Converting to ONNX: {onnx_path}...")
 
@@ -421,19 +421,19 @@ os.system(f"python -m tf2onnx.convert \
 
 print("\n✅ Conversion complete!")
 
-# Verify
+# 验证
 onnx_model = onnx.load(onnx_path)
 onnx.checker.check_model(onnx_model)
 print("✅ ONNX model is valid!")
 
-# Model info
+# 模型信息
 file_size_mb = os.path.getsize(onnx_path) / (1024 * 1024)
 print(f"\nModel Statistics:")
 print(f"  File size: {file_size_mb:.2f} MB")
 print(f"  Graph nodes: {len(onnx_model.graph.node)}")
 ```
 
-### Step 3.3: Alternative Conversion Method
+### 步骤 3.3：替代转换方法
 
 ```python
 # tensorflow_to_onnx_alternative.py
@@ -441,22 +441,22 @@ import tensorflow as tf
 import tf2onnx
 import numpy as np
 
-# Load model
+# 加载模型
 model = tf.keras.applications.MobileNetV2(
     weights='imagenet',
     input_shape=(224, 224, 3)
 )
 
-# Method 2: Convert using concrete function
+# 方法 2：使用 concrete function 转换
 onnx_path = "models/mobilenet_v2_alt.onnx"
 
-# Get concrete function
+# 获取 concrete function
 concrete_func = tf.function(lambda x: model(x))
 concrete_func = concrete_func.get_concrete_function(
     tf.TensorSpec(model.inputs[0].shape, model.inputs[0].dtype)
 )
 
-# Convert to ONNX
+# 转换为 ONNX
 model_proto, _ = tf2onnx.convert.from_function(
     concrete_func,
     input_signature=[tf.TensorSpec([None, 224, 224, 3], tf.float32, name="input")],
@@ -467,25 +467,25 @@ model_proto, _ = tf2onnx.convert.from_function(
 print(f"✅ Model exported to {onnx_path}")
 ```
 
-✅ **Checkpoint**: You can convert both PyTorch and TensorFlow models to ONNX.
+✅ **检查点**：你能将 PyTorch 和 TensorFlow 模型都转换为 ONNX 了。
 
 ---
 
-## Part 4: Running Inference with ONNX Runtime
+## 第 4 部分：使用 ONNX Runtime 运行推理
 
-### Step 4.1: Basic ONNX Runtime Inference
+### 步骤 4.1：基本 ONNX Runtime 推理
 
 ```python
 # onnx_runtime_basic.py
 import onnxruntime as ort
 import numpy as np
 
-# Load ONNX model
+# 加载 ONNX 模型
 print("Loading ONNX model...")
 onnx_path = "models/simple_net.onnx"
 session = ort.InferenceSession(onnx_path)
 
-# Get model metadata
+# 获取模型元数据
 print("\n=== Model Information ===")
 print(f"Inputs:")
 for input_meta in session.get_inputs():
@@ -499,11 +499,11 @@ for output_meta in session.get_outputs():
     print(f"  Shape: {output_meta.shape}")
     print(f"  Type: {output_meta.type}")
 
-# Prepare input
+# 准备输入
 input_name = session.get_inputs()[0].name
 input_data = np.random.randn(1, 10).astype(np.float32)
 
-# Run inference
+# 运行推理
 print("\n=== Running Inference ===")
 outputs = session.run(None, {input_name: input_data})
 
@@ -511,7 +511,7 @@ print(f"Output shape: {outputs[0].shape}")
 print(f"Output values: {outputs[0]}")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 Loading ONNX model...
 
@@ -531,7 +531,7 @@ Output shape: (1, 5)
 Output values: [[-0.123  0.456 -0.789  0.234 -0.567]]
 ```
 
-### Step 4.2: ResNet50 Inference with ONNX Runtime
+### 步骤 4.2：使用 ONNX Runtime 进行 ResNet50 推理
 
 ```python
 # onnx_resnet_inference.py
@@ -540,33 +540,33 @@ import numpy as np
 from PIL import Image
 import urllib.request
 
-# Load ImageNet labels
+# 加载 ImageNet 标签
 labels_url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
 urllib.request.urlretrieve(labels_url, "imagenet_classes.txt")
 with open("imagenet_classes.txt") as f:
     labels = [line.strip() for line in f.readlines()]
 
-# Load ONNX model
+# 加载 ONNX 模型
 print("Loading ONNX ResNet50...")
 session = ort.InferenceSession("models/resnet50.onnx")
 
-# Get input name
+# 获取输入名称
 input_name = session.get_inputs()[0].name
 output_name = session.get_outputs()[0].name
 
 print(f"Input name: {input_name}")
 print(f"Output name: {output_name}")
 
-# Load and preprocess image
+# 加载并预处理图像
 def preprocess_image(image_path):
-    """Preprocess image for ResNet50"""
+    """为 ResNet50 预处理图像"""
     from PIL import Image
     import numpy as np
 
-    # Load image
+    # 加载图像
     image = Image.open(image_path).convert('RGB')
 
-    # Resize and center crop
+    # 调整大小并中心裁剪
     image = image.resize((256, 256))
     left = (256 - 224) / 2
     top = (256 - 224) / 2
@@ -574,36 +574,36 @@ def preprocess_image(image_path):
     bottom = top + 224
     image = image.crop((left, top, right, bottom))
 
-    # Convert to array and normalize
+    # 转换为数组并归一化
     img_array = np.array(image).astype(np.float32) / 255.0
 
-    # Normalize with ImageNet stats
+    # 使用 ImageNet 统计数据归一化
     mean = np.array([0.485, 0.456, 0.406])
     std = np.array([0.229, 0.224, 0.225])
     img_array = (img_array - mean) / std
 
-    # Transpose to CHW format and add batch dimension
+    # 转置为 CHW 格式并添加 batch 维度
     img_array = img_array.transpose(2, 0, 1)
     img_array = np.expand_dims(img_array, axis=0)
 
     return img_array
 
-# Preprocess image
+# 预处理图像
 image_path = "test_images/dog.jpg"
 print(f"\nPreprocessing {image_path}...")
 input_data = preprocess_image(image_path)
 print(f"Input shape: {input_data.shape}")
 print(f"Input dtype: {input_data.dtype}")
 
-# Run inference
+# 运行推理
 print("\nRunning inference...")
 outputs = session.run([output_name], {input_name: input_data})
 predictions = outputs[0][0]
 
-# Get top 5 predictions
+# 获取 top 5 预测
 top5_indices = np.argsort(predictions)[-5:][::-1]
 
-# Apply softmax to get probabilities
+# 应用 softmax 获取概率
 exp_predictions = np.exp(predictions - np.max(predictions))
 probabilities = exp_predictions / exp_predictions.sum()
 
@@ -612,7 +612,7 @@ for i, idx in enumerate(top5_indices):
     print(f"  {i+1}. {labels[idx]:<30} {probabilities[idx]*100:>6.2f}%")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 Loading ONNX ResNet50...
 Input name: input
@@ -632,21 +632,21 @@ Top 5 Predictions:
   5. Great Pyrenees                1.34%
 ```
 
-### Step 4.3: Choosing Execution Providers
+### 步骤 4.3：选择执行提供者
 
-ONNX Runtime supports multiple execution providers for hardware acceleration:
+ONNX Runtime 支持多种执行提供者以实现硬件加速：
 
 ```python
 # onnx_execution_providers.py
 import onnxruntime as ort
 import numpy as np
 
-# List available providers
+# 列出可用的提供者
 print("Available execution providers:")
 for provider in ort.get_available_providers():
     print(f"  - {provider}")
 
-# Create sessions with different providers
+# 使用不同提供者创建会话
 onnx_path = "models/resnet50.onnx"
 
 # CPU Provider
@@ -657,7 +657,7 @@ cpu_session = ort.InferenceSession(
 )
 print(f"Using: {cpu_session.get_providers()}")
 
-# CUDA Provider (if available)
+# CUDA Provider（如果可用）
 if 'CUDAExecutionProvider' in ort.get_available_providers():
     print("\n=== CUDA Execution Provider ===")
     cuda_session = ort.InferenceSession(
@@ -666,22 +666,22 @@ if 'CUDAExecutionProvider' in ort.get_available_providers():
     )
     print(f"Using: {cuda_session.get_providers()}")
 else:
-    print("\n⚠️  CUDA not available")
+    print("\n⚠ CUDA not available")
 
-# Other providers (if available)
+# 其他提供者（如果可用）
 # - TensorrtExecutionProvider: NVIDIA TensorRT
 # - OpenVINOExecutionProvider: Intel OpenVINO
 # - CoreMLExecutionProvider: Apple CoreML
 # - DmlExecutionProvider: DirectML (Windows)
 ```
 
-✅ **Checkpoint**: You can run inference with ONNX Runtime on converted models.
+✅ **检查点**：你能使用 ONNX Runtime 在转换后的模型上运行推理了。
 
 ---
 
-## Part 5: Model Validation
+## 第 5 部分：模型验证
 
-### Step 5.1: Validate PyTorch to ONNX Conversion
+### 步骤 5.1：验证 PyTorch 到 ONNX 的转换
 
 ```python
 # validate_pytorch_onnx.py
@@ -690,37 +690,37 @@ import torch.nn as nn
 import onnxruntime as ort
 import numpy as np
 
-# Load PyTorch model
+# 加载 PyTorch 模型
 print("Loading PyTorch ResNet50...")
 pytorch_model = torch.hub.load('pytorch/vision', 'resnet50', pretrained=True)
 pytorch_model.eval()
 
-# Load ONNX model
+# 加载 ONNX 模型
 print("Loading ONNX ResNet50...")
 onnx_session = ort.InferenceSession("models/resnet50.onnx")
 
-# Create test input
+# 创建测试输入
 batch_size = 1
 test_input = torch.randn(batch_size, 3, 224, 224)
 print(f"\nTest input shape: {test_input.shape}")
 
-# PyTorch inference
+# PyTorch 推理
 print("\nRunning PyTorch inference...")
 with torch.no_grad():
     pytorch_output = pytorch_model(test_input)
 pytorch_result = pytorch_output.numpy()
 
-# ONNX inference
+# ONNX 推理
 print("Running ONNX inference...")
 input_name = onnx_session.get_inputs()[0].name
 onnx_result = onnx_session.run(None, {input_name: test_input.numpy()})[0]
 
-# Compare outputs
+# 比较输出
 print("\n=== Validation Results ===")
 print(f"PyTorch output shape: {pytorch_result.shape}")
 print(f"ONNX output shape: {onnx_result.shape}")
 
-# Calculate differences
+# 计算差异
 absolute_diff = np.abs(pytorch_result - onnx_result)
 max_diff = np.max(absolute_diff)
 mean_diff = np.mean(absolute_diff)
@@ -731,14 +731,14 @@ print(f"  Max absolute difference: {max_diff:.6f}")
 print(f"  Mean absolute difference: {mean_diff:.6f}")
 print(f"  Mean relative difference: {relative_diff:.6f}")
 
-# Check if outputs are close
+# 检查输出是否接近
 tolerance = 1e-5
 if np.allclose(pytorch_result, onnx_result, rtol=tolerance, atol=tolerance):
     print(f"\n✅ PASS: Outputs match within tolerance ({tolerance})")
 else:
     print(f"\n❌ FAIL: Outputs differ beyond tolerance ({tolerance})")
 
-# Compare top predictions
+# 比较 top 预测
 pytorch_top5 = np.argsort(pytorch_result[0])[-5:][::-1]
 onnx_top5 = np.argsort(onnx_result[0])[-5:][::-1]
 
@@ -749,10 +749,10 @@ print(f"  ONNX:    {onnx_top5}")
 if np.array_equal(pytorch_top5, onnx_top5):
     print("  ✅ Top 5 predictions match!")
 else:
-    print("  ⚠️  Top 5 predictions differ")
+    print("  ⚠ Top 5 predictions differ")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 Loading PyTorch ResNet50...
 Loading ONNX ResNet50...
@@ -779,7 +779,7 @@ Top 5 Class Predictions:
   ✅ Top 5 predictions match!
 ```
 
-### Step 5.2: Comprehensive Validation Suite
+### 步骤 5.2：综合验证套件
 
 ```python
 # validation_suite.py
@@ -789,7 +789,7 @@ import numpy as np
 from typing import Dict, Tuple
 
 class ModelValidator:
-    """Validate ONNX model against PyTorch original"""
+    """验证 ONNX 模型与 PyTorch 原始模型的一致性"""
 
     def __init__(self, pytorch_model: torch.nn.Module, onnx_path: str):
         self.pytorch_model = pytorch_model
@@ -798,7 +798,7 @@ class ModelValidator:
         self.input_name = self.onnx_session.get_inputs()[0].name
 
     def validate(self, test_inputs: list, tolerance: float = 1e-5) -> Dict:
-        """Run validation on multiple test inputs"""
+        """在多个测试输入上运行验证"""
         results = {
             'passed': 0,
             'failed': 0,
@@ -810,26 +810,26 @@ class ModelValidator:
         print(f"Running validation on {len(test_inputs)} test cases...")
 
         for i, test_input in enumerate(test_inputs):
-            # PyTorch inference
+            # PyTorch 推理
             with torch.no_grad():
                 pytorch_output = self.pytorch_model(test_input).numpy()
 
-            # ONNX inference
+            # ONNX 推理
             onnx_output = self.onnx_session.run(
                 None,
                 {self.input_name: test_input.numpy()}
             )[0]
 
-            # Calculate differences
+            # 计算差异
             abs_diff = np.abs(pytorch_output - onnx_output)
             max_diff = np.max(abs_diff)
             mean_diff = np.mean(abs_diff)
 
-            # Update results
+            # 更新结果
             results['max_diff'] = max(results['max_diff'], max_diff)
             results['mean_diff'] += mean_diff
 
-            # Check if passed
+            # 检查是否通过
             passed = np.allclose(pytorch_output, onnx_output, rtol=tolerance, atol=tolerance)
             if passed:
                 results['passed'] += 1
@@ -850,12 +850,12 @@ class ModelValidator:
         results['mean_diff'] /= len(test_inputs)
         return results
 
-# Example usage
+# 示例使用
 print("Loading models...")
 pytorch_model = torch.hub.load('pytorch/vision', 'resnet18', pretrained=True)
 pytorch_model.eval()
 
-# Export to ONNX
+# 导出为 ONNX
 torch.onnx.export(
     pytorch_model,
     torch.randn(1, 3, 224, 224),
@@ -866,22 +866,22 @@ torch.onnx.export(
     output_names=['output']
 )
 
-# Create validator
+# 创建验证器
 validator = ModelValidator(pytorch_model, "models/resnet18.onnx")
 
-# Generate test inputs with different characteristics
+# 生成具有不同特征的测试输入
 test_inputs = [
-    torch.randn(1, 3, 224, 224),           # Random normal
-    torch.zeros(1, 3, 224, 224),           # All zeros
-    torch.ones(1, 3, 224, 224),            # All ones
-    torch.randn(1, 3, 224, 224) * 0.1,     # Small values
-    torch.randn(1, 3, 224, 224) * 10,      # Large values
+    torch.randn(1, 3, 224, 224),           # 随机正态
+    torch.zeros(1, 3, 224, 224),           # 全零
+    torch.ones(1, 3, 224, 224),            # 全一
+    torch.randn(1, 3, 224, 224) * 0.1,     # 小值
+    torch.randn(1, 3, 224, 224) * 10,      # 大值
 ]
 
-# Run validation
+# 运行验证
 results = validator.validate(test_inputs, tolerance=1e-5)
 
-# Print summary
+# 打印摘要
 print("\n=== Validation Summary ===")
 print(f"Total tests: {len(test_inputs)}")
 print(f"Passed: {results['passed']}")
@@ -892,16 +892,16 @@ print(f"Mean difference: {results['mean_diff']:.6f}")
 if results['failed'] == 0:
     print("\n✅ All validation tests passed!")
 else:
-    print(f"\n⚠️  {results['failed']} tests failed")
+    print(f"\n⚠ {results['failed']} tests failed")
 ```
 
-✅ **Checkpoint**: You can validate ONNX models for numerical accuracy.
+✅ **检查点**：你能验证 ONNX 模型的数值精度了。
 
 ---
 
-## Part 6: Performance Comparison
+## 第 6 部分：性能对比
 
-### Step 6.1: Latency Comparison
+### 步骤 6.1：延迟对比
 
 ```python
 # performance_comparison.py
@@ -912,15 +912,15 @@ import time
 from typing import Dict
 
 def benchmark_pytorch(model, input_tensor, iterations=100, warmup=10):
-    """Benchmark PyTorch model"""
+    """对 PyTorch 模型进行基准测试"""
     model.eval()
 
-    # Warmup
+    # 预热
     with torch.no_grad():
         for _ in range(warmup):
             _ = model(input_tensor)
 
-    # Measure
+    # 测量
     start = time.time()
     with torch.no_grad():
         for _ in range(iterations):
@@ -930,13 +930,13 @@ def benchmark_pytorch(model, input_tensor, iterations=100, warmup=10):
     return (elapsed / iterations) * 1000  # ms
 
 def benchmark_onnx(session, input_name, input_data, iterations=100, warmup=10):
-    """Benchmark ONNX Runtime"""
+    """对 ONNX Runtime 进行基准测试"""
 
-    # Warmup
+    # 预热
     for _ in range(warmup):
         _ = session.run(None, {input_name: input_data})
 
-    # Measure
+    # 测量
     start = time.time()
     for _ in range(iterations):
         _ = session.run(None, {input_name: input_data})
@@ -944,7 +944,7 @@ def benchmark_onnx(session, input_name, input_data, iterations=100, warmup=10):
 
     return (elapsed / iterations) * 1000  # ms
 
-# Load models
+# 加载模型
 print("Loading models...")
 pytorch_model = torch.hub.load('pytorch/vision', 'resnet50', pretrained=True)
 pytorch_model.eval()
@@ -952,18 +952,18 @@ pytorch_model.eval()
 onnx_session = ort.InferenceSession("models/resnet50.onnx")
 input_name = onnx_session.get_inputs()[0].name
 
-# Test different batch sizes
+# 测试不同的批大小
 batch_sizes = [1, 4, 8, 16]
 print("\n=== Performance Comparison (CPU) ===")
 print(f"{'Batch Size':<12} {'PyTorch (ms)':<15} {'ONNX (ms)':<15} {'Speedup':<10}")
 print("-" * 55)
 
 for batch_size in batch_sizes:
-    # Prepare inputs
+    # 准备输入
     pytorch_input = torch.randn(batch_size, 3, 224, 224)
     onnx_input = pytorch_input.numpy()
 
-    # Benchmark
+    # 基准测试
     pytorch_time = benchmark_pytorch(pytorch_model, pytorch_input, iterations=50)
     onnx_time = benchmark_onnx(onnx_session, input_name, onnx_input, iterations=50)
 
@@ -972,7 +972,7 @@ for batch_size in batch_sizes:
     print(f"{batch_size:<12} {pytorch_time:<15.2f} {onnx_time:<15.2f} {speedup:<10.2f}x")
 ```
 
-**Expected Output (CPU)**:
+**预期输出（CPU）**：
 ```
 Loading models...
 
@@ -985,7 +985,7 @@ Batch Size   PyTorch (ms)    ONNX (ms)       Speedup
 16           645.78          447.23          1.44x
 ```
 
-### Step 6.2: Comprehensive Performance Suite
+### 步骤 6.2：综合性能套件
 
 ```python
 # performance_suite.py
@@ -997,18 +997,18 @@ import psutil
 import os
 
 class PerformanceBenchmark:
-    """Comprehensive performance benchmarking"""
+    """综合性能基准测试"""
 
     def __init__(self):
         self.results = {}
 
     def measure_latency(self, func, iterations=100, warmup=10):
-        """Measure average latency"""
-        # Warmup
+        """测量平均延迟"""
+        # 预热
         for _ in range(warmup):
             func()
 
-        # Measure
+        # 测量
         latencies = []
         for _ in range(iterations):
             start = time.perf_counter()
@@ -1027,7 +1027,7 @@ class PerformanceBenchmark:
         }
 
     def measure_throughput(self, func, duration_sec=5):
-        """Measure throughput (iterations per second)"""
+        """测量吞吐量（每秒迭代次数）"""
         count = 0
         start = time.time()
 
@@ -1039,16 +1039,16 @@ class PerformanceBenchmark:
         return count / elapsed
 
     def measure_memory(self, func):
-        """Measure memory usage"""
+        """测量内存使用"""
         process = psutil.Process(os.getpid())
 
-        # Initial memory
+        # 初始内存
         mem_before = process.memory_info().rss / 1024 / 1024  # MB
 
-        # Run function
+        # 运行函数
         func()
 
-        # Final memory
+        # 最终内存
         mem_after = process.memory_info().rss / 1024 / 1024  # MB
 
         return {
@@ -1058,23 +1058,23 @@ class PerformanceBenchmark:
         }
 
     def benchmark_model(self, name, inference_func):
-        """Run complete benchmark suite"""
+        """运行完整基准测试套件"""
         print(f"\n{'='*50}")
         print(f"Benchmarking: {name}")
         print(f"{'='*50}")
 
-        # Latency
+        # 延迟
         print("\n📊 Latency Statistics:")
         latency_stats = self.measure_latency(inference_func, iterations=100)
         for key, value in latency_stats.items():
             print(f"  {key:>6}: {value:>8.3f} ms")
 
-        # Throughput
+        # 吞吐量
         print("\n🚀 Throughput:")
         throughput = self.measure_throughput(inference_func, duration_sec=3)
         print(f"  {throughput:.2f} inferences/second")
 
-        # Memory
+        # 内存
         print("\n💾 Memory Usage:")
         memory_stats = self.measure_memory(inference_func)
         print(f"  Before: {memory_stats['before_mb']:.2f} MB")
@@ -1088,7 +1088,7 @@ class PerformanceBenchmark:
         }
 
     def print_comparison(self):
-        """Print comparison between all benchmarked models"""
+        """打印所有基准测试模型之间的比较"""
         print(f"\n\n{'='*70}")
         print("PERFORMANCE COMPARISON SUMMARY")
         print(f"{'='*70}")
@@ -1113,35 +1113,35 @@ class PerformanceBenchmark:
         print(f"  Latency:    {latency_speedup:>6.2f}x {'faster' if latency_speedup > 1 else 'slower'}")
         print(f"  Throughput: {throughput_improvement:>6.2f}x {'higher' if throughput_improvement > 1 else 'lower'}")
 
-# Example usage
+# 示例使用
 print("Setting up benchmark...")
 
-# Load PyTorch model
+# 加载 PyTorch 模型
 pytorch_model = torch.hub.load('pytorch/vision', 'mobilenet_v2', pretrained=True)
 pytorch_model.eval()
 pytorch_input = torch.randn(1, 3, 224, 224)
 
-# Load ONNX model
+# 加载 ONNX 模型
 onnx_session = ort.InferenceSession("models/mobilenet_v2.onnx")
 input_name = onnx_session.get_inputs()[0].name
 onnx_input = pytorch_input.numpy()
 
-# Create benchmark
+# 创建基准测试
 benchmark = PerformanceBenchmark()
 
-# Benchmark PyTorch
+# PyTorch 基准测试
 pytorch_func = lambda: pytorch_model(pytorch_input)
 benchmark.benchmark_model("PyTorch MobileNetV2", pytorch_func)
 
-# Benchmark ONNX
+# ONNX 基准测试
 onnx_func = lambda: onnx_session.run(None, {input_name: onnx_input})
 benchmark.benchmark_model("ONNX MobileNetV2", onnx_func)
 
-# Print comparison
+# 打印比较
 benchmark.print_comparison()
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 ==================================================
 Benchmarking: PyTorch MobileNetV2
@@ -1194,19 +1194,19 @@ PERFORMANCE COMPARISON SUMMARY
   Throughput:   1.47x higher
 ```
 
-✅ **Checkpoint**: You can comprehensively measure and compare performance.
+✅ **检查点**：你能全面测量和比较性能了。
 
 ---
 
-## Part 7: Production-Ready Conversion Script
+## 第 7 部分：生产就绪的转换脚本
 
-### Step 7.1: Complete Conversion Tool
+### 步骤 7.1：完整转换工具
 
 ```python
 # model_converter.py
 """
-Production-ready model conversion tool
-Converts PyTorch and TensorFlow models to ONNX with validation
+生产就绪的模型转换工具
+将 PyTorch 和 TensorFlow 模型转换为 ONNX 并验证
 """
 
 import torch
@@ -1219,7 +1219,7 @@ from typing import Optional, Tuple
 import json
 
 class ModelConverter:
-    """Convert and validate models to ONNX format"""
+    """将模型转换并验证为 ONNX 格式"""
 
     def __init__(self, validate: bool = True, verbose: bool = True):
         self.validate = validate
@@ -1227,7 +1227,7 @@ class ModelConverter:
         self.conversion_report = {}
 
     def log(self, message: str):
-        """Print message if verbose"""
+        """如果 verbose，打印消息"""
         if self.verbose:
             print(message)
 
@@ -1241,24 +1241,24 @@ class ModelConverter:
         dynamic_axes: Optional[dict] = None,
         opset_version: int = 14
     ) -> bool:
-        """Convert PyTorch model to ONNX"""
+        """将 PyTorch 模型转换为 ONNX"""
 
         self.log(f"\n{'='*60}")
         self.log("Converting PyTorch Model to ONNX")
         self.log(f"{'='*60}")
 
         try:
-            # Ensure model is in eval mode
+            # 确保模型处于 eval 模式
             model.eval()
 
-            # Default dynamic axes for batch size
+            # batch size 的默认动态轴
             if dynamic_axes is None:
                 dynamic_axes = {
                     input_names[0]: {0: 'batch_size'},
                     output_names[0]: {0: 'batch_size'}
                 }
 
-            # Export to ONNX
+            # 导出为 ONNX
             self.log(f"\n📤 Exporting to {output_path}...")
             torch.onnx.export(
                 model,
@@ -1273,13 +1273,13 @@ class ModelConverter:
                 verbose=False
             )
 
-            # Verify ONNX model
+            # 验证 ONNX 模型
             self.log("✅ Checking ONNX model validity...")
             onnx_model = onnx.load(output_path)
             onnx.checker.check_model(onnx_model)
             self.log("✅ ONNX model is valid!")
 
-            # Store model info
+            # 存储模型信息
             file_size = os.path.getsize(output_path) / (1024 * 1024)
             self.conversion_report['output_path'] = output_path
             self.conversion_report['file_size_mb'] = round(file_size, 2)
@@ -1290,7 +1290,7 @@ class ModelConverter:
             self.log(f"  Opset version: {opset_version}")
             self.log(f"  Graph nodes: {len(onnx_model.graph.node)}")
 
-            # Validate if requested
+            # 如果请求，进行验证
             if self.validate:
                 self.log("\n🔍 Validating conversion accuracy...")
                 validation_passed = self._validate_pytorch_conversion(
@@ -1301,7 +1301,7 @@ class ModelConverter:
                 if validation_passed:
                     self.log("✅ Validation passed!")
                 else:
-                    self.log("⚠️  Validation failed - outputs differ significantly")
+                    self.log("⚠ Validation failed - outputs differ significantly")
                     return False
 
             self.log("\n✅ Conversion successful!")
@@ -1319,18 +1319,18 @@ class ModelConverter:
         test_input: torch.Tensor,
         tolerance: float = 1e-5
     ) -> bool:
-        """Validate PyTorch to ONNX conversion"""
+        """验证 PyTorch 到 ONNX 的转换"""
 
-        # PyTorch inference
+        # PyTorch 推理
         with torch.no_grad():
             pytorch_output = pytorch_model(test_input).numpy()
 
-        # ONNX inference
+        # ONNX 推理
         onnx_session = ort.InferenceSession(onnx_path)
         input_name = onnx_session.get_inputs()[0].name
         onnx_output = onnx_session.run(None, {input_name: test_input.numpy()})[0]
 
-        # Compare
+        # 比较
         abs_diff = np.abs(pytorch_output - onnx_output)
         max_diff = np.max(abs_diff)
         mean_diff = np.mean(abs_diff)
@@ -1344,7 +1344,7 @@ class ModelConverter:
         return np.allclose(pytorch_output, onnx_output, rtol=tolerance, atol=tolerance)
 
     def save_report(self, output_path: str = "conversion_report.json"):
-        """Save conversion report to JSON"""
+        """将转换报告保存为 JSON"""
         with open(output_path, 'w') as f:
             json.dump(self.conversion_report, f, indent=2)
         self.log(f"\n📄 Report saved to {output_path}")
@@ -1362,18 +1362,18 @@ def main():
 
     args = parser.parse_args()
 
-    # Load PyTorch model
+    # 加载 PyTorch 模型
     print(f"Loading PyTorch model: {args.model}")
     model = torch.hub.load('pytorch/vision', args.model, pretrained=True)
     model.eval()
 
-    # Create dummy input
+    # 创建虚拟输入
     dummy_input = torch.randn(1, 3, 224, 224)
 
-    # Create converter
+    # 创建转换器
     converter = ModelConverter(validate=not args.no_validate)
 
-    # Convert model
+    # 转换模型
     success = converter.convert_pytorch(
         model=model,
         dummy_input=dummy_input,
@@ -1381,7 +1381,7 @@ def main():
         opset_version=args.opset
     )
 
-    # Save report
+    # 保存报告
     if success:
         converter.save_report()
 
@@ -1391,30 +1391,30 @@ if __name__ == "__main__":
     exit(main())
 ```
 
-**Usage**:
+**使用方法**：
 ```bash
-# Convert ResNet18
+# 转换 ResNet18
 python model_converter.py --model resnet18 --output models/resnet18.onnx
 
-# Convert MobileNetV2 without validation
+# 转换 MobileNetV2 不验证
 python model_converter.py --model mobilenet_v2 --output models/mobilenet.onnx --no-validate
 
-# Convert with specific opset version
+# 使用特定 opset 版本转换
 python model_converter.py --model efficientnet_b0 --opset 15
 ```
 
-✅ **Checkpoint**: You have a production-ready conversion tool!
+✅ **检查点**：你有了一个生产就绪的转换工具！
 
 ---
 
-## Part 8: Real-World Application
+## 第 8 部分：实际应用
 
-### Step 8.1: Complete Inference Comparison Tool
+### 步骤 8.1：完整推理对比工具
 
 ```python
 # inference_comparison_app.py
 """
-Compare inference across PyTorch, TensorFlow, and ONNX
+比较 PyTorch、TensorFlow 和 ONNX 之间的推理
 """
 
 import torch
@@ -1426,7 +1426,7 @@ import argparse
 from typing import Dict, List
 
 class MultiFrameworkInference:
-    """Run inference across multiple frameworks"""
+    """跨多个框架运行推理"""
 
     def __init__(self, image_path: str):
         self.image_path = image_path
@@ -1435,7 +1435,7 @@ class MultiFrameworkInference:
         self._load_labels()
 
     def _load_labels(self):
-        """Load ImageNet labels"""
+        """加载 ImageNet 标签"""
         import urllib.request
         url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
         urllib.request.urlretrieve(url, "imagenet_classes.txt")
@@ -1443,7 +1443,7 @@ class MultiFrameworkInference:
             self.labels = [line.strip() for line in f.readlines()]
 
     def preprocess_pytorch(self) -> torch.Tensor:
-        """Preprocess for PyTorch"""
+        """为 PyTorch 预处理"""
         from torchvision import transforms
 
         transform = transforms.Compose([
@@ -1460,51 +1460,51 @@ class MultiFrameworkInference:
         return transform(image).unsqueeze(0)
 
     def preprocess_onnx(self) -> np.ndarray:
-        """Preprocess for ONNX"""
+        """为 ONNX 预处理"""
         image = Image.open(self.image_path).convert('RGB')
         image = image.resize((256, 256))
 
-        # Center crop
+        # 中心裁剪
         left = (256 - 224) / 2
         top = (256 - 224) / 2
         image = image.crop((left, top, left + 224, top + 224))
 
-        # Normalize
+        # 归一化
         img_array = np.array(image).astype(np.float32) / 255.0
         mean = np.array([0.485, 0.456, 0.406])
         std = np.array([0.229, 0.224, 0.225])
         img_array = (img_array - mean) / std
 
-        # CHW format
+        # CHW 格式
         img_array = img_array.transpose(2, 0, 1)
         return np.expand_dims(img_array, axis=0)
 
     def run_pytorch(self, model_name: str = 'resnet18') -> Dict:
-        """Run PyTorch inference"""
+        """运行 PyTorch 推理"""
         print(f"\n{'='*50}")
         print(f"PyTorch Inference ({model_name})")
         print(f"{'='*50}")
 
-        # Load model
+        # 加载模型
         print("Loading model...")
         model = torch.hub.load('pytorch/vision', model_name, pretrained=True)
         model.eval()
 
-        # Preprocess
+        # 预处理
         input_tensor = self.preprocess_pytorch()
 
-        # Warmup
+        # 预热
         with torch.no_grad():
             for _ in range(10):
                 _ = model(input_tensor)
 
-        # Measure inference
+        # 测量推理
         start = time.perf_counter()
         with torch.no_grad():
             output = model(input_tensor)
         latency_ms = (time.perf_counter() - start) * 1000
 
-        # Get predictions
+        # 获取预测
         probabilities = torch.nn.functional.softmax(output[0], dim=0)
         top5_prob, top5_idx = torch.topk(probabilities, 5)
 
@@ -1525,29 +1525,29 @@ class MultiFrameworkInference:
         return results
 
     def run_onnx(self, onnx_path: str) -> Dict:
-        """Run ONNX Runtime inference"""
+        """运行 ONNX Runtime 推理"""
         print(f"\n{'='*50}")
         print(f"ONNX Runtime Inference")
         print(f"{'='*50}")
 
-        # Load model
+        # 加载模型
         print(f"Loading model from {onnx_path}...")
         session = ort.InferenceSession(onnx_path)
         input_name = session.get_inputs()[0].name
 
-        # Preprocess
+        # 预处理
         input_data = self.preprocess_onnx()
 
-        # Warmup
+        # 预热
         for _ in range(10):
             _ = session.run(None, {input_name: input_data})
 
-        # Measure inference
+        # 测量推理
         start = time.perf_counter()
         output = session.run(None, {input_name: input_data})[0]
         latency_ms = (time.perf_counter() - start) * 1000
 
-        # Get predictions
+        # 获取预测
         exp_output = np.exp(output[0] - np.max(output[0]))
         probabilities = exp_output / exp_output.sum()
         top5_idx = np.argsort(probabilities)[-5:][::-1]
@@ -1569,14 +1569,14 @@ class MultiFrameworkInference:
         return results
 
     def _print_results(self, results: Dict):
-        """Print inference results"""
+        """打印推理结果"""
         print(f"\n⏱️  Inference time: {results['latency_ms']:.2f} ms")
         print(f"\n🎯 Top 5 Predictions:")
         for i, pred in enumerate(results['predictions']):
             print(f"  {i+1}. {pred['class']:<30} {pred['probability']*100:>6.2f}%")
 
     def compare(self, results: List[Dict]):
-        """Compare results across frameworks"""
+        """跨框架比较结果"""
         print(f"\n\n{'='*70}")
         print("COMPARISON SUMMARY")
         print(f"{'='*70}")
@@ -1587,11 +1587,11 @@ class MultiFrameworkInference:
         for result in results:
             print(f"{result['framework']:<20} {result['model']:<25} {result['latency_ms']:<15.2f}")
 
-        # Find fastest
+        # 找到最快的
         fastest = min(results, key=lambda x: x['latency_ms'])
         print(f"\n🏆 Fastest: {fastest['framework']} ({fastest['latency_ms']:.2f} ms)")
 
-        # Compare predictions
+        # 比较预测
         print(f"\n🎯 Top Prediction Comparison:")
         for result in results:
             top_pred = result['predictions'][0]
@@ -1607,10 +1607,10 @@ def main():
 
     args = parser.parse_args()
 
-    # Create inference engine
+    # 创建推理引擎
     engine = MultiFrameworkInference(args.image)
 
-    # Run inference on both frameworks
+    # 在两个框架上运行推理
     results = []
 
     # PyTorch
@@ -1622,10 +1622,10 @@ def main():
         onnx_result = engine.run_onnx(args.onnx_model)
         results.append(onnx_result)
     else:
-        print(f"\n⚠️  ONNX model not found: {args.onnx_model}")
+        print(f"\n⚠ ONNX model not found: {args.onnx_model}")
         print("Convert PyTorch model first using model_converter.py")
 
-    # Compare
+    # 比较
     if len(results) > 1:
         engine.compare(results)
 
@@ -1633,42 +1633,42 @@ if __name__ == "__main__":
     main()
 ```
 
-**Usage**:
+**使用方法**：
 ```bash
-# Compare PyTorch and ONNX inference
+# 比较 PyTorch 和 ONNX 推理
 python inference_comparison_app.py test_images/dog.jpg \
     --pytorch-model resnet18 \
     --onnx-model models/resnet18.onnx
 ```
 
-✅ **Final Checkpoint**: You have a complete multi-framework inference system!
+✅ **最终检查点**：你有了一个完整的跨框架推理系统！
 
 ---
 
-## Stretch Goals (Optional Challenges)
+## 拓展目标（可选挑战）
 
-### Challenge 1: Optimize ONNX Model
+### 挑战 1：优化 ONNX 模型
 
-**Task**: Apply optimization techniques to reduce model size and improve speed.
+**任务**：应用优化技术以减少模型大小并提高速度。
 
 ```python
-# Hint: Use onnxruntime.transformers.optimizer
+# 提示：使用 onnxruntime.transformers.optimizer
 from onnxruntime.transformers import optimizer
 
 optimized_model = optimizer.optimize_model(
     "models/resnet50.onnx",
-    model_type='bert',  # or appropriate type
+    model_type='bert',  # 或适当的类型
     num_heads=0,
     hidden_size=0
 )
 ```
 
-### Challenge 2: Quantization
+### 挑战 2：量化
 
-**Task**: Convert model to INT8 quantization for faster inference.
+**任务**：将模型转换为 INT8 量化以实现更快的推理。
 
 ```python
-# Hint: Use dynamic quantization
+# 提示：使用动态量化
 import onnxruntime as ort
 from onnxruntime.quantization import quantize_dynamic, QuantType
 
@@ -1679,27 +1679,27 @@ quantize_dynamic(
 )
 ```
 
-### Challenge 3: Custom Operators
+### 挑战 3：自定义算子
 
-**Task**: Handle models with custom PyTorch operators in ONNX conversion.
+**任务**：在 ONNX 转换中处理具有自定义 PyTorch 算子的模型。
 
-Research:
-- How to register custom ONNX operators
-- Symbolic function definition
-- Operator compatibility across versions
+研究：
+- 如何注册自定义 ONNX 算子
+- 符号函数定义
+- 跨版本的算子兼容性
 
 ---
 
-## Validation and Testing
+## 验证和测试
 
-### Test Your Knowledge
+### 测试你的知识
 
 ```python
 # test_conversions.py
-"""Test your conversion implementations"""
+"""测试你的转换实现"""
 
 def test_conversion_validity():
-    """Test that converted models are valid ONNX"""
+    """测试转换后的模型是否为有效的 ONNX"""
     import onnx
 
     onnx_files = [
@@ -1713,16 +1713,16 @@ def test_conversion_validity():
             onnx.checker.check_model(model)
             print(f"✅ {onnx_file} is valid")
         else:
-            print(f"⚠️  {onnx_file} not found")
+            print(f"⚠ {onnx_file} not found")
 
 def test_numerical_accuracy():
-    """Test that ONNX outputs match PyTorch"""
-    # Your implementation here
+    """测试 ONNX 输出是否与 PyTorch 匹配"""
+    # 在此处实现
     pass
 
 def test_performance_improvement():
-    """Test that ONNX is faster than PyTorch"""
-    # Your implementation here
+    """测试 ONNX 是否比 PyTorch 更快"""
+    # 在此处实现
     pass
 
 if __name__ == "__main__":
@@ -1733,92 +1733,92 @@ if __name__ == "__main__":
 
 ---
 
-## Reflection Questions
+## 反思问题
 
-Answer these questions to solidify your learning:
+回答这些问题以巩固你的学习：
 
-1. **What are the main benefits of using ONNX in production?**
-   - Your answer:
+1. **在生产中使用 ONNX 的主要好处是什么？**
+   - 你的答案：
 
-2. **When would you NOT use ONNX (stick with native framework)?**
-   - Your answer:
+2. **什么时候你不会使用 ONNX（坚持使用原生框架）？**
+   - 你的答案：
 
-3. **Why is model validation important after conversion?**
-   - Your answer:
+3. **为什么转换后的模型验证很重要？**
+   - 你的答案：
 
-4. **How does ONNX Runtime achieve better performance than native frameworks?**
-   - Your answer:
+4. **ONNX Runtime 如何实现比原生框架更好的性能？**
+   - 你的答案：
 
-5. **What are the trade-offs between different opset versions?**
-   - Your answer:
+5. **不同 opset 版本之间的权衡是什么？**
+   - 你的答案：
 
-6. **In what scenarios would you use dynamic_axes?**
-   - Your answer:
+6. **在什么场景下你会使用 dynamic_axes？**
+   - 你的答案：
 
-7. **How would you debug a model that converts but gives wrong outputs?**
-   - Your answer:
-
----
-
-## Summary
-
-**What You Accomplished**:
-✅ Converted PyTorch models to ONNX format
-✅ Converted TensorFlow models to ONNX format
-✅ Ran inference with ONNX Runtime
-✅ Validated converted models for accuracy
-✅ Measured performance across frameworks
-✅ Built production-ready conversion tools
-✅ Understood ONNX's role in ML infrastructure
-
-**Key Skills Gained**:
-- Model format conversion (PyTorch → ONNX)
-- Model format conversion (TensorFlow → ONNX)
-- ONNX Runtime inference
-- Numerical validation techniques
-- Performance benchmarking
-- Multi-framework deployment strategies
-
-**Infrastructure Engineer Takeaways**:
-- **Deployment Flexibility**: ONNX enables framework-agnostic deployment
-- **Performance**: ONNX Runtime often outperforms native frameworks for inference
-- **Optimization**: Standard format enables hardware-specific optimizations
-- **Interoperability**: Train in one framework, deploy in another
-- **Cost Savings**: Faster inference reduces cloud compute costs
+7. **如果模型转换成功但输出错误，你如何调试？**
+   - 你的答案：
 
 ---
 
-## Next Steps
+## 总结
 
-1. **Explore ONNX Runtime Optimizations**: Learn about graph optimizations, quantization, and pruning
-2. **Try Different Models**: Convert various architectures (transformers, GANs, etc.)
-3. **Production Deployment**: Use ONNX models in serving frameworks (TorchServe, TensorFlow Serving, Triton)
-4. **Hardware Acceleration**: Experiment with TensorRT, OpenVINO, CoreML execution providers
-5. **Complete Project 02**: Deploy ONNX model as a REST API
+**你完成了什么**：
+✅ 将 PyTorch 模型转换为 ONNX 格式
+✅ 将 TensorFlow 模型转换为 ONNX 格式
+✅ 使用 ONNX Runtime 运行推理
+✅ 验证转换后模型的精度
+✅ 跨框架测量性能
+✅ 构建生产就绪的转换工具
+✅ 理解 ONNX 在 ML 基础设施中的角色
+
+**获得的关键技能**：
+- 模型格式转换（PyTorch → ONNX）
+- 模型格式转换（TensorFlow → ONNX）
+- ONNX Runtime 推理
+- 数值验证技术
+- 性能基准测试
+- 多框架部署策略
+
+**基础设施工程师要点**：
+- **部署灵活性**：ONNX 实现与框架无关的部署
+- **性能**：ONNX Runtime 通常优于原生框架的推理性能
+- **优化**：标准格式支持硬件特定的优化
+- **互操作性**：在一个框架中训练，在另一个框架中部署
+- **成本节约**：更快的推理减少了云计算成本
 
 ---
 
-## Additional Resources
+## 下一步
 
-### Documentation
-- [ONNX Official Documentation](https://onnx.ai/onnx/)
-- [ONNX Runtime Documentation](https://onnxruntime.ai/)
-- [PyTorch ONNX Export](https://pytorch.org/docs/stable/onnx.html)
-- [TF2ONNX Documentation](https://github.com/onnx/tensorflow-onnx)
+1. **探索 ONNX Runtime 优化**：了解图优化、量化和剪枝
+2. **尝试不同模型**：转换各种架构（transformers, GANs 等）
+3. **生产部署**：在服务框架中使用 ONNX 模型（TorchServe, TensorFlow Serving, Triton）
+4. **硬件加速**：尝试 TensorRT, OpenVINO, CoreML 执行提供者
+5. **完成项目 02**：将 ONNX 模型部署为 REST API
 
-### Tutorials
-- ONNX Runtime Performance Tuning Guide
-- Model Optimization Best Practices
-- Quantization and Pruning Techniques
+---
 
-### Tools
-- Netron (visualize ONNX models)
+## 额外资源
+
+### 文档
+- [ONNX 官方文档](https://onnx.ai/onnx/)
+- [ONNX Runtime 文档](https://onnxruntime.ai/)
+- [PyTorch ONNX 导出](https://pytorch.org/docs/stable/onnx.html)
+- [TF2ONNX 文档](https://github.com/onnx/tensorflow-onnx)
+
+### 教程
+- ONNX Runtime 性能调优指南
+- 模型优化最佳实践
+- 量化和剪枝技术
+
+### 工具
+- Netron（可视化 ONNX 模型）
 - ONNX Optimizer
 - ONNX Runtime Tools
 
 ---
 
-**Exercise Version**: 1.0
-**Last Updated**: October 2025
-**Estimated Time**: 3-4 hours
-**Difficulty**: Beginner-Intermediate
+**练习版本**: 1.0
+**最后更新**: 2025 年 10 月
+**预计时间**: 3-4 小时
+**难度**: 初级-中级

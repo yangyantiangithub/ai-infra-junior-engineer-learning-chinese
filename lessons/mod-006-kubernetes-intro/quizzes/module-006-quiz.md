@@ -1,303 +1,303 @@
-# Module 006: Kubernetes Introduction - Assessment Quiz
+# Module 006: Kubernetes 入门 - 评估测验
 
-## Instructions
+## 说明
 
-This quiz contains 25 questions covering all aspects of Module 006. Answer each question to the best of your ability. The answer key is provided at the end.
+本测验包含 25 道题，涵盖 Module 006 的所有方面。请尽最大能力回答每道题。答案在最后提供。
 
-**Time Limit**: 60 minutes (recommended)
-**Passing Score**: 80% (20/25 correct)
+**时间限制**：60 分钟（建议）
+**及格分数**：80%（25 题中 20 题正确）
 
-## Questions
+## 问题
 
-### Section 1: Kubernetes Architecture (Questions 1-6)
+### 第 1 部分：Kubernetes 架构（第 1-6 题）
 
-**Question 1**: Which Kubernetes component is responsible for scheduling Pods to nodes?
+**问题 1**：哪个 Kubernetes 组件负责将 Pod 调度到节点？
 - A) kubelet
 - B) kube-scheduler
 - C) kube-controller-manager
 - D) kube-proxy
 
-**Question 2**: Where does Kubernetes store all cluster state and configuration?
-- A) In memory on the API server
-- B) In etcd
-- C) In a relational database
-- D) On each worker node
+**问题 2**：Kubernetes 将集群状态和配置存储在哪里？
+- A) API server 的内存中
+- B) etcd 中
+- C) 关系型数据库中
+- D) 每个工作节点上
 
-**Question 3**: What is the purpose of the kubelet?
-- A) Schedule Pods to nodes
-- B) Run controllers that manage cluster state
-- C) Manage containers on a specific node
-- D) Implement Service networking
+**问题 3**：kubelet 的作用是什么？
+- A) 将 Pod 调度到节点
+- B) 运行管理集群状态的控制器
+- C) 管理特定节点上的容器
+- D) 实现 Service 网络
 
-**Question 4**: Which component implements Service load balancing on each node?
+**问题 4**：哪个组件在每个节点上实现 Service 负载均衡？
 - A) kube-proxy
 - B) kubelet
-- C) Container runtime
+- C) container runtime
 - D) CoreDNS
 
-**Question 5**: What communication protocol does the Kubernetes API Server use?
+**问题 5**：Kubernetes API Server 使用什么通信协议？
 - A) gRPC
 - B) REST (HTTP/HTTPS)
 - C) WebSockets
 - D) MQTT
 
-**Question 6**: In Helm 3, where does Helm store release information?
-- A) In a separate Tiller service
-- B) In Kubernetes Secrets
-- C) In etcd directly
-- D) On the client machine only
+**问题 6**：在 Helm 3 中，Helm 将 release 信息存储在哪里？
+- A) 在独立的 Tiller 服务中
+- B) 在 Kubernetes Secrets 中
+- C) 直接在 etcd 中
+- D) 仅在客户端机器上
 
-### Section 2: Pods and Deployments (Questions 7-11)
+### 第 2 部分：Pod 和 Deployment（第 7-11 题）
 
-**Question 7**: What is the smallest deployable unit in Kubernetes?
+**问题 7**：Kubernetes 中最小的可部署单元是什么？
 - A) Container
 - B) Pod
 - C) Deployment
 - D) ReplicaSet
 
-**Question 8**: How many containers can a Pod contain?
-- A) Exactly one
-- B) One or more
-- C) At least two
-- D) Up to five
+**问题 8**：一个 Pod 可以包含多少个容器？
+- A) 恰好一个
+- B) 一个或多个
+- C) 至少两个
+- D) 最多五个
 
-**Question 9**: What happens when you delete a Deployment?
-- A) Only the Deployment object is deleted
-- B) The Deployment and ReplicaSets are deleted, but Pods remain
-- C) The Deployment, ReplicaSets, and Pods are all deleted
-- D) Nothing happens; Deployments cannot be deleted
+**问题 9**：删除 Deployment 时会发生什么？
+- A) 仅删除 Deployment 对象
+- B) Deployment 和 ReplicaSet 被删除，但 Pod 保留
+- C) Deployment、ReplicaSet 和 Pod 都被删除
+- D) 什么都不会发生；Deployment 不能被删除
 
-**Question 10**: What is the purpose of a liveness probe?
-- A) Determine if a container should receive traffic
-- B) Determine if Kubernetes should restart a container
-- C) Check if a container has started successfully
-- D) Monitor resource usage
+**问题 10**：liveness probe 的目的是什么？
+- A) 判断容器是否应该接收流量
+- B) 判断 Kubernetes 是否应该重启容器
+- C) 检查容器是否已成功启动
+- D) 监控资源使用情况
 
-**Question 11**: In a rolling update with maxUnavailable=1 and maxSurge=1, starting with 3 replicas, what is the maximum number of Pods during the update?
+**问题 11**：在 maxUnavailable=1 和 maxSurge=1 的滚动更新中，从 3 个副本开始，更新期间的最大 Pod 数量是多少？
 - A) 3
 - B) 4
 - C) 5
 - D) 6
 
-### Section 3: Services and Networking (Questions 12-15)
+### 第 3 部分：Service 和网络（第 12-15 题）
 
-**Question 12**: What is the default Service type in Kubernetes?
+**问题 12**：Kubernetes 中默认的 Service 类型是什么？
 - A) NodePort
 - B) LoadBalancer
 - C) ClusterIP
 - D) ExternalName
 
-**Question 13**: How does a Service find its backend Pods?
-- A) By IP address
-- B) By name
-- C) By label selectors
-- D) By namespace
+**问题 13**：Service 如何找到其后端 Pod？
+- A) 通过 IP 地址
+- B) 通过名称
+- C) 通过 label selectors
+- D) 通过 namespace
 
-**Question 14**: What port range is used for NodePort services?
+**问题 14**：NodePort 服务使用的端口范围是什么？
 - A) 1-1024
 - B) 8000-9000
 - C) 30000-32767
 - D) 40000-50000
 
-**Question 15**: What is the full DNS name for a service named "api" in the "production" namespace?
+**问题 15**：名为 "api" 的 service 在 "production" namespace 中的完整 DNS 名称是什么？
 - A) api.production
 - B) api.production.svc
 - C) api.production.svc.cluster.local
 - D) production.api.cluster.local
 
-### Section 4: Configuration and Storage (Questions 16-19)
+### 第 4 部分：配置和存储（第 16-19 题）
 
-**Question 16**: What is the difference between a ConfigMap and a Secret?
-- A) Secrets are encrypted at rest, ConfigMaps are not (by default)
-- B) ConfigMaps can be larger than Secrets
-- C) Secrets can only store strings, ConfigMaps can store any data
-- D) There is no difference; they're interchangeable
+**问题 16**：ConfigMap 和 Secret 有什么区别？
+- A) Secret 在持久化时加密，ConfigMap 默认不加密
+- B) ConfigMap 可以比 Secret 更大
+- C) Secret 只能存储字符串，ConfigMap 可以存储任何数据
+- D) 没有区别；它们可以互换
 
-**Question 17**: What happens when you update a ConfigMap that's mounted as a volume in a running Pod?
-- A) Pod automatically restarts
-- B) File is updated in the container (eventually)
-- C) Nothing; Pods don't see ConfigMap updates
-- D) Container crashes
+**问题 17**：当你更新一个作为卷挂载到正在运行的 Pod 中的 ConfigMap 时会发生什么？
+- A) Pod 自动重启
+- B) 文件（最终）会在容器中更新
+- C) 什么都不会发生；Pod 看不到 ConfigMap 的更新
+- D) 容器崩溃
 
-**Question 18**: What access mode allows multiple nodes to mount a volume for reading and writing?
+**问题 18**：哪种访问模式允许多个节点挂载卷进行读写？
 - A) ReadWriteOnce (RWO)
 - B) ReadOnlyMany (ROX)
 - C) ReadWriteMany (RWX)
 - D) ReadWriteMulti (RWM)
 
-**Question 19**: What creates PersistentVolumes automatically when a PersistentVolumeClaim is created?
+**问题 19**：当 PersistentVolumeClaim 被创建时，什么会自动创建 PersistentVolume？
 - A) kubelet
-- B) StorageClass with dynamic provisioner
+- B) 带有动态 provisioner 的 StorageClass
 - C) PersistentVolume controller
 - D) Volume plugin
 
-### Section 5: Helm (Questions 20-22)
+### 第 5 部分：Helm（第 20-22 题）
 
-**Question 20**: What file in a Helm chart contains default configuration values?
+**问题 20**：Helm chart 中哪个文件包含默认配置值？
 - A) Chart.yaml
 - B) values.yaml
 - C) defaults.yaml
 - D) config.yaml
 
-**Question 21**: What is a Helm release?
-- A) A version of Helm software
-- B) An instance of a chart installed in a cluster
-- C) A packaged Helm chart
-- D) A Helm repository
+**问题 21**：什么是 Helm release？
+- A) Helm 软件的版本
+- B) 安装在集群中的 chart 实例
+- C) 打包的 Helm chart
+- D) Helm 仓库
 
-**Question 22**: How do you roll back a Helm release to the previous version?
+**问题 22**：如何将 Helm release 回滚到上一个版本？
 - A) `helm undo`
 - B) `helm revert`
 - C) `helm rollback`
 - D) `helm restore`
 
-### Section 6: Operations and Debugging (Questions 23-25)
+### 第 6 部分：运维和调试（第 23-25 题）
 
-**Question 23**: What kubectl command shows detailed information about a resource including events?
+**问题 23**：哪个 kubectl 命令显示资源的详细信息，包括事件？
 - A) kubectl get
 - B) kubectl explain
 - C) kubectl describe
 - D) kubectl logs
 
-**Question 24**: A Pod is in "CrashLoopBackOff" status. Which command shows why the container crashed?
+**问题 24**：Pod 处于 "CrashLoopBackOff" 状态。哪个命令显示容器崩溃的原因？
 - A) `kubectl logs <pod>`
 - B) `kubectl logs <pod> --previous`
 - C) `kubectl describe pod <pod>`
-- D) Both B and C
+- D) B 和 C 都可以
 
-**Question 25**: What does the command `kubectl top pods` display?
-- A) The first few Pods in the list
-- B) Current CPU and memory usage
-- C) Pod priority levels
-- D) Pods with most restarts
-
----
-
-## Answer Key
-
-### Section 1: Kubernetes Architecture
-1. **B** - kube-scheduler is responsible for assigning Pods to nodes
-2. **B** - etcd stores all cluster state using Raft consensus
-3. **C** - kubelet manages containers and Pod lifecycle on each node
-4. **A** - kube-proxy implements Service networking and load balancing
-5. **B** - The API server uses REST (HTTP/HTTPS) for communication
-6. **B** - Helm 3 stores releases as Secrets in Kubernetes
-
-### Section 2: Pods and Deployments
-7. **B** - Pod is the smallest deployable unit
-8. **B** - Pods can contain one or more containers
-9. **C** - Deleting a Deployment cascades to ReplicaSets and Pods
-10. **B** - Liveness probes determine if a container should be restarted
-11. **B** - maxSurge=1 allows up to 4 Pods (3 + 1), maxUnavailable=1 means at least 2 running
-
-### Section 3: Services and Networking
-12. **C** - ClusterIP is the default Service type
-13. **C** - Services use label selectors to find Pods
-14. **C** - NodePort uses port range 30000-32767
-15. **C** - Full DNS name format: `<service>.<namespace>.svc.cluster.local`
-
-### Section 4: Configuration and Storage
-16. **A** - Secrets support encryption at rest, ConfigMaps do not (by default)
-17. **B** - Mounted ConfigMaps are eventually updated in the container
-18. **C** - ReadWriteMany (RWX) allows multi-node read-write access
-19. **B** - StorageClass with dynamic provisioner automatically creates PVs
-
-### Section 5: Helm
-20. **B** - values.yaml contains default configuration values
-21. **B** - A release is an instance of a chart installed in a cluster
-22. **C** - `helm rollback` rolls back to previous version
-
-### Section 6: Operations and Debugging
-23. **C** - `kubectl describe` shows detailed information including events
-24. **D** - Both `kubectl logs --previous` and `kubectl describe` help identify crash causes
-25. **B** - `kubectl top pods` shows current CPU and memory usage
+**问题 25**：命令 `kubectl top pods` 显示什么？
+- A) 列表中的前几个 Pod
+- B) 当前的 CPU 和内存使用量
+- C) Pod 优先级级别
+- D) 重启次数最多的 Pod
 
 ---
 
-## Scoring Guide
+## 答案
 
-- **25 correct (100%)**: Excellent! You have mastered Kubernetes fundamentals
-- **23-24 correct (92-96%)**: Very good! Minor review recommended
-- **20-22 correct (80-88%)**: Good! Review topics you missed
-- **17-19 correct (68-76%)**: Fair! Review lectures and exercises
-- **Below 17 (< 68%)**: Needs improvement! Review all material
+### 第 1 部分：Kubernetes 架构
+1. **B** - kube-scheduler 负责将 Pod 分配到节点
+2. **B** - etcd 使用 Raft 共识存储所有集群状态
+3. **C** - kubelet 管理每个节点上的容器和 Pod 生命周期
+4. **A** - kube-proxy 实现 Service 网络和负载均衡
+5. **B** - API server 使用 REST (HTTP/HTTPS) 进行通信
+6. **B** - Helm 3 将 release 作为 Secrets 存储在 Kubernetes 中
 
-## Review Recommendations by Section
+### 第 2 部分：Pod 和 Deployment
+7. **B** - Pod 是最小的可部署单元
+8. **B** - Pod 可以包含一个或多个容器
+9. **C** - 删除 Deployment 会级联删除 ReplicaSet 和 Pod
+10. **B** - Liveness probe 判断容器是否应该被重启
+11. **B** - maxSurge=1 允许最多 4 个 Pod (3 + 1)，maxUnavailable=1 意味着至少 2 个在运行
 
-**If you missed questions in Section 1 (Architecture)**:
-- Re-read Lecture 01: Kubernetes Architecture
-- Review the control plane and node components
-- Understand the role of each component
+### 第 3 部分：Service 和网络
+12. **C** - ClusterIP 是默认的 Service 类型
+13. **C** - Service 使用 label selectors 查找 Pod
+14. **C** - NodePort 使用端口范围 30000-32767
+15. **C** - 完整 DNS 名称格式：`<service>.<namespace>.svc.cluster.local`
 
-**If you missed questions in Section 2 (Pods/Deployments)**:
-- Re-read Lecture 02: Deploying Applications
-- Complete Exercise 01 again
-- Focus on Pod lifecycle and health probes
+### 第 4 部分：配置和存储
+16. **A** - Secret 支持持久化加密，ConfigMap 默认不支持
+17. **B** - 挂载的 ConfigMap 最终会在容器中更新
+18. **C** - ReadWriteMany (RWX) 允许多节点读写访问
+19. **B** - 带有动态 provisioner 的 StorageClass 会自动创建 PV
 
-**If you missed questions in Section 3 (Services)**:
-- Review Service types and DNS naming
-- Practice creating Services
-- Understand label selectors and endpoints
+### 第 5 部分：Helm
+20. **B** - values.yaml 包含默认配置值
+21. **B** - Release 是安装在集群中的 chart 实例
+22. **C** - `helm rollback` 回滚到之前的版本
 
-**If you missed questions in Section 4 (Config/Storage)**:
-- Review ConfigMaps, Secrets, and Volumes
-- Understand access modes and dynamic provisioning
-- Practice mounting ConfigMaps and Secrets
-
-**If you missed questions in Section 5 (Helm)**:
-- Re-read Lecture 03: Helm
-- Complete Exercise 02 again
-- Practice with Helm commands
-
-**If you missed questions in Section 6 (Operations)**:
-- Re-read Lecture 04: Kubernetes Operations
-- Complete Exercise 03 again
-- Practice debugging workflows
-
----
-
-## Additional Practice Questions
-
-For more practice, try these bonus questions:
-
-1. Explain the difference between Deployment and StatefulSet
-2. Describe the complete flow of a Service request to a Pod
-3. What happens during a rolling update with maxSurge=0 and maxUnavailable=1?
-4. How would you debug a Pod that's stuck in "Pending"?
-5. What's the difference between `kubectl apply` and `kubectl create`?
-6. How do you update a Secret without restarting Pods?
-7. What's the purpose of an Ingress resource?
-8. How does Kubernetes handle node failures?
-9. What's the difference between a DaemonSet and a Deployment?
-10. How do you ensure two Pods never run on the same node?
+### 第 6 部分：运维和调试
+23. **C** - `kubectl describe` 显示包括事件在内的详细信息
+24. **D** - `kubectl logs --previous` 和 `kubectl describe` 都有助于识别崩溃原因
+25. **B** - `kubectl top pods` 显示当前的 CPU 和内存使用量
 
 ---
 
-## Next Steps
+## 评分指南
 
-- **If you passed (80%+)**: Proceed to Module 007 (Advanced Kubernetes)
-- **If you need review**: Focus on weak areas and retake quiz
-- **All students**: Complete all three exercises if not done already
-- **Extra credit**: Set up a multi-node cluster and practice all scenarios
+- **25 正确 (100%)**：优秀！你已经掌握了 Kubernetes 基础知识
+- **23-24 正确 (92-96%)**：非常好！建议做少量复习
+- **20-22 正确 (80-88%)**：良好！复习你答错的题目
+- **17-19 正确 (68-76%)**：一般！复习讲义和练习
+- **低于 17 (< 68%)**：需要改进！复习所有材料
 
-## Feedback
+## 按部分划分的复习建议
 
-Track your quiz results:
+**如果你在第 1 部分（架构）答错了问题**：
+- 重新阅读 Lecture 01：Kubernetes 架构
+- 复习控制平面和工作节点组件
+- 理解每个组件的作用
+
+**如果你在第 2 部分（Pod/Deployment）答错了问题**：
+- 重新阅读 Lecture 02：部署应用
+- 再次完成 Exercise 01
+- 重点关注 Pod 生命周期和健康检查
+
+**如果你在第 3 部分（Service）答错了问题**：
+- 复习 Service 类型和 DNS 命名
+- 练习创建 Service
+- 理解 label selectors 和 endpoints
+
+**如果你在第 4 部分（配置/存储）答错了问题**：
+- 复习 ConfigMap、Secret 和 Volume
+- 理解访问模式和动态 provisioning
+- 练习挂载 ConfigMap 和 Secret
+
+**如果你在第 5 部分（Helm）答错了问题**：
+- 重新阅读 Lecture 03：Helm
+- 再次完成 Exercise 02
+- 练习使用 Helm 命令
+
+**如果你在第 6 部分（运维）答错了问题**：
+- 重新阅读 Lecture 04：Kubernetes 运维
+- 再次完成 Exercise 03
+- 练习调试工作流程
+
+---
+
+## 额外练习题
+
+想要更多练习，试试这些附加题：
+
+1. 解释 Deployment 和 StatefulSet 的区别
+2. 描述从 Service 请求到 Pod 的完整流程
+3. maxSurge=0 和 maxUnavailable=1 的滚动更新期间会发生什么？
+4. 你会如何调试卡在 "Pending" 状态的 Pod？
+5. `kubectl apply` 和 `kubectl create` 的区别是什么？
+6. 如何在不重启 Pod 的情况下更新 Secret？
+7. Ingress 资源的目的是什么？
+8. Kubernetes 如何处理节点故障？
+9. DaemonSet 和 Deployment 的区别是什么？
+10. 如何确保两个 Pod 永远不会运行在同一节点上？
+
+---
+
+## 后续步骤
+
+- **如果你通过了 (80%+)**：继续学习 Module 007（高级 Kubernetes）
+- **如果你需要复习**：专注于薄弱领域并重新参加测验
+- **所有学生**：如果还未完成，完成全部三个练习
+- **额外挑战**：设置一个多节点集群并练习所有场景
+
+## 反馈
+
+跟踪你的测验结果：
 
 ```
-Date Taken: __________
-Score: _____/25 (_____%)
-Time Taken: _____ minutes
+考试日期：__________
+分数：_____/25 (_____%)
+用时：_____ 分钟
 
-Areas to review:
-- [ ] Architecture
-- [ ] Pods and Deployments
-- [ ] Services and Networking
-- [ ] Configuration and Storage
+需要复习的领域：
+- [ ] 架构
+- [ ] Pod 和 Deployment
+- [ ] Service 和网络
+- [ ] 配置和存储
 - [ ] Helm
-- [ ] Operations and Debugging
+- [ ] 运维和调试
 
-Notes:
+备注：
 _________________________________
 _________________________________
 _________________________________
@@ -305,6 +305,6 @@ _________________________________
 
 ---
 
-**Congratulations on completing the Module 006 quiz!** This assessment validates your understanding of Kubernetes fundamentals essential for AI infrastructure work.
+**恭喜你完成了 Module 006 测验！** 本次评估验证了你对 AI 基础设施工作至关重要的 Kubernetes 基础知识的理解。
 
-Keep practicing, and remember: hands-on experience is more valuable than memorizing answers!
+继续练习，记住：动手经验比死记硬背答案更有价值！

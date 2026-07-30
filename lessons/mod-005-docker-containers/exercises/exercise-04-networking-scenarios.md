@@ -2,157 +2,157 @@
 
 ## Exercise Overview
 
-**Objective**: Master Docker networking concepts including network drivers, service discovery, DNS resolution, network isolation, and advanced networking patterns for ML infrastructure.
+**Objective**: 掌握 Docker 网络概念，包括网络驱动、服务发现、DNS 解析、网络隔离以及面向 ML 基础设施的高级网络模式。
 
-**Difficulty**: Intermediate to Advanced
-**Estimated Time**: 3-4 hours
+**Difficulty**: 中级到高级
+**Estimated Time**: 3-4 小时
 **Prerequisites**:
 - Exercise 01-03 (Container Operations, Images, Compose)
 - Lecture 04 (Networking & Volumes)
 
 **What You'll Learn**:
-- Docker network drivers (bridge, host, overlay, macvlan)
-- Container DNS and service discovery
-- Network isolation and security
-- Custom bridge networks
-- Container-to-container communication
-- External connectivity
-- Load balancing patterns
-- Multi-host networking
-- Troubleshooting network issues
+- Docker 网络驱动（bridge、host、overlay、macvlan）
+- Container DNS 和服务发现
+- 网络隔离和安全
+- 自定义 bridge 网络
+- Container 间通信
+- 外部连接
+- 负载均衡模式
+- 多主机网络
+- 网络问题排错
 
 ---
 
-## Part 1: Understanding Network Drivers
+## Part 1: 理解网络驱动
 
-### Step 1.1: Bridge Network (Default)
+### Step 1.1: Bridge 网络（默认）
 
 ```bash
-# Create project directory
+# 创建项目目录
 mkdir -p ~/docker-exercises/networking
 cd ~/docker-exercises/networking
 
-# Inspect default bridge network
+# 检查默认 bridge 网络
 docker network ls
 docker network inspect bridge
 
-# Run container on default bridge
+# 在默认 bridge 上运行 container
 docker run -d --name web1 nginx
 docker run -d --name web2 nginx
 
-# Check their IPs
+# 查看它们的 IP
 docker inspect web1 --format='{{.NetworkSettings.IPAddress}}'
 docker inspect web2 --format='{{.NetworkSettings.IPAddress}}'
 
-# Try DNS resolution (will fail on default bridge!)
+# 尝试 DNS 解析（在默认 bridge 上会失败！）
 docker exec web1 ping web2
 # Error: ping: web2: Name or service not known
 
-# Containers can ping by IP though
+# Container 可以通过 IP 互 ping
 WEB2_IP=$(docker inspect web2 --format='{{.NetworkSettings.IPAddress}}')
 docker exec web1 ping -c 3 $WEB2_IP
 
-# Cleanup
+# 清理
 docker rm -f web1 web2
 ```
 
-**Key Insight**: Default bridge network doesn't support automatic DNS resolution!
+**Key Insight**: 默认 bridge 网络不支持自动 DNS 解析！
 
-### Step 1.2: Custom Bridge Network
+### Step 1.2: 自定义 Bridge 网络
 
 ```bash
-# Create custom bridge network
+# 创建自定义 bridge 网络
 docker network create my-network
 
-# Inspect it
+# 检查
 docker network inspect my-network
 
-# Run containers on custom network
+# 在自定义网络上运行 container
 docker run -d --name web1 --network my-network nginx
 docker run -d --name web2 --network my-network nginx
 
-# Now DNS works!
+# 现在 DNS 可以工作了！
 docker exec web1 ping -c 3 web2
 docker exec web2 ping -c 3 web1
 
-# Success! Custom bridges provide automatic DNS resolution
+# 成功！自定义 bridge 提供自动 DNS 解析
 ```
 
-### Step 1.3: Host Network
+### Step 1.3: Host 网络
 
 ```bash
-# Run container with host network
+# 使用 host 网络运行 container
 docker run -d --name web-host --network host nginx
 
-# Container uses host's network stack directly
-# No port mapping needed - nginx accessible on port 80
+# Container 直接使用主机的网络栈
+# 无需端口映射 — nginx 可通过 80 端口访问
 
-# Check (if port 80 is available)
+# 检查（如果 80 端口可用）
 curl http://localhost:80
 
-# View network settings
+# 查看网络设置
 docker inspect web-host --format='{{.NetworkSettings.Networks}}'
 
-# Cleanup
+# 清理
 docker rm -f web-host
 ```
 
 **Use Cases**:
-- High-performance networking (no NAT overhead)
-- Network monitoring tools
-- When you need host's network interfaces
+- 高性能网络（无 NAT 开销）
+- 网络监控工具
+- 需要主机网络接口时
 
 **Limitations**:
-- No network isolation
-- Can't run multiple containers on same port
-- Less portable
+- 没有网络隔离
+- 不能在相同端口上运行多个 container
+- 可移植性较差
 
-### Step 1.4: None Network
+### Step 1.4: None 网络
 
 ```bash
-# Container with no network
+# 没有网络的 container
 docker run -d --name isolated --network none alpine sleep 3600
 
-# Verify no network interfaces (except loopback)
+# 验证没有网络接口（除 loopback 外）
 docker exec isolated ip addr show
 
-# Only sees 'lo' (loopback)
+# 只看到 'lo'（loopback）
 
-# Cleanup
+# 清理
 docker rm -f isolated
 ```
 
 **Use Cases**:
-- Maximum network isolation
-- Testing scenarios
-- Security-sensitive workloads
+- 最大程度的网络隔离
+- 测试场景
+- 安全敏感性工作负载
 
-✅ **Checkpoint**: You understand different Docker network drivers.
+✅ **Checkpoint**: 你理解了不同的 Docker 网络驱动。
 
 ---
 
-## Part 2: Service Discovery and DNS
+## Part 2: 服务发现和 DNS
 
-### Step 2.1: Basic Service Discovery
+### Step 2.1: 基本服务发现
 
 ```bash
-# Create network
+# 创建网络
 docker network create app-net
 
-# Run database
+# 运行数据库
 docker run -d \
   --name postgres-db \
   --network app-net \
   -e POSTGRES_PASSWORD=secret \
   postgres:15
 
-# Run application that connects to 'postgres-db'
+# 运行连接到 'postgres-db' 的应用
 cat > app.py << 'EOF'
 import psycopg2
 import sys
 
 try:
-    # Connect using service name 'postgres-db'
+    # 使用服务名称 'postgres-db' 连接
     conn = psycopg2.connect(
         host='postgres-db',
         database='postgres',
@@ -176,31 +176,31 @@ EOF
 
 docker build -t db-client .
 
-# Run client - it finds DB by name!
+# 运行客户端 — 它通过名称找到数据库！
 docker run --rm --network app-net db-client
 ```
 
-### Step 2.2: DNS Round-Robin
+### Step 2.2: DNS 轮询
 
 ```bash
-# Create multiple containers with same network alias
+# 创建具有相同网络别名的多个 container
 docker network create lb-net
 
-# Run 3 web servers with alias 'web'
+# 运行 3 个别名为 'web' 的 web 服务器
 docker run -d --name web1 --network lb-net --network-alias web nginx
 docker run -d --name web2 --network lb-net --network-alias web nginx
 docker run -d --name web3 --network lb-net --network-alias web nginx
 
-# Create test client
+# 创建测试客户端
 docker run -it --rm --network lb-net alpine sh
 
-# Inside container, try multiple DNS lookups:
+# 在 container 内部，尝试多次 DNS 查找：
 # nslookup web
 # wget -qO- http://web
-# Multiple requests will round-robin across containers
+# 多次请求会在多个 container 间轮询
 ```
 
-### Step 2.3: Service Discovery in Compose
+### Step 2.3: Compose 中的服务发现
 
 ```yaml
 cat > docker-compose.yml << 'EOF'
@@ -210,7 +210,7 @@ services:
   api:
     build: .
     environment:
-      # Can reference other services by name
+      # 可以按名称引用其他服务
       - DB_HOST=database
       - CACHE_HOST=redis-cache
       - QUEUE_HOST=message-queue
@@ -233,24 +233,24 @@ EOF
 ```
 
 **How It Works**:
-- Compose creates a default network
-- Each service gets a DNS entry matching its service name
-- Services can resolve each other by name
-- Multiple replicas get round-robin DNS
+- Compose 创建一个默认网络
+- 每个服务获得与其服务名称匹配的 DNS 条目
+- 服务可以按名称解析彼此
+- 多个副本获得轮询 DNS
 
-✅ **Checkpoint**: You understand Docker DNS and service discovery.
+✅ **Checkpoint**: 你理解了 Docker DNS 和服务发现。
 
 ---
 
-## Part 3: Network Isolation Patterns
+## Part 3: 网络隔离模式
 
-### Step 3.1: Frontend-Backend Separation
+### Step 3.1: 前后端分离
 
 ```bash
 mkdir -p ~/docker-exercises/network-isolation
 cd ~/docker-exercises/network-isolation
 
-# Create simple API
+# 创建简单 API
 cat > api.py << 'EOF'
 from flask import Flask, jsonify
 import psycopg2
@@ -295,7 +295,7 @@ cat > docker-compose.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Public-facing (frontend network only)
+  # 面向公网（仅前端网络）
   nginx:
     image: nginx:alpine
     ports:
@@ -305,7 +305,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
 
-  # API layer (both networks)
+  # API 层（两个网络）
   api:
     build: .
     networks:
@@ -314,7 +314,7 @@ services:
     environment:
       - DB_PASSWORD=secret
 
-  # Database (backend network only - isolated!)
+  # 数据库（仅后端网络 — 隔离！）
   db:
     image: postgres:15
     networks:
@@ -328,44 +328,44 @@ networks:
     driver: bridge
   backend:
     driver: bridge
-    internal: true  # No external internet access
+    internal: true  # 无外部互联网访问
 EOF
 ```
 
 ```bash
-# Start services
+# 启动服务
 docker compose up -d
 
-# Verify isolation
-# Nginx CAN reach API
+# 验证隔离
+# Nginx 可以访问 API
 docker compose exec nginx nc -zv api 5000
 
-# Nginx CANNOT reach DB directly (different network)
+# Nginx 不能直接访问数据库（不同网络）
 docker compose exec nginx nc -zv db 5432
-# Should fail!
+# 应该失败！
 
-# API CAN reach DB (on backend network)
+# API 可以访问数据库（在后端网络上）
 docker compose exec api nc -zv db 5432
 
-# DB cannot reach internet (internal network)
+# 数据库无法访问互联网（内部网络）
 docker compose exec db ping -c 1 8.8.8.8
-# Should fail!
+# 应该失败！
 ```
 
 **Security Benefits**:
-- Database not exposed to frontend
-- Backend network has no internet access
-- API acts as controlled gateway
-- Minimizes attack surface
+- 数据库不暴露给前端
+- 后端网络无互联网访问
+- API 充当受控网关
+- 最小化攻击面
 
-### Step 3.2: Multi-Tier Isolation
+### Step 3.2: 多层隔离
 
 ```yaml
 cat > docker-compose-3tier.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Tier 1: Public DMZ
+  # 第 1 层：公共 DMZ
   load-balancer:
     image: nginx:alpine
     ports:
@@ -373,7 +373,7 @@ services:
     networks:
       - dmz
 
-  # Tier 2: Application Layer
+  # 第 2 层：应用层
   web-app:
     build: .
     networks:
@@ -388,7 +388,7 @@ services:
       - app-tier
       - data-tier
 
-  # Tier 3: Data Layer
+  # 第 3 层：数据层
   database:
     image: postgres:15
     networks:
@@ -420,16 +420,16 @@ Internet → DMZ → App Tier → Data Tier
           LB     Web/API    DB/Cache
 ```
 
-✅ **Checkpoint**: You can implement network isolation for security.
+✅ **Checkpoint**: 你可以为实现安全性实现网络隔离。
 
 ---
 
-## Part 4: Custom Network Configuration
+## Part 4: 自定义网络配置
 
-### Step 4.1: Custom Subnet and IP Ranges
+### Step 4.1: 自定义子网和 IP 范围
 
 ```bash
-# Create network with custom subnet
+# 使用自定义子网创建网络
 docker network create \
   --driver bridge \
   --subnet 172.25.0.0/16 \
@@ -437,7 +437,7 @@ docker network create \
   --ip-range 172.25.5.0/24 \
   custom-net
 
-# Assign specific IPs to containers
+# 为 container 分配特定 IP
 docker run -d \
   --name web \
   --network custom-net \
@@ -450,36 +450,36 @@ docker run -d \
   --ip 172.25.5.11 \
   nginx
 
-# Verify IPs
+# 验证 IP
 docker inspect web --format='{{.NetworkSettings.Networks.custom_net.IPAddress}}'
 docker inspect api --format='{{.NetworkSettings.Networks.custom_net.IPAddress}}'
 ```
 
-### Step 4.2: Multiple Networks per Container
+### Step 4.2: 每个 Container 多个网络
 
 ```bash
-# Create two networks
+# 创建两个网络
 docker network create net-a
 docker network create net-b
 
-# Run container on net-a
+# 在 net-a 上运行 container
 docker run -d --name app --network net-a nginx
 
-# Connect to net-b as well
+# 也连接到 net-b
 docker network connect net-b app
 
-# Now container has IPs on both networks
+# 现在 container 在两个网络上都有 IP
 docker inspect app --format='{{json .NetworkSettings.Networks}}' | python -m json.tool
 
-# Container can reach services on either network!
+# Container 可以访问任一网络上的服务！
 ```
 
-### Step 4.3: Network Aliases
+### Step 4.3: 网络别名
 
 ```bash
 docker network create multi-alias
 
-# Run container with multiple aliases
+# 使用多个别名运行 container
 docker run -d \
   --name web \
   --network multi-alias \
@@ -488,25 +488,25 @@ docker run -d \
   --network-alias frontend \
   nginx
 
-# All these DNS names resolve to same container:
+# 所有这些 DNS 名称解析到同一个 container：
 docker run --rm --network multi-alias alpine nslookup webserver
 docker run --rm --network multi-alias alpine nslookup api
 docker run --rm --network multi-alias alpine nslookup frontend
 ```
 
-✅ **Checkpoint**: You can configure advanced network settings.
+✅ **Checkpoint**: 你可以配置高级网络设置。
 
 ---
 
-## Part 5: Container Communication Patterns
+## Part 5: Container 通信模式
 
-### Step 5.1: Request-Response Pattern
+### Step 5.1: 请求-响应模式
 
 ```bash
 mkdir -p ~/docker-exercises/communication
 cd ~/docker-exercises/communication
 
-# Service A (client)
+# 服务 A（客户端）
 cat > client.py << 'EOF'
 import requests
 import time
@@ -520,7 +520,7 @@ while True:
     time.sleep(5)
 EOF
 
-# Service B (server)
+# 服务 B（服务器）
 cat > server.py << 'EOF'
 from flask import Flask, jsonify
 import random
@@ -560,10 +560,10 @@ services:
 EOF
 ```
 
-### Step 5.2: Publish-Subscribe Pattern
+### Step 5.2: 发布-订阅模式
 
 ```bash
-# Publisher
+# 发布者
 cat > publisher.py << 'EOF'
 import redis
 import time
@@ -580,7 +580,7 @@ while True:
     time.sleep(2)
 EOF
 
-# Subscriber
+# 订阅者
 cat > subscriber.py << 'EOF'
 import redis
 import json
@@ -635,14 +635,14 @@ EOF
 docker compose -f docker-compose-pubsub.yml up
 ```
 
-### Step 5.3: Service Mesh Pattern (Envoy Proxy)
+### Step 5.3: 服务网格模式（Envoy 代理）
 
 ```yaml
 cat > docker-compose-mesh.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Service with sidecar proxy
+  # 带 sidecar 代理的服务
   app:
     build: .
     networks:
@@ -657,13 +657,13 @@ services:
       - mesh
     command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml
 
-  # Another service
+  # 另一个服务
   api:
     build: ./api
     networks:
       - mesh
 
-  # Its sidecar
+  # 它的 sidecar
   envoy-api:
     image: envoyproxy/envoy:v1.28-latest
     volumes:
@@ -677,19 +677,19 @@ networks:
 EOF
 ```
 
-✅ **Checkpoint**: You understand container communication patterns.
+✅ **Checkpoint**: 你理解了 container 通信模式。
 
 ---
 
-## Part 6: Load Balancing and High Availability
+## Part 6: 负载均衡和高可用
 
-### Step 6.1: Nginx Load Balancer
+### Step 6.1: Nginx 负载均衡
 
 ```bash
 mkdir -p ~/docker-exercises/load-balancing
 cd ~/docker-exercises/load-balancing
 
-# Backend application
+# 后端应用
 cat > app.py << 'EOF'
 from flask import Flask, jsonify
 import socket
@@ -725,13 +725,13 @@ COPY app.py .
 CMD ["python", "app.py"]
 EOF
 
-# Nginx config with load balancing
+# 带负载均衡的 Nginx 配置
 mkdir -p nginx
 cat > nginx/nginx.conf << 'EOF'
 upstream backend {
-    least_conn;  # Load balancing algorithm
+    least_conn;  # 负载均衡算法
 
-    # Health check configuration
+    # 健康检查配置
     server backend1:5000 max_fails=3 fail_timeout=30s;
     server backend2:5000 max_fails=3 fail_timeout=30s;
     server backend3:5000 max_fails=3 fail_timeout=30s;
@@ -746,7 +746,7 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
-        # Retry on failure
+        # 失败时重试
         proxy_next_upstream error timeout http_502 http_503 http_504;
     }
 
@@ -798,31 +798,31 @@ EOF
 ```
 
 ```bash
-# Start the stack
+# 启动栈
 docker compose up -d
 
-# Test load balancing - see different servers
+# 测试负载均衡 — 看到不同的服务器
 for i in {1..10}; do
   curl -s http://localhost/ | grep server
   sleep 0.5
 done
 
-# Simulate failure
+# 模拟故障
 docker compose stop backend2
 
-# Requests still work (distributed to healthy backends)
+# 请求仍然有效（分发到健康的后端）
 for i in {1..5}; do
   curl -s http://localhost/ | grep server
 done
 
-# Bring it back
+# 恢复
 docker compose start backend2
 ```
 
-### Step 6.2: HAProxy Load Balancer
+### Step 6.2: HAProxy 负载均衡
 
 ```bash
-# HAProxy configuration
+# HAProxy 配置
 cat > haproxy.cfg << 'EOF'
 global
     log stdout format raw local0
@@ -867,7 +867,7 @@ services:
     image: haproxy:2.8-alpine
     ports:
       - "80:80"
-      - "8080:8080"  # Stats page
+      - "8080:8080"  # 状态页面
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
     depends_on:
@@ -887,200 +887,200 @@ EOF
 ```
 
 ```bash
-# Start with HAProxy
+# 使用 HAProxy 启动
 docker compose -f docker-compose-haproxy.yml up -d
 
-# Test
+# 测试
 for i in {1..10}; do curl -s http://localhost/ | grep server; done
 
-# View stats
+# 查看状态
 open http://localhost:8080/stats
 ```
 
-✅ **Checkpoint**: You can configure load balancing with health checks.
+✅ **Checkpoint**: 你可以配置带健康检查的负载均衡。
 
 ---
 
-## Part 7: External Connectivity
+## Part 7: 外部连接
 
-### Step 7.1: Port Publishing Modes
+### Step 7.1: 端口发布模式
 
 ```bash
-# Bind to all interfaces
+# 绑定到所有接口
 docker run -d -p 8080:80 --name web-all nginx
 
-# Bind to specific interface (localhost only)
+# 绑定到特定接口（仅 localhost）
 docker run -d -p 127.0.0.1:8081:80 --name web-local nginx
 
-# Random port assignment
+# 随机端口分配
 docker run -d -p 80 --name web-random nginx
 docker port web-random
 
-# Multiple port mappings
+# 多个端口映射
 docker run -d \
   -p 8082:80 \
   -p 8443:443 \
   --name web-multi \
   nginx
 
-# Check published ports
+# 检查发布的端口
 docker port web-multi
 ```
 
-### Step 7.2: Exposing Services
+### Step 7.2: 暴露服务
 
 ```yaml
 cat > docker-compose-expose.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Exposed externally
+  # 对外暴露
   web:
     image: nginx
     ports:
       - "8080:80"  # host:container
 
-  # Not exposed externally (only internal)
+  # 不对外暴露（仅内部）
   api:
     image: nginx
     expose:
-      - "80"  # Visible to other services, not host
+      - "80"  # 对其他服务可见，不对主机
 
-  # Internal service
+  # 内部服务
   db:
     image: postgres:15
     environment:
       - POSTGRES_PASSWORD=secret
-    # No ports or expose - completely internal
+    # 无 ports 或 expose — 完全内部
 EOF
 ```
 
-### Step 7.3: Host Network Access
+### Step 7.3: 主机网络访问
 
 ```bash
-# Container accessing host services
+# Container 访问主机服务
 docker run --rm \
   --add-host host.docker.internal:host-gateway \
   alpine ping -c 3 host.docker.internal
 
-# Useful for accessing host's services from container
+# 用于从 container 访问主机的服务
 ```
 
-✅ **Checkpoint**: You understand external connectivity patterns.
+✅ **Checkpoint**: 你理解了外部连接模式。
 
 ---
 
-## Part 8: Network Debugging and Troubleshooting
+## Part 8: 网络调试和排错
 
-### Step 8.1: Network Inspection Tools
+### Step 8.1: 网络检查工具
 
 ```bash
-# List all networks
+# 列出所有网络
 docker network ls
 
-# Inspect network details
+# 检查网络详情
 docker network inspect bridge
 
-# See which containers are on a network
+# 查看哪些 container 在网络中
 docker network inspect my-network \
   --format='{{range .Containers}}{{.Name}} {{end}}'
 
-# Container's network settings
+# Container 的网络设置
 docker inspect container-name \
   --format='{{json .NetworkSettings}}' | python -m json.tool
 ```
 
-### Step 8.2: Connectivity Testing
+### Step 8.2: 连接测试
 
 ```bash
-# Create test network
+# 创建测试网络
 docker network create test-net
 
-# Run test containers
+# 运行测试 container
 docker run -d --name server --network test-net nginx
 docker run -d --name client --network test-net alpine sleep 3600
 
-# Test DNS resolution
+# 测试 DNS 解析
 docker exec client nslookup server
 
-# Test connectivity
+# 测试连接
 docker exec client ping -c 3 server
 
-# Test port connectivity
+# 测试端口连接
 docker exec client nc -zv server 80
 
-# HTTP test
+# HTTP 测试
 docker exec client wget -qO- http://server
 
-# Install debugging tools
+# 安装调试工具
 docker exec client apk add --no-cache curl tcpdump bind-tools
 
-# Advanced debugging
+# 高级调试
 docker exec client tcpdump -i eth0 -n
 ```
 
-### Step 8.3: Common Issues and Solutions
+### Step 8.3: 常见问题及解决方案
 
 ```bash
-# Issue 1: DNS not working
-# Solution: Use custom bridge network (not default bridge)
+# 问题 1：DNS 不工作
+# 解决方案：使用自定义 bridge 网络（而非默认 bridge）
 
-# Issue 2: Can't connect to container
-# Check if on same network
+# 问题 2：无法连接到 container
+# 检查是否在同一网络上
 docker inspect container1 --format='{{json .NetworkSettings.Networks}}'
 docker inspect container2 --format='{{json .NetworkSettings.Networks}}'
 
-# Issue 3: Port already in use
-# Check what's using the port
+# 问题 3：端口已被占用
+# 检查哪个程序在使用该端口
 docker ps -a
 netstat -tlnp | grep :8080
 
-# Issue 4: Network cleanup
+# 问题 4：网络清理
 docker network prune
 
-# Issue 5: Container can't reach internet
-# Check Docker daemon DNS settings
+# 问题 5：Container 无法访问互联网
+# 检查 Docker daemon DNS 设置
 cat /etc/docker/daemon.json
-# Add: {"dns": ["8.8.8.8", "8.8.4.4"]}
+# 添加：{"dns": ["8.8.8.8", "8.8.4.4"]}
 ```
 
-### Step 8.4: Network Monitoring
+### Step 8.4: 网络监控
 
 ```bash
-# Real-time network stats
+# 实时网络统计
 docker stats
 
-# Network traffic with tcpdump
+# 使用 tcpdump 查看网络流量
 docker run --rm --net=host \
   nicolaka/netshoot \
   tcpdump -i any port 80
 
-# Network diagnostic container
+# 网络诊断 container
 docker run -it --rm \
   --network container:target-container \
   nicolaka/netshoot
 
-# Inside netshoot, you have:
+# 在 netshoot 内部，你有：
 # - ping, nslookup, dig
 # - curl, wget
 # - tcpdump, iperf
 # - netstat, ss
 ```
 
-✅ **Checkpoint**: You can debug and troubleshoot network issues.
+✅ **Checkpoint**: 你可以调试和排错网络问题。
 
 ---
 
-## Part 9: ML Infrastructure Networking
+## Part 9: ML 基础设施网络
 
-### Step 9.1: Distributed Training Network
+### Step 9.1: 分布式训练网络
 
 ```yaml
 cat > docker-compose-training.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Master node
+  # 主节点
   master:
     image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
     command: python train.py --role master --rank 0
@@ -1096,7 +1096,7 @@ services:
       - MASTER_PORT=29500
       - WORLD_SIZE=3
 
-  # Worker nodes
+  # Worker 节点
   worker1:
     image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
     command: python train.py --role worker --rank 1
@@ -1139,14 +1139,14 @@ volumes:
 EOF
 ```
 
-### Step 9.2: Model Serving with A/B Testing
+### Step 9.2: 带 A/B 测试的模型 Serving
 
 ```yaml
 cat > docker-compose-ab-testing.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Load balancer with A/B routing
+  # 带 A/B 路由的负载均衡器
   nginx:
     image: nginx:alpine
     ports:
@@ -1156,7 +1156,7 @@ services:
     networks:
       - serving-net
 
-  # Model version A (80% traffic)
+  # 模型版本 A（80% 流量）
   model-v1:
     build:
       context: .
@@ -1169,7 +1169,7 @@ services:
         aliases:
           - model-a
 
-  # Model version B (20% traffic)
+  # 模型版本 B（20% 流量）
   model-v2:
     build:
       context: .
@@ -1182,7 +1182,7 @@ services:
         aliases:
           - model-b
 
-  # Metrics collection
+  # 指标收集
   prometheus:
     image: prom/prometheus
     ports:
@@ -1220,14 +1220,14 @@ server {
 }
 ```
 
-### Step 9.3: Feature Store Architecture
+### Step 9.3: 特征存储架构
 
 ```yaml
 cat > docker-compose-features.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Online feature serving
+  # 在线特征 serving
   feature-server:
     build: ./feature-server
     networks:
@@ -1237,13 +1237,13 @@ services:
       - redis
       - postgres
 
-  # Fast cache layer
+  # 快速缓存层
   redis:
     image: redis:7-alpine
     networks:
       - cache-tier
 
-  # Feature database
+  # 特征数据库
   postgres:
     image: postgres:15
     networks:
@@ -1252,7 +1252,7 @@ services:
     volumes:
       - features-db:/var/lib/postgresql/data
 
-  # Offline feature computation
+  # 离线特征计算
   spark-master:
     image: bitnami/spark:3.4
     networks:
@@ -1272,23 +1272,23 @@ services:
       replicas: 2
 
 networks:
-  online-tier:     # API access
-  cache-tier:      # Fast feature access
-  storage-tier:    # Persistent storage
-  compute-tier:    # Batch processing
+  online-tier:     # API 访问
+  cache-tier:      # 快速特征访问
+  storage-tier:    # 持久存储
+  compute-tier:    # 批处理
 
 volumes:
   features-db:
 EOF
 ```
 
-✅ **Checkpoint**: You can design ML infrastructure networks.
+✅ **Checkpoint**: 你可以设计 ML 基础设施网络。
 
 ---
 
-## Part 10: Production Networking Patterns
+## Part 10: 生产网络模式
 
-### Step 10.1: Zero-Downtime Deployments
+### Step 10.1: 零停机部署
 
 ```yaml
 cat > docker-compose-rolling.yml << 'EOF'
@@ -1305,7 +1305,7 @@ services:
       - app-blue
       - app-green
 
-  # Blue deployment (current)
+  # 蓝色部署（当前）
   app-blue:
     build: .
     environment:
@@ -1315,7 +1315,7 @@ services:
     deploy:
       replicas: 3
 
-  # Green deployment (new version)
+  # 绿色部署（新版本）
   app-green:
     build: .
     environment:
@@ -1330,7 +1330,7 @@ networks:
 EOF
 ```
 
-### Step 10.2: Circuit Breaker Pattern
+### Step 10.2: 断路器模式
 
 ```python
 # circuit_breaker.py
@@ -1340,9 +1340,9 @@ import time
 from enum import Enum
 
 class CircuitState(Enum):
-    CLOSED = 1   # Normal operation
-    OPEN = 2     # Failures detected, blocking requests
-    HALF_OPEN = 3  # Testing if service recovered
+    CLOSED = 1   # 正常运行
+    OPEN = 2     # 检测到故障，阻止请求
+    HALF_OPEN = 3  # 测试服务是否恢复
 
 class CircuitBreaker:
     def __init__(self, failure_threshold=5, timeout=60):
@@ -1378,7 +1378,7 @@ class CircuitBreaker:
 
             raise e
 
-# Usage
+# 使用
 breaker = CircuitBreaker()
 try:
     response = breaker.call('http://api:5000/data')
@@ -1387,16 +1387,16 @@ except Exception as e:
 EOF
 ```
 
-### Step 10.3: Service Mesh with Istio (Conceptual)
+### Step 10.3: 使用 Istio 的服务网格（概念）
 
 ```yaml
-# Istio would handle:
-# - Service-to-service encryption (mTLS)
-# - Traffic management (routing, retries, timeouts)
-# - Observability (metrics, logs, traces)
-# - Circuit breaking and fault injection
+# Istio 将处理：
+# - 服务间加密（mTLS）
+# - 流量管理（路由、重试、超时）
+# - 可观测性（指标、日志、追踪）
+# - 断路和故障注入
 
-# Example service with Istio sidecar pattern
+# 带 Istio sidecar 模式的示例服务
 cat > docker-compose-sidecar.yml << 'EOF'
 version: '3.8'
 
@@ -1406,75 +1406,75 @@ services:
     networks:
       - mesh
 
-  # Envoy sidecar proxy
+  # Envoy sidecar 代理
   envoy:
     image: envoyproxy/envoy:v1.28-latest
     volumes:
       - ./envoy-config.yaml:/etc/envoy/envoy.yaml
     networks:
       - mesh
-    # All traffic goes through Envoy
+    # 所有流量通过 Envoy
 
 networks:
   mesh:
 EOF
 ```
 
-✅ **Checkpoint**: You understand production networking patterns.
+✅ **Checkpoint**: 你理解了生产网络模式。
 
 ---
 
-## Practical Challenges
+## 实际挑战
 
-### Challenge 1: Secure Multi-Tier Application
-
-**Requirements**:
-- 3-tier architecture (web, api, database)
-- Network isolation between tiers
-- Only necessary connections allowed
-- No database internet access
-- Load balancing on API tier
-
-### Challenge 2: Microservices Communication
+### Challenge 1: 安全多层应用
 
 **Requirements**:
-- 5 microservices
-- Service discovery
-- One service accessible publicly
-- Internal service mesh
-- Health checks and circuit breakers
+- 3 层架构（web、api、database）
+- 层之间的网络隔离
+- 仅允许必要的连接
+- 数据库无互联网访问
+- API 层负载均衡
 
-### Challenge 3: ML Pipeline Network
+### Challenge 2: 微服务通信
 
 **Requirements**:
-- Training cluster (master + workers)
-- Feature store (online + offline)
-- Model serving (A/B testing)
-- Monitoring and logging
-- Proper network segmentation
+- 5 个微服务
+- 服务发现
+- 一个服务可公开访问
+- 内部服务网格
+- 健康检查和断路器
+
+### Challenge 3: ML Pipeline 网络
+
+**Requirements**:
+- 训练集群（主节点 + worker）
+- 特征存储（在线 + 离线）
+- Model serving（A/B 测试）
+- 监控和日志记录
+- 适当的网络分段
 
 ---
 
 ## Summary
 
 **What You Accomplished**:
-✅ Mastered Docker network drivers (bridge, host, overlay, none)
-✅ Implemented service discovery and DNS resolution
-✅ Created network isolation for security
-✅ Configured custom networks with specific IP ranges
-✅ Implemented load balancing with health checks
-✅ Debugged network connectivity issues
-✅ Designed ML infrastructure networks
-✅ Applied production networking patterns
+✅ 掌握了 Docker 网络驱动（bridge、host、overlay、none）
+✅ 实现了服务发现和 DNS 解析
+✅ 为实现安全性创建了网络隔离
+✅ 配置了带有特定 IP 范围的自定义网络
+✅ 实现了带健康检查的负载均衡
+✅ 调试了网络连接问题
+✅ 设计了 ML 基础设施网络
+✅ 应用了生产网络模式
 
 **Key Networking Concepts**:
-- Bridge networks and DNS
-- Network isolation and security
-- Load balancing algorithms
-- Service discovery patterns
-- Circuit breakers and resilience
-- Network troubleshooting
-- Production-ready architectures
+- Bridge 网络和 DNS
+- 网络隔离和安全
+- 负载均衡算法
+- 服务发现模式
+- 断路器和弹性
+- 网络排错
+- 生产就绪架构
 
 ---
 
@@ -1489,5 +1489,5 @@ EOF
 
 **Exercise Version**: 1.0
 **Last Updated**: October 2025
-**Estimated Time**: 3-4 hours
-**Difficulty**: Intermediate to Advanced
+**Estimated Time**: 3-4 小时
+**Difficulty**: 中级到高级

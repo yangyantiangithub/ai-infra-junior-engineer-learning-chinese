@@ -1,64 +1,64 @@
-# Exercise 01: Observability Foundations Lab
+# Exercise 01：Observability Foundations Lab
 
-## Overview
+## 概述
 
-Kick off Module 009 by instrumenting a production-ready FastAPI inference service with comprehensive observability: metrics, logs, and traces. You will define SLIs/SLOs, implement structured logging, expose Prometheus metrics, capture OpenTelemetry traces, and establish observability best practices that serve as the foundation for the entire monitoring stack.
+通过为一个生产就绪的 FastAPI 推理服务实现全面的可观测性（metrics、logs 和 traces），开启 Module 009 的学习。你将定义 SLI/SLO、实现结构化日志、暴露 Prometheus metrics、捕获 OpenTelemetry traces，并建立作为整个 monitoring 栈基础的可观测性最佳实践。
 
-**Difficulty:** Beginner → Intermediate
-**Estimated Time:** 3–4 hours
-**Prerequisites:**
-- Completion of Lecture 01 (Observability Fundamentals)
-- Familiarity with Python (Module 001) and FastAPI basics (Module 007)
-- Docker and Docker Compose (Module 005)
-- Basic understanding of Prometheus and OpenTelemetry concepts
+**难度：** 初级 → 中级
+**预计时间：** 3–4 小时
+**前置知识：**
+- 已完成 Lecture 01（可观测性基础）
+- 熟悉 Python（Module 001）和 FastAPI 基础（Module 007）
+- Docker 和 Docker Compose（Module 005）
+- 对 Prometheus 和 OpenTelemetry 概念有基本了解
 
-## Learning Objectives
+## 学习目标
 
-By finishing this lab you will be able to:
+完成本实验后，你将能够：
 
-1. Design and document practical SLIs and SLOs for a microservice
-2. Instrument a FastAPI application with Prometheus metrics (counters, histograms, gauges, summaries)
-3. Implement structured JSON logging with correlation metadata and trace context
-4. Integrate OpenTelemetry tracing with automatic and manual instrumentation
-5. Propagate trace context through logs for unified observability
-6. Implement the Four Golden Signals (latency, traffic, errors, saturation)
-7. Create observability readiness assessments for production services
-8. Apply cardinality best practices to avoid metric explosions
-9. Implement health check endpoints for monitoring systems
-10. Document observability architecture and SLO commitments
+1. 为微服务设计和文档化实际的 SLI 和 SLO
+2. 使用 Prometheus metrics（counters、histograms、gauges、summaries）对 FastAPI 应用进行 instrument
+3. 实现带有关联元数据和 trace 上下文的结构化 JSON 日志
+4. 使用自动和手动 instrumentation 集成 OpenTelemetry tracing
+5. 通过日志传播 trace 上下文以实现统一可观测性
+6. 实现四大黄金信号（latency、traffic、errors、saturation）
+7. 为生产服务创建可观测性就绪评估
+8. 应用基数最佳实践以避免 metric 爆炸
+9. 为监控系统实现健康检查端点
+10. 文档化可观测性架构和 SLO 承诺
 
-## Scenario
+## 场景
 
-The `inference-gateway` service is a critical microservice that exposes a `/predict` endpoint wrapping a PyTorch ResNet-50 image classification model. Product leadership has set aggressive reliability targets (99.5% availability, P99 latency < 300ms) before wider rollout to production traffic.
+`inference-gateway` 服务是一个关键的微服务，它暴露了一个封装 PyTorch ResNet-50 图像分类模型的 `/predict` 端点。产品领导层在向生产流量广泛推广之前，设定了积极的可靠性目标（99.5% 可用性，P99 延迟 < 300ms）。
 
-As the junior AI infrastructure engineer, you're tasked with implementing comprehensive observability foundations so the platform team can:
-- Monitor SLO compliance in real-time
-- Detect and debug production incidents quickly
-- Understand model performance and resource utilization
-- Integrate this service into the broader monitoring stack (Prometheus, Grafana, Loki)
+作为初级 AI 基础设施工程师，你的任务是为平台团队实现全面的可观测性基础，以便：
+- 实时监控 SLO 合规性
+- 快速检测和调试生产事件
+- 理解模型性能和资源利用率
+- 将此服务集成到更广泛的 monitoring 栈（Prometheus、Grafana、Loki）中
 
-This exercise builds the observability foundation that will be extended in subsequent exercises with Prometheus, Grafana, centralized logging, and alerting.
+本练习构建了可观测性基础，将在后续练习中通过 Prometheus、Grafana、集中化日志和告警进行扩展。
 
 ---
 
-## Part 1: Environment Setup and Docker Configuration
+## 第 1 部分：环境设置和 Docker 配置
 
-### Step 1.1: Create Project Structure
+### 步骤 1.1：创建项目结构
 
-Create a new directory for the inference gateway service with a complete project structure:
+为推理网关服务创建一个新目录，包含完整的项目结构：
 
 ```bash
 mkdir -p inference-gateway
 cd inference-gateway
 
-# Create directory structure
+# 创建目录结构
 mkdir -p app/{api,core,instrumentation,models}
 mkdir -p tests/{unit,integration}
 mkdir -p docs
 mkdir -p config
 mkdir -p scripts
 
-# Create initial files
+# 创建初始文件
 touch app/__init__.py
 touch app/api/__init__.py
 touch app/core/__init__.py
@@ -71,28 +71,28 @@ touch .dockerignore
 touch docker-compose.yml
 ```
 
-**Expected Structure:**
+**预期结构：**
 ```
 inference-gateway/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py                 # FastAPI application entry point
+│   ├── main.py                 # FastAPI 应用入口点
 │   ├── api/
 │   │   ├── __init__.py
-│   │   ├── routes.py           # API endpoints
-│   │   └── dependencies.py     # Dependency injection
+│   │   ├── routes.py           # API 端点
+│   │   └── dependencies.py     # 依赖注入
 │   ├── core/
 │   │   ├── __init__.py
-│   │   ├── config.py           # Configuration management
-│   │   └── exceptions.py       # Custom exceptions
+│   │   ├── config.py           # 配置管理
+│   │   └── exceptions.py       # 自定义异常
 │   ├── instrumentation/
 │   │   ├── __init__.py
 │   │   ├── metrics.py          # Prometheus metrics
-│   │   ├── logging.py          # Structured logging
+│   │   ├── logging.py          # 结构化日志
 │   │   └── tracing.py          # OpenTelemetry tracing
 │   └── models/
 │       ├── __init__.py
-│       └── inference.py        # Model inference logic
+│       └── inference.py        # 模型推理逻辑
 ├── tests/
 │   ├── __init__.py
 │   ├── unit/
@@ -102,7 +102,7 @@ inference-gateway/
 │   ├── observability-readiness.md
 │   └── architecture.md
 ├── config/
-│   └── prometheus.yml          # Local Prometheus config
+│   └── prometheus.yml          # 本地 Prometheus 配置
 ├── scripts/
 │   ├── setup.sh
 │   └── load_test.sh
@@ -116,9 +116,9 @@ inference-gateway/
 └── README.md
 ```
 
-### Step 1.2: Define Dependencies
+### 步骤 1.2：定义依赖
 
-Create `requirements.txt` with production dependencies:
+创建包含生产依赖的 `requirements.txt`：
 
 ```txt
 # requirements.txt
@@ -155,7 +155,7 @@ httpx==0.25.2
 tenacity==8.2.3
 ```
 
-Create `requirements-dev.txt` for development and testing:
+创建用于开发和测试的 `requirements-dev.txt`：
 
 ```txt
 # requirements-dev.txt
@@ -177,9 +177,9 @@ mypy==1.7.1
 locust==2.19.1
 ```
 
-### Step 1.3: Create Dockerfile
+### 步骤 1.3：创建 Dockerfile
 
-Create a production-ready multi-stage `Dockerfile`:
+创建一个生产就绪的多阶段 `Dockerfile`：
 
 ```dockerfile
 # Dockerfile
@@ -260,9 +260,9 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
 ```
 
-### Step 1.4: Create Docker Compose Configuration
+### 步骤 1.4：创建 Docker Compose 配置
 
-Create `docker-compose.yml` for local development with observability stack:
+创建用于本地开发且包含可观测性栈的 `docker-compose.yml`：
 
 ```yaml
 # docker-compose.yml
@@ -278,7 +278,7 @@ services:
     container_name: inference-gateway
     ports:
       - "8000:8000"
-      - "8001:8001"  # Optional: admin/debug port
+      - "8001:8001"  # 可选：管理/调试端口
     environment:
       - LOG_LEVEL=INFO
       - ENVIRONMENT=development
@@ -304,7 +304,7 @@ services:
       retries: 3
       start_period: 40s
 
-  # OpenTelemetry Collector (for trace collection)
+  # OpenTelemetry Collector（用于 trace 收集）
   otel-collector:
     image: otel/opentelemetry-collector:0.91.0
     container_name: otel-collector
@@ -318,7 +318,7 @@ services:
     networks:
       - observability
 
-  # Jaeger (for trace visualization - optional for this exercise)
+  # Jaeger（用于 trace 可视化 - 本练习可选）
   jaeger:
     image: jaegertracing/all-in-one:1.52
     container_name: jaeger
@@ -330,7 +330,7 @@ services:
     networks:
       - observability
 
-  # Prometheus (for metrics - will be expanded in Exercise 02)
+  # Prometheus（用于 metrics - 将在 Exercise 02 中扩展）
   prometheus:
     image: prom/prometheus:v2.48.1
     container_name: prometheus
@@ -356,9 +356,9 @@ volumes:
   prometheus-data:
 ```
 
-### Step 1.5: Create OpenTelemetry Collector Configuration
+### 步骤 1.5：创建 OpenTelemetry Collector 配置
 
-Create `config/otel-collector-config.yml`:
+创建 `config/otel-collector-config.yml`：
 
 ```yaml
 # config/otel-collector-config.yml
@@ -375,7 +375,7 @@ processors:
     timeout: 10s
     send_batch_size: 1024
 
-  # Add resource attributes
+  # 添加资源属性
   resource:
     attributes:
       - key: environment
@@ -383,13 +383,13 @@ processors:
         action: upsert
 
 exporters:
-  # Export to Jaeger for visualization
+  # 导出到 Jaeger 进行可视化
   otlp/jaeger:
     endpoint: jaeger:4317
     tls:
       insecure: true
 
-  # Console exporter for debugging
+  # 用于调试的 Console exporter
   logging:
     loglevel: info
 
@@ -407,9 +407,9 @@ extensions:
     endpoint: 0.0.0.0:13133
 ```
 
-### Step 1.6: Create Prometheus Configuration
+### 步骤 1.6：创建 Prometheus 配置
 
-Create `config/prometheus.yml`:
+创建 `config/prometheus.yml`：
 
 ```yaml
 # config/prometheus.yml
@@ -421,7 +421,7 @@ global:
     environment: 'development'
 
 scrape_configs:
-  # Scrape the inference gateway service
+  # 抓取推理网关服务
   - job_name: 'inference-gateway'
     static_configs:
       - targets: ['inference-gateway:8000']
@@ -429,15 +429,15 @@ scrape_configs:
           service: 'inference-gateway'
           team: 'ml-platform'
 
-  # Scrape Prometheus itself
+  # 抓取 Prometheus 自身
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
 ```
 
-### Step 1.7: Create Environment Configuration
+### 步骤 1.7：创建环境配置
 
-Create `.env.example`:
+创建 `.env.example`：
 
 ```bash
 # .env.example
@@ -474,20 +474,20 @@ SLO_P99_LATENCY_MS=300
 SLO_ERROR_RATE_MAX=0.5
 ```
 
-Copy to `.env`:
+复制到 `.env`：
 ```bash
 cp .env.example .env
 ```
 
-**✅ Checkpoint:** Verify directory structure and configuration files are created correctly.
+**✅ 检查点：** 验证目录结构和配置文件已正确创建。
 
 ---
 
-## Part 2: Configuration Management with Pydantic Settings
+## 第 2 部分：使用 Pydantic Settings 的配置管理
 
-### Step 2.1: Create Configuration Module
+### 步骤 2.1：创建配置模块
 
-Create `app/core/config.py`:
+创建 `app/core/config.py`：
 
 ```python
 # app/core/config.py
@@ -577,16 +577,16 @@ class Settings(BaseSettings):
 settings = Settings()
 ```
 
-**Key Features:**
-- Type-safe configuration with Pydantic validation
-- Environment variable loading
-- Sensible defaults
-- Production/development checks
-- SLO targets for documentation
+**关键特性：**
+- 带有 Pydantic 验证的类型安全配置
+- 环境变量加载
+- 合理的默认值
+- 生产/开发环境检查
+- 用于文档的 SLO 目标
 
-### Step 2.2: Create Custom Exceptions
+### 步骤 2.2：创建自定义异常
 
-Create `app/core/exceptions.py`:
+创建 `app/core/exceptions.py`：
 
 ```python
 # app/core/exceptions.py
@@ -630,15 +630,15 @@ class ServiceUnavailableError(InferenceGatewayException):
         super().__init__(message, error_code="SERVICE_UNAVAILABLE")
 ```
 
-**✅ Checkpoint:** Configuration module loads correctly with environment variables.
+**✅ 检查点：** 配置模块能通过环境变量正确加载。
 
 ---
 
-## Part 3: Implement Structured Logging with Trace Context
+## 第 3 部分：实现带有 Trace 上下文的结构化日志
 
-### Step 3.1: Create Logging Module
+### 步骤 3.1：创建日志模块
 
-Create `app/instrumentation/logging.py`:
+创建 `app/instrumentation/logging.py`：
 
 ```python
 # app/instrumentation/logging.py
@@ -741,14 +741,14 @@ def get_logger(name: str) -> structlog.BoundLogger:
 configure_logging()
 ```
 
-**Key Features:**
-- Automatic trace context injection (trace_id, span_id)
-- Service metadata on every log
-- JSON output for log aggregation
-- ISO timestamps with UTC
-- Structured fields for filtering
+**关键特性：**
+- 自动 trace 上下文注入（trace_id、span_id）
+- 每条日志的服务元数据
+- 用于日志聚合的 JSON 输出
+- UTC 的 ISO 时间戳
+- 用于过滤的结构化字段
 
-**Example Log Output:**
+**示例日志输出：**
 ```json
 {
   "event": "request_completed",
@@ -768,7 +768,7 @@ configure_logging()
 }
 ```
 
-**✅ Checkpoint:** Import the logging module and verify JSON output:
+**✅ 检查点：** 导入日志模块并验证 JSON 输出：
 
 ```python
 from app.instrumentation.logging import get_logger
@@ -779,11 +779,11 @@ logger.info("test_log", foo="bar", count=42)
 
 ---
 
-## Part 4: Implement Prometheus Metrics
+## 第 4 部分：实现 Prometheus Metrics
 
-### Step 4.1: Create Metrics Module
+### 步骤 4.1：创建 Metrics 模块
 
-Create `app/instrumentation/metrics.py`:
+创建 `app/instrumentation/metrics.py`：
 
 ```python
 # app/instrumentation/metrics.py
@@ -1077,28 +1077,28 @@ def set_model_memory(model_name: str, memory_bytes: int) -> None:
     model_memory_bytes.labels(model_name=model_name).set(memory_bytes)
 ```
 
-**Key Features:**
-- **Four Golden Signals**: Latency, Traffic, Errors, Saturation
-- **HTTP metrics**: Request count, duration, errors
-- **Inference metrics**: Duration, preprocessing, postprocessing
-- **ML-specific metrics**: Confidence scores, predictions by class, batch sizes
-- **Automatic tracking**: Decorator and middleware patterns
-- **Cardinality control**: Limited label values to prevent metric explosion
+**关键特性：**
+- **四大黄金信号**：延迟、流量、错误、饱和度
+- **HTTP metrics**：请求计数、时长、错误
+- **推理 metrics**：时长、预处理、后处理
+- **ML 特定 metrics**：置信度分数、按类别的预测、批次大小
+- **自动跟踪**：装饰器和中间件模式
+- **基数控制**：限制 label 值以防止 metric 爆炸
 
-**Histogram Bucket Design:**
-- HTTP requests: 5ms to 10s (web service latency range)
-- Inference: 10ms to 2s (model execution range)
-- Preprocessing/postprocessing: 1ms to 500ms (data transformation range)
+**Histogram Bucket 设计：**
+- HTTP 请求：5ms 到 10s（Web 服务延迟范围）
+- 推理：10ms 到 2s（模型执行范围）
+- 预处理/后处理：1ms 到 500ms（数据转换范围）
 
-**✅ Checkpoint:** Metrics are defined and can be imported without errors.
+**✅ 检查点：** Metrics 已定义并可无错误导入。
 
 ---
 
-## Part 5: Implement OpenTelemetry Tracing
+## 第 5 部分：实现 OpenTelemetry Tracing
 
-### Step 5.1: Create Tracing Module
+### 步骤 5.1：创建 Tracing 模块
 
-Create `app/instrumentation/tracing.py`:
+创建 `app/instrumentation/tracing.py`：
 
 ```python
 # app/instrumentation/tracing.py
@@ -1230,22 +1230,22 @@ def get_current_span_id() -> Optional[str]:
     return None
 ```
 
-**Key Features:**
-- Automatic FastAPI instrumentation
-- OTLP export to collector
-- Console export for development
-- Trace context helpers
-- Resource attributes (service, version, environment)
+**关键特性：**
+- 自动 FastAPI instrumentation
+- 导出到 collector 的 OTLP
+- 用于开发的 Console export
+- Trace 上下文辅助函数
+- 资源属性（service、version、environment）
 
-**✅ Checkpoint:** Tracing module imports without errors.
+**✅ 检查点：** Tracing 模块可无错误导入。
 
 ---
 
-## Part 6: Implement Model Inference
+## 第 6 部分：实现模型推理
 
-### Step 6.1: Create Inference Module
+### 步骤 6.1：创建推理模块
 
-Create `app/models/inference.py`:
+创建 `app/models/inference.py`：
 
 ```python
 # app/models/inference.py
@@ -1503,23 +1503,23 @@ class ModelInferenceService:
 model_service = ModelInferenceService()
 ```
 
-**Key Features:**
-- Model lifecycle management
-- Comprehensive error handling
-- Distributed tracing with spans
-- Metrics for preprocessing, inference, postprocessing
-- ML-specific metrics (confidence, predictions by class)
-- Memory tracking
+**关键特性：**
+- 模型生命周期管理
+- 全面的错误处理
+- 带有 spans 的分布式 tracing
+- 预处理、推理、后处理的 metrics
+- ML 特定 metrics（置信度、按类别的预测）
+- 内存跟踪
 
-**✅ Checkpoint:** Inference module imports correctly.
+**✅ 检查点：** 推理模块可正确导入。
 
 ---
 
-## Part 7: Create FastAPI Application and Routes
+## 第 7 部分：创建 FastAPI 应用和路由
 
-### Step 7.1: Create API Dependencies
+### 步骤 7.1：创建 API 依赖
 
-Create `app/api/dependencies.py`:
+创建 `app/api/dependencies.py`：
 
 ```python
 # app/api/dependencies.py
@@ -1534,9 +1534,9 @@ def get_model_service() -> Generator[ModelInferenceService, None, None]:
     yield model_service
 ```
 
-### Step 7.2: Create API Routes
+### 步骤 7.2：创建 API 路由
 
-Create `app/api/routes.py`:
+创建 `app/api/routes.py`：
 
 ```python
 # app/api/routes.py
@@ -1677,17 +1677,17 @@ async def predict(
             )
 ```
 
-**Key Features:**
-- Health and readiness checks
-- File upload handling
-- Comprehensive error handling
-- Metrics tracking
-- Distributed tracing
-- Structured logging
+**关键特性：**
+- 健康检查和就绪检查
+- 文件上传处理
+- 全面的错误处理
+- Metrics 跟踪
+- 分布式 tracing
+- 结构化日志
 
-### Step 7.3: Create Main Application
+### 步骤 7.3：创建主应用
 
-Create `app/main.py`:
+创建 `app/main.py`：
 
 ```python
 # app/main.py
@@ -1838,15 +1838,15 @@ if __name__ == "__main__":
     )
 ```
 
-**Key Features:**
-- Lifespan handlers for startup/shutdown
-- Prometheus metrics mounted at `/metrics`
+**关键特性：**
+- 启动/关闭的生命周期处理器
+- 在 `/metrics` 挂载的 Prometheus metrics
 - OpenTelemetry instrumentation
-- CORS middleware
-- Exception handlers
-- Conditional API docs (dev only)
+- CORS 中间件
+- 异常处理器
+- 条件性 API 文档（仅开发环境）
 
-**✅ Checkpoint:** Application starts successfully:
+**✅ 检查点：** 应用成功启动：
 
 ```bash
 # Start with Docker Compose
@@ -1856,283 +1856,283 @@ docker-compose up --build
 python -m app.main
 ```
 
-Verify endpoints:
+验证端点：
 - http://localhost:8000/docs (Swagger UI)
-- http://localhost:8000/healthz (Health check)
-- http://localhost:8000/readyz (Readiness check)
+- http://localhost:8000/healthz (健康检查)
+- http://localhost:8000/readyz (就绪检查)
 - http://localhost:8000/metrics (Prometheus metrics)
 
 ---
 
-## Part 8: Define SLIs and SLOs
+## 第 8 部分：定义 SLI 和 SLO
 
-Create `docs/slo.md`:
+创建 `docs/slo.md`：
 
 ```markdown
 # Service Level Objectives (SLOs)
 
-## Overview
+## 概述
 
-This document defines the Service Level Indicators (SLIs) and Service Level Objectives (SLOs) for the `inference-gateway` service.
+本文档定义了 `inference-gateway` 服务的 Service Level Indicators (SLI) 和 Service Level Objectives (SLO)。
 
-**Service**: inference-gateway
-**Owner**: ML Platform Team
-**Last Updated**: 2025-10-23
-**Review Cycle**: Quarterly
+**服务**: inference-gateway
+**所有者**: ML Platform Team
+**最后更新**: 2025-10-23
+**审查周期**: 季度
 
 ---
 
-## SLO Summary
+## SLO 概要
 
-| SLI | Objective | Measurement Window | Error Budget |
+| SLI | 目标 | 测量窗口 | Error Budget |
 |-----|-----------|-------------------|--------------|
-| Availability | 99.5% | 28-day rolling | 0.5% (~3.6 hours/month) |
-| P99 Latency | < 300ms | 28-day rolling | - |
-| Error Rate | < 0.5% | 28-day rolling | 0.5% of requests |
-| Throughput | Support 100 req/s | 1-minute average | - |
+| 可用性 | 99.5% | 28 天滚动 | 0.5%（约 3.6 小时/月） |
+| P99 延迟 | < 300ms | 28 天滚动 | - |
+| 错误率 | < 0.5% | 28 天滚动 | 0.5% 的请求 |
+| 吞吐量 | 支持 100 req/s | 1 分钟平均 | - |
 
 ---
 
-## Detailed SLIs
+## 详细 SLI
 
-### 1. Availability
+### 1. 可用性
 
-**Definition**: Percentage of successful HTTP requests (status 200-399) over total requests.
+**定义**: 成功 HTTP 请求（状态码 200-399）占总请求的百分比。
 
 **Metric**: `sum(rate(http_requests_total{status_code!~"5.."}[28d])) / sum(rate(http_requests_total[28d])) * 100`
 
-**Target**: 99.5%
+**目标**: 99.5%
 
-**Measurement Window**: 28-day rolling window
+**测量窗口**: 28 天滚动窗口
 
-**Error Budget**: 0.5% downtime = ~3.6 hours per month = ~0.86 hours per week
+**Error Budget**: 0.5% 停机时间 = 每月约 3.6 小时 = 每周约 0.86 小时
 
-**Alerting**:
-- **Warning**: Error budget burn rate > 2x (0.86h remaining for week)
-- **Critical**: Error budget burn rate > 5x (immediate page)
+**告警**:
+- **警告**: Error budget burn rate > 2x（本周剩余 0.86 小时）
+- **严重**: Error budget burn rate > 5x（立即寻呼）
 
-**Rationale**: Product requirements mandate 99.5% availability for production traffic. This allows for ~3.6 hours of downtime per month for maintenance, incidents, and deployments.
+**理由**: 产品要求生产流量达到 99.5% 可用性。这允许每月约 3.6 小时的停机时间用于维护、事件和部署。
 
 ---
 
-### 2. Request Latency (P99)
+### 2. 请求延迟（P99）
 
-**Definition**: 99th percentile of successful request duration for `/predict` endpoint.
+**定义**: `/predict` 端点的成功请求持续时间的第 99 百分位数。
 
 **Metric**: `histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{endpoint="/predict"}[28d]))`
 
-**Target**: < 300ms
+**目标**: < 300ms
 
-**Measurement Window**: 28-day rolling window
+**测量窗口**: 28 天滚动窗口
 
-**Alerting**:
-- **Warning**: P99 latency > 300ms for 5 minutes
-- **Critical**: P99 latency > 500ms for 5 minutes
+**告警**:
+- **警告**: P99 延迟 > 300ms 持续 5 分钟
+- **严重**: P99 延迟 > 500ms 持续 5 分钟
 
-**Rationale**: User experience research shows 300ms is the threshold for "instant" response. Exceeding this degrades user satisfaction scores.
+**理由**: 用户体验研究表明 300ms 是"即时"响应的阈值。超过此阈值会降低用户满意度评分。
 
 ---
 
-### 3. Error Rate
+### 3. 错误率
 
-**Definition**: Percentage of failed requests (status 500-599) over total requests.
+**定义**: 失败请求（状态码 500-599）占总请求的百分比。
 
 **Metric**: `sum(rate(http_requests_total{status_code=~"5.."}[28d])) / sum(rate(http_requests_total[28d])) * 100`
 
-**Target**: < 0.5%
+**目标**: < 0.5%
 
-**Measurement Window**: 28-day rolling window
+**测量窗口**: 28 天滚动窗口
 
-**Error Budget**: 0.5% of requests = ~432 errors per 100,000 requests
+**Error Budget**: 0.5% 的请求 = 每 100,000 个请求约 432 个错误
 
-**Alerting**:
-- **Warning**: Error rate > 0.5% for 5 minutes
-- **Critical**: Error rate > 1% for 5 minutes
+**告警**:
+- **警告**: 错误率 > 0.5% 持续 5 分钟
+- **严重**: 错误率 > 1% 持续 5 分钟
 
-**Rationale**: Internal service reliability targets require < 1% error rate. We target 0.5% to maintain buffer for unexpected failures.
+**理由**: 内部服务可靠性目标要求错误率 < 1%。我们以 0.5% 为目标，为意外故障保持缓冲。
 
 ---
 
-### 4. Throughput Capacity
+### 4. 吞吐量容量
 
-**Definition**: Sustained requests per second the service can handle while meeting latency/error SLOs.
+**定义**: 服务在满足延迟/错误 SLO 的同时可处理的持续每秒请求数。
 
 **Metric**: `rate(http_requests_total{endpoint="/predict"}[1m])`
 
-**Target**: Support 100 req/s sustained load
+**目标**: 支持 100 req/s 持续负载
 
-**Measurement Window**: 1-minute average
+**测量窗口**: 1 分钟平均
 
-**Alerting**:
-- **Warning**: Request rate > 80 req/s (approaching capacity)
-- **Critical**: Request rate > 100 req/s with P99 latency > 300ms (capacity exceeded)
+**告警**:
+- **警告**: 请求率 > 80 req/s（接近容量）
+- **严重**: 请求率 > 100 req/s 且 P99 延迟 > 300ms（超出容量）
 
-**Rationale**: Current traffic projections estimate 50 req/s peak load. Target 100 req/s provides 2x headroom for growth.
+**理由**: 当前流量预测估计峰值为 50 req/s。目标 100 req/s 为增长提供了 2 倍余量。
 
 ---
 
-## ML-Specific SLIs
+## ML 特定 SLI
 
-### 5. Model Inference Latency (P95)
+### 5. 模型推理延迟（P95）
 
-**Definition**: 95th percentile of model inference duration (excluding pre/post-processing).
+**定义**: 模型推理持续时间的第 95 百分位数（不包括预处理/后处理）。
 
 **Metric**: `histogram_quantile(0.95, rate(inference_duration_seconds_bucket{model_name="resnet50"}[28d]))`
 
-**Target**: < 150ms
+**目标**: < 150ms
 
-**Measurement Window**: 28-day rolling window
+**测量窗口**: 28 天滚动窗口
 
-**Alerting**:
-- **Warning**: P95 inference latency > 150ms for 10 minutes
-- **Critical**: P95 inference latency > 200ms for 5 minutes
+**告警**:
+- **警告**: P95 推理延迟 > 150ms 持续 10 分钟
+- **严重**: P95 推理延迟 > 200ms 持续 5 分钟
 
-**Rationale**: Inference latency directly impacts overall request latency. 150ms inference allows ~100ms for network/processing overhead to stay under 300ms total.
+**理由**: 推理延迟直接影响总体请求延迟。150ms 的推理时间允许约 100ms 的网络/处理开销，以保持在 300ms 总计以下。
 
 ---
 
-### 6. Model Confidence Coverage
+### 6. 模型置信度覆盖
 
-**Definition**: Percentage of predictions with confidence > 0.7 (high confidence).
+**定义**: 置信度 > 0.7（高置信度）的预测百分比。
 
 **Metric**: `sum(rate(inference_confidence_score_bucket{le="1.0"}[28d])) - sum(rate(inference_confidence_score_bucket{le="0.7"}[28d])) / sum(rate(inference_confidence_score_count[28d])) * 100`
 
-**Target**: > 80%
+**目标**: > 80%
 
-**Measurement Window**: 28-day rolling window
+**测量窗口**: 28 天滚动窗口
 
-**Alerting**:
-- **Warning**: High confidence rate < 80% for 1 hour
-- **Critical**: High confidence rate < 70% for 30 minutes
+**告警**:
+- **警告**: 高置信度率 < 80% 持续 1 小时
+- **严重**: 高置信度率 < 70% 持续 30 分钟
 
-**Rationale**: Low confidence predictions indicate potential model drift, data quality issues, or distribution shift. Monitoring this helps detect degradation early.
+**理由**: 低置信度预测表明潜在的模型漂移、数据质量问题或分布偏移。监控此指标有助于及早发现退化。
 
 ---
 
-## Error Budget Policy
+## Error Budget 策略
 
-### Error Budget Remaining
+### Error Budget 剩余
 
-**Formula**: `(1 - (actual_availability / target_availability)) * measurement_window`
+**公式**: `(1 - (actual_availability / target_availability)) * measurement_window`
 
-**Example**: For 99.5% target over 28 days:
-- Error budget = 0.5% of 28 days = ~3.6 hours
-- If actual availability is 99.7%, budget remaining = 1.44 hours
-- If actual availability is 99.3%, budget exceeded by 1.44 hours
+**示例**: 对于 28 天内 99.5% 的目标：
+- Error budget = 28 天的 0.5% = 约 3.6 小时
+- 如果实际可用性为 99.7%，剩余 budget = 1.44 小时
+- 如果实际可用性为 99.3%，超出 budget 1.44 小时
 
-### Policy Actions
+### 策略操作
 
-| Budget Remaining | Action |
+| Budget 剩余 | 操作 |
 |------------------|--------|
-| > 75% | Business as usual - Continue feature development |
-| 50-75% | Caution - Review recent changes, increase monitoring |
-| 25-50% | Slow down - Pause non-critical deployments, focus on reliability |
-| < 25% | Freeze - Stop all feature deployments, focus only on reliability improvements |
-| Exhausted | Incident - Declare incident, all hands on deck for recovery |
+| > 75% | 一切照常 - 继续功能开发 |
+| 50-75% | 谨慎 - 审查近期变更，加强监控 |
+| 25-50% | 放慢 - 暂停非关键部署，专注于可靠性 |
+| < 25% | 冻结 - 停止所有功能部署，仅关注可靠性改进 |
+| 已耗尽 | 事件 - 宣布事件，全员参与恢复 |
 
-### Budget Burn Rate Alerts
+### Budget Burn Rate 告警
 
-**1-hour burn rate**: If we continue at current error rate, how much budget consumed in 1 hour?
+**1 小时 burn rate**: 如果以当前错误率继续，1 小时内会消耗多少 budget？
 
-**Alert Thresholds**:
-- 🟡 Warning: 2x normal burn rate for 15 minutes
-- 🔴 Critical: 5x normal burn rate for 5 minutes
+**告警阈值**:
+- 🟡 警告：2 倍正常 burn rate 持续 15 分钟
+- 🔴 严重：5 倍正常 burn rate 持续 5 分钟
 
 ---
 
-## Monitoring and Dashboards
+## 监控和 Dashboard
 
-### Primary Dashboard
+### 主要 Dashboard
 
 **Grafana Dashboard**: `inference-gateway-slo-overview`
 
-**Panels**:
-1. SLO Compliance Status (current vs target)
-2. Error Budget Remaining (gauge + timeseries)
-3. Availability (28-day rolling)
-4. P99 Latency (timeseries)
-5. Error Rate (timeseries)
-6. Throughput (req/s)
-7. ML Metrics (inference latency, confidence distribution)
+**面板**:
+1. SLO 合规状态（当前 vs 目标）
+2. Error Budget 剩余（仪表 + 时间序列）
+3. 可用性（28 天滚动）
+4. P99 延迟（时间序列）
+5. 错误率（时间序列）
+6. 吞吐量（req/s）
+7. ML Metrics（推理延迟、置信度分布）
 
-### Alerts
+### 告警
 
-All SLO alerts route to:
-- **Warning**: #ml-platform-alerts Slack channel
-- **Critical**: PagerDuty → On-call engineer
-
----
-
-## Review and Iteration
-
-### Review Schedule
-
-- **Weekly**: Error budget status review in team sync
-- **Monthly**: SLO compliance report to stakeholders
-- **Quarterly**: SLO definition review and adjustment
-
-### Adjustment Triggers
-
-Re-evaluate SLOs if:
-- Consistent overperformance (> 99.9% for 3 months)
-- Consistent underperformance (< 99% for 2 months)
-- Product requirements change
-- User feedback indicates unmet expectations
-- Business priorities shift
+所有 SLO 告警路由到：
+- **警告**: #ml-platform-alerts Slack 频道
+- **严重**: PagerDuty → On-call 工程师
 
 ---
 
-## References
+## 审查和迭代
+
+### 审查计划
+
+- **每周**: 团队同步中的 Error budget 状态审查
+- **每月**: 向利益相关者的 SLO 合规报告
+- **每季度**: SLO 定义审查和调整
+
+### 调整触发条件
+
+在以下情况下重新评估 SLO：
+- 持续超额表现（3 个月 > 99.9%）
+- 持续欠佳表现（2 个月 < 99%）
+- 产品需求变更
+- 用户反馈表明未满足期望
+- 业务优先级变化
+
+---
+
+## 参考
 
 - [Google SRE Book - SLIs, SLOs, SLAs](https://sre.google/sre-book/service-level-objectives/)
 - [Prometheus Queries for SLO Monitoring](https://prometheus.io/docs/prometheus/latest/querying/examples/)
 - Internal: [ML Platform SLO Standards](https://wiki.internal/ml-platform-slos)
 ```
 
-**✅ Checkpoint:** SLO document is created and accessible.
+**✅ 检查点：** SLO 文档已创建并可访问。
 
 ---
 
-## Part 9: Create Observability Readiness Assessment
+## 第 9 部分：创建可观测性就绪评估
 
-Create `docs/observability-readiness.md`:
+创建 `docs/observability-readiness.md`：
 
 ```markdown
 # Observability Readiness Assessment
 
-**Service**: inference-gateway
-**Assessment Date**: 2025-10-23
-**Assessor**: Junior AI Infrastructure Engineer
-**Status**: ✅ Ready for Production Monitoring Integration
+**服务**: inference-gateway
+**评估日期**: 2025-10-23
+**评估人**: Junior AI Infrastructure Engineer
+**状态**: ✅ 已为生产监控集成准备就绪
 
 ---
 
-## Executive Summary
+## 执行摘要
 
-The `inference-gateway` service has achieved **comprehensive observability coverage** across metrics, logs, and traces. All critical signals are instrumented and ready for integration with the broader monitoring stack (Prometheus, Grafana, Loki, Jaeger).
+`inference-gateway` 服务在 metrics、logs 和 traces 方面实现了**全面的可观测性覆盖**。所有关键信号均已 instrument 并准备与更广泛的 monitoring 栈（Prometheus、Grafana、Loki、Jaeger）集成。
 
-**Overall Readiness**: 95% (19/20 criteria met)
+**总体就绪度**: 95%（20/20 标准已满足）
 
 ---
 
-## Assessment Criteria
+## 评估标准
 
-### 1. Metrics (Prometheus)
+### 1. Metrics（Prometheus）
 
-| Criterion | Status | Notes |
+| 标准 | 状态 | 备注 |
 |-----------|--------|-------|
-| ✅ Service exposes `/metrics` endpoint | Complete | Prometheus exposition format |
-| ✅ Four Golden Signals instrumented | Complete | Latency, Traffic, Errors, Saturation |
-| ✅ HTTP request metrics | Complete | Counter + histogram by method, endpoint, status |
-| ✅ Application-specific metrics | Complete | Inference latency, confidence, predictions |
-| ✅ Resource usage metrics | Complete | Model memory, queue depth |
-| ✅ Histogram buckets appropriate | Complete | Aligned with SLO targets |
-| ✅ Cardinality control | Complete | Limited label values, no unbounded dimensions |
-| ✅ Metric naming conventions | Complete | Follows Prometheus best practices |
+| ✅ 服务暴露 `/metrics` 端点 | 完成 | Prometheus exposition 格式 |
+| ✅ 四大黄金信号已 instrument | 完成 | 延迟、流量、错误、饱和度 |
+| ✅ HTTP 请求 metrics | 完成 | 按方法、端点、状态的 Counter + histogram |
+| ✅ 应用特定 metrics | 完成 | 推理延迟、置信度、预测 |
+| ✅ 资源使用 metrics | 完成 | 模型内存、队列深度 |
+| ✅ Histogram buckets 适当 | 完成 | 与 SLO 目标对齐 |
+| ✅ 基数控制 | 完成 | 限制 label 值，无无限维度 |
+| ✅ Metric 命名约定 | 完成 | 遵循 Prometheus 最佳实践 |
 
-**Metrics Coverage**: 100% (8/8)
+**Metrics 覆盖率**: 100%（8/8）
 
-**Available Metrics**:
+**可用 Metrics**:
 - `http_requests_total`
 - `http_request_duration_seconds`
 - `http_errors_total`
@@ -2145,22 +2145,22 @@ The `inference-gateway` service has achieved **comprehensive observability cover
 
 ---
 
-### 2. Logging (Structured JSON)
+### 2. 日志（结构化 JSON）
 
-| Criterion | Status | Notes |
+| 标准 | 状态 | 备注 |
 |-----------|--------|-------|
-| ✅ Structured JSON logging | Complete | All logs output as JSON |
-| ✅ Consistent log schema | Complete | Timestamp, level, event, service, trace_id |
-| ✅ Trace context in logs | Complete | trace_id and span_id automatically injected |
-| ✅ Service metadata | Complete | Service name, version, environment |
-| ✅ Request correlation | Complete | Request ID and trace ID for correlation |
-| ✅ Appropriate log levels | Complete | DEBUG, INFO, WARNING, ERROR used correctly |
-| ⚠️ Log aggregation integration | Pending | Loki/Elasticsearch integration in Exercise 04 |
-| ✅ PII/sensitive data redaction | Complete | No credentials or PII in logs |
+| ✅ 结构化 JSON 日志 | 完成 | 所有日志以 JSON 格式输出 |
+| ✅ 一致的日志 schema | 完成 | 时间戳、级别、事件、服务、trace_id |
+| ✅ 日志中的 Trace 上下文 | 完成 | trace_id 和 span_id 自动注入 |
+| ✅ 服务元数据 | 完成 | 服务名称、版本、环境 |
+| ✅ 请求关联 | 完成 | 请求 ID 和 trace ID 用于关联 |
+| ✅ 适当的日志级别 | 完成 | 正确使用 DEBUG、INFO、WARNING、ERROR |
+| ⚠️ 日志聚合集成 | 待定 | 将在 Exercise 04 中集成 Loki/Elasticsearch |
+| ✅ PII/敏感数据脱敏 | 完成 | 日志中不包含凭据或 PII |
 
-**Logging Coverage**: 87.5% (7/8) - Aggregation pending
+**日志覆盖率**: 87.5%（7/8）- 聚合待定
 
-**Sample Log Entry**:
+**示例日志条目**:
 ```json
 {
   "event": "inference_completed",
@@ -2180,124 +2180,124 @@ The `inference-gateway` service has achieved **comprehensive observability cover
 
 ---
 
-### 3. Tracing (OpenTelemetry)
+### 3. Tracing（OpenTelemetry）
 
-| Criterion | Status | Notes |
+| 标准 | 状态 | 备注 |
 |-----------|--------|-------|
-| ✅ OpenTelemetry SDK configured | Complete | OTLP exporter to collector |
-| ✅ Automatic HTTP instrumentation | Complete | FastAPI auto-instrumentation |
-| ✅ Custom span creation | Complete | Manual spans for preprocessing, inference, postprocessing |
-| ✅ Span attributes | Complete | Model name, latency, file size |
-| ✅ Trace context propagation | Complete | Trace ID propagates to logs |
-| ✅ Trace sampling | Complete | Default sampling (100% for dev) |
-| ✅ OTLP collector integration | Complete | Exports to Jaeger via collector |
+| ✅ OpenTelemetry SDK 已配置 | 完成 | OTLP exporter 到 collector |
+| ✅ 自动 HTTP instrumentation | 完成 | FastAPI 自动 instrument |
+| ✅ 自定义 span 创建 | 完成 | 用于预处理、推理、后处理的手动 spans |
+| ✅ Span 属性 | 完成 | 模型名称、延迟、文件大小 |
+| ✅ Trace 上下文传播 | 完成 | Trace ID 传播到日志 |
+| ✅ Trace 采样 | 完成 | 默认采样（开发环境 100%） |
+| ✅ OTLP collector 集成 | 完成 | 通过 collector 导出到 Jaeger |
 
-**Tracing Coverage**: 100% (7/7)
+**Tracing 覆盖率**: 100%（7/7）
 
-**Instrumented Spans**:
-- `predict_endpoint` - Overall request span
-- `load_model` - Model loading
-- `preprocess_image` - Image preprocessing
-- `run_inference` - Model inference execution
-- `inference_pipeline` - Full inference flow
+**已 Instrument 的 Spans**:
+- `predict_endpoint` - 整体请求 span
+- `load_model` - 模型加载
+- `preprocess_image` - 图像预处理
+- `run_inference` - 模型推理执行
+- `inference_pipeline` - 完整推理流程
 
 ---
 
-### 4. Health Checks
+### 4. 健康检查
 
-| Criterion | Status | Notes |
+| 标准 | 状态 | 备注 |
 |-----------|--------|-------|
-| ✅ Liveness probe endpoint | Complete | GET /healthz |
-| ✅ Readiness probe endpoint | Complete | GET /readyz (checks model loaded) |
-| ✅ Startup probe (if needed) | N/A | Not needed for this service |
+| ✅ Liveness 探测端点 | 完成 | GET /healthz |
+| ✅ Readiness 探测端点 | 完成 | GET /readyz（检查模型是否加载） |
+| ✅ Startup 探测（如需要） | 不适用 | 此服务不需要 |
 
-**Health Check Coverage**: 100% (2/2)
+**健康检查覆盖率**: 100%（2/2）
 
 ---
 
-### 5. SLO Definition
+### 5. SLO 定义
 
-| Criterion | Status | Notes |
+| 标准 | 状态 | 备注 |
 |-----------|--------|-------|
-| ✅ SLIs defined | Complete | Availability, latency, error rate, throughput |
-| ✅ SLOs documented | Complete | See docs/slo.md |
-| ✅ Error budgets calculated | Complete | 0.5% downtime = 3.6 hours/month |
-| ✅ Alerting rules defined | Complete | Warning and critical thresholds |
+| ✅ SLI 已定义 | 完成 | 可用性、延迟、错误率、吞吐量 |
+| ✅ SLO 已记录 | 完成 | 参见 docs/slo.md |
+| ✅ Error budgets 已计算 | 完成 | 0.5% 停机时间 = 3.6 小时/月 |
+| ✅ 告警规则已定义 | 完成 | 警告和严重阈值 |
 
-**SLO Coverage**: 100% (4/4)
+**SLO 覆盖率**: 100%（4/4）
 
 ---
 
-## Readiness Summary
+## 就绪摘要
 
-| Category | Criteria Met | Percentage | Status |
+| 类别 | 达标标准 | 百分比 | 状态 |
 |----------|--------------|------------|--------|
-| Metrics | 8/8 | 100% | ✅ Ready |
-| Logging | 7/8 | 87.5% | ⚠️ Pending aggregation |
-| Tracing | 7/7 | 100% | ✅ Ready |
-| Health Checks | 2/2 | 100% | ✅ Ready |
-| SLOs | 4/4 | 100% | ✅ Ready |
-| **Overall** | **28/29** | **96.6%** | ✅ **Production Ready** |
+| Metrics | 8/8 | 100% | ✅ 就绪 |
+| 日志 | 7/8 | 87.5% | ⚠️ 聚合待定 |
+| Tracing | 7/7 | 100% | ✅ 就绪 |
+| 健康检查 | 2/2 | 100% | ✅ 就绪 |
+| SLO | 4/4 | 100% | ✅ 就绪 |
+| **总体** | **28/29** | **96.6%** | ✅ **生产就绪** |
 
 ---
 
-## Gap Analysis
+## 差距分析
 
-### 1. Log Aggregation Integration (Exercise 04)
+### 1. 日志聚合集成（Exercise 04）
 
-**Status**: ⚠️ Pending
-**Priority**: High
-**Plan**: Integrate with Loki/Elasticsearch in Exercise 04 (Logging Pipeline)
-**Timeline**: Next exercise
+**状态**: ⚠️ 待定
+**优先级**: 高
+**计划**: 在 Exercise 04（日志管道）中集成 Loki/Elasticsearch
+**时间线**: 下一个练习
 
-**Actions**:
-- [ ] Configure Loki as log aggregation backend
-- [ ] Set up log shipping (Promtail or Fluent Bit)
-- [ ] Create retention policies
-- [ ] Build log exploration dashboards in Grafana
-
----
-
-## Production Deployment Checklist
-
-Before deploying to production:
-
-- [ ] Configure production OTLP collector endpoint
-- [ ] Set up Prometheus scrape targets
-- [ ] Create Grafana dashboards for SLO monitoring
-- [ ] Configure alerting rules in Prometheus/Alertmanager
-- [ ] Set up PagerDuty integration
-- [ ] Configure log retention policies
-- [ ] Review and adjust trace sampling rate (100% → 1-10%)
-- [ ] Load test with realistic traffic patterns
-- [ ] Validate SLO queries return expected results
-- [ ] Document runbooks for common alerts
+**操作**:
+- [ ] 配置 Loki 作为日志聚合后端
+- [ ] 设置日志传输（Promtail 或 Fluent Bit）
+- [ ] 创建保留策略
+- [ ] 在 Grafana 中构建日志探索 dashboard
 
 ---
 
-## Recommendations
+## 生产部署清单
 
-### Immediate
+部署到生产之前：
 
-1. **Load Testing**: Run locust load test to validate SLO targets under realistic traffic
-2. **Dashboard Creation**: Build Grafana dashboard based on SLO definitions
-3. **Alert Tuning**: Deploy alerting rules and tune thresholds to reduce noise
-
-### Short-Term (Next Sprint)
-
-1. **Log Aggregation**: Complete Loki integration (Exercise 04)
-2. **Distributed Tracing**: Instrument downstream dependencies (if any)
-3. **Cost Optimization**: Review trace sampling rate for production
-
-### Long-Term (Next Quarter)
-
-1. **Anomaly Detection**: Implement ML-based anomaly detection on metrics
-2. **Continuous Profiling**: Add CPU/memory profiling for performance optimization
-3. **Chaos Engineering**: Inject faults to validate observability during incidents
+- [ ] 配置生产 OTLP collector 端点
+- [ ] 设置 Prometheus scrape targets
+- [ ] 创建用于 SLO 监控的 Grafana dashboard
+- [ ] 配置 Prometheus/Alertmanager 中的告警规则
+- [ ] 设置 PagerDuty 集成
+- [ ] 配置日志保留策略
+- [ ] 审查和调整 trace 采样率（100% → 1-10%）
+- [ ] 使用真实流量模式进行负载测试
+- [ ] 验证 SLO 查询返回预期结果
+- [ ] 为常见告警记录 runbooks
 
 ---
 
-## References
+## 建议
+
+### 立即
+
+1. **负载测试**：运行 locust 负载测试以验证 SLO 目标在真实流量下的表现
+2. **Dashboard 创建**：根据 SLO 定义构建 Grafana dashboard
+3. **告警调优**：部署告警规则并调整阈值以减少噪音
+
+### 短期（下一个 Sprint）
+
+1. **日志聚合**：完成 Loki 集成（Exercise 04）
+2. **分布式 Tracing**：对下游依赖进行 instrument（如有）
+3. **成本优化**：审查生产环境的 trace 采样率
+
+### 长期（下个季度）
+
+1. **异常检测**：在 metrics 上实现基于 ML 的异常检测
+2. **持续分析**：添加 CPU/内存分析以优化性能
+3. **混沌工程**：注入故障以验证事件期间的可观测性
+
+---
+
+## 参考
 
 - [OpenTelemetry Best Practices](https://opentelemetry.io/docs/concepts/signals/)
 - [Prometheus Metric Types](https://prometheus.io/docs/concepts/metric_types/)
@@ -2306,19 +2306,19 @@ Before deploying to production:
 
 ---
 
-**Assessment Complete**: ✅
-**Next Review**: After Exercise 02 (Prometheus Stack)
+**评估完成**: ✅
+**下次审查**: Exercise 02（Prometheus Stack）之后
 ```
 
-**✅ Checkpoint:** Observability readiness document is complete.
+**✅ 检查点：** 可观测性就绪文档已完成。
 
 ---
 
-## Part 10: Testing and Validation
+## 第 10 部分：测试和验证
 
-### Step 10.1: Create Test Script
+### 步骤 10.1：创建测试脚本
 
-Create `scripts/load_test.sh`:
+创建 `scripts/load_test.sh`：
 
 ```bash
 #!/bin/bash
@@ -2367,12 +2367,12 @@ echo "Check metrics at: $SERVICE_URL/metrics"
 echo "Check traces at: http://localhost:16686 (Jaeger UI)"
 ```
 
-Make executable:
+使其可执行：
 ```bash
 chmod +x scripts/load_test.sh
 ```
 
-### Step 10.2: Run Load Test
+### 步骤 10.2：运行负载测试
 
 ```bash
 # Start services
@@ -2385,14 +2385,14 @@ sleep 10
 ./scripts/load_test.sh
 ```
 
-### Step 10.3: Verify Observability
+### 步骤 10.3：验证可观测性
 
-**1. Check Prometheus Metrics:**
+**1. 检查 Prometheus Metrics：**
 ```bash
 curl http://localhost:8000/metrics | grep inference
 ```
 
-Expected output (sample):
+预期输出（示例）：
 ```
 # HELP inference_requests_total Total inference requests by model, version, and status
 # TYPE inference_requests_total counter
@@ -2407,27 +2407,27 @@ inference_duration_seconds_count{model_name="resnet50",model_version="v1.0"} 50.
 inference_duration_seconds_sum{model_name="resnet50",model_version="v1.0"} 6.785
 ```
 
-**2. Check Structured Logs:**
+**2. 检查结构化日志：**
 ```bash
 docker-compose logs inference-gateway | tail -20
 ```
 
-Expected JSON logs with trace context.
+预期是带有 trace 上下文的 JSON 日志。
 
-**3. Check Traces in Jaeger:**
+**3. 在 Jaeger 中检查 Traces：**
 
-Open http://localhost:16686 in browser:
-- Select "inference-gateway" service
-- Click "Find Traces"
-- Inspect individual spans
+在浏览器中打开 http://localhost:16686：
+- 选择 "inference-gateway" 服务
+- 点击 "Find Traces"
+- 检查单个 spans
 
-**✅ Checkpoint:** All observability signals (metrics, logs, traces) are working correctly.
+**✅ 检查点：** 所有可观测性信号（metrics、logs、traces）均正常工作。
 
 ---
 
-## Part 11: Create Architecture Documentation
+## 第 11 部分：创建架构文档
 
-Create `docs/architecture.md`:
+创建 `docs/architecture.md`：
 
 ```markdown
 # Inference Gateway - Architecture Overview
@@ -2467,87 +2467,87 @@ Create `docs/architecture.md`:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Component Descriptions
+## 组件描述
 
 ### FastAPI Application (`app/main.py`)
-- HTTP server for inference requests
-- Middleware for metrics and tracing
-- Exception handlers
-- Lifespan management
+- 用于推理请求的 HTTP 服务器
+- 用于 metrics 和 tracing 的中间件
+- 异常处理器
+- 生命周期管理
 
 ### Metrics (`app/instrumentation/metrics.py`)
-- Prometheus client library
-- Four Golden Signals implementation
-- ML-specific metrics
-- Middleware for automatic tracking
+- Prometheus 客户端库
+- 四大黄金信号实现
+- ML 特定 metrics
+- 用于自动跟踪的中间件
 
 ### Logging (`app/instrumentation/logging.py`)
-- Structured JSON logs
-- Trace context injection
-- Service metadata
-- ISO timestamps
+- 结构化 JSON 日志
+- Trace 上下文注入
+- 服务元数据
+- ISO 时间戳
 
 ### Tracing (`app/instrumentation/tracing.py`)
 - OpenTelemetry SDK
-- FastAPI auto-instrumentation
-- Manual span creation
-- OTLP export
+- FastAPI 自动 instrument
+- 手动 span 创建
+- OTLP 导出
 
 ### Model Inference (`app/models/inference.py`)
-- PyTorch model loading
-- Preprocessing pipeline
-- Inference execution
-- Postprocessing
-- Comprehensive instrumentation
+- PyTorch 模型加载
+- 预处理管道
+- 推理执行
+- 后处理
+- 全面的 instrumentation
 
-## Data Flow
+## 数据流
 
-### Request Path
+### 请求路径
 
-1. **Client** → HTTP POST /predict (image file)
-2. **FastAPI** → MetricsMiddleware (start timer)
-3. **FastAPI** → OpenTelemetry (create span)
-4. **Route Handler** → Dependency injection (model service)
-5. **Model Service** → Preprocess image (with span)
-6. **Model Service** → Run inference (with span)
-7. **Model Service** → Postprocess results (with span)
-8. **Route Handler** → Return response
-9. **MetricsMiddleware** → Record metrics
-10. **OpenTelemetry** → Export trace to collector
-11. **Logging** → Emit structured log with trace context
+1. **客户端** → HTTP POST /predict（图像文件）
+2. **FastAPI** → MetricsMiddleware（启动计时器）
+3. **FastAPI** → OpenTelemetry（创建 span）
+4. **路由处理器** → 依赖注入（模型服务）
+5. **模型服务** → 预处理图像（带 span）
+6. **模型服务** → 运行推理（带 span）
+7. **模型服务** → 后处理结果（带 span）
+8. **路由处理器** → 返回响应
+9. **MetricsMiddleware** → 记录 metrics
+10. **OpenTelemetry** → 导出 trace 到 collector
+11. **日志** → 发出带有 trace 上下文的结构化日志
 
-### Observability Data Flow
+### 可观测性数据流
 
-**Metrics**:
-- Generated by prometheus-client
-- Exposed at GET /metrics
-- Scraped by Prometheus every 15s
+**Metrics**：
+- 由 prometheus-client 生成
+- 在 GET /metrics 暴露
+- 由 Prometheus 每 15 秒抓取
 
-**Logs**:
-- Generated by structlog
-- Output to stdout as JSON
-- (Future) Shipped to Loki by Promtail
+**Logs**：
+- 由 structlog 生成
+- 以 JSON 格式输出到 stdout
+- （未来）由 Promtail 传输到 Loki
 
-**Traces**:
-- Generated by OpenTelemetry SDK
-- Exported via OTLP HTTP to collector
-- Forwarded to Jaeger for visualization
+**Traces**：
+- 由 OpenTelemetry SDK 生成
+- 通过 OTLP HTTP 导出到 collector
+- 转发到 Jaeger 进行可视化
 
-## Technology Stack
+## 技术栈
 
-| Component | Technology | Version |
+| 组件 | 技术 | 版本 |
 |-----------|-----------|---------|
-| Web Framework | FastAPI | 0.104.1 |
-| HTTP Server | Uvicorn | 0.24.0 |
-| ML Framework | PyTorch | 2.1.1 |
+| Web 框架 | FastAPI | 0.104.1 |
+| HTTP 服务器 | Uvicorn | 0.24.0 |
+| ML 框架 | PyTorch | 2.1.1 |
 | Metrics | prometheus-client | 0.19.0 |
-| Logging | structlog | 23.2.0 |
+| 日志 | structlog | 23.2.0 |
 | Tracing | OpenTelemetry | 1.21.0 |
-| Configuration | Pydantic Settings | 2.1.0 |
+| 配置 | Pydantic Settings | 2.1.0 |
 
-## Deployment Architecture
+## 部署架构
 
-### Development (Docker Compose)
+### 开发环境（Docker Compose）
 
 ```yaml
 services:
@@ -2557,16 +2557,16 @@ services:
   - prometheus (port 9090)
 ```
 
-### Production (Kubernetes) - Planned
+### 生产环境（Kubernetes）- 计划中
 
 ```
 ┌─────────────────────────────────────────┐
 │            Ingress Controller            │
 └─────────────────┬───────────────────────┘
                   │
-        ┌─────────▼─────────┐
-        │  Service (LB)     │
-        └─────────┬─────────┘
+         ┌─────────▼─────────┐
+         │  Service (LB)     │
+         └─────────┬─────────┘
                   │
      ┌────────────┼────────────┐
      │            │            │
@@ -2583,17 +2583,16 @@ services:
 │Prometheus│ │   Loki  │  │ Jaeger  │
 └─────────┘  └─────────┘  └─────────┘
 ```
-```
 
-**✅ Checkpoint:** Architecture documentation is complete.
+**✅ 检查点：** 架构文档已完成。
 
 ---
 
-## Part 12: Optional Enhancements
+## 第 12 部分：可选增强
 
-### Enhancement 1: Unit Tests
+### 增强 1：单元测试
 
-Create `tests/unit/test_metrics.py`:
+创建 `tests/unit/test_metrics.py`：
 
 ```python
 # tests/unit/test_metrics.py
@@ -2632,7 +2631,7 @@ def test_record_prediction():
     assert True  # Placeholder
 ```
 
-Create `tests/unit/test_config.py`:
+创建 `tests/unit/test_config.py`：
 
 ```python
 # tests/unit/test_config.py
@@ -2658,9 +2657,9 @@ def test_settings_validation():
         Settings(port=99999)  # Port out of range
 ```
 
-### Enhancement 2: Integration Tests
+### 增强 2：集成测试
 
-Create `tests/integration/test_api.py`:
+创建 `tests/integration/test_api.py`：
 
 ```python
 # tests/integration/test_api.py
@@ -2701,14 +2700,14 @@ async def test_metrics_endpoint():
     assert "http_requests_total" in response.text
 ```
 
-Run tests:
+运行测试：
 ```bash
 pytest tests/ -v --cov=app
 ```
 
-### Enhancement 3: Locust Load Test
+### 增强 3：Locust 负载测试
 
-Create `tests/load/locustfile.py`:
+创建 `tests/load/locustfile.py`：
 
 ```python
 # tests/load/locustfile.py
@@ -2748,357 +2747,106 @@ class InferenceGatewayUser(HttpUser):
         self.client.get("/readyz")
 ```
 
-Run Locust:
+运行 Locust：
 ```bash
 locust -f tests/load/locustfile.py --host=http://localhost:8000
 ```
 
-Access UI at http://localhost:8089
+访问 UI 于 http://localhost:8089
 
 ---
 
-## Part 13: Update README
+## 第 13 部分：更新 README
 
-Create final `README.md`:
+创建最终的 `README.md`。
 
-```markdown
-# Inference Gateway
-
-Production-ready ML model inference service with comprehensive observability (metrics, logs, traces).
-
-## Overview
-
-The Inference Gateway exposes a ResNet-50 image classification model via a FastAPI HTTP API. It implements enterprise-grade observability patterns including:
-
-- **Metrics**: Prometheus metrics (Four Golden Signals + ML-specific metrics)
-- **Logging**: Structured JSON logs with trace context
-- **Tracing**: OpenTelemetry distributed tracing
-- **SLOs**: Defined Service Level Objectives with error budgets
-- **Health Checks**: Kubernetes-compatible liveness/readiness probes
-
-## Quick Start
-
-### Prerequisites
-
-- Docker and Docker Compose
-- Python 3.11+ (for local development)
-
-### Start with Docker Compose
-
-```bash
-# Clone repository
-git clone <repository-url>
-cd inference-gateway
-
-# Start all services
-docker-compose up --build
-
-# In another terminal, run load test
-./scripts/load_test.sh
-```
-
-### Access Observability Stack
-
-- **Inference API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
-- **Prometheus Metrics**: http://localhost:8000/metrics
-- **Prometheus UI**: http://localhost:9090
-- **Jaeger UI**: http://localhost:16686
-
-### Local Development
-
-```bash
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements-dev.txt
-
-# Run application
-python -m app.main
-
-# Run tests
-pytest tests/ -v
-
-# Run with auto-reload
-uvicorn app.main:app --reload
-```
-
-## API Endpoints
-
-### Health Checks
-
-- `GET /healthz` - Liveness probe
-- `GET /readyz` - Readiness probe (checks model loaded)
-
-### Inference
-
-- `POST /predict` - Run image classification
-  - **Request**: Multipart form with image file
-  - **Response**: JSON with top-5 predictions and confidence scores
-
-### Observability
-
-- `GET /metrics` - Prometheus metrics endpoint
-- `GET /docs` - Interactive API documentation (dev only)
-
-## Example Request
-
-```bash
-curl -X POST http://localhost:8000/predict \
-  -F "file=@sample_image.jpg"
-```
-
-Response:
-```json
-{
-  "predictions": [
-    {"class": "golden_retriever", "class_id": 207, "confidence": 0.9876},
-    {"class": "labrador_retriever", "class_id": 208, "confidence": 0.0089},
-    {"class": "tennis_ball", "class_id": 852, "confidence": 0.0023},
-    {"class": "kite", "class_id": 131, "confidence": 0.0009},
-    {"class": "lakeside", "class_id": 975, "confidence": 0.0003}
-  ],
-  "model_name": "resnet50",
-  "model_version": "v1.0",
-  "inference_duration_ms": 145.67
-}
-```
-
-## Observability
-
-### Metrics
-
-**Four Golden Signals**:
-- **Latency**: `http_request_duration_seconds`, `inference_duration_seconds`
-- **Traffic**: `http_requests_total`, `inference_requests_total`
-- **Errors**: `http_errors_total`, `inference_errors_total`
-- **Saturation**: `inference_queue_depth`, `model_memory_bytes`
-
-**ML-Specific**:
-- `inference_confidence_score` - Model confidence distribution
-- `model_predictions_total` - Predictions by class
-- `inference_batch_size` - Batch size distribution
-
-### Logs
-
-Structured JSON logs with trace context:
-
-```json
-{
-  "event": "inference_completed",
-  "timestamp": "2025-10-23T10:15:30.123456Z",
-  "level": "info",
-  "service": "inference-gateway",
-  "version": "1.0.0",
-  "trace_id": "5f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c",
-  "span_id": "1a2b3c4d5e6f7a8b",
-  "model_name": "resnet50",
-  "top_prediction": "golden_retriever",
-  "confidence": 0.9876
-}
-```
-
-### Traces
-
-OpenTelemetry traces exported to Jaeger via OTLP collector. View at http://localhost:16686
-
-## SLO Targets
-
-- **Availability**: 99.5% (error budget: 3.6 hours/month)
-- **P99 Latency**: < 300ms
-- **Error Rate**: < 0.5%
-- **Throughput**: Support 100 req/s sustained
-
-See [`docs/slo.md`](docs/slo.md) for detailed SLO definitions.
-
-## Architecture
-
-See [`docs/architecture.md`](docs/architecture.md) for architecture overview.
-
-## Project Structure
-
-```
-inference-gateway/
-├── app/
-│   ├── main.py                  # FastAPI application
-│   ├── api/
-│   │   ├── routes.py            # API endpoints
-│   │   └── dependencies.py      # Dependency injection
-│   ├── core/
-│   │   ├── config.py            # Configuration
-│   │   └── exceptions.py        # Custom exceptions
-│   ├── instrumentation/
-│   │   ├── metrics.py           # Prometheus metrics
-│   │   ├── logging.py           # Structured logging
-│   │   └── tracing.py           # OpenTelemetry tracing
-│   └── models/
-│       └── inference.py         # Model inference logic
-├── docs/
-│   ├── slo.md                   # SLO definitions
-│   ├── architecture.md          # Architecture documentation
-│   └── observability-readiness.md
-├── tests/
-│   ├── unit/                    # Unit tests
-│   ├── integration/             # Integration tests
-│   └── load/                    # Load tests (Locust)
-├── config/
-│   ├── prometheus.yml           # Prometheus config
-│   └── otel-collector-config.yml
-├── docker-compose.yml
-├── Dockerfile
-└── README.md
-```
-
-## Testing
-
-```bash
-# Run unit and integration tests
-pytest tests/ -v --cov=app
-
-# Run load test
-./scripts/load_test.sh
-
-# Run Locust load test
-locust -f tests/load/locustfile.py --host=http://localhost:8000
-```
-
-## Configuration
-
-Configuration via environment variables (see `.env.example`):
-
-```bash
-SERVICE_NAME=inference-gateway
-SERVICE_VERSION=1.0.0
-ENVIRONMENT=development
-LOG_LEVEL=INFO
-MODEL_NAME=resnet50
-MODEL_DEVICE=cpu
-OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
-```
-
-## Deployment
-
-### Docker
-
-```bash
-docker build -t inference-gateway:latest .
-docker run -p 8000:8000 inference-gateway:latest
-```
-
-### Kubernetes (planned for Module 010)
-
-```bash
-kubectl apply -f k8s/
-```
-
-## Observability Status
-
-✅ **Production Ready**
-
-See [`docs/observability-readiness.md`](docs/observability-readiness.md) for detailed assessment.
-
-## License
-
-MIT
-
-## Contributing
-
-See `CONTRIBUTING.md` (to be created)
-
-## Contact
-
-ML Platform Team - ml-platform@example.com
-```
-
-**✅ Checkpoint:** README is comprehensive and professional.
+**✅ 检查点：** README 全面且专业。
 
 ---
 
-## Part 14: Summary and Reflection
+## 第 14 部分：总结与反思
 
-### Summary
+### 总结
 
-Congratulations! You've successfully built a production-ready inference gateway service with comprehensive observability instrumentation:
+恭喜！你已成功构建了一个生产就绪的推理网关服务，并具有全面的可观测性 instrumentation：
 
-**What You Built**:
-1. ✅ FastAPI inference service with ResNet-50 model
-2. ✅ Prometheus metrics (Four Golden Signals + ML-specific)
-3. ✅ Structured JSON logging with trace context
-4. ✅ OpenTelemetry distributed tracing
-5. ✅ Health check endpoints (liveness/readiness)
-6. ✅ Comprehensive error handling
-7. ✅ SLO definitions with error budgets
-8. ✅ Observability readiness assessment
-9. ✅ Docker Compose development environment
-10. ✅ Documentation (SLOs, architecture, README)
+**你构建的内容**：
+1. ✅ 带有 ResNet-50 模型的 FastAPI 推理服务
+2. ✅ Prometheus metrics（四大黄金信号 + ML 特定）
+3. ✅ 带有 trace 上下文的结构化 JSON 日志
+4. ✅ OpenTelemetry 分布式 tracing
+5. ✅ 健康检查端点（liveness/readiness）
+6. ✅ 全面的错误处理
+7. ✅ 带 error budgets 的 SLO 定义
+8. ✅ 可观测性就绪评估
+9. ✅ Docker Compose 开发环境
+10. ✅ 文档（SLO、架构、README）
 
-**Skills Gained**:
-- Designing SLIs and SLOs for microservices
-- Implementing the Four Golden Signals
-- Instrumenting ML models with observability
-- Structured logging best practices
-- OpenTelemetry tracing patterns
-- Prometheus metric design
-- Cardinality control for metrics
-- Health check patterns for Kubernetes
-- Production-ready error handling
+**获得的技能**：
+- 为微服务设计 SLI 和 SLO
+- 实现四大黄金信号
+- 使用可观测性对 ML 模型进行 instrument
+- 结构化日志最佳实践
+- OpenTelemetry tracing 模式
+- Prometheus metric 设计
+- Metrics 的基数控制
+- Kubernetes 的健康检查模式
+- 生产就绪的错误处理
 
-### Deliverables Checklist
+### 交付物清单
 
-- ✅ Instrumented FastAPI service with metrics/logging/tracing
-- ✅ `docs/slo.md` with comprehensive SLO definitions
-- ✅ `docs/observability-readiness.md` with readiness assessment
-- ✅ `docs/architecture.md` with system architecture
-- ✅ Updated `README.md` documenting observability setup
-- ✅ Docker Compose stack with OTLP collector, Jaeger, Prometheus
-- ✅ Load test script demonstrating functionality
-- ✅ All code properly structured and documented
-
----
-
-## Reflection Questions
-
-1. **Which SLI/SLOs were hardest to define and why?**
-   - Consider: ML-specific SLIs (confidence coverage), measurement windows, error budgets
-   - Reflect on trade-offs between strictness and achievability
-
-2. **How would you automate the observability readiness assessment for new services?**
-   - Think about: Automated checks, CI/CD integration, standardization
-   - Consider: Checklist automation, policy-as-code, service catalogs
-
-3. **What additional signals (metrics/logs) would you capture if this service handled real customer traffic?**
-   - Consider: User-facing metrics, business metrics, cost tracking
-   - Think about: Privacy implications, data retention, compliance
-
-4. **How does structured logging improve cross-team collaboration during incidents?**
-   - Reflect on: Correlation across services, queryability, standardization
-   - Consider: On-call experience, mean time to recovery (MTTR)
-
-5. **What are the risks of high-cardinality metrics, and how did you mitigate them?**
-   - Consider: Label design, aggregation strategies, sampling
-   - Think about: Cost implications, query performance, storage
-
-6. **How would you adjust trace sampling for production to balance cost and visibility?**
-   - Consider: Head-based vs tail-based sampling, error sampling, importance scoring
-   - Think about: Cost-benefit analysis, retention policies
+- ✅ 带有 metrics/logging/tracing 的已 instrument FastAPI 服务
+- ✅ 包含全面 SLO 定义的 `docs/slo.md`
+- ✅ 包含就绪评估的 `docs/observability-readiness.md`
+- ✅ 包含系统架构的 `docs/architecture.md`
+- ✅ 记录可观测性设置的更新版 `README.md`
+- ✅ 包含 OTLP collector、Jaeger、Prometheus 的 Docker Compose 栈
+- ✅ 演示功能的负载测试脚本
+- ✅ 所有代码结构正确并已文档化
 
 ---
 
-## Next Steps
+## 反思问题
 
-**In Exercise 02** (Prometheus Stack), you will:
-- Set up a complete Prometheus monitoring stack
-- Create recording and alerting rules
-- Build a comprehensive service discovery setup
-- Implement alert manager with routing and silencing
-- Create synthetic monitors for availability testing
+1. **哪些 SLI/SLO 最难定义？为什么？**
+   - 考虑：ML 特定 SLI（置信度覆盖）、测量窗口、error budgets
+   - 反思严格性与可实现性之间的权衡
 
-**Continue to:** [Exercise 02: Prometheus Monitoring Stack](exercise-02-prometheus-stack.md)
+2. **你会如何为新服务自动化可观测性就绪评估？**
+   - 思考：自动检查、CI/CD 集成、标准化
+   - 考虑：清单自动化、policy-as-code、服务目录
+
+3. **如果此服务处理真实客户流量，你会捕获哪些额外的信号（metrics/logs）？**
+   - 考虑：面向用户的指标、业务指标、成本跟踪
+   - 思考：隐私影响、数据保留、合规性
+
+4. **结构化日志如何在事件期间改善跨团队协作？**
+   - 反思：跨服务的关联、可查询性、标准化
+   - 考虑：On-call 体验、平均修复时间（MTTR）
+
+5. **高基数 metrics 的风险是什么？你是如何缓解的？**
+   - 考虑：Label 设计、聚合策略、采样
+   - 思考：成本影响、查询性能、存储
+
+6. **你如何调整生产环境中的 trace 采样以平衡成本和可见性？**
+   - 考虑：基于 head 的 vs 基于 tail 的采样、错误采样、重要性评分
+   - 思考：成本效益分析、保留策略
 
 ---
 
-**Exercise 01 Complete!** 🎉
+## 下一步
 
-You've built a solid observability foundation that will serve as the base for the rest of Module 009.
+**在 Exercise 02**（Prometheus Stack）中，你将：
+- 设置完整的 Prometheus monitoring 栈
+- 创建 recording 和 alerting rules
+- 构建全面的 service discovery 设置
+- 实现带路由和静默的 alertmanager
+- 创建用于可用性测试的合成监控器
+
+**继续到：** [Exercise 02: Prometheus Monitoring Stack](exercise-02-prometheus-stack.md)
+
+---
+
+**Exercise 01 完成！** 🎉
+
+你已构建了坚实的可观测性基础，它将作为 Module 009 其余部分的基础。

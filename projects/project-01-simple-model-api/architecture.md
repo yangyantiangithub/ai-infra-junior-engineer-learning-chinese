@@ -1,67 +1,67 @@
-# Project 01: System Architecture
+# Project 01：系统架构
 
-**Project:** Simple Model API Deployment
-**Role:** Junior AI Infrastructure Engineer
-**Version:** 1.0
-
----
-
-## Table of Contents
-
-1. [System Overview](#system-overview)
-2. [Architecture Diagram](#architecture-diagram)
-3. [Component Design](#component-design)
-4. [Data Flow](#data-flow)
-5. [Technology Stack](#technology-stack)
-6. [Deployment Architecture](#deployment-architecture)
-7. [Design Decisions](#design-decisions)
-8. [Scalability Considerations](#scalability-considerations)
+**项目：** 简单模型 API 部署
+**角色：** 初级 AI 基础设施工程师
+**版本：** 1.0
 
 ---
 
-## System Overview
+## 目录
 
-This project implements a simple REST API for serving predictions from a pre-trained image classification model. The system follows a stateless, containerized microservice architecture pattern that is commonly used in production ML systems.
-
-### Key Characteristics
-
-- **Stateless:** No server-side session state, enabling horizontal scaling
-- **Containerized:** Docker packaging for consistent deployment across environments
-- **Synchronous:** Request-response pattern with blocking inference
-- **Single-model:** Serves one model version at a time (no A/B testing yet)
-- **CPU-optimized:** Designed for CPU inference (GPU support in later projects)
-
-### Design Philosophy
-
-This architecture prioritizes:
-1. **Simplicity:** Easy to understand and debug for beginners
-2. **Reliability:** Graceful error handling and recovery
-3. **Observability:** Comprehensive logging for troubleshooting
-4. **Maintainability:** Clear separation of concerns, modular design
+1. [系统概述](#系统概述)
+2. [架构图](#架构图)
+3. [组件设计](#组件设计)
+4. [数据流](#数据流)
+5. [技术栈](#技术栈)
+6. [部署架构](#部署架构)
+7. [设计决策](#设计决策)
+8. [可扩展性考虑](#可扩展性考虑)
 
 ---
 
-## Architecture Diagram
+## 系统概述
 
-### High-Level Architecture
+本项目实现了一个简单的 REST API，用于提供来自预训练图像分类模型的预测。系统采用无状态、容器化的微服务架构模式，这是生产级 ML 系统中常用的模式。
+
+### 关键特性
+
+- **无状态：** 无服务端会话状态，支持水平扩展
+- **容器化：** 使用 Docker 打包，实现跨环境一致部署
+- **同步：** 请求-响应模式，阻塞式推理
+- **单模型：** 每次只服务一个模型版本（尚无 A/B 测试）
+- **CPU 优化：** 专为 CPU 推理设计（后续项目支持 GPU）
+
+### 设计理念
+
+本架构优先考虑：
+1. **简洁性：** 易于初学者理解和调试
+2. **可靠性：** 优雅的错误处理和恢复
+3. **可观测性：** 全面的日志记录便于故障排除
+4. **可维护性：** 清晰的关注点分离，模块化设计
+
+---
+
+## 架构图
+
+### 高层架构
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                        Cloud Platform                         │
+│                          云平台                               │
 │                   (AWS / GCP / Azure)                         │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────┐   │
-│  │              Virtual Machine Instance                 │   │
-│  │                (t3.medium or equivalent)              │   │
+│  │                    虚拟机实例                          │   │
+│  │                (t3.medium 或同等配置)                   │   │
 │  │                                                        │   │
 │  │  ┌──────────────────────────────────────────────┐   │   │
-│  │  │           Docker Container                    │   │   │
+│  │  │              Docker 容器                      │   │   │
 │  │  │                                                │   │   │
 │  │  │  ┌──────────────────────────────────────┐   │   │   │
-│  │  │  │      Flask/FastAPI Application       │   │   │   │
+│  │  │  │      Flask/FastAPI 应用              │   │   │   │
 │  │  │  │                                        │   │   │   │
 │  │  │  │  ┌─────────────┐  ┌──────────────┐  │   │   │   │
-│  │  │  │  │  API Layer  │  │ Model Manager│  │   │   │   │
+│  │  │  │  │  API 层     │  │ 模型管理器    │  │   │   │   │
 │  │  │  │  │             │  │              │  │   │   │   │
 │  │  │  │  │ /predict    │◄─┤ load_model() │  │   │   │   │
 │  │  │  │  │ /health     │  │ predict()    │  │   │   │   │
@@ -69,46 +69,46 @@ This architecture prioritizes:
 │  │  │  │  └─────────────┘  └──────────────┘  │   │   │   │
 │  │  │  │                                        │   │   │   │
 │  │  │  │  ┌─────────────┐  ┌──────────────┐  │   │   │   │
-│  │  │  │  │   Config    │  │   Logging    │  │   │   │   │
-│  │  │  │  │  Manager    │  │   Handler    │  │   │   │   │
+│  │  │  │  │  配置管理器  │  │  日志处理器  │  │   │   │   │
+│  │  │  │  │             │  │              │  │   │   │   │
 │  │  │  │  └─────────────┘  └──────────────┘  │   │   │   │
 │  │  │  │                                        │   │   │   │
 │  │  │  └──────────────────────────────────────┘   │   │   │
 │  │  │                                                │   │   │
-│  │  │  Port Mapping: 5000:5000                     │   │   │
+│  │  │  端口映射: 5000:5000                          │   │   │
 │  │  └──────────────────────────────────────────────┘   │   │
 │  │                                                        │   │
-│  │  Security Group / Firewall:                           │   │
-│  │  - Port 5000 (HTTP)                                   │   │
-│  │  - Port 22 (SSH - admin only)                         │   │
+│  │  安全组 / 防火墙:                                      │   │
+│  │  - 端口 5000 (HTTP)                                    │   │
+│  │  - 端口 22 (SSH - 仅管理员)                            │   │
 │  └──────────────────────────────────────────────────────┘   │
 │                                                                │
-│  Public IP: X.X.X.X                                           │
+│  公网 IP: X.X.X.X                                             │
 └──────────────────────────────────────────────────────────────┘
                               ▲
                               │
-                              │ HTTP Requests
+                              │ HTTP 请求
                               │
                     ┌─────────┴──────────┐
                     │                    │
                 ┌───┴────┐         ┌────┴─────┐
-                │ Client │         │ Postman  │
-                │Browser │         │  /cURL   │
+                │ 客户端  │         │ Postman  │
+                │ 浏览器  │         │  /cURL   │
                 └────────┘         └──────────┘
 ```
 
-### Component Architecture
+### 组件架构
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│                   Application Layer                         │
+│                       应用层                                │
 ├────────────────────────────────────────────────────────────┤
 │                                                              │
 │  ┌────────────────────────────────────────────────────┐   │
-│  │                 app.py (Main Application)           │   │
+│  │                 app.py（主应用）                     │   │
 │  │                                                      │   │
 │  │  ┌──────────────────────────────────────────────┐  │   │
-│  │  │          API Route Handlers                   │  │   │
+│  │  │          API 路由处理器                       │  │   │
 │  │  │                                                │  │   │
 │  │  │  @app.route('/predict')                       │  │   │
 │  │  │  @app.route('/health')                        │  │   │
@@ -117,26 +117,26 @@ This architecture prioritizes:
 │  │                        │                             │   │
 │  │                        ▼                             │   │
 │  │  ┌──────────────────────────────────────────────┐  │   │
-│  │  │         Request Processing Pipeline           │  │   │
+│  │  │           请求处理流水线                       │  │   │
 │  │  │                                                │  │   │
-│  │  │  1. Request Validation                        │  │   │
-│  │  │  2. File Upload Handling                      │  │   │
-│  │  │  3. Image Preprocessing                       │  │   │
-│  │  │  4. Model Inference                           │  │   │
-│  │  │  5. Response Formatting                       │  │   │
-│  │  │  6. Error Handling                            │  │   │
-│  │  │  7. Logging                                   │  │   │
+│  │  │  1. 请求验证                                   │  │   │
+│  │  │  2. 文件上传处理                               │  │   │
+│  │  │  3. 图片预处理                                 │  │   │
+│  │  │  4. 模型推理                                   │  │   │
+│  │  │  5. 响应格式化                                 │  │   │
+│  │  │  6. 错误处理                                   │  │   │
+│  │  │  7. 日志记录                                   │  │   │
 │  │  └──────────────────────────────────────────────┘  │   │
 │  └────────────────────────────────────────────────────┘   │
 │                                                              │
 ├────────────────────────────────────────────────────────────┤
-│                  Business Logic Layer                       │
+│                      业务逻辑层                              │
 ├────────────────────────────────────────────────────────────┤
 │                                                              │
 │  ┌──────────────────┐      ┌──────────────────────────┐   │
 │  │  model_loader.py │      │      config.py           │   │
 │  │                  │      │                          │   │
-│  │  ModelLoader     │      │  Configuration           │   │
+│  │  ModelLoader     │      │  配置                    │   │
 │  │  ├─ __init__()   │      │  ├─ MODEL_NAME           │   │
 │  │  ├─ load()       │      │  ├─ MODEL_PATH           │   │
 │  │  ├─ predict()    │      │  ├─ HOST / PORT          │   │
@@ -145,335 +145,329 @@ This architecture prioritizes:
 │  └──────────────────┘      └──────────────────────────┘   │
 │                                                              │
 ├────────────────────────────────────────────────────────────┤
-│                    Infrastructure Layer                     │
+│                      基础设施层                              │
 ├────────────────────────────────────────────────────────────┤
 │                                                              │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
-│  │   Logging    │  │  Error       │  │   Health     │    │
-│  │   System     │  │  Handler     │  │   Monitor    │    │
+│  │   日志系统    │  │  错误处理器   │  │  健康监控    │    │
 │  └──────────────┘  └──────────────┘  └──────────────┘    │
 │                                                              │
 └────────────────────────────────────────────────────────────┘
 
 ┌────────────────────────────────────────────────────────────┐
-│                      ML Framework Layer                     │
+│                      ML 框架层                              │
 │                   (PyTorch / TensorFlow)                    │
 └────────────────────────────────────────────────────────────┘
 
 ┌────────────────────────────────────────────────────────────┐
-│                     Operating System                        │
-│                    (Linux Container)                        │
+│                      操作系统                                │
+│                    (Linux 容器)                              │
 └────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Component Design
+## 组件设计
 
-### 1. API Layer (app.py)
+### 1. API 层 (app.py)
 
-**Responsibility:** HTTP request/response handling, routing, API contract enforcement
+**职责：** HTTP 请求/响应处理、路由、API 契约执行
 
-**Key Components:**
-- Flask/FastAPI application instance
-- Route handlers for each endpoint
-- Request validation middleware
-- Response formatting utilities
-- Error handling middleware
+**关键组件：**
+- Flask/FastAPI 应用实例
+- 每个端点的路由处理器
+- 请求验证中间件
+- 响应格式化工具
+- 错误处理中间件
 
-**Design Pattern:** MVC (Model-View-Controller) - API layer acts as the Controller
+**设计模式：** MVC（模型-视图-控制器）- API 层充当控制器
 
-**Interface:**
+**接口：**
 ```python
 class ModelAPI:
-    """Main API application class"""
+    """主 API 应用类"""
 
     def __init__(self, model_loader: ModelLoader, config: Config):
-        """Initialize API with dependencies"""
+        """使用依赖项初始化 API"""
 
     def predict(self, request) -> Response:
-        """Handle /predict endpoint"""
+        """处理 /predict 端点"""
 
     def health(self) -> Response:
-        """Handle /health endpoint"""
+        """处理 /health 端点"""
 
     def info(self) -> Response:
-        """Handle /info endpoint"""
+        """处理 /info 端点"""
 ```
 
-### 2. Model Manager (model_loader.py)
+### 2. 模型管理器 (model_loader.py)
 
-**Responsibility:** ML model lifecycle management, inference execution
+**职责：** ML 模型生命周期管理、推理执行
 
-**Key Components:**
-- Model loading from pretrained weights
-- Image preprocessing pipeline
-- Inference execution
-- Result post-processing
-- Class label mapping
+**关键组件：**
+- 从预训练权重加载模型
+- 图像预处理流水线
+- 推理执行
+- 结果后处理
+- 类别标签映射
 
-**Design Pattern:** Singleton - One model instance per application
+**设计模式：** 单例模式 - 每个应用一个模型实例
 
-**Interface:**
+**接口：**
 ```python
 class ModelLoader:
-    """Manages ML model lifecycle"""
+    """管理 ML 模型生命周期"""
 
     def __init__(self, model_name: str, device: str = "cpu"):
-        """Initialize with model configuration"""
+        """使用模型配置初始化"""
 
     def load_model(self) -> None:
-        """Load model weights and initialize"""
+        """加载模型权重并初始化"""
 
     def preprocess(self, image: PIL.Image) -> torch.Tensor:
-        """Preprocess image for inference"""
+        """预处理图片以供推理"""
 
     def predict(self, image: PIL.Image, top_k: int = 5) -> List[Prediction]:
-        """Generate predictions for image"""
+        """为图片生成预测"""
 
     def get_model_info(self) -> ModelInfo:
-        """Return model metadata"""
+        """返回模型元数据"""
 ```
 
-### 3. Configuration Manager (config.py)
+### 3. 配置管理器 (config.py)
 
-**Responsibility:** Application configuration management, environment variable handling
+**职责：** 应用配置管理、环境变量处理
 
-**Key Components:**
-- Environment variable loading
-- Configuration validation
-- Default value management
-- Type conversions
+**关键组件：**
+- 环境变量加载
+- 配置验证
+- 默认值管理
+- 类型转换
 
-**Design Pattern:** Configuration Object
+**设计模式：** 配置对象
 
-**Interface:**
+**接口：**
 ```python
 class Config:
-    """Application configuration"""
+    """应用配置"""
 
-    # Model settings
+    # 模型设置
     MODEL_NAME: str
     MODEL_PATH: str
-    DEVICE: str  # "cpu" or "cuda"
+    DEVICE: str  # "cpu" 或 "cuda"
 
-    # API settings
+    # API 设置
     HOST: str
     PORT: int
     DEBUG: bool
 
-    # Limits
+    # 限制
     MAX_FILE_SIZE: int
     REQUEST_TIMEOUT: int
 
-    # Logging
+    # 日志
     LOG_LEVEL: str
     LOG_FORMAT: str
 ```
 
-### 4. Logging System
+### 4. 日志系统
 
-**Responsibility:** Structured logging, request tracking, error reporting
+**职责：** 结构化日志、请求跟踪、错误报告
 
-**Key Components:**
-- Logger configuration
-- Correlation ID generation
-- Structured log formatting (JSON)
-- Log level management
+**关键组件：**
+- 日志记录器配置
+- 关联 ID 生成
+- 结构化日志格式化（JSON）
+- 日志级别管理
 
-**Design Pattern:** Decorator pattern for request logging
+**设计模式：** 装饰器模式用于请求日志记录
 
 ---
 
-## Data Flow
+## 数据流
 
-### Prediction Request Flow
+### 预测请求流程
 
 ```
 ┌─────────┐
-│ Client  │
+│ 客户端  │
 └────┬────┘
      │
      │ 1. POST /predict (multipart/form-data)
-     │    - file: image bytes
-     │    - top_k: 5 (optional)
+     │    - file: 图片字节
+     │    - top_k: 5（可选）
      ▼
 ┌────────────────┐
-│  API Gateway   │ (Flask/FastAPI)
-│  (Route)       │
+│  API 网关      │ (Flask/FastAPI)
+│  (路由)        │
 └────┬───────────┘
      │
-     │ 2. Route to predict() handler
+     │ 2. 路由到 predict() 处理器
      ▼
 ┌────────────────┐
-│ Request        │
-│ Validation     │ - Check Content-Type
-│                │ - Validate file exists
-│                │ - Check file size
+│ 请求验证       │ - 检查 Content-Type
+│                │ - 验证文件存在
+│                │ - 检查文件大小
 └────┬───────────┘
      │
-     │ 3. Valid request
+     │ 3. 有效请求
      ▼
 ┌────────────────┐
-│ File Upload    │
-│ Handler        │ - Read file bytes
-│                │ - Parse multipart data
+│ 文件上传       │
+│ 处理器         │ - 读取文件字节
+│                │ - 解析 multipart 数据
 └────┬───────────┘
      │
-     │ 4. Image bytes
+     │ 4. 图片字节
      ▼
 ┌────────────────┐
-│ Image          │
-│ Loader         │ - Load with PIL
-│                │ - Convert to RGB
-│                │ - Validate format
+│ 图片加载器     │ - 使用 PIL 加载
+│                │ - 转换为 RGB
+│                │ - 验证格式
 └────┬───────────┘
      │
-     │ 5. PIL.Image object
+     │ 5. PIL.Image 对象
      ▼
 ┌────────────────┐
-│ Model          │
-│ Preprocessor   │ - Resize to 224x224
-│                │ - Normalize
-│                │ - Convert to tensor
+│ 模型预处理器   │ - 调整大小为 224x224
+│                │ - 归一化
+│                │ - 转换为 tensor
 └────┬───────────┘
      │
      │ 6. torch.Tensor [1, 3, 224, 224]
      ▼
 ┌────────────────┐
-│ ML Model       │
-│ (ResNet-50)    │ - Forward pass
-│                │ - Generate logits
+│ ML 模型        │
+│ (ResNet-50)    │ - 前向传播
+│                │ - 生成 logits
 └────┬───────────┘
      │
-     │ 7. Output tensor [1, 1000]
+     │ 7. 输出 tensor [1, 1000]
      ▼
 ┌────────────────┐
-│ Post-          │
-│ Processor      │ - Apply softmax
-│                │ - Get top-K
-│                │ - Map to labels
+│ 后处理器       │ - 应用 softmax
+│                │ - 获取 top-K
+│                │ - 映射到标签
 └────┬───────────┘
      │
      │ 8. List[Prediction]
      ▼
 ┌────────────────┐
-│ Response       │
-│ Formatter      │ - Format JSON
-│                │ - Add metadata
-│                │ - Add timestamps
+│ 响应格式化器   │ - 格式化 JSON
+│                │ - 添加元数据
+│                │ - 添加时间戳
 └────┬───────────┘
      │
-     │ 9. JSON response
+     │ 9. JSON 响应
      ▼
 ┌────────────────┐
-│ Logging        │ - Log request
-│                │ - Record latency
-│                │ - Track errors
+│ 日志记录       │ - 记录请求
+│                │ - 记录延迟
+│                │ - 跟踪错误
 └────┬───────────┘
      │
      │ 10. HTTP 200 OK
      ▼
 ┌─────────┐
-│ Client  │ - Receives predictions
+│ 客户端  │ - 接收预测结果
 └─────────┘
 ```
 
-### Error Handling Flow
+### 错误处理流程
 
 ```
-     [Any Stage]
+     [任意阶段]
           │
-          │ Exception occurs
+          │ 发生异常
           ▼
      ┌────────────┐
      │ Try/Catch  │
-     │ Block      │
+     │ 块         │
      └────┬───────┘
           │
-          ├─── ValueError ────────► HTTP 400 (Bad Request)
+          ├─── ValueError ────────► HTTP 400 (错误请求)
           │
-          ├─── MemoryError ───────► HTTP 503 (Service Unavailable)
+          ├─── MemoryError ───────► HTTP 503 (服务不可用)
           │
-          ├─── TimeoutError ──────► HTTP 504 (Gateway Timeout)
+          ├─── TimeoutError ──────► HTTP 504 (网关超时)
           │
-          ├─── FileNotFoundError ─► HTTP 400 (Bad Request)
+          ├─── FileNotFoundError ─► HTTP 400 (错误请求)
           │
-          └─── Exception ─────────► HTTP 500 (Internal Server Error)
+          └─── Exception ─────────► HTTP 500 (服务器内部错误)
                     │
                     ▼
           ┌──────────────────┐
-          │ Error Handler    │
-          │ - Format error   │
-          │ - Generate ID    │
-          │ - Log error      │
+          │ 错误处理器       │
+          │ - 格式化错误     │
+          │ - 生成 ID        │
+          │ - 记录错误       │
           └────┬─────────────┘
                │
                ▼
-          [Error Response]
+          [错误响应]
 ```
 
 ---
 
-## Technology Stack
+## 技术栈
 
-### Programming Language
+### 编程语言
 - **Python 3.11+**
-  - Justification: Excellent ML ecosystem, readability, productivity
-  - Alternatives considered: Go (lack of ML libraries), Java (verbosity)
+  - 理由：优秀的 ML 生态系统、可读性、生产力
+  - 考虑的替代方案：Go（缺乏 ML 库）、Java（冗长）
 
-### Web Framework
-- **Flask 3.0+** or **FastAPI 0.100+**
-  - Flask: Simpler, more traditional, extensive documentation
-  - FastAPI: Modern, async support, automatic API docs, type validation
-  - Recommendation for beginners: Flask (less complexity)
+### Web 框架
+- **Flask 3.0+** 或 **FastAPI 0.100+**
+  - Flask：更简单、更传统、文档丰富
+  - FastAPI：现代化、支持异步、自动 API 文档、类型验证
+  - 给初学者的建议：Flask（复杂性较低）
 
-### ML Framework
-- **PyTorch 2.0+** or **TensorFlow 2.13+**
-  - PyTorch: More intuitive, better debugging, research-friendly
-  - TensorFlow: Production-ready, broader ecosystem, TF Serving integration
-  - Recommendation: PyTorch (easier learning curve)
+### ML 框架
+- **PyTorch 2.0+** 或 **TensorFlow 2.13+**
+  - PyTorch：更直观、调试更好、对研究友好
+  - TensorFlow：生产就绪、生态系统更广、TF Serving 集成
+  - 建议：PyTorch（学习曲线较平缓）
 
-### Image Processing
+### 图像处理
 - **Pillow (PIL Fork)**
-  - Industry standard for Python image processing
-  - Alternative: OpenCV (overkill for this use case)
+  - Python 图像处理的行业标准
+  - 替代方案：OpenCV（对本用例来说过于庞大）
 
-### Configuration
+### 配置
 - **python-dotenv**
-  - Load environment variables from .env files
-  - Alternative: Manual os.environ (less convenient)
+  - 从 .env 文件加载环境变量
+  - 替代方案：手动 os.environ（不够方便）
 
-### Testing
+### 测试
 - **pytest**
-  - Modern, feature-rich testing framework
-  - Alternative: unittest (more verbose)
+  - 现代化、功能丰富的测试框架
+  - 替代方案：unittest（更冗长）
 
-### Containerization
+### 容器化
 - **Docker 24.0+**
-  - Industry standard for containerization
-  - Base image: python:3.11-slim (smaller, faster)
+  - 容器化的行业标准
+  - 基础镜像：python:3.11-slim（更小、更快）
 
 ---
 
-## Deployment Architecture
+## 部署架构
 
-### Container Architecture
+### 容器架构
 
 ```
 ┌─────────────────────────────────────────────────┐
-│           Docker Container                       │
+│              Docker 容器                         │
 │                                                   │
 │  ┌────────────────────────────────────────┐    │
-│  │  Python 3.11 Runtime Environment       │    │
+│  │  Python 3.11 运行时环境                │    │
 │  ├────────────────────────────────────────┤    │
-│  │  System Dependencies:                  │    │
-│  │  - libgomp1 (OpenMP for PyTorch)       │    │
+│  │  系统依赖：                             │    │
+│  │  - libgomp1 (PyTorch 的 OpenMP)        │    │
 │  │  - ca-certificates                     │    │
 │  └────────────────────────────────────────┘    │
 │                                                   │
 │  ┌────────────────────────────────────────┐    │
-│  │  Python Dependencies:                  │    │
+│  │  Python 依赖：                         │    │
 │  │  - flask / fastapi                     │    │
 │  │  - torch / torchvision                 │    │
 │  │  - pillow                              │    │
@@ -481,7 +475,7 @@ class Config:
 │  └────────────────────────────────────────┘    │
 │                                                   │
 │  ┌────────────────────────────────────────┐    │
-│  │  Application Code:                     │    │
+│  │  应用代码：                             │    │
 │  │  /app/                                 │    │
 │  │  ├── src/                              │    │
 │  │  │   ├── app.py                        │    │
@@ -491,165 +485,165 @@ class Config:
 │  └────────────────────────────────────────┘    │
 │                                                   │
 │  ┌────────────────────────────────────────┐    │
-│  │  Cached Model Weights:                 │    │
+│  │  缓存的模型权重：                      │    │
 │  │  ~/.cache/torch/hub/                   │    │
 │  │  └── checkpoints/                      │    │
 │  │      └── resnet50.pth (97MB)           │    │
 │  └────────────────────────────────────────┘    │
 │                                                   │
-│  Exposed Ports: 5000                             │
-│  Health Check: GET /health (every 30s)          │
+│  暴露端口: 5000                                   │
+│  健康检查: GET /health (每 30 秒)                │
 └─────────────────────────────────────────────────┘
 ```
 
-### Cloud Deployment (AWS Example)
+### 云部署（AWS 示例）
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│                     AWS Cloud                         │
+│                      AWS 云                           │
 │                                                        │
 │  ┌────────────────────────────────────────────────┐ │
-│  │              VPC (Virtual Private Cloud)        │ │
+│  │              VPC（虚拟私有云）                   │ │
 │  │                                                  │ │
 │  │  ┌────────────────────────────────────────┐   │ │
-│  │  │         Public Subnet                   │   │ │
+│  │  │         公共子网                       │   │ │
 │  │  │                                          │   │ │
 │  │  │  ┌──────────────────────────────────┐  │   │ │
-│  │  │  │     EC2 Instance (t3.medium)     │  │   │ │
-│  │  │  │     - 2 vCPUs                    │  │   │ │
-│  │  │  │     - 4GB RAM                    │  │   │ │
+│  │  │  │     EC2 实例 (t3.medium)         │  │   │ │
+│  │  │  │     - 2 个 vCPU                  │  │   │ │
+│  │  │  │     - 4GB 内存                   │  │   │ │
 │  │  │  │     - Ubuntu 22.04 LTS           │  │   │ │
-│  │  │  │     - Docker Engine              │  │   │ │
+│  │  │  │     - Docker 引擎               │  │   │ │
 │  │  │  │                                   │  │   │ │
 │  │  │  │  ┌──────────────────────────┐   │  │   │ │
-│  │  │  │  │  Model API Container     │   │  │   │ │
-│  │  │  │  │  (Port 5000)             │   │  │   │ │
+│  │  │  │  │  模型 API 容器           │   │  │   │ │
+│  │  │  │  │  (端口 5000)             │   │  │   │ │
 │  │  │  │  └──────────────────────────┘   │  │   │ │
 │  │  │  │                                   │  │   │ │
-│  │  │  │  Public IP: 52.x.x.x             │  │   │ │
+│  │  │  │  公网 IP: 52.x.x.x               │  │   │ │
 │  │  │  └──────────────────────────────────┘  │   │ │
 │  │  │                                          │   │ │
 │  │  └────────────────────────────────────────┘   │ │
 │  │                                                  │ │
 │  │  ┌────────────────────────────────────────┐   │ │
-│  │  │        Security Group                   │   │ │
-│  │  │  - Inbound: Port 5000 (0.0.0.0/0)      │   │ │
-│  │  │  - Inbound: Port 22 (Admin IP only)    │   │ │
-│  │  │  - Outbound: All traffic               │   │ │
+│  │  │        安全组                          │   │ │
+│  │  │  - 入站: 端口 5000 (0.0.0.0/0)        │   │ │
+│  │  │  - 入站: 端口 22 (仅管理员 IP)        │   │ │
+│  │  │  - 出站: 所有流量                     │   │ │
 │  │  └────────────────────────────────────────┘   │ │
 │  └────────────────────────────────────────────────┘ │
 │                                                        │
 │  ┌────────────────────────────────────────────────┐ │
-│  │           CloudWatch Logs                       │ │
-│  │  - Container stdout/stderr                      │ │
-│  │  - Application logs                             │ │
+│  │           CloudWatch 日志                       │ │
+│  │  - 容器 stdout/stderr                          │ │
+│  │  - 应用日志                                    │ │
 │  └────────────────────────────────────────────────┘ │
 └──────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Design Decisions
+## 设计决策
 
-### 1. Synchronous vs Asynchronous
+### 1. 同步 vs 异步
 
-**Decision:** Synchronous (blocking) request handling
+**决策：** 同步（阻塞）请求处理
 
-**Rationale:**
-- Simpler implementation for beginners
-- ML inference is CPU-bound (not I/O-bound)
-- Fewer concurrency issues
-- Easier debugging
+**理由：**
+- 对初学者实现更简单
+- ML 推理是 CPU 密集型（而非 I/O 密集型）
+- 更少的并发问题
+- 更易调试
 
-**Trade-offs:**
-- Lower throughput under high concurrency
-- Request queuing can cause timeouts
-- Not optimal for long-running requests
+**权衡：**
+- 高并发下吞吐量较低
+- 请求排队可能导致超时
+- 对于长时间运行的请求不是最优
 
-**Future Consideration:** Move to async (FastAPI) in later projects
+**未来考虑：** 在后续项目中迁移到异步（FastAPI）
 
-### 2. Model Loading Strategy
+### 2. 模型加载策略
 
-**Decision:** Load model once at startup, keep in memory
+**决策：** 启动时一次性加载模型，保持在内存中
 
-**Rationale:**
-- Faster inference (no loading overhead per request)
-- Simpler code (no caching logic needed)
-- Acceptable memory footprint (<500MB for ResNet-50)
+**理由：**
+- 更快的推理（没有每次请求的加载开销）
+- 更简单的代码（不需要缓存逻辑）
+- 可接受的内存占用（ResNet-50 小于 500MB）
 
-**Trade-offs:**
-- Higher memory usage
-- Slower startup time (20-30 seconds)
-- No model hot-swapping
+**权衡：**
+- 更高的内存使用
+- 启动时间较慢（20-30 秒）
+- 无法热切换模型
 
-**Alternative Considered:** Lazy loading (load on first request) - rejected due to poor first-request latency
+**考虑的替代方案：** 懒加载（首次请求时加载）- 因首次请求延迟过大而被拒绝
 
-### 3. Single Model vs Multi-Model
+### 3. 单模型 vs 多模型
 
-**Decision:** Single model per instance
+**决策：** 每个实例一个模型
 
-**Rationale:**
-- Simpler deployment and management
-- Predictable resource usage
-- Easier monitoring and debugging
+**理由：**
+- 更简单的部署和管理
+- 可预测的资源使用
+- 更易监控和调试
 
-**Trade-offs:**
-- Cannot A/B test models
-- Requires redeployment for model updates
+**权衡：**
+- 无法进行 A/B 测试
+- 模型更新需要重新部署
 
-**Future Path:** Multi-model serving in advanced projects
+**未来路径：** 高级项目中的多模型服务
 
 ### 4. CPU vs GPU
 
-**Decision:** CPU-only for this project
+**决策：** 本项目仅使用 CPU
 
-**Rationale:**
-- Lower cost (no GPU instances)
-- Simpler setup (no CUDA configuration)
-- Sufficient performance for learning (<1s latency)
+**理由：**
+- 更低的成本（无需 GPU 实例）
+- 更简单的设置（无需 CUDA 配置）
+- 足够的学习性能（延迟 < 1 秒）
 
-**Trade-offs:**
-- Higher latency (300-500ms vs 50-100ms on GPU)
-- Lower throughput
+**权衡：**
+- 更高的延迟（300-500ms vs GPU 上的 50-100ms）
+- 更低的吞吐量
 
-**Future Path:** GPU optimization in later projects
+**未来路径：** 后续项目中的 GPU 优化
 
-### 5. Image Storage
+### 5. 图片存储
 
-**Decision:** In-memory only (no disk persistence)
+**决策：** 仅内存（不持久化到磁盘）
 
-**Rationale:**
-- Faster processing
-- No disk I/O overhead
-- Simpler cleanup (automatic garbage collection)
-- Reduced security risk
+**理由：**
+- 更快的处理
+- 无磁盘 I/O 开销
+- 更简单的清理（自动垃圾回收）
+- 降低安全风险
 
-**Trade-offs:**
-- Cannot replay requests
-- No audit trail of inputs
+**权衡：**
+- 无法重放请求
+- 没有输入审计记录
 
-### 6. Logging Strategy
+### 6. 日志策略
 
-**Decision:** Structured logging to stdout/stderr
+**决策：** 结构化日志输出到 stdout/stderr
 
-**Rationale:**
-- Compatible with container orchestration
-- Easy integration with cloud logging (CloudWatch, Stackdriver)
-- No file system dependencies
+**理由：**
+- 与容器编排兼容
+- 易于与云日志集成（CloudWatch、Stackdriver）
+- 无文件系统依赖
 
-**Format:** JSON for structured logging, text for development
+**格式：** 生产环境使用 JSON 结构化日志，开发环境使用文本
 
 ---
 
-## Scalability Considerations
+## 可扩展性考虑
 
-### Horizontal Scaling
+### 水平扩展
 
-The application is designed to scale horizontally:
+应用设计为可水平扩展：
 
 ```
                   ┌──────────────┐
-                  │ Load Balancer│
+                  │   负载均衡器  │
                   └──────┬───────┘
                          │
            ┌─────────────┼─────────────┐
@@ -657,149 +651,148 @@ The application is designed to scale horizontally:
            ▼             ▼             ▼
       ┌────────┐    ┌────────┐    ┌────────┐
       │ API    │    │ API    │    │ API    │
-      │ Instance│   │ Instance│   │ Instance│
-      │   #1   │    │   #2   │    │   #3   │
+      │ 实例 1 │    │ 实例 2 │    │ 实例 3 │
       └────────┘    └────────┘    └────────┘
 ```
 
-**Scaling Characteristics:**
-- Stateless design (no shared state between instances)
-- Independent model loading per instance
-- No database dependencies
-- Session-less authentication (if added)
+**扩展特性：**
+- 无状态设计（实例之间无共享状态）
+- 每个实例独立加载模型
+- 无数据库依赖
+- 无会话认证（如添加）
 
-**Limitations:**
-- No shared cache (each instance loads model independently)
-- Startup time scales linearly (all instances load model)
-- Total memory = memory_per_instance × num_instances
+**限制：**
+- 无共享缓存（每个实例独立加载模型）
+- 启动时间线性增长（所有实例都要加载模型）
+- 总内存 = 每实例内存 × 实例数
 
-### Vertical Scaling
+### 垂直扩展
 
-For higher throughput on a single instance:
+对于单个实例的更高吞吐量：
 
-**Options:**
-1. **More CPU cores:** Run multiple worker processes (Gunicorn/Uvicorn)
-2. **More memory:** Support larger batch sizes or bigger models
-3. **Add GPU:** 10-20x inference speedup
+**选项：**
+1. **更多 CPU 核心：** 运行多个工作进程（Gunicorn/Uvicorn）
+2. **更多内存：** 支持更大的批次或更大的模型
+3. **添加 GPU：** 推理速度提升 10-20 倍
 
-**Recommendation:** Start with 2 vCPUs, 4GB RAM (t3.medium equivalent)
+**建议：** 从 2 个 vCPU、4GB 内存开始（相当于 t3.medium）
 
-### Performance Optimization Paths
+### 性能优化路径
 
-**Phase 1 (Current):**
-- Single worker, CPU inference
-- Target: 10 requests/second
+**阶段 1（当前）：**
+- 单工作进程，CPU 推理
+- 目标：10 请求/秒
 
-**Phase 2 (Future):**
-- Multi-worker deployment (4-8 workers)
-- Target: 40-80 requests/second
+**阶段 2（未来）：**
+- 多工作进程部署（4-8 个工作进程）
+- 目标：40-80 请求/秒
 
-**Phase 3 (Future):**
-- GPU inference
-- Target: 200-400 requests/second
+**阶段 3（未来）：**
+- GPU 推理
+- 目标：200-400 请求/秒
 
-**Phase 4 (Future):**
-- Model optimization (TensorRT, ONNX)
-- Target: 500-1000 requests/second
+**阶段 4（未来）：**
+- 模型优化（TensorRT、ONNX）
+- 目标：500-1000 请求/秒
 
 ---
 
-## Security Architecture
+## 安全架构
 
-### Defense in Depth
+### 纵深防御
 
 ```
 ┌─────────────────────────────────────────────┐
-│         Layer 1: Network Security           │
-│  - Security Groups / Firewall Rules         │
-│  - Rate Limiting (optional)                 │
+│         第 1 层：网络安全                     │
+│  - 安全组 / 防火墙规则                        │
+│  - 速率限制（可选）                           │
 └─────────────────┬───────────────────────────┘
                   │
 ┌─────────────────▼───────────────────────────┐
-│     Layer 2: Application Input Validation   │
-│  - File type validation                     │
-│  - File size limits                         │
-│  - Content-Type checking                    │
+│     第 2 层：应用输入验证                     │
+│  - 文件类型验证                              │
+│  - 文件大小限制                              │
+│  - Content-Type 检查                        │
 └─────────────────┬───────────────────────────┘
                   │
 ┌─────────────────▼───────────────────────────┐
-│     Layer 3: Request Processing             │
-│  - Timeout enforcement                      │
-│  - Memory limits                            │
-│  - No file system persistence               │
+│     第 3 层：请求处理                        │
+│  - 超时强制执行                              │
+│  - 内存限制                                  │
+│  - 无文件系统持久化                          │
 └─────────────────┬───────────────────────────┘
                   │
 ┌─────────────────▼───────────────────────────┐
-│        Layer 4: Error Handling              │
-│  - No sensitive data in errors              │
-│  - Sanitized error messages                 │
-│  - Correlation ID tracking                  │
+│        第 4 层：错误处理                     │
+│  - 错误中不包含敏感数据                      │
+│  - 清理后的错误消息                          │
+│  - 关联 ID 跟踪                             │
 └─────────────────────────────────────────────┘
 ```
 
 ---
 
-## Monitoring and Observability
+## 监控与可观测性
 
-### Logging Levels
+### 日志级别
 
 ```python
-# INFO: Normal operations
+# INFO：正常操作
 "Request received: correlation_id=abc123"
 "Prediction completed: latency=234ms"
 
-# WARNING: Unusual but recoverable
+# WARNING：异常但可恢复
 "File size near limit: 9.8MB"
 "Request took longer than expected: 950ms"
 
-# ERROR: Request failed
+# ERROR：请求失败
 "Invalid image format: correlation_id=abc123"
 "Out of memory during inference"
 
-# CRITICAL: System failure
+# CRITICAL：系统故障
 "Model failed to load on startup"
 "Health check failing"
 ```
 
-### Metrics to Track
+### 要跟踪的指标
 
-**Request Metrics:**
-- Request count (per endpoint)
-- Latency (P50, P95, P99)
-- Error rate (4xx, 5xx)
-- Request size distribution
+**请求指标：**
+- 请求计数（按端点）
+- 延迟（P50、P95、P99）
+- 错误率（4xx、5xx）
+- 请求大小分布
 
-**Resource Metrics:**
-- CPU usage (%)
-- Memory usage (MB)
-- Memory utilization (%)
-- Disk I/O (minimal)
+**资源指标：**
+- CPU 使用率（%）
+- 内存使用量（MB）
+- 内存利用率（%）
+- 磁盘 I/O（极少）
 
-**Application Metrics:**
-- Model load time
-- Inference time
-- Preprocessing time
-- Queue depth (if async)
-
----
-
-## Future Enhancements
-
-This architecture provides a foundation for future improvements:
-
-1. **Batch Inference:** Accept multiple images per request
-2. **Async Processing:** Use FastAPI + async for better concurrency
-3. **GPU Support:** Add CUDA support for faster inference
-4. **Model Versioning:** Support multiple model versions simultaneously
-5. **Caching:** Add result caching for repeated requests
-6. **Authentication:** Add API key or JWT authentication
-7. **Rate Limiting:** Add per-client rate limiting
-8. **Metrics Export:** Export Prometheus metrics
-9. **Health Checks:** Advanced health checks (model accuracy testing)
-10. **Blue-Green Deployment:** Zero-downtime model updates
+**应用指标：**
+- 模型加载时间
+- 推理时间
+- 预处理时间
+- 队列深度（如使用异步）
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** October 2025
-**Maintained by:** AI Infrastructure Curriculum Team
+## 未来增强
+
+本架构为未来的改进提供了基础：
+
+1. **批量推理：** 每次请求接受多张图片
+2. **异步处理：** 使用 FastAPI + 异步实现更好的并发
+3. **GPU 支持：** 添加 CUDA 支持以实现更快的推理
+4. **模型版本管理：** 同时支持多个模型版本
+5. **缓存：** 为重复请求添加结果缓存
+6. **认证：** 添加 API 密钥或 JWT 认证
+7. **速率限制：** 添加每客户端速率限制
+8. **指标导出：** 导出 Prometheus 指标
+9. **健康检查：** 高级健康检查（模型准确性测试）
+10. **蓝绿部署：** 零停机模型更新
+
+---
+
+**文档版本：** 1.0
+**最后更新：** 2025 年 10 月
+**维护者：** AI 基础设施课程团队

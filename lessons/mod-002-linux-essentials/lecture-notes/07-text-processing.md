@@ -1,250 +1,229 @@
-# Lecture 07: Text Processing Tools
+# 讲座 07：文本处理工具
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [grep: Pattern Matching](#grep-pattern-matching)
-3. [sed: Stream Editing](#sed-stream-editing)
-4. [awk: Text Processing and Reports](#awk-text-processing-and-reports)
-5. [Combining Tools with Pipes](#combining-tools-with-pipes)
-6. [AI Infrastructure Applications](#ai-infrastructure-applications)
-7. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [简介](#简介)
+2. [grep：模式匹配](#grep-模式匹配)
+3. [sed：流编辑](#sed-流编辑)
+4. [awk：文本处理和报告](#awk-文本处理和报告)
+5. [使用管道组合工具](#使用管道组合工具)
+6. [AI 基础设施应用](#ai-基础设施应用)
+7. [总结和要点](#总结和要点)
 
-## Introduction
+## 简介
 
-Text processing is essential for AI infrastructure engineers. You'll analyze training logs, parse metrics, process datasets, extract information from configuration files, and troubleshoot issues by searching through massive log files. The three core text processing tools—grep, sed, and awk—are the power tools of the command line.
+文本处理对 AI 基础设施工程师至关重要。你将分析训练日志、解析指标、处理数据集、从配置文件中提取信息，以及通过搜索海量日志文件来排查问题。三个核心文本处理工具——grep、sed 和 awk——是命令行的强力工具。
 
-This lecture teaches you to master these tools for real-world AI infrastructure tasks.
+本讲座教你掌握这些工具，用于实际的 AI 基础设施任务。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Search files and logs efficiently with grep
-- Transform text streams with sed
-- Process structured data with awk
-- Combine tools in powerful pipelines
-- Apply text processing to ML log analysis
-- Extract insights from training metrics
-- Debug infrastructure issues through log analysis
+完成本讲座后，你将能够：
+- 使用 grep 高效搜索文件和日志
+- 使用 sed 转换文本流
+- 使用 awk 处理结构化数据
+- 在强大的管道中组合工具
+- 将文本处理应用于 ML 日志分析
+- 从训练指标中提取见解
+- 通过日志分析调试基础设施问题
 
-### Prerequisites
-- Lectures 01-06 (Linux fundamentals through advanced scripting)
-- Comfort with command-line basics
-- Understanding of regular expressions (helpful but not required)
+### 先决条件
+- 讲座 01-06（从 Linux 基础到高级脚本）
+- 熟悉命令行基础
+- 理解正则表达式（有帮助但不是必需的）
 
-### Why Text Processing for AI Infrastructure?
+### 为什么 AI 基础设施需要文本处理？
 
-**Log Analysis**: Extract errors, warnings, and metrics from training logs
-**Metrics Processing**: Parse and analyze model performance data
-**Configuration Management**: Modify config files programmatically
-**Data Preprocessing**: Clean and transform datasets
-**Troubleshooting**: Debug issues by searching through logs
-**Automation**: Process text in scripts and pipelines
-**Reporting**: Generate summaries from raw data
+**日志分析**：从训练日志中提取错误、警告和指标
+**指标处理**：解析和分析模型性能数据
+**配置管理**：以编程方式修改配置文件
+**数据预处理**：清洗和转换数据集
+**故障排查**：通过搜索日志来调试问题
+**自动化**：在脚本和管道中处理文本
+**报告生成**：从原始数据生成摘要
 
-**Duration**: 90 minutes
-**Difficulty**: Intermediate
+**时长**：90 分钟
+**难度**：中级
 
 ---
 
-## grep: Pattern Matching
+## grep：模式匹配
 
-**grep** (Global Regular Expression Print) searches for patterns in text.
+**grep**（全局正则表达式打印）在文本中搜索模式。
 
-### Basic grep Syntax
+### grep 基本语法
 
 ```bash
 grep [OPTIONS] PATTERN [FILE...]
 ```
 
-### Simple Pattern Search
+### 简单模式搜索
 
 ```bash
-# Search for "error" in file
+# 在文件中搜索"error"
 grep error training.log
 
-# Search multiple files
+# 搜索多个文件
 grep error *.log
 
-# Search all files recursively
+# 递归搜索所有文件
 grep -r error /var/log/
 
-# Search from stdin (pipe)
+# 从 stdin 搜索（管道）
 cat training.log | grep error
 ```
 
-### Essential grep Options
+### 基本 grep 选项
 
-**-i**: Case-insensitive search
+**-i**：不区分大小写搜索
 ```bash
-# Find "error", "Error", "ERROR", etc.
+# 查找"error"、"Error"、"ERROR"等
 grep -i error training.log
 ```
 
-**-v**: Invert match (show lines that DON'T match)
+**-v**：反向匹配（显示不匹配的行）
 ```bash
-# Show lines without "DEBUG"
+# 显示不带"DEBUG"的行
 grep -v DEBUG application.log
 ```
 
-**-n**: Show line numbers
+**-n**：显示行号
 ```bash
-# Show line numbers with matches
+# 显示匹配的行号
 grep -n error training.log
-# Output: 42:ERROR: Model failed to load
+# 输出：42:ERROR: Model failed to load
 ```
 
-**-c**: Count matching lines
+**-c**：计数匹配行
 ```bash
-# Count error lines
+# 计算错误行数
 grep -c error training.log
-# Output: 15
+# 输出：15
 ```
 
-**-l**: List files with matches (don't show the matches)
+**-l**：列出包含匹配的文件（不显示匹配本身）
 ```bash
-# Which log files contain errors?
+# 哪些日志文件包含错误？
 grep -l error *.log
-# Output: training.log api.log
+# 输出：training.log api.log
 ```
 
-**-r**: Recursive search
+**-r**：递归搜索
 ```bash
-# Search all files in directory tree
+# 搜索目录树中的所有文件
 grep -r "cuda error" /var/log/
 ```
 
-**-A, -B, -C**: Context lines
+**-A、-B、-C**：上下文行
 ```bash
-# Show 3 lines AFTER match
+# 显示匹配后 3 行
 grep -A 3 "ERROR" training.log
 
-# Show 3 lines BEFORE match
+# 显示匹配前 3 行
 grep -B 3 "ERROR" training.log
 
-# Show 3 lines AROUND match (before AND after)
+# 显示匹配前后各 3 行
 grep -C 3 "ERROR" training.log
 ```
 
-**-w**: Match whole words only
+**-w**：仅匹配完整单词
 ```bash
-# Match "train" but not "training" or "trainer"
+# 匹配"train"但不匹配"training"或"trainer"
 grep -w train commands.log
 ```
 
-**-o**: Show only the matched part
+**-o**：仅显示匹配的部分
 ```bash
-# Extract just the matched text
+# 仅提取匹配的文本
 grep -o "[0-9]\+\.[0-9]\+" metrics.log
-# Output: 0.95
+# 输出：0.95
 #         0.87
 #         0.92
 ```
 
-### Regular Expressions with grep
+### grep 的正则表达式
 
-**Basic regex patterns**:
+**基本正则表达式模式**：
 ```bash
-# . - Any single character
+# . - 任意单个字符
 grep "model.h5" files.log
 
-# * - Zero or more of previous character
-grep "erro*r" log.txt     # er, error, errrror
+# * - 前一个字符出现零次或多次
+grep "erro*r" log.txt     # er、error、errrror
 
-# ^ - Start of line
-grep "^ERROR" log.txt     # Lines starting with ERROR
+# ^ - 行首
+grep "^ERROR" log.txt     # 以 ERROR 开头的行
 
-# $ - End of line
-grep "success$" log.txt   # Lines ending with success
+# $ - 行尾
+grep "success$" log.txt   # 以 success 结尾的行
 
-# [...] - Character class
-grep "[Ee]rror" log.txt   # Error or error
-
-# [^...] - Negated character class
-grep "[^0-9]" log.txt     # Lines without numbers
+# [...] - 字符类
+grep "[Ee]rror" log.txt   # Error 或 error
 ```
 
-**Extended regex** (use -E or egrep):
+**扩展正则表达式**（使用 -E 或 egrep）：
 ```bash
-# + - One or more
+# + - 一次或多次
 grep -E "erro+r" log.txt
 
-# ? - Zero or one
-grep -E "colou?r" log.txt  # color or colour
+# ? - 零次或一次
+grep -E "colou?r" log.txt  # color 或 colour
 
 # | - OR
 grep -E "error|warning" log.txt
 
-# () - Grouping
+# () - 分组
 grep -E "(failed|error)" log.txt
-
-# {n} - Exactly n times
-grep -E "[0-9]{3}" log.txt  # 3 digits
-
-# {n,m} - Between n and m times
-grep -E "[0-9]{2,4}" log.txt  # 2-4 digits
 ```
 
-### AI/ML Log Analysis Examples
+### AI/ML 日志分析示例
 
-**Find training errors**:
+**查找训练错误**：
 ```bash
-# All error lines
+# 所有错误行
 grep -i error training.log
 
-# CUDA errors specifically
+# 特别是 CUDA 错误
 grep -i "cuda error" training.log
 
-# Out of memory errors
+# 内存不足错误
 grep -i "out of memory" training.log
 grep -i "oom" training.log
 ```
 
-**Extract metrics**:
+**提取指标**：
 ```bash
-# Find lines with accuracy
+# 查找包含 accuracy 的行
 grep "accuracy" training.log
 
-# Lines with epoch information
+# 包含 epoch 信息的行
 grep "Epoch [0-9]\+/" training.log
 
-# Loss values
+# 损失值
 grep -o "loss: [0-9]\+\.[0-9]\+" training.log
 ```
 
-**Filter by severity**:
+**按严重级别过滤**：
 ```bash
-# Only errors and critical
+# 仅错误和严重
 grep -E "ERROR|CRITICAL" application.log
 
-# Exclude debug messages
+# 排除调试消息
 grep -v DEBUG application.log
-
-# Info, warning, and error (exclude debug)
-grep -E "INFO|WARN|ERROR" application.log
 ```
 
-**Search by timestamp**:
+**查找特定 GPU 问题**：
 ```bash
-# Errors in specific hour
-grep "2024-10-28 14:" training.log | grep ERROR
-
-# Errors today
-grep "$(date +%Y-%m-%d)" training.log | grep ERROR
-```
-
-**Find specific GPU issues**:
-```bash
-# GPU out of memory
+# GPU 内存不足
 grep -i "gpu.*memory" training.log
 
-# GPU not found
+# GPU 未找到
 grep -i "gpu.*not found" training.log
 
-# CUDA version mismatch
+# CUDA 版本不匹配
 grep -i "cuda.*version" training.log
 ```
 
-### Practical Example: Analyze Training Log
+### 实际示例：分析训练日志
 
 ```bash
 #!/bin/bash
@@ -255,19 +234,19 @@ LOG_FILE="training.log"
 echo "=== Training Log Analysis ==="
 echo ""
 
-# Total errors
+# 总错误数
 ERROR_COUNT=$(grep -c ERROR "$LOG_FILE" || echo 0)
 echo "Total errors: $ERROR_COUNT"
 
-# Warnings
+# 警告数
 WARN_COUNT=$(grep -c WARNING "$LOG_FILE" || echo 0)
 echo "Total warnings: $WARN_COUNT"
 
-# Epochs completed
+# 已完成的 epoch 数
 EPOCHS=$(grep -c "Epoch [0-9]\+/" "$LOG_FILE")
 echo "Epochs completed: $EPOCHS"
 
-# CUDA errors
+# CUDA 错误
 CUDA_ERRORS=$(grep -c "cuda error" "$LOG_FILE" || echo 0)
 if [ $CUDA_ERRORS -gt 0 ]; then
     echo ""
@@ -275,7 +254,7 @@ if [ $CUDA_ERRORS -gt 0 ]; then
     grep "cuda error" "$LOG_FILE"
 fi
 
-# OOM errors
+# OOM 错误
 OOM_ERRORS=$(grep -c -i "out of memory" "$LOG_FILE" || echo 0)
 if [ $OOM_ERRORS -gt 0 ]; then
     echo ""
@@ -283,7 +262,7 @@ if [ $OOM_ERRORS -gt 0 ]; then
     grep -i "out of memory" "$LOG_FILE"
 fi
 
-# Last 5 errors
+# 最后 5 个错误
 echo ""
 echo "Last 5 errors:"
 grep ERROR "$LOG_FILE" | tail -5
@@ -291,203 +270,148 @@ grep ERROR "$LOG_FILE" | tail -5
 
 ---
 
-## sed: Stream Editing
+## sed：流编辑
 
-**sed** (Stream EDitor) performs text transformations on streams.
+**sed**（流编辑器）对流执行文本转换。
 
-### Basic sed Syntax
+### sed 基本语法
 
 ```bash
 sed [OPTIONS] 'COMMAND' [FILE...]
 ```
 
-### Substitution (Most Common Use)
+### 替换（最常见用途）
 
-**Basic substitution**:
+**基本替换**：
 ```bash
-# Replace first occurrence on each line
+# 替换每行第一个匹配
 sed 's/old/new/' file.txt
 
-# Replace all occurrences (g = global)
+# 替换所有匹配（g = 全局）
 sed 's/old/new/g' file.txt
 
-# Replace only on lines matching pattern
+# 仅匹配特定模式的行
 sed '/pattern/s/old/new/g' file.txt
 ```
 
-**Substitution flags**:
+**替换标志**：
 ```bash
-# g - Global (all occurrences on line)
+# g - 全局（行中所有匹配）
 sed 's/error/ERROR/g' file.txt
 
-# i - Case-insensitive
+# i - 不区分大小写
 sed 's/error/ERROR/gi' file.txt
 
-# 2 - Only 2nd occurrence
+# 2 - 仅第二个匹配
 sed 's/old/new/2' file.txt
 
-# p - Print lines where substitution occurred
+# p - 打印发生替换的行
 sed -n 's/error/ERROR/p' file.txt
 ```
 
-### In-Place Editing
+### 原地编辑
 
-**Edit files directly** (-i flag):
+**原地编辑文件**（-i 标志）：
 ```bash
-# Edit file in place
+# 原地编辑文件
 sed -i 's/old/new/g' file.txt
 
-# Create backup with .bak extension
+# 创建备份（.bak 扩展名）
 sed -i.bak 's/old/new/g' file.txt
 
-# macOS requires empty string for no backup
+# macOS 需要空字符串表示无备份
 sed -i '' 's/old/new/g' file.txt  # macOS
 ```
 
-### Line Operations
+### 行操作
 
-**Delete lines**:
+**删除行**：
 ```bash
-# Delete lines containing pattern
+# 删除包含模式的行
 sed '/pattern/d' file.txt
 
-# Delete lines 5-10
+# 删除第 5-10 行
 sed '5,10d' file.txt
 
-# Delete first line
+# 删除第一行
 sed '1d' file.txt
 
-# Delete last line
+# 删除最后一行
 sed '$d' file.txt
 
-# Delete empty lines
+# 删除空行
 sed '/^$/d' file.txt
 
-# Delete lines starting with #
+# 删除以 # 开头的行
 sed '/^#/d' file.txt
 ```
 
-**Print lines**:
+**打印行**：
 ```bash
-# Print specific lines (use -n to suppress default)
-sed -n '5,10p' file.txt      # Lines 5-10
-sed -n '1p' file.txt          # First line
-sed -n '$p' file.txt          # Last line
+# 打印特定行（使用 -n 抑制默认输出）
+sed -n '5,10p' file.txt      # 第 5-10 行
+sed -n '1p' file.txt          # 第一行
+sed -n '$p' file.txt          # 最后一行
 
-# Print lines matching pattern
+# 打印匹配模式的行
 sed -n '/pattern/p' file.txt
-
-# Print every 2nd line
-sed -n '1~2p' file.txt
 ```
 
-**Insert and append**:
+**插入和追加**：
 ```bash
-# Insert before line 5
+# 在第 5 行前插入
 sed '5i\New line here' file.txt
 
-# Append after line 5
+# 在第 5 行后追加
 sed '5a\New line here' file.txt
-
-# Insert before matching line
-sed '/pattern/i\New line' file.txt
-
-# Append after matching line
-sed '/pattern/a\New line' file.txt
 ```
 
-### Advanced Substitution
+### 高级替换
 
-**Using different delimiters** (helpful with paths):
+**使用不同分隔符**（对路径很有用）：
 ```bash
-# Instead of s/\/old\/path/\/new\/path/g
-# Use | or # as delimiter
+# 替代 s/\/old\/path/\/new\/path/g
+# 使用 | 或 # 作为分隔符
 sed 's|/old/path|/new/path|g' file.txt
 sed 's#/old/path#/new/path#g' file.txt
 ```
 
-**Capture groups and backreferences**:
+**多命令**：
 ```bash
-# Swap two words
-echo "first second" | sed 's/\(.*\) \(.*\)/\2 \1/'
-# Output: second first
-
-# Extract and reformat
-echo "2024-10-28" | sed 's/\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)/\3\/\2\/\1/'
-# Output: 28/10/2024
-```
-
-**Multiple commands**:
-```bash
-# Use -e for multiple commands
+# 使用 -e 执行多个命令
 sed -e 's/old1/new1/g' -e 's/old2/new2/g' file.txt
 
-# Or use semicolons
+# 或使用分号
 sed 's/old1/new1/g; s/old2/new2/g' file.txt
-
-# Or newlines
-sed '
-s/old1/new1/g
-s/old2/new2/g
-' file.txt
 ```
 
-### AI/ML Configuration Examples
+### AI/ML 配置示例
 
-**Update model paths**:
+**更新模型路径**：
 ```bash
-# Update model path in config
+# 在配置中更新模型路径
 sed -i 's|/models/old|/models/new|g' config.yaml
-
-# Update multiple paths
-sed -i '
-s|/data/train|/datasets/training|g
-s|/data/val|/datasets/validation|g
-s|/data/test|/datasets/testing|g
-' config.yaml
 ```
 
-**Modify hyperparameters**:
+**修改超参数**：
 ```bash
-# Change learning rate
+# 更改学习率
 sed -i 's/learning_rate: 0.001/learning_rate: 0.0001/' config.yaml
 
-# Update batch size
+# 更新批处理大小
 sed -i 's/batch_size: 32/batch_size: 64/' config.yaml
-
-# Enable GPU
-sed -i 's/use_gpu: false/use_gpu: true/' config.yaml
 ```
 
-**Clean log files**:
+**清除日志文件**：
 ```bash
-# Remove ANSI color codes
+# 删除 ANSI 颜色代码
 sed 's/\x1b\[[0-9;]*m//g' colored.log > clean.log
 
-# Remove timestamps
+# 删除时间戳
 sed 's/^[0-9-]\+ [0-9:]\+ //' log.txt
-
-# Remove debug lines
-sed '/DEBUG/d' log.txt > filtered.log
-
-# Extract only errors
-sed -n '/ERROR/p' log.txt > errors.log
 ```
 
-**Format metrics**:
-```bash
-# Convert scientific notation
-echo "loss: 1.234e-03" | sed 's/\([0-9]\+\.[0-9]\+\)e-\([0-9]\+\)/0.00\1/'
-
-# Add commas to numbers
-echo "1000000" | sed ':a;s/\B[0-9]\{3\}\>/,&/;ta'
-# Output: 1,000,000
-
-# Round percentages
-sed 's/\([0-9]\+\)\.[0-9]\+%/\1%/g' metrics.txt
-```
-
-### Practical Example: Config File Update Script
+### 实际示例：配置文件更新脚本
 
 ```bash
 #!/bin/bash
@@ -496,24 +420,24 @@ sed 's/\([0-9]\+\)\.[0-9]\+%/\1%/g' metrics.txt
 CONFIG_FILE="training_config.yaml"
 BACKUP_FILE="${CONFIG_FILE}.backup"
 
-# Create backup
+# 创建备份
 cp "$CONFIG_FILE" "$BACKUP_FILE"
 
 echo "Updating training configuration..."
 
-# Update learning rate
+# 更新学习率
 sed -i 's/learning_rate: 0.001/learning_rate: 0.0001/' "$CONFIG_FILE"
 echo "✓ Learning rate updated to 0.0001"
 
-# Update batch size
+# 更新批处理大小
 sed -i 's/batch_size: 32/batch_size: 64/' "$CONFIG_FILE"
 echo "✓ Batch size updated to 64"
 
-# Update model path
+# 更新模型路径
 sed -i 's|model_path: /models/v1|model_path: /models/v2|' "$CONFIG_FILE"
 echo "✓ Model path updated to /models/v2"
 
-# Enable mixed precision
+# 启用混合精度
 sed -i 's/mixed_precision: false/mixed_precision: true/' "$CONFIG_FILE"
 echo "✓ Mixed precision enabled"
 
@@ -524,180 +448,140 @@ echo "Backup saved to: $BACKUP_FILE"
 
 ---
 
-## awk: Text Processing and Reports
+## awk：文本处理和报告
 
-**awk** is a powerful pattern scanning and processing language.
+**awk** 是一种强大的模式扫描和处理语言。
 
-### Basic awk Syntax
+### awk 基本语法
 
 ```bash
 awk 'PATTERN {ACTION}' file.txt
 ```
 
-### Field Processing
+### 字段处理
 
-**Default field separator is whitespace**:
+**默认字段分隔符是空白**：
 ```bash
-# Print first field
+# 打印第一个字段
 echo "one two three" | awk '{print $1}'
-# Output: one
+# 输出：one
 
-# Print multiple fields
+# 打印多个字段
 echo "one two three" | awk '{print $1, $3}'
-# Output: one three
+# 输出：one three
 
-# Print all fields
+# 打印所有字段
 echo "one two three" | awk '{print $0}'
-# Output: one two three
+# 输出：one two three
 
-# Print last field
+# 打印最后一个字段
 echo "one two three" | awk '{print $NF}'
-# Output: three
-
-# Print second-to-last field
-echo "one two three" | awk '{print $(NF-1)}'
-# Output: two
+# 输出：three
 ```
 
-**Custom field separator** (-F flag):
+**自定义字段分隔符**（-F 标志）：
 ```bash
-# CSV file (comma-separated)
+# CSV 文件（逗号分隔）
 echo "name,age,city" | awk -F',' '{print $1, $2}'
-# Output: name age
+# 输出：name age
 
-# Colon-separated (/etc/passwd)
+# 冒号分隔（/etc/passwd）
 awk -F':' '{print $1, $3}' /etc/passwd
-
-# Multiple separators
-awk -F'[:,]' '{print $1}' file.txt
 ```
 
-### Built-in Variables
+### 内置变量
 
-**Common awk variables**:
+**常用 awk 变量**：
 ```bash
-# NR - Number of Records (current line number)
+# NR - 记录数（当前行号）
 awk '{print NR, $0}' file.txt
 
-# NF - Number of Fields (fields in current line)
+# NF - 字段数（当前行的字段数）
 awk '{print NF}' file.txt
 
-# FS - Field Separator (input)
+# FS - 字段分隔符（输入）
 awk -v FS=',' '{print $1}' file.txt
 
-# OFS - Output Field Separator
+# OFS - 输出字段分隔符
 awk 'BEGIN {OFS=","} {print $1, $2}' file.txt
-
-# FILENAME - Current filename
-awk '{print FILENAME, $0}' file1.txt file2.txt
 ```
 
-### Pattern Matching
+### 模式匹配
 
 ```bash
-# Print lines matching pattern
+# 打印匹配模式的行
 awk '/pattern/' file.txt
 
-# Print if field matches
+# 如果字段匹配则打印
 awk '$1 == "value"' file.txt
 
-# Numeric comparison
+# 数字比较
 awk '$3 > 100' file.txt
 
-# Multiple conditions
+# 多条件
 awk '$1 == "ERROR" && $3 > 100' file.txt
 
-# Regex match
+# 正则匹配
 awk '$2 ~ /pattern/' file.txt
-
-# Negated regex match
-awk '$2 !~ /pattern/' file.txt
 ```
 
-### Calculations and Reports
+### 计算和报告
 
-**Arithmetic operations**:
+**算术运算**：
 ```bash
-# Add values in column 3
+# 对第 3 列的值求和
 awk '{sum += $3} END {print sum}' numbers.txt
 
-# Average
+# 平均值
 awk '{sum += $1; count++} END {print sum/count}' numbers.txt
 
-# Find maximum
+# 查找最大值
 awk 'BEGIN {max=0} {if($1>max) max=$1} END {print max}' numbers.txt
-
-# Find minimum
-awk 'BEGIN {min=999999} {if($1<min) min=$1} END {print min}' numbers.txt
 ```
 
-**Counting and grouping**:
+**计数和分组**：
 ```bash
-# Count occurrences
+# 计数出现次数
 awk '{count[$1]++} END {for(word in count) print word, count[word]}' file.txt
 
-# Sum by category
+# 按类别求和
 awk '{sum[$1] += $2} END {for(cat in sum) print cat, sum[cat]}' file.txt
 ```
 
-### AI/ML Log Analysis with awk
+### AI/ML 日志分析中的 awk
 
-**Extract training metrics**:
+**提取训练指标**：
 ```bash
-# Extract epoch and loss
+# 提取 epoch 和 loss
 awk '/Epoch/ {print $2, $NF}' training.log
 
-# Extract accuracy from specific format
-# Example: "Epoch 10/100 - loss: 0.1234 - acc: 0.9876"
+# 从特定格式提取 accuracy
 awk -F': ' '/acc:/ {print $NF}' training.log
 
-# Calculate average loss
+# 计算平均损失
 awk '/loss:/ {sum += $NF; count++} END {print "Avg loss:", sum/count}' training.log
 ```
 
-**Parse GPU metrics**:
+**解析 GPU 指标**：
 ```bash
-# nvidia-smi output processing
+# nvidia-smi 输出处理
 nvidia-smi --query-gpu=index,utilization.gpu,memory.used \
   --format=csv,noheader | \
   awk -F, '{print "GPU " $1 ": " $2 " util, " $3 " memory"}'
-
-# Average GPU utilization
-nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader | \
-  awk '{sum += $1; count++} END {print "Avg GPU util:", sum/count "%"}'
 ```
 
-**Analyze API logs**:
+**分析 API 日志**：
 ```bash
-# Count requests by endpoint
+# 按端点计数请求
 awk '{print $7}' access.log | sort | uniq -c | sort -rn
 
-# Average response time
+# 平均响应时间
 awk '{sum += $10; count++} END {print "Avg response:", sum/count "ms"}' api.log
-
-# Requests per minute
-awk -F: '{print $1":"$2}' access.log | uniq -c
 ```
 
-**Process CSV data**:
-```bash
-# Calculate statistics from metrics.csv
-awk -F',' '
-NR>1 {
-    sum_loss += $2
-    sum_acc += $3
-    count++
-}
-END {
-    print "Average Loss:", sum_loss/count
-    print "Average Accuracy:", sum_acc/count
-}
-' metrics.csv
-```
+### 高级 awk 特性
 
-### Advanced awk Features
-
-**BEGIN and END blocks**:
+**BEGIN 和 END 块**：
 ```bash
 awk '
 BEGIN {
@@ -714,7 +598,7 @@ END {
 ' numbers.txt
 ```
 
-**Conditional actions**:
+**条件操作**：
 ```bash
 awk '
 {
@@ -728,22 +612,7 @@ awk '
 ' scores.txt
 ```
 
-**Arrays in awk**:
-```bash
-# Count word frequency
-awk '
-{
-    for(i=1; i<=NF; i++)
-        words[$i]++
-}
-END {
-    for(word in words)
-        print word, words[word]
-}
-' file.txt
-```
-
-### Practical Example: Training Metrics Report
+### 实际示例：训练指标报告
 
 ```bash
 #!/bin/bash
@@ -754,7 +623,7 @@ LOG_FILE="training.log"
 echo "=== Training Metrics Report ==="
 echo ""
 
-# Extract metrics and generate report
+# 提取指标并生成报告
 awk '
 BEGIN {
     epoch_count = 0
@@ -764,9 +633,8 @@ BEGIN {
     max_acc = 0
 }
 
-# Match epoch lines: "Epoch 10/100 - loss: 0.1234 - acc: 0.9876"
+# 匹配 epoch 行
 /Epoch [0-9]+\// {
-    # Extract values using field positions or regex
     for(i=1; i<=NF; i++) {
         if($i ~ /loss:/) {
             loss = $(i+1)
@@ -813,41 +681,40 @@ END {
 
 ---
 
-## Combining Tools with Pipes
+## 使用管道组合工具
 
-The real power comes from combining grep, sed, and awk in pipelines.
+真正的力量来自在管道中组合 grep、sed 和 awk。
 
-### Simple Pipelines
+### 简单管道
 
-**Filter then extract**:
+**过滤然后提取**：
 ```bash
-# Find errors, extract timestamps
+# 查找错误，提取时间戳
 grep ERROR log.txt | awk '{print $1, $2}'
 
-# Find GPU lines, extract GPU ID
+# 查找 GPU 行，提取 GPU ID
 grep GPU log.txt | sed 's/.*GPU \([0-9]\+\).*/\1/'
 
-# Count error types
+# 统计错误类型
 grep ERROR log.txt | awk '{print $3}' | sort | uniq -c
 ```
 
-**Transform then analyze**:
+**转换然后分析**：
 ```bash
-# Clean data, then calculate
+# 清洗数据，然后计算
 sed 's/[^0-9.]//g' metrics.txt | awk '{sum+=$1} END {print sum}'
 
-# Extract values, sort, show top 10
+# 提取值，排序，显示前 10
 grep "accuracy:" log.txt | awk '{print $NF}' | sort -rn | head -10
 ```
 
-### Complex Analysis Pipelines
+### 复杂分析管道
 
-**Analyze training performance**:
+**分析训练性能**：
 ```bash
 #!/bin/bash
-# Analyze last 24 hours of training
+# 分析最近 24 小时的训练
 
-# Extract recent epochs, calculate statistics
 grep "$(date +%Y-%m-%d)" training.log | \
 grep "Epoch" | \
 awk -F': ' '{print $2, $4}' | \
@@ -859,10 +726,10 @@ awk '{loss+=$1; acc+=$2; count++} END {
 }'
 ```
 
-**Find bottlenecks**:
+**查找瓶颈**：
 ```bash
 #!/bin/bash
-# Find slowest training steps
+# 查找最慢的训练步骤
 
 grep "step_time" training.log | \
 awk '{print $5}' | \
@@ -877,27 +744,7 @@ END {
 }'
 ```
 
-**API performance analysis**:
-```bash
-#!/bin/bash
-# Analyze API response times
-
-cat api_access.log | \
-awk '{print $7, $11}' | \          # endpoint, response_time
-grep -v "^$" | \                   # remove empty lines
-awk '{
-    sum[$1] += $2
-    count[$1]++
-}
-END {
-    print "Average Response Times:"
-    for(endpoint in sum)
-        printf "  %s: %.2fms\n", endpoint, sum[endpoint]/count[endpoint]
-}' | \
-sort -k2 -rn                        # sort by time
-```
-
-### Advanced Pipeline: Log Analysis Tool
+### 高级管道：日志分析工具
 
 ```bash
 #!/bin/bash
@@ -914,7 +761,7 @@ echo "=== Comprehensive Log Analysis ==="
 echo "File: $LOG_FILE"
 echo ""
 
-# Timeline Analysis
+# 时间线分析
 echo "## Timeline"
 grep -E "ERROR|WARN" "$LOG_FILE" | \
 awk '{print $1, $2}' | \
@@ -923,7 +770,7 @@ sort | uniq -c | \
 awk '{printf "  %s: %d events\n", $2, $1}'
 echo ""
 
-# Error Analysis
+# 错误分析
 echo "## Error Distribution"
 grep ERROR "$LOG_FILE" | \
 awk '{
@@ -939,7 +786,7 @@ sort -t: -k2 -rn | \
 head -10
 echo ""
 
-# Performance Metrics
+# 性能指标
 echo "## Performance Metrics"
 grep -E "time:|duration:" "$LOG_FILE" | \
 sed 's/.*time: \([0-9.]\+\).*/\1/' | \
@@ -959,312 +806,124 @@ END {
     }
 }'
 echo ""
-
-# Resource Usage
-echo "## Resource Usage Patterns"
-grep -E "memory|cpu|gpu" "$LOG_FILE" | \
-awk '{
-    if($0 ~ /memory/)
-        mem++
-    if($0 ~ /cpu/)
-        cpu++
-    if($0 ~ /gpu/)
-        gpu++
-}
-END {
-    print "  Memory events:", mem
-    print "  CPU events:", cpu
-    print "  GPU events:", gpu
-}'
 ```
 
 ---
 
-## AI Infrastructure Applications
+## 总结和要点
 
-### Use Case 1: Parse TensorFlow Training Logs
+### 掌握的工具
 
-```bash
-#!/bin/bash
-# parse-tf-logs.sh
+**grep - 模式匹配**：
+- 在文件中搜索模式
+- 正则表达式
+- 上下文行（-A、-B、-C）
+- 递归搜索（-r）
+- 计数匹配（-c）
+- 不区分大小写（-i）
 
-LOG_FILE="$1"
+**sed - 流编辑**：
+- 替换（s/old/new/g）
+- 原地编辑（-i）
+- 删除行（d）
+- 插入/追加（i、a）
+- 多命令
+- 正则表达式
 
-echo "=== TensorFlow Training Analysis ==="
+**awk - 文本处理**：
+- 字段处理（$1、$2、$NF）
+- 模式-动作范式
+- 内置变量（NR、NF、FS）
+- 算术运算
+- 数组和循环
+- 报告和摘要
 
-# Extract epoch metrics
-awk '
-/Epoch [0-9]+\// {
-    epoch = $2
-    sub(/\/.*/, "", epoch)
+### 关键概念
 
-    for(i=1; i<=NF; i++) {
-        if($i == "loss:") loss = $(i+1)
-        if($i == "accuracy:") acc = $(i+1)
-        if($i == "val_loss:") val_loss = $(i+1)
-        if($i == "val_accuracy:") val_acc = $(i+1)
-    }
+1. **管道**：链式工具实现强大文本处理
+2. **模式**：匹配和提取特定信息
+3. **字段**：逐列处理结构化数据
+4. **转换**：以编程方式修改文本
+5. **聚合**：计算统计信息和摘要
 
-    printf "Epoch %d: loss=%.4f acc=%.4f val_loss=%.4f val_acc=%.4f\n",
-           epoch, loss, acc, val_loss, val_acc
+### AI 基础设施应用
 
-    sum_loss += loss
-    sum_acc += acc
-    count++
-}
+**日志分析**：
+- 提取错误和警告
+- 解析训练指标
+- 识别性能瓶颈
+- 监控资源使用情况
 
-END {
-    print ""
-    print "Summary:"
-    printf "  Average Loss: %.4f\n", sum_loss/count
-    printf "  Average Accuracy: %.4f\n", sum_acc/count
-}
-' "$LOG_FILE"
-```
+**数据处理**：
+- 清洗数据集
+- 转换格式
+- 提取特征
+- 生成报告
 
-### Use Case 2: Monitor Distributed Training
+**自动化**：
+- 在脚本中处理日志
+- 生成告警
+- 创建仪表盘
+- 自动化报告
 
-```bash
-#!/bin/bash
-# monitor-distributed-training.sh
+### 最佳实践
 
-# Collect logs from all workers
-WORKERS=(worker1 worker2 worker3 worker4)
+✅ **从简单开始**：先使用基本 grep，再使用复杂 awk
+✅ **增量测试**：逐步构建管道
+✅ **使用合适的工具**：grep 用于搜索，sed 用于替换，awk 用于报告
+✅ **引用模式**：防止 shell 解释
+✅ **保存中间结果**：调试复杂管道
+✅ **注释正则表达式**：记录复杂模式
+✅ **使用 -n 配合 sed**：显式打印以保持清晰
+✅ **命名 awk 变量**：可读性优于简洁
 
-echo "=== Distributed Training Status ==="
-echo ""
-
-for worker in "${WORKERS[@]}"; do
-    echo "## $worker"
-
-    # Get latest status
-    ssh "$worker" "tail -100 /var/log/training.log" | \
-    grep -E "Epoch|ERROR|WARN" | \
-    tail -5
-
-    # Get resource usage
-    ssh "$worker" "nvidia-smi --query-gpu=utilization.gpu,memory.used \
-        --format=csv,noheader" | \
-    awk -F, -v worker="$worker" '{
-        printf "  GPU: %s util, %s memory\n", $1, $2
-    }'
-
-    echo ""
-done
-
-# Aggregate metrics
-echo "## Aggregate Statistics"
-for worker in "${WORKERS[@]}"; do
-    ssh "$worker" "tail -1000 /var/log/training.log"
-done | \
-grep "step_time" | \
-awk '{sum+=$NF; count++} END {
-    printf "  Average step time: %.2fs\n", sum/count
-    printf "  Total steps: %d\n", count
-}'
-```
-
-### Use Case 3: Generate Training Report
+### 常见模式
 
 ```bash
-#!/bin/bash
-# generate-training-report.sh
-
-EXPERIMENT_DIR="$1"
-OUTPUT_FILE="$EXPERIMENT_DIR/report.txt"
-
-{
-    echo "# Training Report"
-    echo "Generated: $(date)"
-    echo "Experiment: $EXPERIMENT_DIR"
-    echo ""
-
-    # Configuration
-    echo "## Configuration"
-    grep -E "model|learning_rate|batch_size|epochs" \
-        "$EXPERIMENT_DIR/config.yaml" | \
-    sed 's/^/  /'
-    echo ""
-
-    # Training Progress
-    echo "## Training Progress"
-    awk '
-    /Epoch [0-9]+\// {
-        epoch=$2
-        sub(/\/.*/, "", epoch)
-        for(i=1; i<=NF; i++) {
-            if($i=="loss:") loss=$(i+1)
-            if($i=="acc:") acc=$(i+1)
-        }
-        if(epoch % 10 == 0 || epoch==1)
-            printf "  Epoch %3d: loss=%.4f acc=%.4f\n", epoch, loss, acc
-    }
-    ' "$EXPERIMENT_DIR/training.log"
-    echo ""
-
-    # Final Metrics
-    echo "## Final Metrics"
-    tail -1 "$EXPERIMENT_DIR/training.log" | \
-    awk '{
-        for(i=1; i<=NF; i++) {
-            if($i=="loss:") printf "  Training Loss: %s\n", $(i+1)
-            if($i=="val_loss:") printf "  Validation Loss: %s\n", $(i+1)
-            if($i=="acc:") printf "  Training Accuracy: %s\n", $(i+1)
-            if($i=="val_acc:") printf "  Validation Accuracy: %s\n", $(i+1)
-        }
-    }'
-    echo ""
-
-    # Errors and Warnings
-    echo "## Issues"
-    ERROR_COUNT=$(grep -c ERROR "$EXPERIMENT_DIR/training.log" || echo 0)
-    WARN_COUNT=$(grep -c WARN "$EXPERIMENT_DIR/training.log" || echo 0)
-    echo "  Errors: $ERROR_COUNT"
-    echo "  Warnings: $WARN_COUNT"
-
-    if [ $ERROR_COUNT -gt 0 ]; then
-        echo ""
-        echo "  Recent Errors:"
-        grep ERROR "$EXPERIMENT_DIR/training.log" | tail -5 | sed 's/^/    /'
-    fi
-
-} > "$OUTPUT_FILE"
-
-echo "Report generated: $OUTPUT_FILE"
-cat "$OUTPUT_FILE"
-```
-
----
-
-## Summary and Key Takeaways
-
-### Tools Mastered
-
-**grep - Pattern Matching**:
-- Search files for patterns
-- Regular expressions
-- Context lines (-A, -B, -C)
-- Recursive search (-r)
-- Count matches (-c)
-- Case-insensitive (-i)
-
-**sed - Stream Editing**:
-- Substitution (s/old/new/g)
-- In-place editing (-i)
-- Delete lines (d)
-- Insert/append (i, a)
-- Multiple commands
-- Regular expressions
-
-**awk - Text Processing**:
-- Field processing ($1, $2, $NF)
-- Pattern-action paradigm
-- Built-in variables (NR, NF, FS)
-- Arithmetic operations
-- Arrays and loops
-- Reports and summaries
-
-### Key Concepts
-
-1. **Pipelines**: Chain tools for powerful text processing
-2. **Patterns**: Match and extract specific information
-3. **Fields**: Process structured data column by column
-4. **Transformations**: Modify text programmatically
-5. **Aggregation**: Calculate statistics and summaries
-
-### AI Infrastructure Applications
-
-**Log Analysis**:
-- Extract errors and warnings
-- Parse training metrics
-- Identify performance bottlenecks
-- Monitor resource usage
-
-**Data Processing**:
-- Clean datasets
-- Transform formats
-- Extract features
-- Generate reports
-
-**Automation**:
-- Process logs in scripts
-- Generate alerts
-- Create dashboards
-- Automate reporting
-
-### Best Practices
-
-✅ **Start simple**: Basic grep before complex awk
-✅ **Test incrementally**: Build pipelines step by step
-✅ **Use appropriate tool**: grep for search, sed for replace, awk for reports
-✅ **Quote patterns**: Prevent shell interpretation
-✅ **Save intermediate results**: Debug complex pipelines
-✅ **Comment regex**: Document complex patterns
-✅ **Use -n with sed**: Explicit printing for clarity
-✅ **Name awk variables**: Readable code over brevity
-
-### Common Patterns
-
-```bash
-# Search and count
+# 搜索并计数
 grep pattern file.txt | wc -l
 
-# Extract and analyze
+# 提取并分析
 grep pattern file.txt | awk '{print $3}' | sort | uniq -c
 
-# Filter and transform
+# 过滤并转换
 grep ERROR log.txt | sed 's/ERROR://' | awk '{print $1, $2}'
 
-# Calculate metrics
+# 计算指标
 awk '/metric/ {sum+=$2; count++} END {print sum/count}' log.txt
-
-# Generate report
-{
-    echo "Report:"
-    grep metric log.txt | awk '{print "  " $0}'
-} > report.txt
 ```
 
-### Next Steps
-
-In **Lecture 08: Networking Fundamentals**, you'll learn:
-- TCP/IP networking basics
-- Network configuration
-- SSH and remote access
-- Network troubleshooting
-- AI infrastructure networking
-
-### Quick Reference
+### 快速参考
 
 ```bash
 # grep
-grep pattern file.txt           # Search
-grep -i pattern file.txt        # Case-insensitive
-grep -r pattern dir/            # Recursive
-grep -n pattern file.txt        # Line numbers
-grep -A 3 pattern file.txt      # 3 lines after
-grep -E 'pat1|pat2' file.txt    # Extended regex
+grep pattern file.txt           # 搜索
+grep -i pattern file.txt        # 不区分大小写
+grep -r pattern dir/            # 递归
+grep -n pattern file.txt        # 行号
+grep -A 3 pattern file.txt      # 之后 3 行
+grep -E 'pat1|pat2' file.txt    # 扩展正则
 
 # sed
-sed 's/old/new/g' file.txt      # Replace all
-sed -i 's/old/new/g' file.txt   # In-place
-sed '/pattern/d' file.txt       # Delete lines
-sed -n '10,20p' file.txt        # Print lines 10-20
+sed 's/old/new/g' file.txt      # 全部替换
+sed -i 's/old/new/g' file.txt   # 原地编辑
+sed '/pattern/d' file.txt       # 删除行
+sed -n '10,20p' file.txt        # 打印行 10-20
 
 # awk
-awk '{print $1}' file.txt       # First field
-awk -F: '{print $1}' file.txt   # Custom separator
-awk '$3 > 100' file.txt         # Filter
-awk '{sum+=$1} END {print sum}' # Sum column
+awk '{print $1}' file.txt       # 第一个字段
+awk -F: '{print $1}' file.txt   # 自定义分隔符
+awk '$3 > 100' file.txt         # 过滤
+awk '{sum+=$1} END {print sum}' # 求列和
 
-# Pipelines
+# 管道
 grep ERROR log.txt | awk '{print $1}' | sort | uniq -c
 ```
 
 ---
 
-**End of Lecture 07: Text Processing Tools**
+**讲座 07：文本处理工具结束**
 
-You now have powerful text processing skills for analyzing logs, processing data, and automating AI infrastructure tasks. These tools are essential for day-to-day operations.
+你现在已经掌握了强大的文本处理技能，用于分析日志、处理数据和自动化 AI 基础设施任务。这些工具对于日常运维是必不可少的。
 
-**Next**: Lecture 08 - Networking Fundamentals
+**下一步**：讲座 08 - 网络基础

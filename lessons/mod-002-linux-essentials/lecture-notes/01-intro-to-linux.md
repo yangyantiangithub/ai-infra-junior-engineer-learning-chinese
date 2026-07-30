@@ -1,615 +1,613 @@
-# Lecture 01: Introduction to Linux and Command Line
+# 讲座 01：Linux 和命令行简介
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [History and Philosophy of Linux](#history-and-philosophy-of-linux)
-3. [Linux Distributions](#linux-distributions)
-4. [Terminal Emulators and Shells](#terminal-emulators-and-shells)
-5. [Basic Command Structure](#basic-command-structure)
-6. [Getting Help and Documentation](#getting-help-and-documentation)
-7. [Environment Variables](#environment-variables)
-8. [Best Practices for AI Infrastructure](#best-practices-for-ai-infrastructure)
-9. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [简介](#简介)
+2. [Linux 的历史和哲学](#linux-的历史和哲学)
+3. [Linux 发行版](#linux-发行版)
+4. [终端模拟器和 Shell](#终端模拟器和-shell)
+5. [基本命令结构](#基本命令结构)
+6. [获取帮助和文档](#获取帮助和文档)
+7. [环境变量](#环境变量)
+8. [AI 基础设施的最佳实践](#ai-基础设施的最佳实践)
+9. [总结和要点](#总结和要点)
 
-## Introduction
+## 简介
 
-As an AI Infrastructure Engineer, Linux is your foundation. Whether deploying machine learning models, managing GPU servers, or orchestrating containers, Linux powers over 90% of cloud infrastructure and is the standard for AI/ML workloads.
+作为一名 AI 基础设施工程师，Linux 是你的基石。无论是部署机器学习模型、管理 GPU 服务器还是编排容器，Linux 驱动着超过 90% 的云基础设施，并且是 AI/ML 工作负载的标准。
 
-This lecture introduces you to Linux, its philosophy, the command-line environment, and essential concepts that will prepare you for deeper technical work ahead.
+本讲座向你介绍 Linux、其哲学、命令行环境以及为你后续深入技术工作做准备的基本概念。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Understand the history and philosophy of Linux
-- Navigate the Linux distribution landscape
-- Use terminal emulators and understand different shells
-- Construct and execute basic Linux commands
-- Access help and documentation systems
-- Work with environment variables
-- Apply Linux fundamentals to AI infrastructure scenarios
+完成本讲座后，你将能够：
+- 理解 Linux 的历史和哲学
+- 浏览 Linux 发行版全景
+- 使用终端模拟器并理解不同的 shell
+- 构建和执行基本 Linux 命令
+- 访问帮助和文档系统
+- 使用环境变量
+- 将 Linux 基础应用到 AI 基础设施场景
 
-### Prerequisites
-- Access to a Linux system (Ubuntu 22.04 LTS, CentOS 8, or similar)
-- Basic computer literacy
-- Willingness to learn command-line interfaces
+### 先决条件
+- 可访问 Linux 系统（Ubuntu 22.04 LTS、CentOS 8 或类似系统）
+- 基本计算机素养
+- 愿意学习命令行界面
 
-### Why Linux for AI Infrastructure?
+### 为什么 AI 基础设施选择 Linux？
 
-**Industry Standard**: Over 90% of cloud infrastructure runs on Linux. Major AI platforms like TensorFlow, PyTorch, and CUDA are optimized for Linux environments.
+**行业标准**：超过 90% 的云基础设施运行在 Linux 上。TensorFlow、PyTorch 和 CUDA 等主要 AI 平台都针对 Linux 环境进行了优化。
 
-**Performance**: Linux provides direct hardware access, critical for GPU computing and high-performance ML workloads.
+**性能**：Linux 提供直接硬件访问，这对 GPU 计算和高性能 ML 工作负载至关重要。
 
-**Automation**: Shell scripting and command-line tools enable infrastructure automation at scale.
+**自动化**：Shell 脚本和命令行工具能够实现大规模基础设施自动化。
 
-**Open Source**: Free, customizable, and supported by extensive community resources.
+**开源**：免费、可定制，并得到广泛社区资源的支持。
 
-**Container Native**: Docker, Kubernetes, and modern orchestration tools are built for Linux.
+**容器原生**：Docker、Kubernetes 和现代编排工具都是为 Linux 构建的。
 
-## History and Philosophy of Linux
+## Linux 的历史和哲学
 
-### The Birth of Unix (1969)
+### Unix 的诞生（1969）
 
-The story begins at Bell Labs with **Unix**, created by Ken Thompson and Dennis Ritchie. Unix introduced revolutionary concepts:
-- Hierarchical file system
-- Everything is a file
-- Small, composable programs
-- Pipes for connecting programs
-- Portable across hardware
+故事始于贝尔实验室的 **Unix**，由 Ken Thompson 和 Dennis Ritchie 创建。Unix 引入了革命性的概念：
+- 层级文件系统
+- 一切都是文件
+- 小型、可组合的程序
+- 用于连接程序的管道
+- 跨硬件可移植
 
-**Unix Philosophy**: "Do one thing and do it well"
+**Unix 哲学**："做好一件事，并且做好它"
 
-### The GNU Project (1983)
+### GNU 项目（1983）
 
-Richard Stallman launched the **GNU Project** (GNU's Not Unix) to create a free Unix-like operating system:
-- Free Software Foundation
-- GNU tools (bash, gcc, make, etc.)
-- GPL (General Public License)
-- **Freedom**: Use, study, modify, distribute software
+Richard Stallman 发起了 **GNU 项目**（GNU's Not Unix），旨在创建一个自由的类 Unix 操作系统：
+- 自由软件基金会
+- GNU 工具（bash、gcc、make 等）
+- GPL（通用公共许可证）
+- **自由**：使用、研究、修改、分发软件
 
-### Linux Kernel (1991)
+### Linux 内核（1991）
 
-Linus Torvalds, a Finnish computer science student, created the **Linux kernel**:
+Linus Torvalds，一位芬兰计算机科学系学生，创建了 **Linux 内核**：
 ```
-Date: August 25, 1991
-From: torvalds@klaava.Helsinki.FI (Linus Benedict Torvalds)
-Subject: What would you like to see most in minix?
+日期：1991 年 8 月 25 日
+来自：torvalds@klaava.Helsinki.FI（Linus Benedict Torvalds）
+主题：你最想在 minix 中看到什么？
 
-Hello everybody out there using minix -
+各位使用 minix 的朋友们好 -
 
-I'm doing a (free) operating system (just a hobby, won't be big and
-professional like gnu) for 386(486) AT clones. This has been brewing
-since april, and is starting to get ready.
+我正在为 386(486) AT 兼容机编写一个（自由的）操作系统（只是个爱好，不会像 gnu 那样大而专业）。这是从四月份开始酝酿的，现在开始逐渐成形了。
 ```
 
-**Key Innovations**:
-- Open source from day one
-- Monolithic kernel architecture
-- Community-driven development
-- Rapid iteration and improvement
+**关键创新**：
+- 从第一天开始就开源
+- 宏内核架构
+- 社区驱动的开发
+- 快速迭代和改进
 
-### GNU/Linux Combination
+### GNU/Linux 组合
 
-**GNU + Linux Kernel = Complete Operating System**
-- GNU provided user-space tools
-- Linux provided the kernel
-- Combined: A free, powerful, Unix-like OS
+**GNU + Linux 内核 = 完整的操作系统**
+- GNU 提供用户空间工具
+- Linux 提供内核
+- 两者结合：一个自由、强大、类 Unix 的操作系统
 
-### Linux Today
+### Linux 今天
 
-**Statistics (2024)**:
-- 100% of supercomputers run Linux
-- 96.3% of top million web servers run Linux
-- 85% of smartphones (Android) use Linux kernel
-- Major cloud providers (AWS, Azure, GCP) primarily Linux
-- NASA, CERN, SpaceX use Linux
+**统计数据（2024）**：
+- 100% 的超级计算机运行 Linux
+- 96.3% 的前一百万 web 服务器运行 Linux
+- 85% 的智能手机（Android）使用 Linux 内核
+- 主要云提供商（AWS、Azure、GCP）主要使用 Linux
+- NASA、CERN、SpaceX 使用 Linux
 
-## Linux Distributions
+## Linux 发行版
 
-A **Linux distribution** (distro) packages the Linux kernel with software, tools, package managers, and configurations.
+**Linux 发行版**将 Linux 内核与软件、工具、包管理器和配置打包在一起。
 
-### Major Distribution Families
+### 主要发行版家族
 
-#### 1. Debian Family
-**Debian**: Stable, community-driven, massive package repository
-- **Ubuntu**: Most popular, user-friendly, strong community
-  - **Ubuntu Server**: For servers and cloud
-  - **Ubuntu LTS**: Long-term support (5 years)
-- **Linux Mint**: Desktop-focused, beginner-friendly
+#### 1. Debian 家族
+**Debian**：稳定、社区驱动、巨大的包仓库
+- **Ubuntu**：最流行、用户友好、社区强大
+  - **Ubuntu Server**：用于服务器和云
+  - **Ubuntu LTS**：长期支持（5 年）
+- **Linux Mint**：桌面导向、对初学者友好
 
-**Package Manager**: `apt`, `dpkg`
-**AI/ML Use**: Very common, excellent NVIDIA/CUDA support
+**包管理器**：`apt`、`dpkg`
+**AI/ML 用途**：非常常见，优秀的 NVIDIA/CUDA 支持
 
-#### 2. Red Hat Family
-**Red Hat Enterprise Linux (RHEL)**: Enterprise, commercial support
-- **CentOS**: Free RHEL clone (being replaced by Rocky/Alma)
-- **Fedora**: Cutting-edge, Red Hat sponsored
-- **Rocky Linux**: CentOS replacement
-- **AlmaLinux**: Another CentOS replacement
+#### 2. Red Hat 家族
+**Red Hat Enterprise Linux（RHEL）**：企业级、商业支持
+- **CentOS**：免费的 RHEL 克隆（正在被 Rocky/Alma 取代）
+- **Fedora**：前沿、Red Hat 赞助
+- **Rocky Linux**：CentOS 替代品
+- **AlmaLinux**：另一个 CentOS 替代品
 
-**Package Manager**: `yum`, `dnf`, `rpm`
-**AI/ML Use**: Common in enterprise environments
+**包管理器**：`yum`、`dnf`、`rpm`
+**AI/ML 用途**：在企业环境中常见
 
-#### 3. SUSE Family
-**SUSE Linux Enterprise**: Enterprise Linux, popular in Europe
-- **openSUSE**: Community version
+#### 3. SUSE 家族
+**SUSE Linux Enterprise**：企业级 Linux，在欧洲流行
+- **openSUSE**：社区版本
 
-**Package Manager**: `zypper`
-**AI/ML Use**: Less common but supported
+**包管理器**：`zypper`
+**AI/ML 用途**：不太常见但受支持
 
-#### 4. Arch Family
-**Arch Linux**: Rolling release, cutting-edge, DIY
-- **Manjaro**: User-friendly Arch derivative
+#### 4. Arch 家族
+**Arch Linux**：滚动发布、前沿、DIY
+- **Manjaro**：用户友好的 Arch 衍生版
 
-**Package Manager**: `pacman`
-**AI/ML Use**: Developer workstations, less common for production
+**包管理器**：`pacman`
+**AI/ML 用途**：开发者工作站，生产环境不太常见
 
-### Choosing a Distribution for AI Infrastructure
+### 为 AI 基础设施选择发行版
 
-**For Learning** (Recommended for this course):
-- **Ubuntu 22.04 LTS**: Best documentation, community support
-- **Ubuntu 20.04 LTS**: Still widely used, very stable
+**用于学习**（本课程推荐）：
+- **Ubuntu 22.04 LTS**：最佳文档、社区支持
+- **Ubuntu 20.04 LTS**：仍广泛使用，非常稳定
 
-**For Production**:
-- **Ubuntu Server LTS**: Cloud, GPU servers, ML platforms
-- **RHEL/Rocky/Alma**: Enterprise, regulated industries
-- **Amazon Linux 2**: AWS-optimized
+**用于生产**：
+- **Ubuntu Server LTS**：云、GPU 服务器、ML 平台
+- **RHEL/Rocky/Alma**：企业级、受监管行业
+- **Amazon Linux 2**：AWS 优化
 
-**Key Factors**:
-- LTS (Long Term Support) for stability
-- Hardware support (NVIDIA drivers, CUDA)
-- Package availability (ML frameworks)
-- Community size and documentation
-- Enterprise support needs
+**关键因素**：
+- LTS（长期支持）确保稳定性
+- 硬件支持（NVIDIA 驱动、CUDA）
+- 包可用性（ML 框架）
+- 社区规模和文档
+- 企业支持需求
 
-## Terminal Emulators and Shells
+## 终端模拟器和 Shell
 
-### What is a Terminal?
+### 什么是终端？
 
-A **terminal** is your interface to the command-line environment.
+**终端**是你与命令行环境的接口。
 
-**Historical Context**:
-- Originally: Physical hardware terminals (VT100, etc.)
-- Modern: Software emulators running in graphical environments
+**历史背景**：
+- 最初：物理硬件终端（VT100 等）
+- 现代：在图形环境中运行的软件模拟器
 
-### Common Terminal Emulators
+### 常见终端模拟器
 
-**Linux Desktop**:
-- **GNOME Terminal** (Ubuntu default)
-- **Konsole** (KDE)
-- **Terminator**: Split panes, advanced features
-- **Alacritty**: GPU-accelerated, fast
-- **Kitty**: GPU-based, modern
+**Linux 桌面**：
+- **GNOME Terminal**（Ubuntu 默认）
+- **Konsole**（KDE）
+- **Terminator**：分割面板、高级功能
+- **Alacritty**：GPU 加速、快速
+- **Kitty**：基于 GPU、现代
 
-**Remote Access**:
-- **SSH clients**: PuTTY (Windows), iTerm2 (macOS), built-in ssh
+**远程访问**：
+- **SSH 客户端**：PuTTY（Windows）、iTerm2（macOS）、内置 ssh
 
-**Professional Tools**:
-- **tmux**: Terminal multiplexer (split panes, persistence)
-- **screen**: Older multiplexer, still widely used
+**专业工具**：
+- **tmux**：终端复用器（分割面板、持久化）
+- **screen**：较老的复用器，仍广泛使用
 
-### Understanding Shells
+### 理解 Shell
 
-A **shell** is the command interpreter between you and the kernel.
+**Shell**是你和内核之间的命令解释器。
 
-#### Common Shells
+#### 常见 Shell
 
-**Bash (Bourne Again Shell)**:
-- Default on most Linux systems
-- Rich scripting capabilities
-- Extensive documentation
-- **Most common for AI infrastructure automation**
+**Bash（Bourne Again Shell）**：
+- 大多数 Linux 系统的默认 shell
+- 丰富的脚本能力
+- 广泛的文档
+- **AI 基础设施自动化的最常用 shell**
 
 ```bash
-# Check your current shell
+# 检查你当前的 shell
 echo $SHELL
 # /bin/bash
 
-# Bash version
+# Bash 版本
 bash --version
 # GNU bash, version 5.1.16
 ```
 
-**Zsh (Z Shell)**:
-- Advanced features, plugins
-- Oh-My-Zsh framework
-- Better auto-completion
-- Popular among developers
+**Zsh（Z Shell）**：
+- 高级特性、插件
+- Oh-My-Zsh 框架
+- 更好的自动补全
+- 在开发者中流行
 
 ```bash
-# Install zsh
+# 安装 zsh
 sudo apt install zsh
 
-# Change default shell
+# 更改默认 shell
 chsh -s $(which zsh)
 ```
 
-**Fish (Friendly Interactive Shell)**:
-- User-friendly, syntax highlighting
-- Auto-suggestions
-- Different syntax from bash
+**Fish（友好的交互式 Shell）**：
+- 用户友好、语法高亮
+- 自动建议
+- 与 bash 不同的语法
 
-**Sh (Bourne Shell)**:
-- Original Unix shell
-- POSIX-compliant, portable
-- Used for system scripts
+**Sh（Bourne Shell）**：
+- 原始 Unix shell
+- 符合 POSIX、可移植
+- 用于系统脚本
 
-#### Shell Comparison
+#### Shell 比较
 
-| Feature | Bash | Zsh | Fish | Sh |
+| 特性 | Bash | Zsh | Fish | Sh |
 |---------|------|-----|------|-----|
-| Portability | High | Medium | Low | Very High |
-| Scripting | Excellent | Excellent | Different | Basic |
-| Interactive | Good | Excellent | Excellent | Basic |
-| Compatibility | Standard | Bash-like | Unique | POSIX |
-| AI/ML Scripts | ✓✓✓ | ✓✓ | ✓ | ✓✓ |
+| 可移植性 | 高 | 中 | 低 | 非常高 |
+| 脚本能力 | 优秀 | 优秀 | 不同 | 基本 |
+| 交互式 | 好 | 优秀 | 优秀 | 基本 |
+| 兼容性 | 标准 | 类似 Bash | 独特 | POSIX |
+| AI/ML 脚本 | ✓✓✓ | ✓✓ | ✓ | ✓✓ |
 
-**Recommendation**: Learn Bash first. It's universal, standard for system administration and automation.
+**建议**：先学习 Bash。它是通用的，是系统管理和自动化的标准。
 
-## Basic Command Structure
+## 基本命令结构
 
-### Command Anatomy
+### 命令组成
 
 ```
 command [options] [arguments]
    │        │           │
-   │        │           └─ What to act on
-   │        └─ How to modify behavior
-   └─ What action to perform
+   │        │           └─ 操作对象
+   │        └─ 如何修改行为
+   └─ 要执行的操作
 ```
 
-**Examples**:
+**示例**：
 ```bash
-ls                      # Command only
-ls -l                   # Command + option
-ls -l /home            # Command + option + argument
-ls -la /home/alice     # Command + multiple options + argument
+ls                      # 仅命令
+ls -l                   # 命令 + 选项
+ls -l /home            # 命令 + 选项 + 参数
+ls -la /home/alice     # 命令 + 多个选项 + 参数
 ```
 
-### Options (Flags)
+### 选项（标志）
 
-**Short Options** (single hyphen):
+**短选项**（单短横线）：
 ```bash
-ls -l                   # Long format
-ls -a                   # Show all (including hidden)
-ls -h                   # Human-readable sizes
-ls -lah                 # Combine multiple options
+ls -l                   # 长格式
+ls -a                   # 显示所有（包括隐藏）
+ls -h                   # 人类可读大小
+ls -lah                 # 组合多个选项
 ```
 
-**Long Options** (double hyphen):
+**长选项**（双短横线）：
 ```bash
-ls --all                # Same as -a
-ls --human-readable     # Same as -h
-ls --help               # Show help
+ls --all                # 等同于 -a
+ls --human-readable     # 等同于 -h
+ls --help               # 显示帮助
 ```
 
-### Arguments
+### 参数
 
-Arguments specify what the command acts on:
+参数指定命令的操作对象：
 ```bash
-cat file.txt            # Display file.txt
-mkdir new_directory     # Create new_directory
-cp source.txt dest.txt  # Copy source to dest
+cat file.txt            # 显示 file.txt
+mkdir new_directory     # 创建 new_directory
+cp source.txt dest.txt  # 复制 source 到 dest
 ```
 
-### Common Command Patterns
+### 常见命令模式
 
-**List files**:
+**列出文件**：
 ```bash
-ls                      # Current directory
-ls /var/log            # Specific directory
-ls *.py                # Pattern matching (all Python files)
+ls                      # 当前目录
+ls /var/log            # 特定目录
+ls *.py                # 模式匹配（所有 Python 文件）
 ```
 
-**Navigate**:
+**导航**：
 ```bash
-pwd                     # Print working directory
-cd /home/alice         # Change to absolute path
-cd documents           # Change to relative path
-cd ..                  # Up one level
-cd ~                   # Home directory
-cd -                   # Previous directory
+pwd                     # 打印工作目录
+cd /home/alice         # 更改到绝对路径
+cd documents           # 更改到相对路径
+cd ..                  # 上一级
+cd ~                   # 主目录
+cd -                   # 上一个目录
 ```
 
-**File viewing**:
+**文件查看**：
 ```bash
-cat file.txt           # Display entire file
-head file.txt          # First 10 lines
-tail file.txt          # Last 10 lines
-tail -f logfile.log    # Follow file (real-time updates)
-less large_file.txt    # Page through file
+cat file.txt           # 显示整个文件
+head file.txt          # 前 10 行
+tail file.txt          # 最后 10 行
+tail -f logfile.log    # 跟踪文件（实时更新）
+less large_file.txt    # 分页浏览文件
 ```
 
-**System information**:
+**系统信息**：
 ```bash
-whoami                 # Current username
-hostname               # Computer name
-uname -a               # System information
-date                   # Current date/time
-uptime                 # System uptime
+whoami                 # 当前用户名
+hostname               # 计算机名
+uname -a               # 系统信息
+date                   # 当前日期/时间
+uptime                 # 系统运行时间
 ```
 
-### Special Characters
+### 特殊字符
 
-**Wildcards**:
+**通配符**：
 ```bash
-*                      # Match any characters
-?                      # Match single character
-[abc]                  # Match a, b, or c
-[0-9]                  # Match any digit
+*                      # 匹配任意字符
+?                      # 匹配单个字符
+[abc]                  # 匹配 a、b 或 c
+[0-9]                  # 匹配任意数字
 
-# Examples
-ls *.py                # All Python files
-ls file?.txt           # file1.txt, fileA.txt, etc.
-ls [a-z]*.log          # Logs starting with lowercase letter
+# 示例
+ls *.py                # 所有 Python 文件
+ls file?.txt           # file1.txt、fileA.txt 等
+ls [a-z]*.log          # 以小写字母开头的日志
 ```
 
-**Redirection**:
+**重定向**：
 ```bash
->                      # Redirect output to file (overwrite)
->>                     # Redirect output to file (append)
-<                      # Redirect input from file
-2>                     # Redirect stderr
-&>                     # Redirect stdout and stderr
+>                      # 将输出重定向到文件（覆盖）
+>>                     # 将输出重定向到文件（追加）
+<                      # 从文件重定向输入
+2>                     # 重定向 stderr
+&>                     # 重定向 stdout 和 stderr
 
-# Examples
-echo "Hello" > file.txt        # Write to file
-echo "World" >> file.txt       # Append to file
-python train.py > output.log   # Save output
-python train.py 2> error.log   # Save errors only
-python train.py &> all.log     # Save everything
+# 示例
+echo "Hello" > file.txt        # 写入文件
+echo "World" >> file.txt       # 追加到文件
+python train.py > output.log   # 保存输出
+python train.py 2> error.log   # 只保存错误
+python train.py &> all.log     # 保存所有内容
 ```
 
-**Pipes**:
+**管道**：
 ```bash
-|                      # Send output to next command
+|                      # 将输出发送到下一个命令
 
-# Examples
-ls -l | grep ".py"     # List then filter
-cat file.txt | wc -l   # Count lines
-ps aux | grep python   # Find Python processes
+# 示例
+ls -l | grep ".py"     # 列出然后过滤
+cat file.txt | wc -l   # 计算行数
+ps aux | grep python   # 查找 Python 进程
 ```
 
-**Background and Control**:
+**后台和控制**：
 ```bash
-&                      # Run in background
-Ctrl+C                 # Terminate current process
-Ctrl+Z                 # Suspend current process
-Ctrl+D                 # End input / logout
-Ctrl+L                 # Clear screen
+&                      # 在后台运行
+Ctrl+C                 # 终止当前进程
+Ctrl+Z                 # 挂起当前进程
+Ctrl+D                 # 结束输入/登出
+Ctrl+L                 # 清屏
 ```
 
-## Getting Help and Documentation
+## 获取帮助和文档
 
-### Man Pages (Manual)
+### Man 手册页（Manual）
 
-The primary documentation system in Linux:
+Linux 中的主要文档系统：
 
 ```bash
-# View manual for a command
+# 查看命令手册
 man ls
 man grep
 man python
 
-# Search man pages
-man -k "network"       # Search by keyword
-apropos "copy"         # Same as man -k
+# 搜索 man 手册页
+man -k "network"       # 按关键字搜索
+apropos "copy"         # 等同于 man -k
 
-# Man page sections
-man 1 passwd           # User commands
-man 5 passwd           # File formats
+# Man 手册页章节
+man 1 passwd           # 用户命令
+man 5 passwd           # 文件格式
 ```
 
-**Man Page Navigation**:
-- **Space**: Next page
-- **b**: Previous page
-- **/pattern**: Search forward
-- **?pattern**: Search backward
-- **n**: Next search result
-- **q**: Quit
+**Man 手册页导航**：
+- **Space**：下一页
+- **b**：上一页
+- **/pattern**：向前搜索
+- **?pattern**：向后搜索
+- **n**：下一个搜索结果
+- **q**：退出
 
-**Man Page Structure**:
+**Man 手册页结构**：
 ```
-NAME        - Command name and brief description
-SYNOPSIS    - Usage syntax
-DESCRIPTION - Detailed explanation
-OPTIONS     - Available flags and options
-EXAMPLES    - Usage examples
-SEE ALSO    - Related commands
+NAME        - 命令名和简要描述
+SYNOPSIS    - 使用语法
+DESCRIPTION - 详细解释
+OPTIONS     - 可用的标志和选项
+EXAMPLES    - 使用示例
+SEE ALSO    - 相关命令
 ```
 
-### Help Options
+### 帮助选项
 
-Most commands have built-in help:
+大多数命令有内置帮助：
 
 ```bash
-# Short help
+# 简短帮助
 ls --help
 grep --help
 python --help
 
-# Often shows:
-# - Usage syntax
-# - Common options
-# - Quick examples
+# 通常显示：
+# - 使用语法
+# - 常见选项
+# - 快速示例
 ```
 
-### Info Pages
+### Info 页面
 
-More detailed than man pages:
+比 man 手册页更详细：
 ```bash
 info ls
 info bash
 info coreutils
 ```
 
-### Command-Specific Documentation
+### 命令特定文档
 
 ```bash
-# Python help
+# Python 帮助
 python -m pydoc os
 
-# Git help
+# Git 帮助
 git help commit
 
-# Systemctl help
+# Systemctl 帮助
 systemctl --help
 ```
 
-### Online Resources
+### 在线资源
 
-**Official Documentation**:
-- Ubuntu Documentation: https://help.ubuntu.com
-- RHEL Documentation: https://access.redhat.com
-- Arch Wiki: https://wiki.archlinux.org (excellent even for other distros)
+**官方文档**：
+- Ubuntu 文档：https://help.ubuntu.com
+- RHEL 文档：https://access.redhat.com
+- Arch Wiki：https://wiki.archlinux.org（即使对其他发行版也很优秀）
 
-**Command Examples**:
-- **tldr**: Simplified man pages with examples
+**命令示例**：
+- **tldr**：简化的 man 手册页，带有示例
   ```bash
   sudo apt install tldr
   tldr tar
   tldr find
   ```
 
-- **cheat**: Community-driven cheat sheets
+- **cheat**：社区驱动的速查表
   ```bash
   pip install cheat
   cheat grep
   ```
 
-- **explainshell.com**: Web-based command explainer
+- **explainshell.com**：基于 web 的命令解释器
 
-**AI Infrastructure Specific**:
-- NVIDIA CUDA Documentation
-- Docker Documentation
-- Kubernetes Documentation
-- TensorFlow/PyTorch Installation Guides
+**AI 基础设施特定**：
+- NVIDIA CUDA 文档
+- Docker 文档
+- Kubernetes 文档
+- TensorFlow/PyTorch 安装指南
 
-## Environment Variables
+## 环境变量
 
-Environment variables store system configuration and paths.
+环境变量存储系统配置和路径。
 
-### Viewing Environment Variables
+### 查看环境变量
 
 ```bash
-# View all environment variables
+# 查看所有环境变量
 env
 printenv
 
-# View specific variable
+# 查看特定变量
 echo $HOME
 echo $USER
 echo $PATH
 printenv PATH
 ```
 
-### Common Environment Variables
+### 常见环境变量
 
-**System Variables**:
+**系统变量**：
 ```bash
-$HOME                  # User's home directory
-$USER                  # Current username
-$SHELL                 # Current shell
-$PWD                   # Present working directory
-$OLDPWD               # Previous directory
-$HOSTNAME             # Computer name
-$LANG                 # Language/locale
+$HOME                  # 用户的主目录
+$USER                  # 当前用户名
+$SHELL                 # 当前 shell
+$PWD                   # 当前工作目录
+$OLDPWD               # 上一个目录
+$HOSTNAME             # 计算机名
+$LANG                 # 语言/区域设置
 ```
 
-**$PATH - Command Search Path**:
+**$PATH - 命令搜索路径**：
 ```bash
 echo $PATH
 # /usr/local/bin:/usr/bin:/bin:/usr/games
 
-# How Linux finds commands:
+# Linux 如何查找命令：
 which python
-# Searches each directory in $PATH until found
+# 搜索 $PATH 中的每个目录，直到找到
 ```
 
-**AI/ML Specific Variables**:
+**AI/ML 特定变量**：
 ```bash
-# CUDA (GPU computing)
-$CUDA_VISIBLE_DEVICES  # Which GPUs to use
-$CUDA_HOME             # CUDA installation path
+# CUDA（GPU 计算）
+$CUDA_VISIBLE_DEVICES  # 要使用的 GPU
+$CUDA_HOME             # CUDA 安装路径
 
 # Python
-$PYTHONPATH            # Python module search path
-$VIRTUAL_ENV           # Active virtual environment
+$PYTHONPATH            # Python 模块搜索路径
+$VIRTUAL_ENV           # 激活的虚拟环境
 
 # TensorFlow
-$TF_CPP_MIN_LOG_LEVEL # TensorFlow logging level
+$TF_CPP_MIN_LOG_LEVEL # TensorFlow 日志级别
 ```
 
-### Setting Environment Variables
+### 设置环境变量
 
-**Temporary** (current session only):
+**临时**（仅当前会话）：
 ```bash
-# Set variable
+# 设置变量
 export MODEL_PATH="/models/production"
 export CUDA_VISIBLE_DEVICES=0
 
-# Use variable
+# 使用变量
 echo $MODEL_PATH
-python train.py  # Can access CUDA_VISIBLE_DEVICES
+python train.py  # 可以访问 CUDA_VISIBLE_DEVICES
 ```
 
-**Persistent** (across sessions):
+**持久**（跨会话）：
 ```bash
-# Add to ~/.bashrc (user-specific)
+# 添加到 ~/.bashrc（用户特定）
 echo 'export CUDA_HOME=/usr/local/cuda' >> ~/.bashrc
 source ~/.bashrc
 
-# Add to /etc/environment (system-wide)
+# 添加到 /etc/environment（系统级）
 sudo sh -c 'echo "MODEL_DIR=/opt/models" >> /etc/environment'
 ```
 
-### Practical AI Examples
+### 实用 AI 示例
 
-**GPU Selection**:
+**GPU 选择**：
 ```bash
-# Use GPU 0 only
+# 仅使用 GPU 0
 export CUDA_VISIBLE_DEVICES=0
 python train.py
 
-# Use GPUs 2 and 3
+# 使用 GPU 2 和 3
 export CUDA_VISIBLE_DEVICES=2,3
 python multi_gpu_train.py
 
-# Use CPU only (no GPU)
+# 仅使用 CPU（无 GPU）
 export CUDA_VISIBLE_DEVICES=""
 python cpu_train.py
 ```
 
-**Python Path Management**:
+**Python 路径管理**：
 ```bash
-# Add custom module directory
+# 添加自定义模块目录
 export PYTHONPATH="/opt/ml-project/src:$PYTHONPATH"
 python -c "import custom_module"
 ```
 
-**Model Configuration**:
+**模型配置**：
 ```bash
-# Set model path for application
+# 为应用设置模型路径
 export MODEL_PATH="/models/resnet50/model.h5"
 export CONFIG_PATH="/config/production.yaml"
-python serve.py  # Reads these variables
+python serve.py  # 读取这些变量
 ```
 
-## Best Practices for AI Infrastructure
+## AI 基础设施的最佳实践
 
-### 1. Use Absolute Paths in Production
+### 1. 在生产中使用绝对路径
 
 ```bash
-# Bad: Relies on current directory
+# 不好：依赖于当前目录
 python train.py --data data/train
 
-# Good: Explicit and unambiguous
+# 好：明确且无歧义
 python /opt/ml/train.py --data /data/ml/train
 ```
 
-### 2. Set Up Environment Properly
+### 2. 正确设置环境
 
 ```bash
-# Create a setup script for consistency
+# 创建设置脚本以确保一致性
 cat > ~/setup-ml-env.sh << 'EOF'
 #!/bin/bash
 export CUDA_HOME=/usr/local/cuda
@@ -618,27 +616,27 @@ export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
 export PYTHONPATH=/opt/ml-project/src:$PYTHONPATH
 EOF
 
-# Source before working
+# 工作前 source
 source ~/setup-ml-env.sh
 ```
 
-### 3. Document Your Environment
+### 3. 记录你的环境
 
 ```bash
-# Save environment for reproducibility
+# 为可重现性保存环境
 env | grep -E "(CUDA|PYTHON|MODEL)" > environment.txt
 
-# Save system information
+# 保存系统信息
 uname -a > system_info.txt
 lsb_release -a >> system_info.txt
 python --version >> system_info.txt
 nvidia-smi >> system_info.txt
 ```
 
-### 4. Use Version Control for Scripts
+### 4. 为脚本使用版本控制
 
 ```bash
-# Track your automation scripts
+# 跟踪你的自动化脚本
 mkdir -p ~/ml-scripts
 cd ~/ml-scripts
 git init
@@ -646,103 +644,103 @@ git add setup-env.sh deploy-model.sh
 git commit -m "Initial automation scripts"
 ```
 
-### 5. Leverage Tab Completion
+### 5. 利用 Tab 补全
 
 ```bash
-# Press TAB to auto-complete
-cd /var/lo<TAB>        # Completes to /var/log/
-python train<TAB>      # Shows train.py, train_v2.py, etc.
+# 按 TAB 自动补全
+cd /var/lo<TAB>        # 补全为 /var/log/
+python train<TAB>      # 显示 train.py、train_v2.py 等
 
-# Double TAB to show options
-ls --<TAB><TAB>        # Shows all --options
+# 按两次 TAB 显示选项
+ls --<TAB><TAB>        # 显示所有 -- 选项
 ```
 
-## Summary and Key Takeaways
+## 总结和要点
 
-### Essential Concepts
+### 基本概念
 
-**Linux Foundation**:
-- Born from Unix philosophy: simple, composable tools
-- Open source, community-driven
-- Industry standard for AI/ML infrastructure
+**Linux 基础**：
+- 诞生自 Unix 哲学：简单、可组合的工具
+- 开源、社区驱动
+- AI/ML 基础设施的行业标准
 
-**Distributions**:
-- Choose Ubuntu or RHEL family for production
-- LTS versions for stability
-- Package managers vary by family
+**发行版**：
+- 生产环境选择 Ubuntu 或 RHEL 家族
+- LTS 版本保证稳定性
+- 包管理器因家族而异
 
-**Command Line**:
-- Terminal + Shell = Your interface
-- Bash is standard for scripting and automation
-- Commands follow: `command [options] [arguments]`
+**命令行**：
+- 终端 + Shell = 你的界面
+- Bash 是脚本和自动化的标准
+- 命令遵循：`command [options] [arguments]`
 
-**Getting Help**:
-- `man command` for documentation
-- `command --help` for quick reference
-- Online resources (Arch Wiki, tldr, etc.)
+**获取帮助**：
+- `man command` 获取文档
+- `command --help` 获取快速参考
+- 在线资源（Arch Wiki、tldr 等）
 
-**Environment Variables**:
-- Configure system and applications
-- `$PATH`, `$HOME`, `$USER` are essential
-- AI-specific: `$CUDA_VISIBLE_DEVICES`, `$PYTHONPATH`
+**环境变量**：
+- 配置系统和应用程序
+- `$PATH`、`$HOME`、`$USER` 是基本变量
+- AI 特定：`$CUDA_VISIBLE_DEVICES`、`$PYTHONPATH`
 
-### Commands Introduced
+### 介绍的命令
 
 ```bash
-# Basic navigation
-pwd                    # Print working directory
-cd                     # Change directory
-ls                     # List files
+# 基本导航
+pwd                    # 打印工作目录
+cd                     # 更改目录
+ls                     # 列出文件
 
-# System information
-whoami                 # Current user
-hostname               # Computer name
-uname -a               # System details
+# 系统信息
+whoami                 # 当前用户
+hostname               # 计算机名
+uname -a               # 系统详情
 
-# Getting help
-man command            # Manual pages
-command --help         # Quick help
-info command           # Detailed info
+# 获取帮助
+man command            # 手册页
+command --help         # 快速帮助
+info command           # 详细信息
 
-# Environment
-env                    # View all variables
-echo $VARIABLE         # View specific variable
-export VAR=value       # Set variable
+# 环境
+env                    # 查看所有变量
+echo $VARIABLE         # 查看特定变量
+export VAR=value       # 设置变量
 ```
 
-### Best Practices
+### 最佳实践
 
-✅ Learn Bash - it's universal
-✅ Use man pages and help options
-✅ Leverage tab completion
-✅ Set up environment consistently
-✅ Document your configuration
-✅ Use absolute paths in production
-✅ Version control your scripts
-✅ Understand your distribution's package manager
+✅ 学习 Bash - 它是通用的
+✅ 使用 man 手册页和帮助选项
+✅ 利用 Tab 补全
+✅ 一致地设置环境
+✅ 记录你的配置
+✅ 在生产中使用绝对路径
+✅ 对脚本进行版本控制
+✅ 了解你的发行版的包管理器
 
-### AI Infrastructure Applications
+### AI 基础设施应用
 
-- Remote server management via SSH
-- GPU environment configuration
-- Python path and dependency management
-- Model deployment automation
-- System monitoring and logging
-- Distributed training orchestration
+- 通过 SSH 进行远程服务器管理
+- GPU 环境配置
+- Python 路径和依赖管理
+- 模型部署自动化
+- 系统监控和日志记录
+- 分布式训练编排
 
-### Next Steps
+### 下一步
 
-In **Lecture 02: File System and Navigation**, you'll learn:
-- Linux filesystem hierarchy
-- Advanced navigation techniques
-- File operations and management
-- Finding files quickly
-- Working with archives
-- Organizing ML projects
+在**讲座 02：文件系统和导航**中，你将学习：
+- Linux 文件系统层级
+- 高级导航技巧
+- 文件操作和管理
+- 快速查找文件
+- 使用归档文件
+- 组织 ML 项目
 
-### Practice Exercises
+### 练习
 
-1. Explore your Linux system:
+1. 探索你的 Linux 系统：
    ```bash
    uname -a
    lsb_release -a
@@ -750,7 +748,7 @@ In **Lecture 02: File System and Navigation**, you'll learn:
    echo $PATH
    ```
 
-2. Practice basic commands:
+2. 练习基本命令：
    ```bash
    pwd
    cd /tmp
@@ -759,20 +757,20 @@ In **Lecture 02: File System and Navigation**, you'll learn:
    hostname
    ```
 
-3. Read documentation:
+3. 阅读文档：
    ```bash
    man ls
    man bash
    ls --help
    ```
 
-4. Set up environment:
+4. 设置环境：
    ```bash
    export TEST_VAR="Hello Linux"
    echo $TEST_VAR
    ```
 
-5. Explore your system:
+5. 探索你的系统：
    ```bash
    which python
    which bash
@@ -781,32 +779,32 @@ In **Lecture 02: File System and Navigation**, you'll learn:
    pwd
    ```
 
-### Quick Reference Card
+### 快速参考卡
 
 ```bash
-# Navigation
-pwd                    # Where am I?
-cd <directory>         # Go to directory
-ls                     # List files
+# 导航
+pwd                    # 我在哪里？
+cd <directory>         # 前往目录
+ls                     # 列出文件
 
-# Help
-man <command>          # Full manual
-<command> --help       # Quick help
+# 帮助
+man <command>          # 完整手册
+<command> --help       # 快速帮助
 
-# Environment
-echo $VAR              # Show variable
-export VAR=value       # Set variable
-env                    # Show all variables
+# 环境
+echo $VAR              # 显示变量
+export VAR=value       # 设置变量
+env                    # 显示所有变量
 
-# System info
-whoami                 # Current user
-hostname               # Computer name
-uname -a               # System details
-date                   # Current date/time
+# 系统信息
+whoami                 # 当前用户
+hostname               # 计算机名
+uname -a               # 系统详情
+date                   # 当前日期/时间
 ```
 
 ---
 
-**End of Lecture 01**
+**讲座 01 结束**
 
-Continue to **Lecture 02: File System and Navigation** to learn the Linux filesystem structure and essential file operations for AI infrastructure work.
+继续学习**讲座 02：文件系统和导航**，了解 Linux 文件系统结构和 AI 基础设施工作的基本文件操作。

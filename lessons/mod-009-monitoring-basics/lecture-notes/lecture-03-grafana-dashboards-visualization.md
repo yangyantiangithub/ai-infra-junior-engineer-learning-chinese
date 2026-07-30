@@ -1,182 +1,182 @@
-# Lecture 03: Grafana Dashboards & Visualization for AI Infrastructure
+# Lecture 03：面向 AI 基础设施的 Grafana Dashboard 和可视化
 
-## Lecture Overview
-Grafana transforms raw Prometheus metrics into actionable insights by combining flexible dashboards, rich visualization options, and alerting workflows. This lecture shows how to design dashboards that accelerate on-call response, communicate platform health to stakeholders, and capture the nuances of AI/ML workloads. You will learn dashboard architecture, panel composition, Grafana data modeling, templating, sharing, provisioning, and alert configuration that complements your Prometheus pipeline.
+## 讲座概述
+Grafana 将原始 Prometheus metrics 转化为可操作的洞察，结合了灵活的 Dashboard、丰富的可视化选项和告警工作流。本讲座展示了如何设计加速 on-call 响应、向利益相关者传达平台健康状态以及捕捉 AI/ML 工作负载细微差别的 Dashboard。你将学习 Dashboard 架构、面板组成、Grafana 数据建模、模板化、共享、配置以及与 Prometheus 管道互补的告警配置。
 
-**Estimated Reading Time:** 70–85 minutes  
-**Hands-on Companion Lab:** Exercise 03 – Grafana Dashboards  
-**Prerequisite Knowledge:** Lectures 01–02, familiarity with Prometheus queries, awareness of target SLIs/SLOs.
-
----
-
-## 1. Introduction to Grafana
-
-### 1.1 Why Grafana?
-- **Unified observability:** Connects to Prometheus, Loki, Tempo, Elasticsearch, CloudWatch, Datadog, and more.
-- **Composable dashboards:** Drag-and-drop panels, repeatable layouts, variable templating.
-- **Alerting & reporting:** Define thresholds, route notifications, schedule reports.
-- **Collaboration:** Share dashboard snapshots, annotate timelines, embed in docs.
-- **Infrastructure-as-code:** Provision dashboards via JSON or Grafana provisioning files.
-
-### 1.2 Grafana Architecture
-- **Grafana server:** Handles authentication, data source configuration, dashboard rendering.
-- **Backend data sources:** Prometheus, Loki, etc. Grafana does not store time-series data by default (except for alerting state).
-- **Dashboards & folders:** Stored in Grafana’s database or via provisioned files.
-- **Alerting & notification policies:** Manage alert rules and contact points centrally.
-
-Grafana can be deployed via Docker, Kubernetes, or managed offerings (Grafana Cloud, AWS Managed Grafana). Multiple environments (dev/staging/prod) recommended to validate dashboards prior to production.
+**预计阅读时间：** 70–85 分钟  
+**动手配套实验：** Exercise 03 – Grafana Dashboard  
+**前置知识：** Lectures 01–02、熟悉 Prometheus 查询、了解目标 SLI/SLO。
 
 ---
 
-## 2. Dashboard Strategy & Information Architecture
+## 1. Grafana 简介
 
-### 2.1 Dashboard Taxonomy
-1. **Landing Dashboard (Executive Overview):**
-   - Business KPIs, SLO adherence, incident status.
-   - Suitable for leadership, product management.
-2. **Service Dashboard (On-call Triage):**
-   - High-cardinality metrics, latency histograms, error breakdowns, resource saturation.
-   - Targets on-call engineers.
-3. **Subsystem Dashboard (Focused):**
-   - Specific components (feature store, training pipeline, inference gateway).
-   - Deep dive for owners.
-4. **Operational Runbooks:**
-   - Panel + instructions for recurring tasks (capacity planning, deployment readiness).
-5. **Experiment / Analytics Dashboard:**
-   - Model performance metrics, A/B test outcomes, cost dashboards.
+### 1.1 为什么选择 Grafana？
+- **统一的可观测性：** 连接到 Prometheus、Loki、Tempo、Elasticsearch、CloudWatch、Datadog 等
+- **可组合的 Dashboard：** 拖放面板、可重复布局、变量模板化
+- **告警和报告：** 定义阈值、路由通知、安排报告
+- **协作：** 共享 Dashboard 快照、注释时间线、嵌入文档
+- **基础设施即代码：** 通过 JSON 或 Grafana provisioning 文件配置 Dashboard
 
-### 2.2 Layout Principles
-- **Narrative Flow:** Arrange panels from top-level health to granular diagnostics (left-to-right or top-to-bottom).
-- **Focus on Actions:** On-call dashboards should emphasize SLI compliance, error budget burn, alerts, capacity.
-- **Avoid Clutter:** Limit to 6–8 panels per row; use tabs for supplementary data.
-- **Responsive Design:** Use row collapses, navigation links, and consistent panel heights to support different screen sizes.
-- **Color semantics:** Red = critical, orange = warning, green = healthy; maintain consistent thresholds across dashboards.
+### 1.2 Grafana 架构
+- **Grafana server：** 处理身份验证、数据源配置、Dashboard 渲染
+- **后端数据源：** Prometheus、Loki 等。Grafana 默认不存储时间序列数据（告警状态除外）
+- **Dashboard 和文件夹：** 存储在 Grafana 的数据库中或通过 provisioned 文件存储
+- **告警和通知策略：** 集中管理告警规则和联系人点
 
-### 2.3 Collaborating Across Teams
-- Define ownership metadata (panel description includes owner + Slack channel).
-- Establish review cadence (e.g., monthly dashboard audits).
-- Gather feedback from stakeholders (what questions are they attempting to answer?).
+Grafana 可以通过 Docker、Kubernetes 或托管服务（Grafana Cloud、AWS Managed Grafana）部署。建议使用多个环境（dev/staging/prod）在生产之前验证 Dashboard。
 
 ---
 
-## 3. Data Source Configuration
+## 2. Dashboard 策略和信息架构
 
-### 3.1 Prometheus Data Source
-1. Access Grafana UI → **Configuration** → **Data sources** → **Add data source** → Prometheus.
-2. Provide URL (e.g., `http://prometheus:9090` in Docker Compose).
-3. Configure authentication (basic auth, TLS certs, bearer token).
-4. Enable/disable query caching (Grafana OSS v10+).
-5. Save & test connection.
+### 2.1 Dashboard 分类
+1. **着陆 Dashboard（执行概览）：**
+   - 业务 KPI、SLO 遵守情况、事件状态
+   - 适用于领导层、产品管理
+2. **服务 Dashboard（On-call 分流）：**
+   - 高基数指标、延迟直方图、错误分解、资源饱和
+   - 面向 on-call 工程师
+3. **子系统 Dashboard（聚焦）：**
+   - 特定组件（特征存储、训练管道、推理网关）
+   - 供所有者深入分析
+4. **操作 Runbooks：**
+   - 针对重复任务的面板 + 说明（容量规划、部署就绪）
+5. **实验/分析 Dashboard：**
+   - 模型性能指标、A/B 测试结果、成本 Dashboard
 
-### 3.2 Additional Sources
-- **Loki:** For logs; combine with panels to correlate metrics and log events.
-- **Tempo/Jaeger:** Distributed tracing; use exemplars to link to traces.
-- **Elasticsearch/OpenSearch:** Query log indices and connect via Loki/Elastic panels.
-- **PostgreSQL/BigQuery:** For business metrics, cost data.
+### 2.2 布局原则
+- **叙事流程：** 从顶层健康状态排列面板到细粒度诊断（从左到右或从上到下）
+- **聚焦行动：** On-call Dashboard 应强调 SLI 合规、error budget burn、告警、容量
+- **避免杂乱：** 每行限制 6-8 个面板；使用选项卡管理补充数据
+- **响应式设计：** 使用行折叠、导航链接和一致的面板高度以支持不同屏幕尺寸
+- **颜色语义：** 红色=严重、橙色=警告、绿色=健康；跨 Dashboard 保持一致阈值
 
-Unified dashboards often combine multiple data sources for context: metrics + logs + traces + incidents.
-
----
-
-## 4. Building Panels that Drive Action
-
-### 4.1 Panel Types
-- **Time series:** Default Prometheus visualization; supports annotations, stacked series.
-- **Stat:** Single value with thresholds; great for SLO compliance, cost.
-- **Table:** Display top-N lists, aggregated metrics (`sum by` results).
-- **Bar gauge:** Visualize distribution, queue length.
-- **Heatmap:** Model performance across cohorts, GPU utilization vs time.
-- **Histogram:** Latency buckets, inference time distribution.
-- **Logs & Traces:** Embedded panels for Loki, Tempo.
-- **Geomap:** Regional traffic distribution (if geospatial data available).
-
-### 4.2 Best Practices
-- Normalize units (ms vs seconds, bytes vs mebibytes).
-- Set appropriate time ranges (default 6 hours for on-call, 30 days for exec dashboards).
-- Provide panel descriptions and drilling guidance (e.g., “Click to view traces in Tempo via exemplar”).
-- Align axes across similar panels to compare trends.
-- Use transformations to enrich data (calculate percentages, rename fields, merge results).
-
-### 4.3 Example Panel: Inference Latency
-- **Query:** `histogram_quantile(0.99, sum(rate(ai_infra_inference_latency_seconds_bucket[5m])) by (le))`
-- **Visualization:** Time series with thresholds at 200ms (warning), 300ms (critical).
-- **Annotations:** Deploy events via Grafana annotations (link to Git SHA, change log).
-- **Transformations:** Add 7-day moving average for trend detection.
-
-### 4.4 Example Panel: GPU Fleet Health
-- **Query:** `avg by (cluster, gpu) (DCGM_FI_DEV_GPU_UTIL)`
-- **Panel Type:** Heatmap (GPU ID vs time).
-- **Thresholds:** Highlight >85% utilization sustained for >30 min.
-- **Drilldown:** Panel links to GPU node dashboard with node exporter metrics.
+### 2.3 跨团队协作
+- 定义所有权元数据（面板描述包含所有者 + Slack 频道）
+- 建立审查节奏（例如：月度 Dashboard 审计）
+- 收集利益相关者的反馈（他们试图回答什么问题？）
 
 ---
 
-## 5. Dashboard Templating & Variables
+## 3. 数据源配置
 
-### 5.1 Variable Types
-- **Query variables:** Dynamic lists from Prometheus (e.g., `label_values(job)`).
-- **Constant variables:** Hard-coded values reused across panels.
-- **Interval variables:** Control range vector durations (e.g., `5m`, `1h`).
-- **Custom variables:** Manual enumerations (`prod`, `staging`, `dev`).
-- **Datasource variables:** Switch between clusters without duplicating dashboards.
+### 3.1 Prometheus 数据源
+1. 访问 Grafana UI → **Configuration** → **Data sources** → **Add data source** → Prometheus
+2. 提供 URL（例如：Docker Compose 中的 `http://prometheus:9090`）
+3. 配置身份验证（basic auth、TLS 证书、bearer token）
+4. 启用/禁用查询缓存（Grafana OSS v10+）
+5. 保存并测试连接
 
-### 5.2 Creating Variables
-1. Dashboard settings → Variables → Add variable.
-2. Example: `cluster` variable using label values.
+### 3.2 其他数据源
+- **Loki：** 用于日志；结合面板关联 metrics 和日志事件
+- **Tempo/Jaeger：** 分布式 tracing；使用 exemplars 链接到 traces
+- **Elasticsearch/OpenSearch：** 查询日志索引并通过 Loki/Elastic 面板连接
+- **PostgreSQL/BigQuery：** 用于业务指标、成本数据
+
+统一的 Dashboard 通常结合多个数据源以获得上下文：metrics + logs + traces + 事件。
+
+---
+
+## 4. 构建驱动行动的面板
+
+### 4.1 面板类型
+- **Time series：** 默认的 Prometheus 可视化；支持注释、堆叠序列
+- **Stat：** 带阈值的单值；非常适合 SLO 合规、成本
+- **Table：** 显示 Top-N 列表、聚合指标（`sum by` 结果）
+- **Bar gauge：** 可视化分布、队列长度
+- **Heatmap：** 跨群体的模型性能、GPU 利用率与时间
+- **Histogram：** 延迟桶、推理时间分布
+- **Logs & Traces：** 用于 Loki、Tempo 的嵌入面板
+- **Geomap：** 区域流量分布（如果有地理空间数据）
+
+### 4.2 最佳实践
+- 标准化单位（ms vs 秒、bytes vs mebibytes）
+- 设置适当的时间范围（on-call 默认 6 小时、执行 Dashboard 30 天）
+- 提供面板描述和钻取指南（例如："点击通过 exemplar 在 Tempo 中查看 traces"）
+- 对齐相似面板的坐标轴以比较趋势
+- 使用转换来丰富数据（计算百分比、重命名字段、合并结果）
+
+### 4.3 示例面板：推理延迟
+- **查询：** `histogram_quantile(0.99, sum(rate(ai_infra_inference_latency_seconds_bucket[5m])) by (le))`
+- **可视化：** 时间序列，阈值设为 200ms（警告）、300ms（严重）
+- **注释：** 通过 Grafana 注释部署事件（链接到 Git SHA、变更日志）
+- **转换：** 添加 7 天移动平均线用于趋势检测
+
+### 4.4 示例面板：GPU 集群健康
+- **查询：** `avg by (cluster, gpu) (DCGM_FI_DEV_GPU_UTIL)`
+- **面板类型：** Heatmap（GPU ID vs 时间）
+- **阈值：** 高亮 >85% 利用率持续 >30 分钟
+- **钻取：** 面板链接到带有 node exporter 指标的 GPU 节点 Dashboard
+
+---
+
+## 5. Dashboard 模板化与变量
+
+### 5.1 变量类型
+- **Query variables：** 来自 Prometheus 的动态列表（例如：`label_values(job)`）
+- **Constant variables：** 跨面板复用的硬编码值
+- **Interval variables：** 控制 range vector 持续时间（例如：`5m`、`1h`）
+- **Custom variables：** 手动枚举（`prod`、`staging`、`dev`）
+- **Datasource variables：** 无需复制 Dashboard 即可在集群间切换
+
+### 5.2 创建变量
+1. Dashboard 设置 → Variables → Add variable
+2. 示例：使用 label values 的 `cluster` 变量
    ```promql
    label_values(kube_pod_info, cluster)
    ```
-3. Use `${cluster}` in queries: `rate(ai_infra_inference_requests_total{cluster="${cluster}"}[5m])`.
-4. Chain variables (e.g., select `team`, filter `service` variable by team label).
+3. 在查询中使用 `${cluster}`：`rate(ai_infra_inference_requests_total{cluster="${cluster}"}[5m])`
+4. 链式变量（例如：选择 `team`，按 team label 过滤 `service` 变量）
 
-### 5.3 Repeating Panels & Rows
-- Repeat panel across variable values (per region, per model).
-- Combine with dynamic thresholds (panel overrides).
-- Ensure dashboards remain performant (limit repeats for high cardinality; consider pagination via custom filters).
+### 5.3 重复面板和行
+- 跨变量值重复面板（按区域、按模型）
+- 结合动态阈值（面板覆盖）
+- 确保 Dashboard 保持性能（对高基数限制重复；考虑通过自定义过滤器进行分页）
 
 ---
 
-## 6. Grafana Alerting
+## 6. Grafana 告警
 
-### 6.1 Alert Rule Types
-- **Grafana managed alerts (Unified Alerting):** Works across data sources.
-- **Prometheus alerting integration:** Use Prometheus alert rules; Grafana displays via Alertmanager data source.
+### 6.1 告警规则类型
+- **Grafana 管理告警（统一告警）：** 跨数据源工作
+- **Prometheus 告警集成：** 使用 Prometheus 告警规则；Grafana 通过 Alertmanager 数据源显示
 
-### 6.2 Creating an Alert Rule
-1. Select panel → Alert tab → “Create alert rule from panel”.
-2. Define query, reduction (last, avg), condition (is above/below threshold).
-3. Configure evaluation interval, no-data behavior, for duration.
-4. Set alert rule labels (service, severity, environment).
-5. Map to contact points (Slack, email, PagerDuty).
+### 6.2 创建告警规则
+1. 选择面板 → Alert 标签 → "Create alert rule from panel"
+2. 定义查询、缩减（last、avg）、条件（高于/低于阈值）
+3. 配置评估间隔、无数据行为、持续持续时间
+4. 设置告警规则 labels（service、severity、environment）
+5. 映射到联系人点（Slack、email、PagerDuty）
 
-**Example:** Alert when inference error rate >1% for 10 minutes.
+**示例：** 当推理错误率 >1% 持续 10 分钟时告警
 ```promql
 sum(rate(ai_infra_inference_errors_total{cluster="${cluster}"}[5m])) /
 sum(rate(ai_infra_inference_requests_total{cluster="${cluster}"}[5m])) * 100
 ```
-Condition: `WHEN last() OF query (A) IS ABOVE 1`.
+条件：`WHEN last() OF query (A) IS ABOVE 1`。
 
-### 6.3 Alert Grouping & Routing
-- Configure notification policies (Grafana Alerting UI):
-  - Group alerts by `cluster` and `service`.
-  - Route severity=critical to on-call pager; severity=warning to Slack channel.
-- Set silence windows for planned maintenance; use labels for automation (e.g., `maintenance="true"` suppresses alerts).
+### 6.3 告警分组和路由
+- 配置通知策略（Grafana Alerting UI）：
+  - 按 `cluster` 和 `service` 分组告警
+  - 将 severity=critical 路由到 on-call 寻呼器；severity=warning 路由到 Slack 频道
+- 为计划维护设置静默窗口；使用 labels 实现自动化（例如：`maintenance="true"` 抑制告警）
 
-### 6.4 Alert Runbooks
-- Link to runbooks using panel descriptions or annotations (`go/runbook-inference-latency`).
-- Include steps: log queries, dashboard sections, rollbacks.
+### 6.4 告警 Runbooks
+- 使用面板描述或注释链接到 runbook（`go/runbook-inference-latency`）
+- 包含步骤：日志查询、Dashboard 部分、回滚
 
 ---
 
-## 7. Provisioning Dashboards as Code
+## 7. 将 Dashboard 作为代码配置
 
-### 7.1 Why Provision?
-- Ensure consistency across environments.
-- Enable code review, testing, and versioning in Git.
-- Automate deployments via CI/CD or GitOps (e.g., Argo CD, Flux).
+### 7.1 为什么要配置？
+- 确保环境间的一致性
+- 在 Git 中实现代码审查、测试和版本控制
+- 通过 CI/CD 或 GitOps 自动化部署（例如：Argo CD、Flux）
 
-### 7.2 Folder Provisioning
-`provisioning/dashboards/dashboard.yml`:
+### 7.2 文件夹配置
+`provisioning/dashboards/dashboard.yml`：
 ```yaml
 apiVersion: 1
 providers:
@@ -189,173 +189,173 @@ providers:
       path: /var/lib/grafana/dashboards
 ```
 
-Dashboard JSON stored under `/var/lib/grafana/dashboards/`. Generate JSON via Grafana UI (Dashboard → Share → Export).
+Dashboard JSON 存储在 `/var/lib/grafana/dashboards/` 下。通过 Grafana UI 生成 JSON（Dashboard → Share → Export）。
 
 ### 7.3 Terraform Provider
-- Use `grafana_dashboard` resource to manage dashboards via Terraform.
-- Combine with `grafana_folder`, `grafana_data_source`, and `grafana_notification_policy`.
+- 使用 `grafana_dashboard` 资源通过 Terraform 管理 Dashboard
+- 结合 `grafana_folder`、`grafana_data_source` 和 `grafana_notification_policy`
 
-### 7.4 Testing Dashboards-as-Code
-- Use `grafana-toolkit` or `grizzly` for validating JSON dashboards.
-- Add CI check to lint JSON, confirm required panels exist, variable queries valid.
+### 7.4 测试 Dashboard 即代码
+- 使用 `grafana-toolkit` 或 `grizzly` 验证 JSON Dashboard
+- 添加 CI 检查以 lint JSON、确认必需面板存在、变量查询有效
 
 ---
 
-## 8. Enhancing Dashboards with Annotations & Exemplars
+## 8. 使用注释和 Exemplars 增强 Dashboard
 
-### 8.1 Annotations
-- Mark deploys, incidents, feature flags directly on time-series charts.
-- Integrate with GitOps pipeline (e.g., Argo CD posts annotation via Grafana API).
-- Provide context: “Model version 2025-10-17 deployed” or “Incident INC-2245 resolved”.
+### 8.1 注释
+- 直接在时间序列图表上标记部署、事件、功能开关
+- 与 GitOps 管道集成（例如：Argo CD 通过 Grafana API 发布注释）
+- 提供上下文："Model version 2025-10-17 deployed" 或 "Event INC-2245 resolved"
 
 ### 8.2 Exemplars
-- Combine metrics with trace exemplars by enabling exemplars in Prometheus (OpenTelemetry instrumentation).
-- Hover over high latency data point → link to specific trace in Tempo/Jaeger.
-- Helps root cause latency spikes faster by correlating metrics with request traces.
+- 通过在 Prometheus 中启用 exemplars（OpenTelemetry 检测）将指标与 trace exemplars 相结合
+- 悬停在高延迟数据点上 → 链接到 Tempo/Jaeger 中的特定 trace
+- 通过将指标与请求 traces 关联，帮助更快地定位延迟峰值根因
 
 ---
 
-## 9. Case Studies & Panel Recipes
+## 9. 案例研究和面板配方
 
-### 9.1 Inference Gateway Dashboard
-**Sections:**
-1. **SLI Overview:** Stat panels for 99% latency, error rate, request volume, error budget remaining.
-2. **Latency Breakdown:** Time series for P50/P90/P99, histogram bucket heatmap.
-3. **Traffic & Errors:** Stacked area for request rate per status code; table listing top error codes by region.
-4. **Resources:** GPU utilization heatmap, pod CPU/memory saturation.
-5. **Experiments:** Feature toggle state, canary vs baseline comparison.
-6. **Alerts & Runbooks:** Panel linking to open incidents, runbook link, pager state.
+### 9.1 推理网关 Dashboard
+**部分：**
+1. **SLI 概览：** 99% 延迟、错误率、请求量、剩余 error budget 的 Stat 面板
+2. **延迟分解：** P50/P90/P99 时间序列、直方图桶热力图
+3. **流量和错误：** 按状态码分请求率的堆叠面积图；按区域列出前十大错误码
+4. **资源：** GPU 利用率热力图、Pod CPU/内存饱和
+5. **实验：** 功能开关状态、金丝雀与基线对比
+6. **告警和 Runbooks：** 链接到开放事件、runbook 链接、寻呼器状态的面板
 
-**Key Panels:**
+**关键面板：**
 - `histogram_quantile(0.99, sum(rate(ai_infra_inference_latency_seconds_bucket[5m])) by (le))`
 - `sum by (status) (rate(ai_infra_inference_requests_total[5m]))`
 - `avg by (deployment) (container_cpu_utilization_seconds_total{container="inference-gateway"})`
 
-### 9.2 Training Pipeline Dashboard
-Focus on orchestrator (Airflow/Kubeflow):
-1. DAG success/failure ratios.
-2. Task duration by type (ETL, feature engineering, training).
-3. Resource usage (CPU/GPU hours).
-4. Queue length and backlog metrics.
-5. Cost per run (combine with FinOps data source).
-6. Alert summary (delayed DAGs, repeated failures).
+### 9.2 训练管道 Dashboard
+聚焦编排器（Airflow/Kubeflow）：
+1. DAG 成功/失败比率
+2. 按类型的任务持续时间（ETL、特征工程、训练）
+3. 资源使用情况（CPU/GPU 小时）
+4. 队列长度和积压指标
+5. 每次运行的成本（结合 FinOps 数据源）
+6. 告警摘要（延迟的 DAG、重复的失败）
 
-### 9.3 Data Quality Dashboard
-Leverage metrics from Great Expectations / custom checks:
-- Freshness for feature tables (stat panel + sparklines).
-- Null ratio trends per feature.
-- Schema drift detection (table with latest alerts).
-- Data validation failure counts by severity.
-- Impact analysis (downstream models affected).
+### 9.3 数据质量 Dashboard
+利用 Great Expectations / 自定义检查的指标：
+- 特征表的新鲜度（stat 面板 + sparklines）
+- 每个特征的空值比率趋势
+- Schema 漂移检测（包含最新告警的表）
+- 按严重程度的数据验证失败计数
+- 影响分析（受影响的下游模型）
 
 ---
 
-## 10. Access Control & Collaboration
+## 10. 访问控制与协作
 
 ### 10.1 RBAC
-- Grafana roles: Viewer, Editor, Admin.
-- Use folder permissions to restrict sensitive dashboards (e.g., compliance metrics).
-- integrate SSO via OAuth, SAML, or LDAP (Okta, Azure AD).
+- Grafana 角色：Viewer、Editor、Admin
+- 使用文件夹权限限制敏感 Dashboard（例如：合规指标）
+- 通过 OAuth、SAML 或 LDAP 集成 SSO（Okta、Azure AD）
 
-### 10.2 Sharing Dashboards
-- **Snapshot sharing:** Generates JSON snapshot; scrub sensitive data before sharing externally.
-- **Embed mode:** iFrames for internal portals (ensure authentication).
-- **Public dashboards:** Use caution; restrict to sanitized data.
+### 10.2 共享 Dashboard
+- **Snapshot sharing：** 生成 JSON 快照；在外部共享前清除敏感数据
+- **Embed 模式：** 用于内部门户的 iFrames（确保身份验证）
+- **Public dashboards：** 谨慎使用；仅限于经过清理的数据
 
-### 10.3 Documentation
-- Every dashboard should link to documentation in README or Confluence.
-- Provide “How to interpret this dashboard” section: what normal looks like, known caveats.
-- Store screenshot updates for training materials (on-call runbook).
-
----
-
-## 11. Performance Optimization
-
-### 11.1 Query Optimization
-- Use recording rules for heavy PromQL expressions.
-- Cache queries (Grafana Enterprise/Cloud) or run Grafana in front of Mimir/Thanos with query caching.
-- Limit dashboard time range for expensive panels; use panel-specific time range.
-- Avoid repeating panels with high-cardinality queries.
-
-### 11.2 Dashboard Performance Diagnostics
-- Grafana Explore → `Profile` to check query timings.
-- Examine Prometheus metrics: `grafana_http_request_duration_seconds`.
-- Monitor Grafana backend load (CPU, memory).
-- Evaluate nested transformations and reduce complexity if dashboard is slow.
+### 10.3 文档
+- 每个 Dashboard 应链接到 README 或 Confluence 中的文档
+- 提供"如何解读此 Dashboard"部分：什么样子是正常的、已知注意事项
+- 为培训材料存储屏幕截图更新（on-call runbook）
 
 ---
 
-## 12. Integrating Logs & Traces
+## 11. 性能优化
 
-### 12.1 Logs Panel (Loki)
-- Add Loki data source.
-- Create panel with log query: `{app="inference-gateway", level="error"} |= "timeout"`.
-- Use log labels to pivot by region, model, customer.
-- Combine with Prometheus panel using dashboard links.
+### 11.1 查询优化
+- 为重型 PromQL 表达式使用 recording rules
+- 缓存查询（Grafana Enterprise/Cloud）或在带查询缓存的 Mimir/Thanos 前运行 Grafana
+- 限制昂贵面板的 Dashboard 时间范围；使用面板特定的时间范围
+- 避免使用高基数查询重复面板
 
-### 12.2 Trace Panel (Tempo/Jaeger)
-- Query for slowest spans: `service="inference-gateway" operation="GET /predict"`.
-- Enable exemplars by instrumenting service with OpenTelemetry; attach trace IDs to Prometheus metrics (`exemplars`).
-
-### 12.3 Unified Observability Flow
-- Panel correlates metrics (latency), logs (errors), trace (call graph). Provide “Investigate in Tempo” button.
-- Document workflow in runbook: start with metrics panel → click exemplar → inspect trace → open relevant logs.
+### 11.2 Dashboard 性能诊断
+- Grafana Explore → `Profile` 检查查询时间
+- 检查 Prometheus 指标：`grafana_http_request_duration_seconds`
+- 监控 Grafana 后端负载（CPU、内存）
+- 评估嵌套转换，如果 Dashboard 缓慢则降低复杂度
 
 ---
 
-## 13. Compliance, Auditing & Cost Visibility
+## 12. 集成日志和 Traces
 
-### 13.1 Audit Trails
-- Grafana keeps audit logs (Enterprise feature) or integrate with logging pipeline capturing dashboard changes, user actions.
-- Ensure dashboards tracking PII follow governance (masking, restricted view).
+### 12.1 Logs Panel（Loki）
+- 添加 Loki 数据源
+- 创建带日志查询的面板：`{app="inference-gateway", level="error"} |= "timeout"`
+- 使用日志 labels 按区域、模型、客户进行透视
+- 结合 Dashboard 链接的 Prometheus 面板
 
-### 13.2 Cost Dashboards
-- Import cost data (AWS CUR, GCP billing export).
-- Combine ingestion cost, GPU cost, storage cost with usage metrics.
-- Compute cost per 1,000 predictions, cost per training epoch.
-- Provide FinOps and leadership visibility into spend vs budget.
+### 12.2 Trace Panel（Tempo/Jaeger）
+- 查询最慢的 spans：`service="inference-gateway" operation="GET /predict"`
+- 通过使用 OpenTelemetry 检测服务启用 exemplars；将 trace ID 附加到 Prometheus 指标（`exemplars`）
 
-### 13.3 Compliance Monitoring
-- Create dashboards for security policy adherence: TLS certificate expiration, unauthorized access attempts, drift in compliance metrics (e.g., fairness).
-- Pair with alerting for compliance breaches.
-
----
-
-## 14. Practical Checklist
-- [ ] Add Prometheus, Loki, and Tempo data sources with validated connections.
-- [ ] Create template variables for environment, cluster, team, and model.
-- [ ] Build inference gateway dashboard with latency, error rate, saturation, and SLO panels.
-- [ ] Configure Grafana alert for error rate >1% over 10 minutes routed to on-call.
-- [ ] Provision dashboards via code and commit to Git repository.
-- [ ] Document dashboard purpose, owner, and runbook link in panel descriptions.
-- [ ] Schedule monthly dashboard review to prune outdated panels.
+### 12.3 统一可观测性流程
+- 面板关联 metrics（延迟）、logs（错误）、trace（调用图）。提供"在 Tempo 中调查"按钮
+- 在 runbook 中记录工作流：从 metrics 面板开始 → 点击 exemplar → 检查 trace → 打开相关日志
 
 ---
 
-## 15. Knowledge Check
-1. How would you structure dashboards for executives vs on-call engineers? Provide specific examples.
-2. When should you rely on recording rules vs live PromQL queries in Grafana?
-3. Describe the steps to add a variable that filters dashboards by `team`.
-4. Explain how exemplars link metrics to traces and why they matter for latency investigations.
-5. Outline a process for provisioning dashboards-as-code and validating them before deployment.
+## 13. 合规、审计与成本可见性
+
+### 13.1 审计跟踪
+- Grafana 保留审计日志（企业功能）或与捕获 Dashboard 更改、用户操作的日志管道集成
+- 确保跟踪 PII 的 Dashboard 遵循治理（脱敏、受限视图）
+
+### 13.2 成本 Dashboard
+- 导入成本数据（AWS CUR、GCP 账单导出）
+- 将摄入成本、GPU 成本、存储成本与使用指标结合
+- 计算每 1000 次预测的成本、每训练周期的成本
+- 为 FinOps 和领导层提供支出与预算的可见性
+
+### 13.3 合规监控
+- 为安全策略遵守创建 Dashboard：TLS 证书过期、未授权访问尝试、合规指标漂移（例如：公平性）
+- 配合告警以应对合规违规
 
 ---
 
-## 16. Additional Resources
+## 14. 实践检查清单
+- [ ] 添加 Prometheus、Loki 和 Tempo 数据源并验证连接
+- [ ] 为环境、集群、团队和模型创建模板变量
+- [ ] 构建推理网关 Dashboard，包含延迟、错误率、饱和度和 SLO 面板
+- [ ] 配置 Grafana 告警，错误率 >1% 持续 10 分钟路由到 on-call
+- [ ] 通过代码配置 Dashboard 并提交到 Git 仓库
+- [ ] 在面板描述中记录 Dashboard 目的、所有者和 runbook 链接
+- [ ] 安排月度 Dashboard 审查以修剪过时的面板
+
+---
+
+## 15. 知识检查
+1. 你会如何为管理层与 on-call 工程师构建 Dashboard？提供具体示例
+2. 什么时候应该依赖 recording rules vs 在 Grafana 中实时 PromQL 查询？
+3. 描述添加按 `team` 过滤 Dashboard 的变量的步骤
+4. 解释 exemplars 如何将指标链接到 traces，以及为什么它们对延迟调查很重要
+5. 概述将 Dashboard 作为代码配置并在部署前验证的流程
+
+---
+
+## 16. 附加资源
 - Grafana Labs Tutorials (https://grafana.com/tutorials/)
-- “Building Effective Dashboards” (GrafanaCON talks).
-- Grafana Play (https://play.grafana.org) for live examples.
-- “Observability Engineering” (Chapters on dashboard design).
-- Grafana Terraform provider documentation.
-- Honeycomb + Grafana blog posts on SLO dashboards.
+- "Building Effective Dashboards"（GrafanaCON talks）
+- Grafana Play (https://play.grafana.org) 查看实时示例
+- "Observability Engineering"（Dashboard 设计章节）
+- Grafana Terraform provider 文档
+- Honeycomb + Grafana 关于 SLO Dashboard 的博客文章
 
 ---
 
-## 17. Summary
-- Grafana bridges the gap between raw metrics and human decision-making.
-- Design dashboards with clear purpose, audience, and actionable insights.
-- Leverage templating, annotations, and exemplars to enhance situational awareness.
-- Integrate logging, tracing, and cost metrics for comprehensive observability.
-- Treat dashboards as code to ensure reliability and collaboration.
+## 17. 总结
+- Grafana 弥合了原始指标与人类决策之间的差距
+- 以明确的目的、受众和可操作洞察来设计 Dashboard
+- 利用模板化、注释和 exemplars 增强态势感知
+- 集成日志、tracing 和成本指标实现全面的可观测性
+- 将 Dashboard 视为代码以确保可靠性和协作
 
-In Lecture 04, we will complete the observability stack by tackling logging pipelines, alerting workflows, and ML-specific monitoring practices.
+在 Lecture 04 中，我们将通过处理日志管道、告警工作流和 ML 特定监控实践来完成可观测性栈。

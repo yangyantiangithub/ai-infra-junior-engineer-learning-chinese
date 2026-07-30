@@ -1,757 +1,755 @@
-# Module 008: Databases and SQL
+# Module 008: 数据库与 SQL
 
-## Module Overview
+## 模块概述
 
-Databases are fundamental to AI/ML infrastructure, storing training data, model metadata, application state, and results. This module provides comprehensive training in relational databases with PostgreSQL, SQL query language, database design, and integration with Python applications.
+数据库是 AI/ML 基础设施的基石，用于存储训练数据、模型元数据、应用状态和结果。本模块提供关系型数据库（PostgreSQL）、SQL 查询语言、数据库设计以及 Python 应用集成的全面培训。
 
-You'll learn database fundamentals, SQL from basics to advanced queries, schema design, indexing, transactions, and how to work with databases in Python using SQLAlchemy. You'll also get an introduction to NoSQL databases and when to use them for AI/ML workloads.
+你将学习数据库基础、从入门到高级的 SQL、schema 设计、索引、事务，以及如何使用 SQLAlchemy 在 Python 中操作数据库。你还将了解 NoSQL 数据库及其在 AI/ML 工作负载中的适用场景。
 
-By the end of this module, you'll be confident designing database schemas, writing efficient SQL queries, optimizing database performance, and integrating databases into Python applications and ML pipelines.
+完成本模块后，你将能够自信地设计数据库 schema、编写高效的 SQL 查询、优化数据库性能，并将数据库集成到 Python 应用程序和 ML 管道中。
 
-## Learning Objectives
+## 学习目标
 
-By completing this module, you will be able to:
+完成本模块后，你将能够：
 
-1. **Understand relational database concepts** and ACID properties
-2. **Write SQL queries** from basic SELECT to complex JOINs and subqueries
-3. **Design database schemas** with proper normalization and relationships
-4. **Use PostgreSQL** effectively including advanced features
-5. **Work with databases in Python** using SQLAlchemy ORM
-6. **Optimize query performance** using indexes and query planning
-7. **Understand transactions** and concurrency control
-8. **Implement database migrations** and version control for schemas
-9. **Explore NoSQL databases** and understand when to use them
-10. **Apply databases to ML workflows** for storing features, models, and results
+1. **理解关系型数据库概念**和 ACID 属性
+2. **编写 SQL 查询**，从基本 SELECT 到复杂 JOIN 和子查询
+3. **设计数据库 schema**，具备合理的范式和关系
+4. **有效使用 PostgreSQL**，包括高级特性
+5. **在 Python 中使用数据库**，通过 SQLAlchemy ORM
+6. **优化查询性能**，使用索引和查询计划
+7. **理解事务**和并发控制
+8. **实现数据库迁移**和 schema 版本控制
+9. **探索 NoSQL 数据库**并理解其适用场景
+10. **将数据库应用于 ML 工作流**，用于存储特征、模型和结果
 
-## Prerequisites
+## 前置条件
 
-- Completion of Module 001 (Python Fundamentals) required
-- Completion of Module 004 (Python for Infrastructure) recommended
-- Completion of Module 002 (Linux Essentials) recommended
-- Basic understanding of data structures
-- Comfort with command-line interfaces
+- 必须完成模块 001（Python 基础）
+- 建议完成模块 004（Python 用于基础设施）
+- 建议完成模块 002（Linux 基础）
+- 基本理解数据结构
+- 熟悉命令行界面
 
-**Recommended Setup:**
-- PostgreSQL 14+ installed locally or via Docker
-- Python 3.9+ with virtual environment
-- Database client (pgAdmin, DBeaver, or psql command-line)
-- Text editor or IDE with SQL support
-- Docker (optional, for database containers)
+**推荐环境配置：**
+- 本地或通过 Docker 安装 PostgreSQL 14+
+- Python 3.9+ 及虚拟环境
+- 数据库客户端（pgAdmin、DBeaver 或 psql 命令行）
+- 支持 SQL 的文本编辑器或 IDE
+- Docker（可选，用于数据库容器）
 
-## Time Commitment
+## 时间投入
 
-- **Total Estimated Time:** 40-50 hours
-- **Lectures & Reading:** 15-18 hours
-- **Hands-on Exercises:** 20-25 hours
-- **Projects:** 5-7 hours
+- **总计预估时间：** 40-50 小时
+- **讲座与阅读：** 15-18 小时
+- **动手练习：** 20-25 小时
+- **项目：** 5-7 小时
 
-**Recommended Pace:**
-- Part-time (5-10 hrs/week): 4-6 weeks
-- Full-time (20-30 hrs/week): 2-3 weeks
+**推荐节奏：**
+- 兼职（5-10 小时/周）：4-6 周
+- 全职（20-30 小时/周）：2-3 周
 
-Database skills develop through practice. Expect to spend time designing schemas, writing queries, and optimizing performance.
+数据库技能通过实践培养。预计需要投入时间设计 schema、编写查询和优化性能。
 
-## Module Structure
+## 模块结构
 
-### Week 1: SQL Fundamentals
-- **Topics:** Database concepts, basic SQL, data types, simple queries
-- **Key Skills:** SELECT, WHERE, INSERT, UPDATE, DELETE, basic filtering
-- **Practice:** Writing basic queries, data manipulation
+### 第 1 周：SQL 基础
+- **主题：** 数据库概念、基本 SQL、数据类型、简单查询
+- **关键技能：** SELECT、WHERE、INSERT、UPDATE、DELETE、基本过滤
+- **练习：** 编写基本查询、数据操作
 
-### Week 2: Advanced SQL
-- **Topics:** JOINs, subqueries, aggregations, window functions
-- **Key Skills:** Complex queries, grouping, advanced filtering
-- **Practice:** Multi-table queries, analytical queries
+### 第 2 周：高级 SQL
+- **主题：** JOIN、子查询、聚合、窗口函数
+- **关键技能：** 复杂查询、分组、高级过滤
+- **练习：** 多表查询、分析查询
 
-### Week 3: Database Design and Python Integration
-- **Topics:** Schema design, normalization, SQLAlchemy, migrations
-- **Key Skills:** ERD design, ORM usage, database version control
-- **Practice:** Designing schemas, Python database applications
+### 第 3 周：数据库设计与 Python 集成
+- **主题：** Schema 设计、范式、SQLAlchemy、迁移
+- **关键技能：** ERD 设计、ORM 使用、数据库版本控制
+- **练习：** 设计 schema、Python 数据库应用程序
 
-### Week 4: Performance and NoSQL
-- **Topics:** Indexing, query optimization, transactions, NoSQL introduction
-- **Key Skills:** Performance tuning, EXPLAIN analysis, NoSQL basics
-- **Practice:** Optimization exercises, exploring NoSQL databases
+### 第 4 周：性能与 NoSQL
+- **主题：** 索引、查询优化、事务、NoSQL 入门
+- **关键技能：** 性能调优、EXPLAIN 分析、NoSQL 基础
+- **练习：** 优化练习、探索 NoSQL 数据库
 
-## Detailed Topic Breakdown
+## 详细主题分解
 
-### 1. Database Fundamentals (5-6 hours)
+### 1. 数据库基础（5-6 小时）
 
-#### 1.1 Introduction to Databases
-- What are databases?
-- Database management systems (DBMS)
-- Relational vs non-relational databases
-- Database use cases in AI/ML
-- ACID properties (Atomicity, Consistency, Isolation, Durability)
-- CAP theorem overview
-- Database architecture
+#### 1.1 数据库简介
+- 什么是数据库？
+- 数据库管理系统（DBMS）
+- 关系型与非关系型数据库
+- 数据库在 AI/ML 中的应用场景
+- ACID 属性（原子性、一致性、隔离性、持久性）
+- CAP 定理概述
+- 数据库架构
 
-#### 1.2 Relational Database Concepts
-- Tables, rows, and columns
-- Primary keys and foreign keys
-- Relationships (one-to-one, one-to-many, many-to-many)
-- Constraints and data integrity
-- Referential integrity
-- Normalization overview
-- Schema design principles
+#### 1.2 关系型数据库概念
+- 表、行和列
+- 主键和外键
+- 关系（一对一、一对多、多对多）
+- 约束与数据完整性
+- 引用完整性
+- 范式概述
+- Schema 设计原则
 
-#### 1.3 PostgreSQL Introduction
-- Why PostgreSQL?
+#### 1.3 PostgreSQL 简介
+- 为什么选择 PostgreSQL？
 - PostgreSQL vs MySQL vs SQLite
-- Installation and setup
-- psql command-line tool
-- PostgreSQL architecture
-- Configuration basics
-- User and permission management
+- 安装与配置
+- psql 命令行工具
+- PostgreSQL 架构
+- 基本配置
+- 用户与权限管理
 
-#### 1.4 Database Tools
-- psql command-line client
-- pgAdmin (GUI client)
-- DBeaver (universal database tool)
-- SQL editors and IDEs
-- Database version control tools
-- Backup and restore tools
-- Monitoring tools
+#### 1.4 数据库工具
+- psql 命令行客户端
+- pgAdmin（GUI 客户端）
+- DBeaver（通用数据库工具）
+- SQL 编辑器和 IDE
+- 数据库版本控制工具
+- 备份与恢复工具
+- 监控工具
 
-### 2. SQL Basics (7-9 hours)
+### 2. SQL 基础（7-9 小时）
 
-#### 2.1 Data Types
-- Numeric types (INTEGER, DECIMAL, FLOAT)
-- String types (VARCHAR, TEXT, CHAR)
-- Date and time types
-- Boolean type
-- JSON and JSONB
-- Arrays
-- Custom types
-- Type casting
+#### 2.1 数据类型
+- 数值类型（INTEGER、DECIMAL、FLOAT）
+- 字符串类型（VARCHAR、TEXT、CHAR）
+- 日期和时间类型
+- 布尔类型
+- JSON 和 JSONB
+- 数组
+- 自定义类型
+- 类型转换
 
-#### 2.2 Creating and Managing Tables
-- CREATE TABLE syntax
-- Column definitions
-- Primary keys
-- Foreign keys
-- Constraints (NOT NULL, UNIQUE, CHECK)
-- Default values
-- ALTER TABLE operations
+#### 2.2 创建和管理表
+- CREATE TABLE 语法
+- 列定义
+- 主键
+- 外键
+- 约束（NOT NULL、UNIQUE、CHECK）
+- 默认值
+- ALTER TABLE 操作
 - DROP TABLE
 
-#### 2.3 Basic Queries (SELECT)
-- SELECT statement structure
-- Selecting specific columns
-- Selecting all columns (*)
-- DISTINCT keyword
-- Column aliases (AS)
-- Limiting results (LIMIT)
-- Ordering results (ORDER BY)
-- Basic WHERE clause
+#### 2.3 基本查询（SELECT）
+- SELECT 语句结构
+- 选择特定列
+- 选择所有列（*）
+- DISTINCT 关键字
+- 列别名（AS）
+- 限制结果（LIMIT）
+- 排序结果（ORDER BY）
+- 基本 WHERE 子句
 
-#### 2.4 Filtering Data
-- WHERE clause conditions
-- Comparison operators (=, !=, <, >, <=, >=)
-- Logical operators (AND, OR, NOT)
-- IN operator
-- BETWEEN operator
-- LIKE and pattern matching
-- NULL handling (IS NULL, IS NOT NULL)
-- CASE expressions
+#### 2.4 数据过滤
+- WHERE 子句条件
+- 比较运算符（=、!=、<、>、<=、>=）
+- 逻辑运算符（AND、OR、NOT）
+- IN 运算符
+- BETWEEN 运算符
+- LIKE 和模式匹配
+- NULL 处理（IS NULL、IS NOT NULL）
+- CASE 表达式
 
-#### 2.5 Data Manipulation (INSERT, UPDATE, DELETE)
-- INSERT single row
-- INSERT multiple rows
-- INSERT with SELECT
-- UPDATE statements
-- UPDATE with conditions
-- DELETE statements
-- DELETE with conditions
+#### 2.5 数据操作（INSERT、UPDATE、DELETE）
+- 插入单行
+- 插入多行
+- INSERT 与 SELECT 结合
+- UPDATE 语句
+- 带条件的 UPDATE
+- DELETE 语句
+- 带条件的 DELETE
 - TRUNCATE vs DELETE
-- RETURNING clause
+- RETURNING 子句
 
-### 3. Advanced SQL (8-10 hours)
+### 3. 高级 SQL（8-10 小时）
 
-#### 3.1 Joins
-- Understanding joins
+#### 3.1 连接（JOIN）
+- 理解 JOIN
 - INNER JOIN
-- LEFT JOIN (LEFT OUTER JOIN)
-- RIGHT JOIN (RIGHT OUTER JOIN)
+- LEFT JOIN（LEFT OUTER JOIN）
+- RIGHT JOIN（RIGHT OUTER JOIN）
 - FULL OUTER JOIN
 - CROSS JOIN
-- Self joins
-- Multiple joins
-- Join conditions and performance
+- 自连接
+- 多表 JOIN
+- JOIN 条件与性能
 
-#### 3.2 Subqueries
-- What are subqueries?
-- Subqueries in WHERE clause
-- Subqueries in SELECT clause
-- Subqueries in FROM clause
-- Correlated subqueries
-- EXISTS and NOT EXISTS
-- IN and NOT IN with subqueries
-- Subquery performance considerations
+#### 3.2 子查询
+- 什么是子查询？
+- WHERE 子句中的子查询
+- SELECT 子句中的子查询
+- FROM 子句中的子查询
+- 相关子查询
+- EXISTS 和 NOT EXISTS
+- IN 和 NOT IN 与子查询
+- 子查询性能考虑
 
-#### 3.3 Aggregate Functions
-- COUNT, SUM, AVG
-- MIN and MAX
-- GROUP BY clause
-- HAVING clause
-- Grouping by multiple columns
-- Aggregating with DISTINCT
-- Aggregate functions with JOINs
-- Statistical aggregates
+#### 3.3 聚合函数
+- COUNT、SUM、AVG
+- MIN 和 MAX
+- GROUP BY 子句
+- HAVING 子句
+- 按多列分组
+- 使用 DISTINCT 聚合
+- 与 JOIN 结合使用的聚合函数
+- 统计聚合
 
-#### 3.4 Window Functions
-- Introduction to window functions
-- OVER clause
+#### 3.4 窗口函数
+- 窗口函数简介
+- OVER 子句
 - PARTITION BY
-- ORDER BY in window functions
-- ROW_NUMBER, RANK, DENSE_RANK
-- LAG and LEAD
-- Running totals and moving averages
-- Window frame specifications
-- Practical use cases
+- 窗口函数中的 ORDER BY
+- ROW_NUMBER、RANK、DENSE_RANK
+- LAG 和 LEAD
+- 累计和与移动平均
+- 窗口帧规范
+- 实际使用场景
 
-#### 3.5 Set Operations
-- UNION and UNION ALL
+#### 3.5 集合操作
+- UNION 和 UNION ALL
 - INTERSECT
 - EXCEPT
-- Combining queries
-- Set operation rules
-- Performance considerations
+- 组合查询
+- 集合操作规则
+- 性能考虑
 
-#### 3.6 Common Table Expressions (CTEs)
-- WITH clause
-- Simple CTEs
-- Multiple CTEs
-- Recursive CTEs
-- CTE vs subqueries
-- Use cases for CTEs
-- CTE best practices
+#### 3.6 公用表表达式（CTE）
+- WITH 子句
+- 简单 CTE
+- 多个 CTE
+- 递归 CTE
+- CTE vs 子查询
+- CTE 的使用场景
+- CTE 最佳实践
 
-#### 3.7 Advanced PostgreSQL Features
-- JSON and JSONB operations
-- Array operations
-- Full-text search
-- Pattern matching with regular expressions
-- Date and time functions
-- String functions
-- Mathematical functions
-- Conditional expressions
+#### 3.7 PostgreSQL 高级特性
+- JSON 和 JSONB 操作
+- 数组操作
+- 全文搜索
+- 使用正则表达式的模式匹配
+- 日期和时间函数
+- 字符串函数
+- 数学函数
+- 条件表达式
 
-### 4. Database Design (6-8 hours)
+### 4. 数据库设计（6-8 小时）
 
-#### 4.1 Schema Design Principles
-- Entity-Relationship modeling
-- Identifying entities and attributes
-- Defining relationships
-- Cardinality and optionality
-- ERD notation and tools
-- Translating ERDs to tables
-- Design patterns
+#### 4.1 Schema 设计原则
+- 实体-关系建模
+- 识别实体和属性
+- 定义关系
+- 基数和可选性
+- ERD 符号与工具
+- 将 ERD 转换为表
+- 设计模式
 
-#### 4.2 Normalization
-- What is normalization?
-- First Normal Form (1NF)
-- Second Normal Form (2NF)
-- Third Normal Form (3NF)
-- Boyce-Codd Normal Form (BCNF)
-- Denormalization (when and why)
-- Normal forms in practice
-- Trade-offs
+#### 4.2 范式
+- 什么是范式？
+- 第一范式（1NF）
+- 第二范式（2NF）
+- 第三范式（3NF）
+- 巴科斯-科德范式（BCNF）
+- 反范式化（何时及为何）
+- 范式在实践中的应用
+- 权衡
 
-#### 4.3 Indexes
-- What are indexes?
-- B-tree indexes (default)
-- Hash indexes
-- GiST and GIN indexes
-- Creating indexes
-- Composite indexes
-- Unique indexes
-- Partial indexes
-- Index maintenance
-- When to use indexes
-- Index performance impact
+#### 4.3 索引
+- 什么是索引？
+- B-tree 索引（默认）
+- Hash 索引
+- GiST 和 GIN 索引
+- 创建索引
+- 复合索引
+- 唯一索引
+- 部分索引
+- 索引维护
+- 何时使用索引
+- 索引性能影响
 
-#### 4.4 Constraints and Data Integrity
-- Primary key constraints
-- Foreign key constraints
-- Unique constraints
-- Check constraints
-- Not null constraints
-- Constraint naming conventions
-- Deferred constraints
-- Constraint validation
+#### 4.4 约束与数据完整性
+- 主键约束
+- 外键约束
+- 唯一约束
+- 检查约束
+- 非空约束
+- 约束命名约定
+- 延迟约束
+- 约束验证
 
-#### 4.5 Views
-- Creating views
-- Materialized views
-- View benefits
-- Updateable views
-- View performance
-- Using views for security
-- View maintenance
+#### 4.5 视图
+- 创建视图
+- 物化视图
+- 视图的优势
+- 可更新视图
+- 视图性能
+- 使用视图保障安全
+- 视图维护
 
-### 5. Python and Database Integration (7-9 hours)
+### 5. Python 与数据库集成（7-9 小时）
 
-#### 5.1 Python Database Drivers
-- psycopg2 (PostgreSQL driver)
-- Database connections
-- Executing queries
-- Parameterized queries
-- Fetching results
-- Connection pooling
-- Error handling
-- Context managers
+#### 5.1 Python 数据库驱动
+- psycopg2（PostgreSQL 驱动）
+- 数据库连接
+- 执行查询
+- 参数化查询
+- 获取结果
+- 连接池
+- 错误处理
+- 上下文管理器
 
 #### 5.2 SQLAlchemy Core
-- Introduction to SQLAlchemy
+- SQLAlchemy 简介
 - Core vs ORM
-- Engine and connections
-- Metadata and Table objects
-- SQL expression language
-- Executing statements
-- Result sets
-- Transactions
+- Engine 和连接
+- Metadata 和 Table 对象
+- SQL 表达式语言
+- 执行语句
+- 结果集
+- 事务
 
 #### 5.3 SQLAlchemy ORM
-- Object-Relational Mapping concepts
-- Defining models
-- Declarative base
-- Column types
-- Relationships (one-to-many, many-to-many)
-- Querying with ORM
-- Session management
-- Lazy loading vs eager loading
+- 对象关系映射概念
+- 定义模型
+- 声明式基类
+- 列类型
+- 关系（一对多、多对多）
+- 使用 ORM 查询
+- Session 管理
+- 懒加载 vs 即时加载
 
-#### 5.4 CRUD Operations with SQLAlchemy
-- Creating records
-- Reading records (queries)
-- Updating records
-- Deleting records
-- Bulk operations
-- Query filtering
-- Ordering and pagination
-- Aggregations
+#### 5.4 使用 SQLAlchemy 进行 CRUD 操作
+- 创建记录
+- 读取记录（查询）
+- 更新记录
+- 删除记录
+- 批量操作
+- 查询过滤
+- 排序与分页
+- 聚合
 
-#### 5.5 Database Migrations
-- Why migrations?
-- Alembic introduction
-- Creating migrations
-- Applying migrations
-- Rollback strategies
-- Migration best practices
-- Team collaboration with migrations
-- Production migration strategies
+#### 5.5 数据库迁移
+- 为什么需要迁移？
+- Alembic 简介
+- 创建迁移
+- 应用迁移
+- 回滚策略
+- 迁移最佳实践
+- 团队协作与迁移
+- 生产环境迁移策略
 
-#### 5.6 Database Connection Management
-- Connection pooling
-- Connection lifecycle
-- Connection strings
-- Environment-based configuration
-- Connection error handling
-- Connection testing
-- Performance tuning
-- Cloud database connections
+#### 5.6 数据库连接管理
+- 连接池
+- 连接生命周期
+- 连接字符串
+- 基于环境的配置
+- 连接错误处理
+- 连接测试
+- 性能调优
+- 云数据库连接
 
-### 6. Performance and Optimization (5-7 hours)
+### 6. 性能与优化（5-7 小时）
 
-#### 6.1 Query Performance
-- EXPLAIN and EXPLAIN ANALYZE
-- Reading query plans
-- Sequential scans vs index scans
-- Join algorithms
-- Query optimization strategies
-- Query rewriting
-- Avoiding N+1 queries
-- Caching strategies
+#### 6.1 查询性能
+- EXPLAIN 和 EXPLAIN ANALYZE
+- 阅读查询计划
+- 顺序扫描 vs 索引扫描
+- 连接算法
+- 查询优化策略
+- 查询重写
+- 避免 N+1 查询
+- 缓存策略
 
-#### 6.2 Indexing Strategy
-- Identifying slow queries
-- Choosing columns to index
-- Composite index design
-- Index coverage
-- Index maintenance overhead
-- Monitoring index usage
-- Removing unused indexes
-- Index bloat
+#### 6.2 索引策略
+- 识别慢查询
+- 选择要索引的列
+- 复合索引设计
+- 索引覆盖
+- 索引维护开销
+- 监控索引使用
+- 移除未使用的索引
+- 索引膨胀
 
-#### 6.3 Transactions and Concurrency
-- Transaction basics (BEGIN, COMMIT, ROLLBACK)
-- ACID properties in practice
-- Isolation levels
-- Concurrency issues (dirty reads, lost updates)
-- Locking mechanisms
-- Deadlocks and prevention
-- Transaction best practices
-- Long-running transactions
+#### 6.3 事务与并发
+- 事务基础（BEGIN、COMMIT、ROLLBACK）
+- 实践中的 ACID 属性
+- 隔离级别
+- 并发问题（脏读、丢失更新）
+- 锁机制
+- 死锁与预防
+- 事务最佳实践
+- 长事务
 
-#### 6.4 Database Maintenance
-- VACUUM and ANALYZE
-- Database statistics
-- Table bloat management
-- Backup strategies
-- Point-in-time recovery
-- Replication basics
-- Monitoring database health
-- Performance tuning parameters
+#### 6.4 数据库维护
+- VACUUM 和 ANALYZE
+- 数据库统计信息
+- 表膨胀管理
+- 备份策略
+- 时间点恢复
+- 复制基础
+- 监控数据库健康
+- 性能调优参数
 
-### 7. NoSQL Databases (4-5 hours)
+### 7. NoSQL 数据库（4-5 小时）
 
-#### 7.1 NoSQL Introduction
-- What is NoSQL?
+#### 7.1 NoSQL 简介
+- 什么是 NoSQL？
 - NoSQL vs SQL
-- NoSQL categories (document, key-value, graph, columnar)
-- CAP theorem revisited
-- Eventual consistency
-- Use cases for NoSQL
-- Polyglot persistence
+- NoSQL 分类（文档、键值、图、列族）
+- CAP 定理再探
+- 最终一致性
+- NoSQL 的使用场景
+- 混合持久化
 
-#### 7.2 Document Databases (MongoDB)
-- Document model
-- Collections and documents
-- CRUD operations in MongoDB
-- Querying documents
-- Indexes in MongoDB
-- Aggregation pipelines
-- Schema design for documents
-- When to use MongoDB
+#### 7.2 文档数据库（MongoDB）
+- 文档模型
+- 集合与文档
+- MongoDB 中的 CRUD 操作
+- 查询文档
+- MongoDB 中的索引
+- 聚合管道
+- 文档的 Schema 设计
+- 何时使用 MongoDB
 
-#### 7.3 Key-Value Stores (Redis)
-- Key-value model
-- Redis data types
-- Redis commands
-- Use cases (caching, sessions, queues)
-- Redis persistence
-- Redis in Python
-- Performance characteristics
+#### 7.3 键值存储（Redis）
+- 键值模型
+- Redis 数据类型
+- Redis 命令
+- 使用场景（缓存、会话、队列）
+- Redis 持久化
+- Python 中的 Redis
+- 性能特性
 - Redis vs Memcached
 
-#### 7.4 NoSQL for AI/ML
-- Storing unstructured data
-- Feature stores
-- Time-series data (InfluxDB, TimescaleDB)
-- Vector databases for embeddings
-- Graph databases for relationships
-- Choosing the right database
-- Hybrid approaches
+#### 7.4 AI/ML 中的 NoSQL
+- 存储非结构化数据
+- 特征存储
+- 时序数据（InfluxDB、TimescaleDB）
+- 用于嵌入向量的 vector database
+- 用于关系的图数据库
+- 选择合适的数据库
+- 混合方法
 
-### 8. Databases in ML Workflows (3-4 hours)
+### 8. ML 工作流中的数据库（3-4 小时）
 
-#### 8.1 Training Data Storage
-- Storing raw data
-- Feature engineering results
-- Data versioning
-- Large dataset handling
-- Data quality checks
-- Data lineage tracking
-- Partitioning strategies
+#### 8.1 训练数据存储
+- 存储原始数据
+- 特征工程结果
+- 数据版本控制
+- 大数据集处理
+- 数据质量检查
+- 数据血缘追踪
+- 分区策略
 
-#### 8.2 Model Metadata Storage
-- Model registry databases
-- Experiment tracking
-- Hyperparameter storage
-- Model versioning
-- Performance metrics
-- Model lineage
-- Metadata querying
+#### 8.2 模型元数据存储
+- 模型注册数据库
+- 实验跟踪
+- 超参数存储
+- 模型版本控制
+- 性能指标
+- 模型血缘
+- 元数据查询
 
-#### 8.3 Inference Results Storage
-- Prediction logging
-- Real-time vs batch storage
-- Time-series prediction data
-- Result aggregation
-- Query patterns for analysis
-- Data retention policies
-- GDPR compliance
+#### 8.3 推理结果存储
+- 预测日志记录
+- 实时 vs 批量存储
+- 时序预测数据
+- 结果聚合
+- 分析查询模式
+- 数据保留策略
+- GDPR 合规
 
-#### 8.4 ML Pipeline Databases
-- Pipeline orchestration metadata
-- Job status and logging
-- Dependency tracking
-- Scheduler databases
-- Monitoring and alerting data
-- Audit trails
+#### 8.4 ML 管道数据库
+- 管道编排元数据
+- 任务状态与日志记录
+- 依赖跟踪
+- 调度器数据库
+- 监控与告警数据
+- 审计追踪
 
-## Lecture Outline
+## 讲座大纲
 
+### 讲座 1：数据库基础（90 分钟）
+- 数据库概念
+- 关系模型
+- PostgreSQL 简介
+- 安装与配置
+- 第一个数据库和表
+- **实验：** PostgreSQL 环境搭建
 
-### Lecture 1: Database Fundamentals (90 min)
-- Database concepts
-- Relational model
-- PostgreSQL introduction
-- Installation and setup
-- First database and table
-- **Lab:** PostgreSQL environment setup
+### 讲座 2：SQL 基础（90 分钟）
+- SELECT 查询
+- WHERE 过滤
+- 数据类型
+- INSERT、UPDATE、DELETE
+- 基本数据操作
+- **实验：** 基本 SQL 操作
 
-### Lecture 2: SQL Basics (90 min)
-- SELECT queries
-- Filtering with WHERE
-- Data types
-- INSERT, UPDATE, DELETE
-- Basic data manipulation
-- **Lab:** Basic SQL operations
+### 讲座 3：高级 SQL 查询（120 分钟）
+- JOIN 深入探讨
+- 子查询
+- 聚合函数
+- GROUP BY 和 HAVING
+- 窗口函数
+- **实验：** 复杂查询挑战
 
-### Lecture 3: Advanced SQL Queries (120 min)
-- JOINs deep dive
-- Subqueries
-- Aggregate functions
-- GROUP BY and HAVING
-- Window functions
-- **Lab:** Complex query challenges
+### 讲座 4：数据库设计（90 分钟）
+- Schema 设计原则
+- 范式
+- ERD 建模
+- 关系与约束
+- 设计模式
+- **实验：** 设计数据库 schema
 
-### Lecture 4: Database Design (90 min)
-- Schema design principles
-- Normalization
-- ERD modeling
-- Relationships and constraints
-- Design patterns
-- **Lab:** Designing a database schema
+### 讲座 5：索引与性能（90 分钟）
+- 理解索引
+- 查询优化
+- EXPLAIN 计划
+- 性能调优
+- 最佳实践
+- **实验：** 查询优化练习
 
-### Lecture 5: Indexes and Performance (90 min)
-- Understanding indexes
-- Query optimization
-- EXPLAIN plans
-- Performance tuning
-- Best practices
-- **Lab:** Query optimization exercises
-
-### Lecture 6: Python and SQLAlchemy (120 min)
-- psycopg2 basics
+### 讲座 6：Python 与 SQLAlchemy（120 分钟）
+- psycopg2 基础
 - SQLAlchemy Core
 - SQLAlchemy ORM
-- Database migrations
-- Python database patterns
-- **Lab:** Python database application
+- 数据库迁移
+- Python 数据库模式
+- **实验：** Python 数据库应用程序
 
-### Lecture 7: Transactions and Concurrency (90 min)
-- Transaction fundamentals
-- Isolation levels
-- Locking and concurrency
-- Deadlock handling
-- Best practices
-- **Lab:** Transaction scenarios
+### 讲座 7：事务与并发（90 分钟）
+- 事务基础
+- 隔离级别
+- 锁与并发
+- 死锁处理
+- 最佳实践
+- **实验：** 事务场景
 
-### Lecture 8: NoSQL and ML Databases (90 min)
-- NoSQL overview
-- MongoDB and Redis
-- Databases for ML workflows
-- Choosing the right database
-- Polyglot persistence
-- **Lab:** NoSQL hands-on
+### 讲座 8：NoSQL 与 ML 数据库（90 分钟）
+- NoSQL 概述
+- MongoDB 和 Redis
+- ML 工作流中的数据库
+- 选择合适的数据库
+- 混合持久化
+- **实验：** NoSQL 动手实践
 
-## Hands-On Exercises
+## 动手练习
 
+### 练习分类
 
-### Exercise Categories
+#### SQL 基础（10 个练习）
+1. 创建表和 schema
+2. 基本 SELECT 查询
+3. 过滤与排序
+4. 数据操作（INSERT、UPDATE、DELETE）
+5. 处理 NULL 值
+6. 日期和时间操作
+7. 字符串操作
+8. CASE 表达式
+9. 子查询基础
+10. 基本聚合
 
-#### SQL Basics (10 exercises)
-1. Creating tables and schemas
-2. Basic SELECT queries
-3. Filtering and sorting
-4. Data manipulation (INSERT, UPDATE, DELETE)
-5. Working with NULL values
-6. Date and time operations
-7. String manipulation
-8. CASE expressions
-9. Subqueries basics
-10. Basic aggregations
+#### 高级 SQL（10 个练习）
+11. INNER 和 OUTER 连接
+12. 自连接
+13. 复杂子查询
+14. 窗口函数
+15. CTE（公用表表达式）
+16. 递归查询
+17. 集合操作
+18. JSON 操作
+19. 高级聚合
+20. 查询优化挑战
 
-#### Advanced SQL (10 exercises)
-11. INNER and OUTER joins
-12. Self-joins
-13. Complex subqueries
-14. Window functions
-15. CTEs (Common Table Expressions)
-16. Recursive queries
-17. Set operations
-18. JSON operations
-19. Advanced aggregations
-20. Query optimization challenges
+#### 数据库设计（5 个练习）
+21. ERD 设计练习
+22. 范式练习
+23. Schema 实现
+24. 约束设计
+25. 索引策略
 
-#### Database Design (5 exercises)
-21. ERD design exercise
-22. Normalization practice
-23. Schema implementation
-24. Constraint design
-25. Index strategy
+#### Python 集成（8 个练习）
+26. psycopg2 基础
+27. SQLAlchemy Core 查询
+28. ORM 模型定义
+29. 使用 ORM 进行 CRUD
+30. ORM 中的关系
+31. 使用 Alembic 进行数据库迁移
+32. 连接池
+33. 完整的 Python 数据库应用
 
-#### Python Integration (8 exercises)
-26. psycopg2 basics
-27. SQLAlchemy Core queries
-28. ORM model definition
-29. CRUD with ORM
-30. Relationships in ORM
-31. Database migrations with Alembic
-32. Connection pooling
-33. Complete Python database app
+#### 性能（4 个练习）
+34. 查询性能分析
+35. 索引优化
+36. 事务管理
+37. 并发场景
 
-#### Performance (4 exercises)
-34. Query performance analysis
-35. Index optimization
-36. Transaction management
-37. Concurrency scenarios
+#### NoSQL（3 个练习）
+38. MongoDB 操作
+39. Redis 缓存
+40. NoSQL 使用场景选择
 
-#### NoSQL (3 exercises)
-38. MongoDB operations
-39. Redis caching
-40. NoSQL use case selection
+## 评估与考核
 
-## Assessment and Evaluation
+### 知识检查
+- 每个主要部分后的测验
+- SQL 语法理解
+- 数据库设计原则
+- 性能概念
+- NoSQL 理解
 
-### Knowledge Checks
-- Quiz after each major section
-- SQL syntax comprehension
-- Database design principles
-- Performance concepts
-- NoSQL understanding
+### 实践评估
+- **SQL 能力：** 编写 20+ 个不同复杂度的查询
+- **Schema 设计：** 为应用程序设计范式化数据库
+- **Python 集成：** 构建带数据库后端的应用
+- **性能：** 使用索引优化慢查询
+- **ML 数据库：** 为 ML 工作流设计数据库
 
-### Practical Assessments
-- **SQL Proficiency:** Write 20+ queries of varying complexity
-- **Schema Design:** Design normalized database for application
-- **Python Integration:** Build application with database backend
-- **Performance:** Optimize slow queries using indexes
-- **ML Database:** Design database for ML workflow
+### 能力标准
+要成功完成本模块，你应该能够：
+- 独立编写复杂 SQL 查询
+- 设计范式化数据库 schema
+- 有效使用 PostgreSQL
+- 将数据库与 Python 应用程序集成
+- 优化查询性能
+- 管理事务与并发
+- 选择合适的数据库类型
+- 将数据库应用于 ML 工作流
+- 排查数据库问题
+- 实现数据库迁移
 
-### Competency Criteria
-To complete this module successfully, you should be able to:
-- Write complex SQL queries independently
-- Design normalized database schemas
-- Use PostgreSQL effectively
-- Integrate databases with Python applications
-- Optimize query performance
-- Manage transactions and concurrency
-- Choose appropriate database types
-- Apply databases to ML workflows
-- Troubleshoot database issues
-- Implement database migrations
+### 结业项目
+**ML 实验跟踪数据库：**
+设计并实现完整的数据库系统，用于：
+- 实验元数据存储
+- 模型版本控制
+- 训练指标
+- 超参数跟踪
+- 结果查询与分析
+- 用于交互的 Python API
+- 性能优化
+- 迁移管理
+- 完整文档
 
-### Capstone Project
-**ML Experiment Tracking Database:**
-Design and implement complete database system for:
-- Experiment metadata storage
-- Model versioning
-- Training metrics
-- Hyperparameter tracking
-- Result querying and analysis
-- Python API for interaction
-- Performance optimization
-- Migration management
-- Complete documentation
+## 资源与参考
 
-## Resources and References
+> **注意：** 参见 `resources/recommended-reading.md` 获取学习材料、书籍和在线资源的完整列表。
 
-> **Note:** See `resources/recommended-reading.md` for a comprehensive list of learning materials, books, and online resources.
+### 核心资源
+- PostgreSQL 文档
+- SQLAlchemy 文档
+- SQL 教程（W3Schools、SQLBolt）
+- PostgreSQL 练习
 
-### Essential Resources
-- PostgreSQL documentation
-- SQLAlchemy documentation
-- SQL Tutorial (W3Schools, SQLBolt)
-- PostgreSQL exercises
+### 推荐书籍
+- 《SQL Cookbook》—— Anthony Molinaro
+- 《PostgreSQL: Up and Running》—— Regina Obe
+- 《Learning SQL》—— Alan Beaulieu
+- 《Database Design for Mere Mortals》—— Michael Hernandez
 
-### Recommended Books
-- "SQL Cookbook" by Anthony Molinaro
-- "PostgreSQL: Up and Running" by Regina Obe
-- "Learning SQL" by Alan Beaulieu
-- "Database Design for Mere Mortals" by Michael Hernandez
-
-### Online Learning
+### 在线学习
 - Mode SQL Tutorial
 - SQLZoo
 - PostgreSQL Tutorial
-- SQLAlchemy tutorials
-- LeetCode database problems
+- SQLAlchemy 教程
+- LeetCode 数据库问题
 
-### Tools
+### 工具
 - pgAdmin
 - DBeaver
 - DataGrip
 - psql
 - TablePlus
 
-## Getting Started
+## 入门指南
 
-### Step 1: Install PostgreSQL
-1. Install PostgreSQL locally or via Docker
-2. Verify installation
-3. Create test database
-4. Install GUI client
-5. Test connection
+### 步骤 1：安装 PostgreSQL
+1. 本地安装或通过 Docker 安装 PostgreSQL
+2. 验证安装
+3. 创建测试数据库
+4. 安装 GUI 客户端
+5. 测试连接
 
-### Step 2: Set Up Python Environment
-1. Install psycopg2 and SQLAlchemy
-2. Create virtual environment
-3. Test Python database connection
-4. Install Alembic for migrations
+### 步骤 2：设置 Python 环境
+1. 安装 psycopg2 和 SQLAlchemy
+2. 创建虚拟环境
+3. 测试 Python 数据库连接
+4. 安装 Alembic 用于迁移
 
-### Step 3: Begin with Lecture 1
-- Learn database fundamentals
-- Set up PostgreSQL
-- Create first tables
-- Execute basic queries
+### 步骤 3：从讲座 1 开始
+- 学习数据库基础
+- 设置 PostgreSQL
+- 创建第一个表
+- 执行基本查询
 
-### Step 4: Practice Regularly
-- Complete SQL exercises
-- Design practice schemas
-- Build Python applications
-- Optimize queries
-- Work on projects
+### 步骤 4：定期练习
+- 完成 SQL 练习
+- 设计练习 schema
+- 构建 Python 应用程序
+- 优化查询
+- 参与项目
 
-## Tips for Success
+## 成功提示
 
-1. **Practice SQL Daily:** Regular practice builds query fluency
-2. **Visualize Schemas:** Draw ERDs before implementing
-3. **Use EXPLAIN:** Always check query plans for slow queries
-4. **Start Normalized:** Design normalized schemas first
-5. **Learn from Examples:** Study schemas of popular applications
-6. **Use Migrations:** Always version control schema changes
-7. **Test Transactions:** Practice isolation levels and locking
-8. **Monitor Performance:** Use database monitoring tools
-9. **Read Documentation:** PostgreSQL docs are comprehensive
-10. **Build Projects:** Apply skills to real applications
+1. **每天练习 SQL：** 定期练习培养查询娴熟度
+2. **可视化 Schema：** 在实现前绘制 ERD
+3. **使用 EXPLAIN：** 始终检查慢查询的查询计划
+4. **从范式开始：** 首先设计范式化 schema
+5. **从示例中学习：** 研究流行应用的 schema
+6. **使用迁移：** 始终对 schema 变更进行版本控制
+7. **测试事务：** 练习隔离级别和锁
+8. **监控性能：** 使用数据库监控工具
+9. **阅读文档：** PostgreSQL 文档内容全面
+10. **构建项目：** 将技能应用于实际应用程序
 
-## Next Steps
+## 后续步骤
 
-After completing this module, you'll be ready to:
-- **Module 009:** Monitoring Basics (monitor databases)
-- **Module 010:** Cloud Platforms (managed databases)
-- Advanced topics: Database administration, replication, sharding
+完成本模块后，你将准备好：
+- **模块 009：** 监控基础（监控数据库）
+- **模块 010：** 云平台（托管数据库）
+- 高级主题：数据库管理、复制、分片
 
-## Development Status
+## 开发状态
 
-**Current Status:** Template phase - comprehensive structure in place
+**当前状态：** 模板阶段——结构已完整搭建
 
-**Available Now:**
-- Complete module structure
-- Detailed topic breakdown
-- Lecture outline
-- Exercise framework
+**现已提供：**
+- 完整的模块结构
+- 详细主题分解
+- 讲座大纲
+- 练习框架
 
-**In Development:**
-- Full lecture notes
-- SQL exercise sets
-- Schema design examples
-- Python integration tutorials
-- Performance tuning guides
-- ML database patterns
+**开发中：**
+- 完整讲座笔记
+- SQL 练习集
+- Schema 设计示例
+- Python 集成教程
+- 性能调优指南
+- ML 数据库模式
 
-**Planned Updates:**
-- Advanced PostgreSQL features
-- Database administration
-- Replication and HA
-- Sharding strategies
-- Time-series databases
-- Vector databases
+**计划更新：**
+- PostgreSQL 高级特性
+- 数据库管理
+- 复制与高可用
+- 分片策略
+- 时序数据库
+- Vector database
 
-## Feedback and Contributions
+## 反馈与贡献
 
-Help improve this module:
-- Report issues
-- Share schema designs
-- Contribute exercises
-- Suggest resources
+帮助改进本模块：
+- 报告问题
+- 分享 schema 设计
+- 贡献练习
+- 推荐资源
 
 ---
 
-**Module Maintainer:** AI Infrastructure Curriculum Team
-**Contact:** ai-infra-curriculum@joshua-ferguson.com
-**Last Updated:** 2025-10-18
-**Version:** 1.0.0-template
+**模块维护者：** AI 基础设施课程团队
+**联系方式：** ai-infra-curriculum@joshua-ferguson.com
+**最后更新：** 2025-10-18
+**版本：** 1.0.0-template

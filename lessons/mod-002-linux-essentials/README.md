@@ -1,647 +1,647 @@
-# Module 002: Linux Essentials for AI Infrastructure
-
-## Module Overview
-
-This module provides a comprehensive foundation in Linux systems administration, essential for any AI Infrastructure Engineer. You'll learn to navigate Linux environments, manage systems, automate tasks through scripting, and understand networking fundamentals. These skills form the backbone of infrastructure engineering, as most AI/ML workloads run on Linux-based systems.
-
-By the end of this module, you'll be comfortable working in Linux environments, writing shell scripts to automate common tasks, managing system resources, and troubleshooting basic system issues.
-
-## Learning Objectives
-
-By completing this module, you will be able to:
-
-1. **Navigate and manipulate files** using Linux command-line interface
-2. **Manage users, groups, and permissions** to secure systems appropriately
-3. **Monitor system resources** (CPU, memory, disk, network) and identify bottlenecks
-4. **Write shell scripts** to automate repetitive infrastructure tasks
-5. **Configure networking** including interfaces, DNS, and basic troubleshooting
-6. **Manage processes and services** using systemd and traditional process management
-7. **Perform basic system administration** tasks like package management and log analysis
-8. **Troubleshoot common system issues** using appropriate diagnostic tools
-9. **Work with text processing tools** (grep, sed, awk) for log analysis
-10. **Understand Linux filesystem hierarchy** and storage management
-
-## Prerequisites
-
-- Basic computer literacy and comfort with text-based interfaces
-- Completion of Module 001 (Python Fundamentals) recommended but not required
-- Access to a Linux system (VM, WSL, or native installation)
-- Willingness to practice commands and experiment safely
-
-**Recommended Setup:**
-- Ubuntu 22.04 LTS or similar distribution (virtual machine acceptable)
-- Terminal emulator of your choice
-- Text editor (vim, nano, or VS Code with remote SSH)
-- At least 2GB RAM and 20GB disk space for practice environment
-
-## Time Commitment
-
-- **Total Estimated Time:** 40-50 hours
-- **Lectures & Reading:** 15-20 hours
-- **Hands-on Exercises:** 20-25 hours
-- **Practice & Review:** 5-10 hours
-
-**Recommended Pace:**
-- Part-time (5-10 hrs/week): 4-6 weeks
-- Full-time (20-30 hrs/week): 2-3 weeks
-
-This module is designed for flexibility. You can move faster through familiar topics and spend more time on challenging areas.
-
-## Module Structure
-
-### Week 1: Linux Fundamentals
-- **Topics:** Command-line basics, file system navigation, file operations
-- **Key Skills:** ls, cd, cp, mv, rm, mkdir, file permissions
-- **Practice:** 10-15 exercises building muscle memory for essential commands
-
-### Week 2: System Administration Basics
-- **Topics:** User management, package management, process control
-- **Key Skills:** useradd, apt/yum, ps, kill, top, systemctl
-- **Practice:** Setting up users, installing software, managing services
-
-### Week 3: Shell Scripting
-- **Topics:** Bash scripting fundamentals, variables, control structures, functions
-- **Key Skills:** Writing automation scripts, error handling, argument processing
-- **Practice:** Creating scripts for backup, monitoring, and deployment tasks
-
-### Week 4: Networking & Advanced Topics
-- **Topics:** Networking basics, text processing, system monitoring
-- **Key Skills:** ip, netstat, ssh, grep, sed, awk, monitoring tools
-- **Practice:** Network troubleshooting, log analysis, performance monitoring
-
-## Detailed Topic Breakdown
-
-### 1. Command-Line Fundamentals (6-8 hours)
-
-#### 1.1 Getting Started with the Shell
-- Terminal emulators and shell types (bash, zsh, sh)
-- Command syntax and structure
-- Getting help: man pages, --help, info
-- Command history and tab completion
-- Environment variables and PATH
-
-#### 1.2 File System Navigation
-- Linux file system hierarchy (/, /home, /etc, /var, /usr)
-- Absolute vs relative paths
-- Essential navigation commands (cd, pwd, ls)
-- Working with directories (mkdir, rmdir, tree)
-- Finding files (find, locate, which, whereis)
-
-#### 1.3 File Operations
-- Creating and editing files (touch, nano, vim)
-- Copying, moving, and deleting (cp, mv, rm)
-- Viewing file contents (cat, less, more, head, tail)
-- File types and extensions
-- Links (hard links vs symbolic links)
-- Archiving and compression (tar, gzip, zip)
-
-#### 1.4 File Permissions and Ownership
-- Understanding Linux permission model (rwx)
-- Numeric and symbolic notation (chmod)
-- Changing ownership (chown, chgrp)
-- Special permissions (setuid, setgid, sticky bit)
-- umask and default permissions
-- Access Control Lists (ACLs) introduction
-
-### 2. System Administration (8-10 hours)
-
-#### 2.1 User and Group Management
-- Understanding /etc/passwd and /etc/group
-- Creating users (useradd, adduser)
-- Modifying users (usermod, passwd)
-- Group management (groupadd, groupmod)
-- Sudo and privilege escalation
-- User authentication and security best practices
-
-#### 2.2 Package Management
-- Understanding package managers (apt, yum, dnf)
-- Installing, updating, and removing packages
-- Managing repositories
-- Handling dependencies
-- System updates and upgrades
-- Building from source when necessary
-
-#### 2.3 Process Management
-- Understanding processes and PIDs
-- Viewing processes (ps, top, htop)
-- Process states and priorities
-- Killing processes (kill, killall, pkill)
-- Background and foreground jobs (&, fg, bg)
-- Process scheduling (nice, renice)
-- Process signals (SIGTERM, SIGKILL, SIGHUP)
-
-#### 2.4 Service Management with systemd
-- Understanding systemd architecture
-- Managing services (systemctl start/stop/restart/status)
-- Enabling services at boot
-- Viewing service logs (journalctl)
-- Creating custom service units
-- Timers as cron alternatives
-
-### 3. Shell Scripting and Automation (10-12 hours)
-
-#### 3.1 Bash Scripting Basics
-- Script structure and shebang (#!/bin/bash)
-- Variables and data types
-- Command substitution
-- Quoting rules (single, double, backticks)
-- Exit codes and error handling
-- Script debugging (set -x, set -e)
-
-#### 3.2 Control Structures
-- Conditional statements (if/elif/else)
-- Test operators (file, string, numeric)
-- Case statements
-- Loops (for, while, until)
-- Break and continue
-- Functions and scope
-
-#### 3.3 Advanced Scripting Techniques
-- Command-line argument processing
-- Reading user input
-- Working with arrays
-- String manipulation
-- Regular expressions basics
-- Error handling and logging
-- Script templates for common tasks
-
-#### 3.4 Practical Automation Scripts
-- System backup scripts
-- Log rotation and cleanup
-- Health check scripts
-- Deployment automation basics
-- Monitoring and alerting scripts
-- Batch processing workflows
-
-### 4. Text Processing and Log Analysis (6-8 hours)
-
-#### 4.1 Text Viewing and Search
-- Pattern matching with grep
-- Regular expressions in practice
-- Recursive searching
-- Finding and replacing text
-- Working with multiple files
-- Performance considerations
-
-#### 4.2 Stream Editing with sed
-- Basic sed syntax
-- Find and replace operations
-- Line-based editing
-- In-place file editing
-- Multi-line operations
-- Practical sed use cases
-
-#### 4.3 Text Processing with awk
-- AWK basics and syntax
-- Field and record processing
-- Pattern matching and actions
-- Built-in variables
-- Arithmetic and string operations
-- Generating reports from logs
-
-#### 4.4 Log Analysis Workflows
-- Understanding common log formats
-- Apache/Nginx access logs
-- System logs (/var/log/)
-- Application logs
-- Combining tools for complex analysis
-- Building log analysis pipelines
-
-### 5. Networking Fundamentals (6-8 hours)
-
-#### 5.1 Network Basics
-- TCP/IP fundamentals
-- IP addressing and subnetting
-- DNS concepts and resolution
-- Ports and protocols
-- OSI model overview
-- Understanding network interfaces
-
-#### 5.2 Network Configuration
-- Viewing network configuration (ip, ifconfig)
-- Configuring network interfaces
-- Static vs DHCP addressing
-- Network manager and netplan
-- Hostname and DNS configuration
-- Routing basics
-
-#### 5.3 Network Diagnostics
-- Connectivity testing (ping, traceroute)
-- Port scanning basics (netstat, ss)
-- Packet capture (tcpdump basics)
-- Network performance testing
-- Troubleshooting methodology
-- Common network issues
-
-#### 5.4 Remote Access and Transfer
-- SSH fundamentals
-- SSH key-based authentication
-- Secure file transfer (scp, rsync)
-- SSH tunneling basics
-- Remote command execution
-- SSH configuration and best practices
-
-### 6. System Monitoring and Performance (6-8 hours)
-
-#### 6.1 Resource Monitoring
-- CPU monitoring (top, htop, mpstat)
-- Memory analysis (free, vmstat)
-- Disk usage (df, du, iostat)
-- Network statistics (iftop, nethogs)
-- System load and uptime
-- Resource limits (ulimit)
-
-#### 6.2 System Logs
-- Understanding syslog
-- Log locations and organization
-- Reading log files
-- Log rotation with logrotate
-- Centralized logging concepts
-- Parsing and analyzing logs
-
-#### 6.3 Performance Tuning Basics
-- Identifying bottlenecks
-- CPU vs I/O bound processes
-- Memory management and swap
-- Disk I/O optimization
-- Network tuning basics
-- Performance monitoring tools
-
-#### 6.4 Troubleshooting Methodology
-- Systematic problem-solving approach
-- Gathering system information
-- Isolating issues
-- Common system problems
-- Documentation and logging
-- When to escalate issues
-
-## Lecture Outline
-
-> **Status Update (2025-10-28):** All 8 lecture notes are now complete and available in the `lecture-notes/` directory! Each lecture includes comprehensive coverage, AI Infrastructure examples, hands-on labs, and code samples.
-
-### Lecture 1: Introduction to Linux and Command Line (90 min)
-- History and philosophy of Linux
-- Distribution landscape
-- Terminal emulators and shells
-- Basic command structure
-- Getting help and documentation
-- **Lab:** Setting up your Linux environment
-
-### Lecture 2: File System and Navigation (90 min)
-- Linux filesystem hierarchy standard
-- Path concepts and navigation
-- File operations and manipulation
-- Working with directories
-- Finding files
-- **Lab:** File system exploration exercises
-
-### Lecture 3: Permissions and Security (90 min)
-- Linux permission model
-- Users and groups
-- Ownership and permissions
-- Special permissions
-- Sudo and privilege escalation
-- **Lab:** Setting up multi-user environment
-
-### Lecture 4: System Administration Basics (120 min)
-- Package management
-- Service management with systemd
-- Process management
-- System monitoring
-- Log files
-- **Lab:** Managing a Linux system
-
-### Lecture 5: Introduction to Shell Scripting (90 min)
-- Why shell scripting?
-- Script structure and syntax
-- Variables and data types
-- Basic control structures
-- Functions
-- **Lab:** Writing your first scripts
-
-### Lecture 6: Advanced Shell Scripting (120 min)
-- Advanced control structures
-- Error handling
-- Argument processing
-- Debugging techniques
-- Best practices
-- **Lab:** Building automation scripts
-
-### Lecture 7: Text Processing Tools (90 min)
-- grep and regular expressions
-- sed for stream editing
-- awk for text processing
-- Combining tools with pipes
-- Practical log analysis
-- **Lab:** Analyzing web server logs
-
-### Lecture 8: Networking Fundamentals (120 min)
-- TCP/IP basics
-- Network configuration
-- SSH and remote access
-- Network diagnostics
-- Security considerations
-- **Lab:** Network troubleshooting scenarios
-
-## Hands-On Exercises
-
-> **Status Update (2025-10-28):** All 8 comprehensive exercises are now complete! Each exercise includes detailed instructions, real-world ML infrastructure scenarios, and complete solutions.
-
-### Exercise Overview
-
-The module includes 8 progressive exercises that build practical Linux skills for AI Infrastructure:
-
-### Exercise 01: Linux Navigation and File System Mastery
-**Time**: 60-90 minutes | **Difficulty**: Beginner | **Lectures**: 01-02
-
-Create ML project directory structures, master file operations, and learn efficient navigation techniques.
-
-**Skills Practiced**:
-- File system navigation (pwd, cd, ls)
-- Creating complex directory structures
-- File operations (cp, mv, rm)
-- Finding files (find, locate)
-- Symbolic links
-- ML project organization
+# 模块 002：AI 基础设施的 Linux 基础
+
+## 模块概述
+
+本模块提供 Linux 系统管理的全面基础，这对任何 AI 基础设施工程师都至关重要。你将学习如何操作 Linux 环境、管理系统、通过脚本实现自动化任务并理解网络基础知识。这些技能构成了基础设施工程的基石，因为大多数 AI/ML 工作负载都在基于 Linux 的系统上运行。
+
+完成本模块后，你将能熟练地在 Linux 环境中工作，编写 shell 脚本来自动化常见任务，管理系统资源和排查基本系统问题。
+
+## 学习目标
+
+完成本模块后，你将能够：
+
+1. **操作和管理文件**，使用 Linux 命令行界面
+2. **管理用户、组和权限**，适当地保护系统安全
+3. **监控系统资源**（CPU、内存、磁盘、网络）并识别瓶颈
+4. **编写 shell 脚本**来自动化重复性基础设施任务
+5. **配置网络**，包括接口、DNS 和基本故障排查
+6. **管理进程和服务**，使用 systemd 和传统进程管理
+7. **执行基本系统管理**任务，如包管理和日志分析
+8. **排查常见系统问题**，使用适当的诊断工具
+9. **使用文本处理工具**（grep、sed、awk）进行日志分析
+10. **理解 Linux 文件系统层级**和存储管理
+
+## 先决条件
+
+- 基本计算机素养，熟悉基于文本的界面
+- 建议完成模块 001（Python 基础），但不是必需的
+- 能够访问 Linux 系统（VM、WSL 或原生安装）
+- 愿意练习命令并安全地尝试
+
+**推荐环境：**
+- Ubuntu 22.04 LTS 或类似发行版（虚拟机亦可）
+- 你喜欢的终端模拟器
+- 文本编辑器（vim、nano 或 VS Code 远程 SSH）
+- 至少 2GB RAM 和 20GB 磁盘空间用于练习环境
+
+## 时间投入
+
+- **总预计时间：** 40-50 小时
+- **讲座与阅读：** 15-20 小时
+- **动手练习：** 20-25 小时
+- **练习与复习：** 5-10 小时
+
+**推荐节奏：**
+- 兼职（5-10 小时/周）：4-6 周
+- 全职（20-30 小时/周）：2-3 周
+
+本模块设计灵活。你可以在熟悉的话题上加快进度，在具有挑战性的领域投入更多时间。
+
+## 模块结构
+
+### 第 1 周：Linux 基础
+- **主题：** 命令行基础、文件系统导航、文件操作
+- **关键技能：** ls、cd、cp、mv、rm、mkdir、文件权限
+- **练习：** 10-15 个练习，建立基本命令的肌肉记忆
+
+### 第 2 周：系统管理基础
+- **主题：** 用户管理、包管理、进程控制
+- **关键技能：** useradd、apt/yum、ps、kill、top、systemctl
+- **练习：** 设置用户、安装软件、管理服务
+
+### 第 3 周：Shell 脚本
+- **主题：** Bash 脚本基础、变量、控制结构、函数
+- **关键技能：** 编写自动化脚本、错误处理、参数处理
+- **练习：** 创建用于备份、监控和部署任务的脚本
+
+### 第 4 周：网络与高级主题
+- **主题：** 网络基础、文本处理、系统监控
+- **关键技能：** ip、netstat、ssh、grep、sed、awk、监控工具
+- **练习：** 网络故障排查、日志分析、性能监控
+
+## 详细主题分解
+
+### 1. 命令行基础（6-8 小时）
+
+#### 1.1 shell 入门
+- 终端模拟器和 shell 类型（bash、zsh、sh）
+- 命令语法和结构
+- 获取帮助：man 手册页、--help、info
+- 命令历史和 Tab 补全
+- 环境变量和 PATH
+
+#### 1.2 文件系统导航
+- Linux 文件系统层级（/、/home、/etc、/var、/usr）
+- 绝对路径与相对路径
+- 基本导航命令（cd、pwd、ls）
+- 处理目录（mkdir、rmdir、tree）
+- 查找文件（find、locate、which、whereis）
+
+#### 1.3 文件操作
+- 创建和编辑文件（touch、nano、vim）
+- 复制、移动和删除（cp、mv、rm）
+- 查看文件内容（cat、less、more、head、tail）
+- 文件类型和扩展名
+- 链接（硬链接与符号链接）
+- 归档和压缩（tar、gzip、zip）
+
+#### 1.4 文件权限和所有权
+- 理解 Linux 权限模型（rwx）
+- 数字和符号表示法（chmod）
+- 更改所有权（chown、chgrp）
+- 特殊权限（setuid、setgid、sticky bit）
+- umask 和默认权限
+- 访问控制列表（ACL）简介
+
+### 2. 系统管理（8-10 小时）
+
+#### 2.1 用户和组管理
+- 理解 /etc/passwd 和 /etc/group
+- 创建用户（useradd、adduser）
+- 修改用户（usermod、passwd）
+- 组管理（groupadd、groupmod）
+- Sudo 和权限提升
+- 用户认证和安全最佳实践
+
+#### 2.2 包管理
+- 理解包管理器（apt、yum、dnf）
+- 安装、更新和删除包
+- 管理软件源
+- 处理依赖关系
+- 系统更新和升级
+- 必要时从源码构建
+
+#### 2.3 进程管理
+- 理解进程和 PID
+- 查看进程（ps、top、htop）
+- 进程状态和优先级
+- 终止进程（kill、killall、pkill）
+- 后台和前台作业（&、fg、bg）
+- 进程调度（nice、renice）
+- 进程信号（SIGTERM、SIGKILL、SIGHUP）
+
+#### 2.4 使用 systemd 进行服务管理
+- 理解 systemd 架构
+- 管理服务（systemctl start/stop/restart/status）
+- 启用开机自启服务
+- 查看服务日志（journalctl）
+- 创建自定义服务单元
+- Timer 作为 cron 的替代方案
+
+### 3. Shell 脚本和自动化（10-12 小时）
+
+#### 3.1 Bash 脚本基础
+- 脚本结构和 shebang（#!/bin/bash）
+- 变量和数据类型
+- 命令替换
+- 引用规则（单引号、双引号、反引号）
+- 退出码和错误处理
+- 脚本调试（set -x、set -e）
+
+#### 3.2 控制结构
+- 条件语句（if/elif/else）
+- 测试操作符（文件、字符串、数字）
+- Case 语句
+- 循环（for、while、until）
+- Break 和 continue
+- 函数和作用域
+
+#### 3.3 高级脚本技巧
+- 命令行参数处理
+- 读取用户输入
+- 使用数组
+- 字符串操作
+- 正则表达式基础
+- 错误处理和日志记录
+- 常见任务的脚本模板
+
+#### 3.4 实用自动化脚本
+- 系统备份脚本
+- 日志轮转和清理
+- 健康检查脚本
+- 部署自动化基础
+- 监控和告警脚本
+- 批处理工作流
+
+### 4. 文本处理和日志分析（6-8 小时）
+
+#### 4.1 文本查看和搜索
+- 使用 grep 进行模式匹配
+- 正则表达式实战
+- 递归搜索
+- 查找和替换文本
+- 处理多个文件
+- 性能考虑
+
+#### 4.2 使用 sed 进行流编辑
+- sed 基本语法
+- 查找和替换操作
+- 基于行的编辑
+- 原地编辑文件
+- 多行操作
+- sed 实用用例
+
+#### 4.3 使用 awk 进行文本处理
+- AWK 基础和语法
+- 字段和记录处理
+- 模式匹配和操作
+- 内置变量
+- 算术和字符串操作
+- 从日志生成报告
+
+#### 4.4 日志分析工作流
+- 理解常见日志格式
+- Apache/Nginx 访问日志
+- 系统日志（/var/log/）
+- 应用日志
+- 结合工具进行复杂分析
+- 构建日志分析管道
+
+### 5. 网络基础（6-8 小时）
+
+#### 5.1 网络基础
+- TCP/IP 基础
+- IP 地址和子网划分
+- DNS 概念和解析
+- 端口和协议
+- OSI 模型概述
+- 理解网络接口
+
+#### 5.2 网络配置
+- 查看网络配置（ip、ifconfig）
+- 配置网络接口
+- 静态 IP 与 DHCP
+- Network manager 和 netplan
+- 主机名和 DNS 配置
+- 路由基础
+
+#### 5.3 网络诊断
+- 连通性测试（ping、traceroute）
+- 端口扫描基础（netstat、ss）
+- 数据包捕获（tcpdump 基础）
+- 网络性能测试
+- 排查方法论
+- 常见网络问题
+
+#### 5.4 远程访问和传输
+- SSH 基础
+- SSH 密钥认证
+- 安全文件传输（scp、rsync）
+- SSH 隧道基础
+- 远程命令执行
+- SSH 配置和最佳实践
+
+### 6. 系统监控和性能（6-8 小时）
+
+#### 6.1 资源监控
+- CPU 监控（top、htop、mpstat）
+- 内存分析（free、vmstat）
+- 磁盘使用情况（df、du、iostat）
+- 网络统计（iftop、nethogs）
+- 系统负载和运行时间
+- 资源限制（ulimit）
+
+#### 6.2 系统日志
+- 理解 syslog
+- 日志位置和组织
+- 读取日志文件
+- 使用 logrotate 进行日志轮转
+- 集中式日志记录概念
+- 解析和分析日志
+
+#### 6.3 性能调优基础
+- 识别瓶颈
+- CPU 密集型与 I/O 密集型进程
+- 内存管理和 swap
+- 磁盘 I/O 优化
+- 网络调优基础
+- 性能监控工具
+
+#### 6.4 排查方法论
+- 系统性问题解决方法
+- 收集系统信息
+- 隔离问题
+- 常见系统问题
+- 文档和记录
+- 何时升级问题
+
+## 讲座大纲
+
+> **状态更新（2025-10-28）：** 全部 8 份讲稿现已完成，可在 `lecture-notes/` 目录中获取！每份讲稿包括全面覆盖、AI 基础设施示例、动手实验和代码示例。
+
+### 讲座 1：Linux 和命令行简介（90 分钟）
+- Linux 的历史和哲学
+- 发行版全景
+- 终端模拟器和 shell
+- 基本命令结构
+- 获取帮助和文档
+- **实验：** 搭建 Linux 环境
+
+### 讲座 2：文件系统和导航（90 分钟）
+- Linux 文件系统层级标准
+- 路径概念和导航
+- 文件操作和操作
+- 处理目录
+- 查找文件
+- **实验：** 文件系统探索练习
+
+### 讲座 3：权限和安全（90 分钟）
+- Linux 权限模型
+- 用户和组
+- 所有权和权限
+- 特殊权限
+- Sudo 和权限提升
+- **实验：** 设置多用户环境
+
+### 讲座 4：系统管理基础（120 分钟）
+- 包管理
+- 使用 systemd 进行服务管理
+- 进程管理
+- 系统监控
+- 日志文件
+- **实验：** 管理 Linux 系统
+
+### 讲座 5：Shell 脚本入门（90 分钟）
+- 为什么要学 shell 脚本？
+- 脚本结构和语法
+- 变量和数据类型
+- 基本控制结构
+- 函数
+- **实验：** 编写你的第一个脚本
+
+### 讲座 6：高级 Shell 脚本（120 分钟）
+- 高级控制结构
+- 错误处理
+- 参数处理
+- 调试技巧
+- 最佳实践
+- **实验：** 构建自动化脚本
+
+### 讲座 7：文本处理工具（90 分钟）
+- grep 和正则表达式
+- sed 流编辑
+- awk 文本处理
+- 使用管道组合工具
+- 实际日志分析
+- **实验：** 分析 web 服务器日志
+
+### 讲座 8：网络基础（120 分钟）
+- TCP/IP 基础
+- 网络配置
+- SSH 和远程访问
+- 网络诊断
+- 安全考虑
+- **实验：** 网络故障排查场景
+
+## 动手练习
+
+> **状态更新（2025-10-28）：** 全部 8 个综合练习现已完成！每个练习包括详细说明、真实 ML 基础架构场景和完整解决方案。
+
+### 练习概述
+
+本模块包含 8 个循序渐进的练习，帮助构建 AI 基础设施的实用 Linux 技能：
+
+### 练习 01：Linux 导航和文件系统掌握
+**时间**：60-90 分钟 | **难度**：初级 | **讲座**：01-02
+
+创建 ML 项目目录结构，掌握文件操作，学习高效导航技巧。
+
+**练习的技能**：
+- 文件系统导航（pwd、cd、ls）
+- 创建复杂目录结构
+- 文件操作（cp、mv、rm）
+- 查找文件（find、locate）
+- 符号链接
+- ML 项目组织
 
 ---
 
-### Exercise 02: File Permissions and Access Control for ML Teams
-**Time**: 75-90 minutes | **Difficulty**: Intermediate | **Lectures**: 01-03
+### 练习 02：ML 团队的文件权限和访问控制
+**时间**：75-90 分钟 | **难度**：中级 | **讲座**：01-03
 
-Configure permissions for multi-user ML teams, implement access control, and secure ML assets.
+为多用户 ML 团队配置权限，实现访问控制，保护 ML 资产安全。
 
-**Skills Practiced**:
-- Linux permission model (rwx)
-- chmod (numeric and symbolic)
-- chown and chgrp
-- umask configuration
-- Access Control Lists (ACLs)
-- Secure multi-user environments
-
----
-
-### Exercise 03: Process Management for ML Workloads
-**Time**: 90 minutes | **Difficulty**: Intermediate | **Lectures**: 01-04
-
-Manage long-running ML training processes, monitor resource usage, and handle process priorities.
-
-**Skills Practiced**:
-- Process viewing (ps, top, htop)
-- Process control (kill, nice, renice)
-- Background/foreground jobs
-- Screen and tmux for persistent sessions
-- GPU process monitoring
-- Resource management
+**练习的技能**：
+- Linux 权限模型（rwx）
+- chmod（数字和符号）
+- chown 和 chgrp
+- umask 配置
+- 访问控制列表（ACL）
+- 安全的多用户环境
 
 ---
 
-### Exercise 04: Shell Scripting for ML Operations
-**Time**: 90-120 minutes | **Difficulty**: Intermediate to Advanced | **Lectures**: 01-05, 06
+### 练习 03：ML 工作负载的进程管理
+**时间**：90 分钟 | **难度**：中级 | **讲座**：01-04
 
-Write automation scripts for ML workflows including model deployment, data preprocessing, and training pipelines.
+管理长时间运行的 ML 训练进程，监控资源使用情况，处理进程优先级。
 
-**Skills Practiced**:
-- Script structure and best practices
-- Variables and control structures
-- Functions and error handling
-- Command-line arguments
-- Practical ML automation
-- Script debugging
-
----
-
-### Exercise 05: Package Management for AI/ML Environments
-**Time**: 75-90 minutes | **Difficulty**: Intermediate | **Lectures**: 01-04
-
-Manage system packages, Python environments, CUDA toolkit, and ML frameworks.
-
-**Skills Practiced**:
-- apt/yum package management
-- Python package management (pip, conda)
-- Virtual environment creation
-- CUDA installation
-- Docker installation
-- Dependency resolution
+**练习的技能**：
+- 进程查看（ps、top、htop）
+- 进程控制（kill、nice、renice）
+- 后台/前台作业
+- 使用 screen 和 tmux 进行持久会话
+- GPU 进程监控
+- 资源管理
 
 ---
 
-### Exercise 06: Log Analysis for ML Systems
-**Time**: 90 minutes | **Difficulty**: Intermediate to Advanced | **Lectures**: 01-07
+### 练习 04：ML 运维的 Shell 脚本
+**时间**：90-120 分钟 | **难度**：中级到高级 | **讲座**：01-05、06
 
-Analyze training logs, parse metrics, and build log processing pipelines using grep, sed, and awk.
+为 ML 工作流编写自动化脚本，包括模型部署、数据预处理和训练管道。
 
-**Skills Practiced**:
-- grep for pattern matching
-- sed for stream editing
-- awk for field processing
-- Building log analysis pipelines
-- Extracting ML metrics
-- Automated report generation
-
----
-
-### Exercise 07: Real-World Troubleshooting Scenarios
-**Time**: 90 minutes | **Difficulty**: Intermediate to Advanced | **Lectures**: ALL
-
-Diagnose and fix real-world issues: disk full, permission errors, hung processes, OOM, CUDA problems, and network issues.
-
-**Skills Practiced**:
-- Systematic troubleshooting methodology
-- Disk space management
-- Permission debugging
-- Process troubleshooting
-- GPU/CUDA diagnostics
-- Network debugging
-- Creating runbooks
+**练习的技能**：
+- 脚本结构和最佳实践
+- 变量和控制结构
+- 函数和错误处理
+- 命令行参数
+- 实用 ML 自动化
+- 脚本调试
 
 ---
 
-### Exercise 08: System Automation and Maintenance for ML Infrastructure
-**Time**: 120 minutes | **Difficulty**: Advanced | **Lectures**: 01-08 (focus on 04, 06)
+### 练习 05：AI/ML 环境的包管理
+**时间**：75-90 分钟 | **难度**：中级 | **讲座**：01-04
 
-Build complete automation suite: backups, monitoring, log rotation, cleanup tasks, and health checks.
+管理系统包、Python 环境、CUDA 工具包和 ML 框架。
 
-**Skills Practiced**:
-- Automated backup scripts
-- Cron and systemd timers
-- GPU health monitoring
-- Log rotation (logrotate)
-- Cleanup automation
-- System health checks
-- End-to-end automation workflows
-
-## Assessment and Evaluation
-
-### Knowledge Checks
-- Quiz after each major section (6 quizzes total)
-- Command recall exercises
-- Concept explanation questions
-- Troubleshooting scenario analysis
-
-### Practical Assessments
-- **Hands-on Labs:** Complete all 25 exercises with working solutions
-- **Script Portfolio:** Create 5 automation scripts demonstrating key concepts
-- **System Setup:** Configure a complete Linux system to specifications
-- **Troubleshooting Challenge:** Diagnose and fix 10 system issues
-
-### Competency Criteria
-To complete this module successfully, you should be able to:
-- Navigate and manage files confidently via command line
-- Write functional shell scripts for common automation tasks
-- Perform basic system administration tasks independently
-- Troubleshoot common system and network issues
-- Read and analyze log files effectively
-- Configure and manage services using systemd
-- Demonstrate security awareness in system administration
-
-### Self-Assessment Questions
-1. Can you confidently navigate any Linux system using only the command line?
-2. Can you write a script to automate a multi-step task?
-3. Can you diagnose why a service isn't starting?
-4. Can you analyze logs to identify issues?
-5. Can you configure network settings and troubleshoot connectivity?
-6. Can you manage users and permissions securely?
-7. Can you monitor system resources and identify bottlenecks?
-
-## Resources and References
-
-> **Note:** See `resources/recommended-reading.md` for a comprehensive list of learning materials, books, and online resources.
-
-### Essential Resources
-- Linux man pages (available on any system via `man` command)
-- The Linux Documentation Project (tldp.org)
-- Ubuntu Official Documentation
-- Red Hat Enterprise Linux Documentation
-
-### Recommended Books
-- "The Linux Command Line" by William Shotts (free online)
-- "Unix and Linux System Administration Handbook" by Evi Nemeth et al.
-- "Learning the bash Shell" by Cameron Newham
-
-### Online Learning
-- Linux Journey (linuxjourney.com)
-- OverTheWire: Bandit (wargames challenges)
-- Digital Ocean Tutorials
-- Red Hat Learning Subscription
-
-### Practice Environments
-- Local VM (VirtualBox, VMware, Hyper-V)
-- Windows Subsystem for Linux (WSL2)
-- Cloud instances (AWS EC2 free tier, GCP, Azure)
-- Docker containers for safe experimentation
-
-## Getting Started
-
-### Step 1: Set Up Your Environment
-1. Install or access a Linux system (Ubuntu 22.04 LTS recommended)
-2. Ensure you have terminal access
-3. Verify you can execute basic commands
-4. Set up a text editor you're comfortable with
-
-### Step 2: Review Prerequisites
-- Ensure you have basic computer literacy
-- Review Python fundamentals if you completed Module 001
-- Familiarize yourself with the concept of a terminal/shell
-
-### Step 3: Begin with Lecture 1
-- Read the lecture notes for Introduction to Linux
-- Watch any supplementary videos
-- Complete the setup lab
-- Practice basic commands
-
-### Step 4: Follow the Learning Path
-- Work through lectures sequentially
-- Complete exercises after each section
-- Take quizzes to verify understanding
-- Build your script portfolio as you progress
-
-### Step 5: Practice Regularly
-- Use Linux for daily tasks when possible
-- Experiment with commands safely
-- Read man pages for commands you use
-- Join Linux communities for support
-
-## Tips for Success
-
-1. **Practice Daily:** Even 15-30 minutes of daily practice is more effective than long infrequent sessions
-2. **Read Man Pages:** Get comfortable with reading documentation
-3. **Break Things Safely:** Use VMs or containers to experiment without fear
-4. **Build a Cheat Sheet:** Keep notes on commands and concepts you use frequently
-5. **Teach Others:** Explaining concepts reinforces your understanding
-6. **Automate Everything:** Look for opportunities to script repetitive tasks
-7. **Join Communities:** Linux forums and IRC channels are welcoming and helpful
-8. **Stay Curious:** Explore how things work under the hood
-
-## Troubleshooting and Support
-
-### Common Challenges
-
-**Challenge:** Overwhelming number of commands
-- **Solution:** Focus on most common commands first, build muscle memory through repetition
-
-**Challenge:** Understanding permissions
-- **Solution:** Use visual tools, practice with test files, draw diagrams
-
-**Challenge:** Scripting seems difficult
-- **Solution:** Start with simple scripts, gradually add complexity, study examples
-
-**Challenge:** Not sure when to use which tool
-- **Solution:** Practice common scenarios, build a decision tree, analyze examples
-
-### Getting Help
-- Use man pages and `--help` flags first
-- Search error messages online
-- Ask in module discussion forums
-- Consult with mentors or study groups
-- Review solutions to similar problems
-
-## Next Steps
-
-After completing this module, you'll be ready to:
-- **Module 003:** Git and Version Control (uses command line extensively)
-- **Module 005:** Docker and Containers (builds on Linux knowledge)
-- **Module 010:** Cloud Platforms (applies Linux skills in cloud environments)
-
-The skills learned here are foundational and will be used in every subsequent module.
-
-## Development Status
-
-**Current Status:** Template phase - comprehensive structure in place
-
-**Available Now:**
-- Complete module structure and learning objectives
-- Detailed topic breakdown
-- Lecture outline
-- Exercise framework
-- Assessment criteria
-
-**In Development:**
-- Full lecture notes (300-400 lines per lecture)
-- Complete exercise instructions
-- Interactive quizzes
-- Solution guides
-- Video demonstrations
-- Additional practice scenarios
-
-**Planned Updates:**
-- Advanced troubleshooting scenarios
-- Container-specific Linux concepts
-- Kubernetes node management
-- Cloud-specific administration
-- Security hardening guides
-
-## Feedback and Contributions
-
-This module is continuously being improved. If you have suggestions, found errors, or want to contribute:
-- Open an issue in the repository
-- Submit a pull request with improvements
-- Share your learning experience
-- Suggest additional resources
+**练习的技能**：
+- apt/yum 包管理
+- Python 包管理（pip、conda）
+- 虚拟环境创建
+- CUDA 安装
+- Docker 安装
+- 依赖解析
 
 ---
 
-**Module Maintainer:** AI Infrastructure Curriculum Team
-**Contact:** ai-infra-curriculum@joshua-ferguson.com
-**Last Updated:** 2025-10-18
-**Version:** 1.0.0-template
+### 练习 06：ML 系统的日志分析
+**时间**：90 分钟 | **难度**：中级到高级 | **讲座**：01-07
+
+分析训练日志，解析指标，使用 grep、sed 和 awk 构建日志处理管道。
+
+**练习的技能**：
+- 使用 grep 进行模式匹配
+- 使用 sed 进行流编辑
+- 使用 awk 进行字段处理
+- 构建日志分析管道
+- 提取 ML 指标
+- 自动化报告生成
+
+---
+
+### 练习 07：真实世界故障排查场景
+**时间**：90 分钟 | **难度**：中级到高级 | **讲座**：全部
+
+诊断和修复真实世界问题：磁盘已满、权限错误、进程挂起、OOM、CUDA 问题和网络问题。
+
+**练习的技能**：
+- 系统化排查方法论
+- 磁盘空间管理
+- 权限调试
+- 进程故障排查
+- GPU/CUDA 诊断
+- 网络调试
+- 创建 runbook
+
+---
+
+### 练习 08：ML 基础设施的系统自动化和维护
+**时间**：120 分钟 | **难度**：高级 | **讲座**：01-08（重点关注 04、06）
+
+构建完整自动化套件：备份、监控、日志轮转、清理任务和健康检查。
+
+**练习的技能**：
+- 自动化备份脚本
+- Cron 和 systemd timers
+- GPU 健康监控
+- 日志轮转（logrotate）
+- 清理自动化
+- 系统健康检查
+- 端到端自动化工作流
+
+## 评估和评价
+
+### 知识检查
+- 每个主要部分后的测验（共 6 个测验）
+- 命令记忆练习
+- 概念解释问题
+- 故障排查场景分析
+
+### 实践评估
+- **动手实验：** 完成全部 25 个练习并提供可行解决方案
+- **脚本作品集：** 创建 5 个演示关键概念的自动化脚本
+- **系统搭建：** 按照规范配置完整的 Linux 系统
+- **故障排查挑战：** 诊断和修复 10 个系统问题
+
+### 能力标准
+要成功完成本模块，你应该能够：
+- 通过命令行自信地导航和管理文件
+- 编写用于常见自动化任务的功能性 shell 脚本
+- 独立执行基本系统管理任务
+- 排查常见系统和网络问题
+- 有效地读取和分析日志文件
+- 使用 systemd 配置和管理服务
+- 在系统管理中展示安全意识
+
+### 自我评估问题
+1. 你能仅使用命令行自信地导航任何 Linux 系统吗？
+2. 你能编写脚本来自动化多步骤任务吗？
+3. 你能诊断服务为何无法启动吗？
+4. 你能分析日志以识别问题吗？
+5. 你能配置网络设置并排查连接问题吗？
+6. 你能安全管理用户和权限吗？
+7. 你能监控系统资源并识别瓶颈吗？
+
+## 资源和参考
+
+> **注意：** 参见 `resources/recommended-reading.md` 获取学习材料、书籍和在线资源的完整列表。
+
+### 基本资源
+- Linux man 手册页（可通过 `man` 命令在任何系统上获取）
+- Linux 文档项目（tldp.org）
+- Ubuntu 官方文档
+- Red Hat Enterprise Linux 文档
+
+### 推荐书籍
+- "The Linux Command Line" - William Shotts（免费在线）
+- "Unix and Linux System Administration Handbook" - Evi Nemeth 等
+- "Learning the bash Shell" - Cameron Newham
+
+### 在线学习
+- Linux Journey（linuxjourney.com）
+- OverTheWire：Bandit（wargames 挑战）
+- Digital Ocean 教程
+- Red Hat 学习订阅
+
+### 练习环境
+- 本地 VM（VirtualBox、VMware、Hyper-V）
+- Windows 子系统 for Linux（WSL2）
+- 云实例（AWS EC2 免费套餐、GCP、Azure）
+- 用于安全实验的 Docker 容器
+
+## 入门指南
+
+### 步骤 1：搭建环境
+1. 安装或访问 Linux 系统（推荐 Ubuntu 22.04 LTS）
+2. 确保你能访问终端
+3. 验证你能执行基本命令
+4. 设置你习惯使用的文本编辑器
+
+### 步骤 2：复习先决条件
+- 确保你具备基本计算机素养
+- 如果你已完成模块 001，复习 Python 基础
+- 熟悉终端/shell 的概念
+
+### 步骤 3：从讲座 1 开始
+- 阅读 Linux 入门讲稿
+- 观看任何补充视频
+- 完成环境搭建实验
+- 练习基本命令
+
+### 步骤 4：遵循学习路径
+- 按顺序学习讲座
+- 每个部分后完成练习
+- 参加测验以验证理解
+- 随着时间的推移构建你的脚本作品集
+
+### 步骤 5：定期练习
+- 在可能的情况下使用 Linux 处理日常任务
+- 安全地尝试命令
+- 为你使用的命令阅读 man 手册页
+- 加入 Linux 社区寻求支持
+
+## 成功秘诀
+
+1. **每日练习：** 即使是每天 15-30 分钟的练习也比长时间不练习更有效
+2. **阅读 Man 手册页：** 习惯阅读文档
+3. **安全地试错：** 使用 VM 或容器进行尝试，无需担心
+4. **建立速查表：** 记录你经常使用的命令和概念
+5. **教他人：** 解释概念可以巩固你的理解
+6. **自动化一切：** 寻找机会将重复性任务脚本化
+7. **加入社区：** Linux 论坛和 IRC 频道非常友好且乐于助人
+8. **保持好奇：** 探索事物在底层是如何工作的
+
+## 故障排查和支持
+
+### 常见挑战
+
+**挑战：** 命令数量过多
+- **解决方案：** 首先关注最常用的命令，通过重复建立肌肉记忆
+
+**挑战：** 理解权限
+- **解决方案：** 使用可视化工具，用测试文件练习，画图表
+
+**挑战：** 脚本编写似乎困难
+- **解决方案：** 从简单脚本开始，逐步增加复杂性，学习示例
+
+**挑战：** 不确定何时使用哪种工具
+- **解决方案：** 练习常见场景，构建决策树，分析示例
+
+### 获取帮助
+- 首先使用 man 手册页和 `--help` 标志
+- 在线搜索错误消息
+- 在模块讨论论坛中提问
+- 咨询导师或学习小组
+- 查看类似问题的解决方案
+
+## 下一步
+
+完成本模块后，你将准备好：
+- **模块 003：** Git 和版本控制（大量使用命令行）
+- **模块 005：** Docker 和容器（基于 Linux 知识）
+- **模块 010：** 云平台（在云环境中应用 Linux 技能）
+
+这里学到的技能是基础性的，将在后续每个模块中使用。
+
+## 开发状态
+
+**当前状态：** 模板阶段 - 已建立完整结构
+
+**现已提供：**
+- 完整模块结构和学习目标
+- 详细主题分解
+- 讲座大纲
+- 练习框架
+- 评估标准
+
+**开发中：**
+- 完整讲稿（每讲 300-400 行）
+- 完整练习说明
+- 交互式测验
+- 解决方案指南
+- 视频演示
+- 额外练习场景
+
+**计划更新：**
+- 高级故障排查场景
+- 容器特定的 Linux 概念
+- Kubernetes 节点管理
+- 云特定管理
+- 安全加固指南
+
+## 反馈和贡献
+
+本模块持续改进中。如果你有建议、发现错误或想要贡献：
+- 在仓库中提交 issue
+- 提交 pull request 进行改进
+- 分享你的学习经验
+- 建议额外资源
+
+---
+
+**模块维护者：** AI 基础设施课程团队
+**联系方式：** ai-infra-curriculum@joshua-ferguson.com
+**最后更新：** 2025-10-18
+**版本：** 1.0.0-template

@@ -1,93 +1,93 @@
-# Exercise 05: Database Optimization & Indexing
+# Exercise 05: 数据库优化与索引
 
-## Overview
+## 概述
 
-Optimize the performance of your ML registry database by profiling queries, introducing indexes, and tuning configuration. You will also establish baseline monitoring dashboards so you can spot regressions early. This exercise transforms you from a database user into a performance engineer, capable of diagnosing bottlenecks and implementing targeted optimizations for production ML infrastructure.
+通过分析查询、引入索引和调整配置来优化 ML 注册数据库的性能。你还将建立基准监控仪表盘，以便及早发现性能退化。本练习将你从数据库用户转变为性能工程师，能够诊断瓶颈并为生产 ML 基础设施实施针对性优化。
 
-**Difficulty:** Intermediate → Advanced
-**Estimated Time:** 3-4 hours
-**Prerequisites:**
-- Exercises 01–04 completed (schema, advanced SQL, ORM integration)
-- Lecture 04 (ORMs & Database Integration)
-- Comfort with interpreting `EXPLAIN ANALYZE` output
-- Basic understanding of database architecture (pages, buffers, WAL)
+**难度：** 中级 → 高级
+**预计时间：** 3-4 小时
+**前置条件：**
+- 已完成练习 01–04（schema、高级 SQL、ORM 集成）
+- 讲座 04（ORM 与数据库集成）
+- 能解释 `EXPLAIN ANALYZE` 输出
+- 基本了解数据库架构（页面、缓冲区、WAL）
 
-## Learning Objectives
+## 学习目标
 
-By the end of this exercise, you will be able to:
+完成本练习后，你将能够：
 
-1. **Profile database performance** using PostgreSQL diagnostic tools (pg_stat_statements, EXPLAIN ANALYZE)
-2. **Identify query bottlenecks** through execution plan analysis and metrics
-3. **Design index strategies** for different query patterns (B-tree, Hash, BRIN, GIN, partial indexes)
-4. **Measure performance improvements** with before/after comparisons
-5. **Implement maintenance procedures** (VACUUM, ANALYZE, REINDEX)
-6. **Configure monitoring** for production database health
-7. **Optimize query patterns** in application code and ORM usage
-8. **Apply production best practices** for database performance management
+1. **使用 PostgreSQL 诊断工具分析数据库性能**（pg_stat_statements、EXPLAIN ANALYZE）
+2. **通过执行计划分析和指标识别查询瓶颈**
+3. **针对不同查询模式设计索引策略**（B-tree、Hash、BRIN、GIN、partial indexes）
+4. **通过前后对比衡量性能改进**
+5. **实施维护程序**（VACUUM、ANALYZE、REINDEX）
+6. **配置生产数据库健康监控**
+7. **在应用代码和 ORM 使用中优化查询模式**
+8. **应用数据库性能管理的生产最佳实践**
 
-## Scenario
+## 场景
 
-Your ML model registry has been running smoothly for 3 months, but recent growth has caused performance issues:
+你的 ML 模型注册已经平稳运行了 3 个月，但最近的增长导致了性能问题：
 
-- **Dashboard queries** taking 5-10 seconds to load (previously <500ms)
-- **Training run ingestion** experiencing occasional timeouts
-- **Deployment status checks** causing API slowdowns during peak hours
-- **Database CPU usage** spiking to 80-90% during business hours
+- **仪表盘查询**加载需要 5-10 秒（之前 <500ms）
+- **训练运行导入**偶尔遇到超时
+- **部署状态检查**在高峰时段导致 API 变慢
+- **数据库 CPU 使用率**在营业时间飙升至 80-90%
 
-As the infrastructure engineer on call, you must:
-1. Profile the workload to identify slow queries
-2. Apply targeted optimizations (indexes, query rewrites)
-3. Establish monitoring to prevent future regressions
-4. Document a repeatable performance tuning process
+作为当班的基础设施工程师，你必须：
+1. 分析工作负载以识别慢查询
+2. 应用针对性优化（索引、查询重写）
+3. 建立监控以防止未来退化
+4. 记录可重复的性能调优流程
 
-Management expects:
-- ✅ 80% reduction in P99 query latency
-- ✅ Dashboard load times < 1 second
-- ✅ Zero query timeouts during peak hours
-- ✅ Automated monitoring and alerting
+管理层期望：
+- ✅ P99 查询延迟降低 80%
+- ✅ 仪表盘加载时间 < 1 秒
+- ✅ 高峰时段零查询超时
+- ✅ 自动监控和告警
 
 ---
 
-## Part 1: Database Performance Profiling
+## 第 1 部分：数据库性能分析
 
-### Step 1.1: Enable Query Statistics
+### 步骤 1.1：启用查询统计
 
-PostgreSQL provides `pg_stat_statements` for tracking query performance. Enable it:
+PostgreSQL 提供 `pg_stat_statements` 用于跟踪查询性能。启用它：
 
 ```sql
--- Connect to your database
+-- 连接到你的数据库
 psql -h localhost -U ml_user -d ml_registry
 
--- Enable the extension
+-- 启用扩展
 CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 
--- Verify it's working
+-- 验证是否工作
 SELECT * FROM pg_stat_statements LIMIT 5;
 ```
 
-**Expected Output:**
+**预期输出：**
 ```
  userid | dbid  | queryid  |         query          | calls | total_time | mean_time
 --------+-------+----------+------------------------+-------+------------+-----------
   16384 | 16385 | 12345678 | SELECT * FROM models   |   142 |    1250.34 |      8.80
 ```
 
-### Step 1.2: Configure PostgreSQL for Performance Tracking
+### 步骤 1.2：配置 PostgreSQL 性能跟踪
 
-Edit `postgresql.conf` (or set via Docker environment):
+编辑 `postgresql.conf`（或通过 Docker 环境变量设置）：
 
 ```conf
-# Track statement execution statistics
+# 跟踪语句执行统计
 shared_preload_libraries = 'pg_stat_statements'
 pg_stat_statements.track = all
 pg_stat_statements.max = 10000
 
-# Enable detailed query logging for slow queries
-log_min_duration_statement = 1000  # Log queries > 1 second
+# 启用慢查询的详细查询日志
+log_min_duration_statement = 1000  # 记录 > 1 秒的查询
 log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d,app=%a,client=%h '
 log_statement = 'ddl'
 
-# Enable auto-explain for queries > 500ms
+# 为 > 500ms 的查询启用自动分析
 session_preload_libraries = 'auto_explain'
 auto_explain.log_min_duration = 500
 auto_explain.log_analyze = true
@@ -95,21 +95,21 @@ auto_explain.log_buffers = true
 auto_explain.log_timing = true
 auto_explain.log_format = 'json'
 
-# Improve statistics accuracy
-default_statistics_target = 100  # Default is 100, increase for complex queries
+# 提高统计信息准确性
+default_statistics_target = 100  # 默认为 100，复杂查询可增加
 ```
 
-**Restart PostgreSQL** to apply changes:
+**重启 PostgreSQL** 以应用更改：
 
 ```bash
 docker restart ml-registry-postgres
 ```
 
-### Step 1.3: Generate Realistic Workload
+### 步骤 1.3：生成真实工作负载
 
-Create a workload simulation script to generate realistic query patterns:
+创建一个工作负载模拟脚本以生成真实查询模式：
 
-Create `scripts/generate_workload.py`:
+创建 `scripts/generate_workload.py`：
 
 ```python
 """
@@ -126,24 +126,15 @@ from psycopg2.extras import execute_values
 
 # Database connection
 conn = psycopg2.connect(
-    host="localhost",
-    port=5432,
-    dbname="ml_registry",
-    user="ml_user",
-    password="ml_password"
+    host="localhost", port=5432, dbname="ml_registry",
+    user="ml_user", password="ml_password"
 )
 
 def simulate_dashboard_query():
     """Simulate slow dashboard query - latest deployments with model info."""
     with conn.cursor() as cur:
         cur.execute("""
-            SELECT
-                m.model_name,
-                mv.semver,
-                d.environment_id,
-                d.status,
-                d.deployed_at,
-                d.deployed_by
+            SELECT m.model_name, mv.semver, d.environment_id, d.status, d.deployed_at, d.deployed_by
             FROM deployments d
             INNER JOIN model_versions mv ON d.version_id = mv.version_id
             INNER JOIN models m ON mv.model_id = m.model_id
@@ -151,41 +142,30 @@ def simulate_dashboard_query():
             ORDER BY d.deployed_at DESC
             LIMIT 50;
         """)
-        results = cur.fetchall()
-        return len(results)
+        return len(cur.fetchall())
 
 def simulate_training_runs_query():
     """Simulate training runs query by experiment."""
     with conn.cursor() as cur:
-        experiment_name = random.choice([
-            "fraud-exp-001", "churn-exp-002", "recommender-exp-003"
-        ])
+        experiment_name = random.choice(["fraud-exp-001", "churn-exp-002", "recommender-exp-003"])
         cur.execute("""
-            SELECT
-                run_id,
-                model_name,
-                status,
-                accuracy,
-                created_at
+            SELECT run_id, model_name, status, accuracy, created_at
             FROM training_runs
             WHERE experiment_name = %s
               AND created_at > NOW() - INTERVAL '7 days'
             ORDER BY accuracy DESC NULLS LAST
             LIMIT 20;
         """, (experiment_name,))
-        results = cur.fetchall()
-        return len(results)
+        return len(cur.fetchall())
 
 def simulate_model_stats_query():
     """Simulate aggregate stats query across all models."""
     with conn.cursor() as cur:
         cur.execute("""
-            SELECT
-                m.model_name,
-                COUNT(DISTINCT mv.version_id) as version_count,
-                COUNT(DISTINCT tr.run_id) as training_runs,
-                COUNT(DISTINCT d.deployment_id) as deployments,
-                MAX(tr.accuracy) as best_accuracy
+            SELECT m.model_name, COUNT(DISTINCT mv.version_id) as version_count,
+                   COUNT(DISTINCT tr.run_id) as training_runs,
+                   COUNT(DISTINCT d.deployment_id) as deployments,
+                   MAX(tr.accuracy) as best_accuracy
             FROM models m
             LEFT JOIN model_versions mv ON m.model_id = mv.model_id
             LEFT JOIN training_runs tr ON tr.version_id = mv.version_id
@@ -194,116 +174,74 @@ def simulate_model_stats_query():
             GROUP BY m.model_id, m.model_name
             ORDER BY deployments DESC;
         """)
-        results = cur.fetchall()
-        return len(results)
+        return len(cur.fetchall())
 
 def simulate_deployment_status_check():
     """Simulate deployment status check for specific environment."""
     with conn.cursor() as cur:
         cur.execute("""
-            SELECT
-                m.model_name,
-                mv.semver,
-                d.status,
-                d.replicas,
-                d.deployed_at
+            SELECT m.model_name, mv.semver, d.status, d.replicas, d.deployed_at
             FROM deployments d
             INNER JOIN model_versions mv ON d.version_id = mv.version_id
             INNER JOIN models m ON mv.model_id = m.model_id
-            WHERE d.environment_id = 1
-              AND d.status = 'active'
+            WHERE d.environment_id = 1 AND d.status = 'active'
             ORDER BY d.deployed_at DESC;
         """)
-        results = cur.fetchall()
-        return len(results)
+        return len(cur.fetchall())
 
 def run_workload(duration_seconds=60, queries_per_second=10):
-    """
-    Run mixed workload for specified duration.
-
-    Args:
-        duration_seconds: How long to run workload
-        queries_per_second: Target QPS
-    """
-    query_functions = [
-        simulate_dashboard_query,
-        simulate_training_runs_query,
-        simulate_model_stats_query,
-        simulate_deployment_status_check,
-    ]
-
+    query_functions = [simulate_dashboard_query, simulate_training_runs_query, simulate_model_stats_query, simulate_deployment_status_check]
     start_time = time.time()
     query_count = 0
-
     print(f"Running workload for {duration_seconds}s at {queries_per_second} QPS...")
-
     while time.time() - start_time < duration_seconds:
-        # Random query selection
         query_func = random.choice(query_functions)
-
         try:
             start = time.time()
             rows = query_func()
-            duration = (time.time() - start) * 1000  # ms
-
+            duration = (time.time() - start) * 1000
             query_count += 1
-
-            if duration > 100:  # Log slow queries
+            if duration > 100:
                 print(f"  ⚠️  {query_func.__name__}: {duration:.1f}ms ({rows} rows)")
-
         except Exception as e:
             print(f"  ❌ Error in {query_func.__name__}: {e}")
-
-        # Rate limiting
         time.sleep(1.0 / queries_per_second)
-
     elapsed = time.time() - start_time
-    print(f"\nWorkload complete:")
-    print(f"  Total queries: {query_count}")
-    print(f"  Duration: {elapsed:.1f}s")
-    print(f"  Actual QPS: {query_count / elapsed:.1f}")
+    print(f"\nWorkload complete:\n  Total queries: {query_count}\n  Duration: {elapsed:.1f}s\n  Actual QPS: {query_count / elapsed:.1f}")
 
 if __name__ == "__main__":
     import sys
-
     duration = int(sys.argv[1]) if len(sys.argv) > 1 else 60
     qps = int(sys.argv[2]) if len(sys.argv) > 2 else 10
-
     try:
         run_workload(duration, qps)
     finally:
         conn.close()
 ```
 
-**Run the workload:**
+**运行工作负载：**
 
 ```bash
-python scripts/generate_workload.py 60 10  # 60 seconds, 10 QPS
+python scripts/generate_workload.py 60 10
 ```
 
-### Step 1.4: Capture Baseline Performance Metrics
+### 步骤 1.4：捕获基准性能指标
 
-Query `pg_stat_statements` to identify slow queries:
+查询 `pg_stat_statements` 以识别慢查询：
 
 ```sql
--- Top 10 slowest queries by total time
-SELECT
-    query,
-    calls,
-    total_exec_time / 1000 as total_time_sec,
-    mean_exec_time as avg_time_ms,
-    max_exec_time as max_time_ms,
-    stddev_exec_time as stddev_ms,
-    rows,
-    100.0 * shared_blks_hit / NULLIF(shared_blks_hit + shared_blks_read, 0) AS cache_hit_ratio
+-- 按总时间排名前 10 的慢查询
+SELECT query, calls, total_exec_time / 1000 as total_time_sec,
+       mean_exec_time as avg_time_ms, max_exec_time as max_time_ms,
+       stddev_exec_time as stddev_ms, rows,
+       100.0 * shared_blks_hit / NULLIF(shared_blks_hit + shared_blks_read, 0) AS cache_hit_ratio
 FROM pg_stat_statements
 WHERE query NOT LIKE '%pg_stat_statements%'
 ORDER BY total_exec_time DESC
 LIMIT 10;
 ```
 
-**Example Output:**
-
+**示例输出：**
 ```
  query                           | calls | total_time_sec | avg_time_ms | max_time_ms | cache_hit_ratio
 ---------------------------------+-------+----------------+-------------+-------------+-----------------
@@ -312,26 +250,21 @@ LIMIT 10;
  SELECT m.model_name, COUNT…     |   156 |          22.34 |      143.21 |      890.12 |           38.45
 ```
 
-**Key Metrics to Track:**
+**关键跟踪指标：**
 
-1. **total_time_sec**: Total time spent in this query (high = priority target)
-2. **avg_time_ms**: Average execution time per call
-3. **max_time_ms**: Worst-case latency (P100)
-4. **cache_hit_ratio**: % of data found in memory vs disk (low = I/O bottleneck)
-5. **calls**: How often the query runs (high + slow = critical)
+1. **total_time_sec**：该查询总耗时（高 = 优先目标）
+2. **avg_time_ms**：每次调用的平均执行时间
+3. **max_time_ms**：最差情况延迟（P100）
+4. **cache_hit_ratio**：在内存中找到数据的百分比 vs 磁盘（低 = I/O 瓶颈）
+5. **calls**：查询运行频率（高 + 慢 = 关键）
 
-### Step 1.5: Analyze Execution Plans with EXPLAIN
+### 步骤 1.5：使用 EXPLAIN 分析执行计划
 
-For each slow query, capture detailed execution plan:
+对每个慢查询，捕获详细执行计划：
 
 ```sql
 EXPLAIN (ANALYZE, BUFFERS, VERBOSE, TIMING)
-SELECT
-    m.model_name,
-    mv.semver,
-    d.environment_id,
-    d.status,
-    d.deployed_at
+SELECT m.model_name, mv.semver, d.environment_id, d.status, d.deployed_at
 FROM deployments d
 INNER JOIN model_versions mv ON d.version_id = mv.version_id
 INNER JOIN models m ON mv.model_id = m.model_id
@@ -340,7 +273,7 @@ ORDER BY d.deployed_at DESC
 LIMIT 50;
 ```
 
-**Example Execution Plan (Before Optimization):**
+**示例执行计划（优化前）：**
 
 ```
 Limit  (cost=1245.67..1246.05 rows=50 width=120) (actual time=145.234..145.567 rows=50 loops=1)
@@ -362,8 +295,6 @@ Limit  (cost=1245.67..1246.05 rows=50 width=120) (actual time=145.234..145.567 r
                     ->  Hash  (cost=98.76..98.76 rows=1975 width=32) (actual time=5.432..5.433 rows=1975 loops=1)
                           Buckets: 2048  Batches: 1  Memory Usage: 125kB
                           Buffers: shared hit=667
-                          ->  Seq Scan on model_versions mv  (cost=0.00..98.76 rows=1975 width=32) (actual time=0.012..3.456 rows=1975 loops=1)
-                                Buffers: shared hit=667
               ->  Hash  (cost=87.65..87.65 rows=1876 width=40) (actual time=6.543..6.544 rows=1876 loops=1)
                     Buckets: 2048  Batches: 1  Memory Usage: 145kB
                     Buffers: shared hit=555
@@ -373,38 +304,38 @@ Planning Time: 1.234 ms
 Execution Time: 145.678 ms
 ```
 
-**Key Findings from Execution Plan:**
+**执行计划关键发现：**
 
-1. **Seq Scan on deployments** (112ms): Full table scan filtering 15,678 rows → **needs index on deployed_at**
-2. **Low cache hit ratio** (2,456 hit / 5,877 total = 42%): Data not in memory → **I/O bottleneck**
-3. **Hash joins**: Efficient, but input data comes from slow sequential scans
-4. **No index usage**: Query doesn't benefit from any existing indexes
+1. **Seq Scan on deployments**（112ms）：全表扫描过滤 15,678 行 → **需要在 deployed_at 上建索引**
+2. **缓存命中率低**（2,456 hit / 5,877 total = 42%）：数据不在内存中 → **I/O 瓶颈**
+3. **Hash joins**：高效，但输入数据来自慢的顺序扫描
+4. **未使用索引**：查询未受益于任何现有索引
 
-### Step 1.6: Document Baseline Performance
+### 步骤 1.6：记录基准性能
 
-Create `docs/performance-baseline.md`:
+创建 `docs/performance-baseline.md`：
 
 ```markdown
-# Performance Baseline Report
+# 性能基准报告
 
-**Date**: 2025-10-23
-**Database**: ml_registry (PostgreSQL 14.x)
-**Workload**: 60 seconds @ 10 QPS mixed queries
-
----
-
-## Executive Summary
-
-- **Slowest Query**: Dashboard deployments view (145ms avg, 1,250ms max)
-- **Primary Bottleneck**: Sequential scans on `deployments` table (no index on `deployed_at`)
-- **Cache Hit Ratio**: 45% (target: >90%)
-- **Total Queries Analyzed**: 4
+**日期**: 2025-10-23
+**数据库**: ml_registry (PostgreSQL 14.x)
+**工作负载**: 60 秒 @ 10 QPS 混合查询
 
 ---
 
-## Query 1: Latest Deployments Dashboard
+## 执行摘要
 
-**Query**:
+- **最慢查询**: 仪表盘部署视图（平均 145ms，最大 1,250ms）
+- **主要瓶颈**: `deployments` 表上的顺序扫描（`deployed_at` 无索引）
+- **缓存命中率**: 45%（目标：>90%）
+- **分析的查询总数**: 4
+
+---
+
+## 查询 1: 最新部署仪表盘
+
+**查询**:
 ```sql
 SELECT m.model_name, mv.semver, d.status, d.deployed_at
 FROM deployments d
@@ -415,29 +346,29 @@ ORDER BY d.deployed_at DESC
 LIMIT 50;
 ```
 
-**Metrics**:
-- Calls: 245
-- Total Time: 35.67 seconds
-- Avg Time: 145.58 ms
-- Max Time: 1,250.34 ms
-- Rows Scanned: 20,128 (deployments table)
-- Rows Returned: 50
-- Cache Hit Ratio: 45.23%
+**指标**:
+- 调用次数: 245
+- 总时间: 35.67 秒
+- 平均时间: 145.58 ms
+- 最大时间: 1,250.34 ms
+- 扫描行数: 20,128 (deployments 表)
+- 返回行数: 50
+- 缓存命中率: 45.23%
 
-**Execution Plan Summary**:
-- Sequential scan on `deployments` (112ms)
-- Hash joins on `model_versions` and `models` (33ms)
-- Sort and limit (0.5ms)
+**执行计划摘要**:
+- `deployments` 顺序扫描 (112ms)
+- 与 `model_versions` 和 `models` 的 Hash join (33ms)
+- 排序和 limit (0.5ms)
 
-**Bottleneck**: Seq Scan filtering by `deployed_at`
+**瓶颈**: 按 `deployed_at` 过滤的 Seq Scan
 
-**Recommendation**: Add B-tree index on `deployments(deployed_at DESC)`
+**建议**: 在 `deployments(deployed_at DESC)` 上添加 B-tree 索引
 
 ---
 
-## Query 2: Training Runs by Experiment
+## 查询 2: 按实验的培训运行
 
-**Query**:
+**查询**:
 ```sql
 SELECT run_id, model_name, status, accuracy, created_at
 FROM training_runs
@@ -447,30 +378,27 @@ ORDER BY accuracy DESC NULLS LAST
 LIMIT 20;
 ```
 
-**Metrics**:
-- Calls: 892
-- Total Time: 28.45 seconds
-- Avg Time: 31.90 ms
-- Max Time: 456.78 ms
-- Rows Scanned: 45,670
-- Rows Returned: 20
-- Cache Hit Ratio: 78.92%
+**指标**:
+- 调用次数: 892
+- 总时间: 28.45 秒
+- 平均时间: 31.90 ms
+- 最大时间: 456.78 ms
+- 扫描行数: 45,670
+- 返回行数: 20
+- 缓存命中率: 78.92%
 
-**Bottleneck**: Seq Scan filtering by `experiment_name` and `created_at`
+**瓶颈**: 按 `experiment_name` 和 `created_at` 过滤的 Seq Scan
 
-**Recommendation**: Composite index on `training_runs(experiment_name, created_at DESC)`
+**建议**: `training_runs(experiment_name, created_at DESC)` 上的复合索引
 
 ---
 
-## Query 3: Model Statistics Aggregation
+## 查询 3: 模型统计聚合
 
-**Query**:
+**查询**:
 ```sql
-SELECT
-    m.model_name,
-    COUNT(DISTINCT mv.version_id) as version_count,
-    COUNT(DISTINCT tr.run_id) as training_runs,
-    MAX(tr.accuracy) as best_accuracy
+SELECT m.model_name, COUNT(DISTINCT mv.version_id) as version_count,
+       COUNT(DISTINCT tr.run_id) as training_runs, MAX(tr.accuracy) as best_accuracy
 FROM models m
 LEFT JOIN model_versions mv ON m.model_id = mv.model_id
 LEFT JOIN training_runs tr ON tr.version_id = mv.version_id
@@ -479,24 +407,24 @@ GROUP BY m.model_id, m.model_name
 ORDER BY version_count DESC;
 ```
 
-**Metrics**:
-- Calls: 156
-- Total Time: 22.34 seconds
-- Avg Time: 143.21 ms
-- Max Time: 890.12 ms
-- Rows Scanned: 67,890
-- Rows Returned: 42
-- Cache Hit Ratio: 38.45%
+**指标**:
+- 调用次数: 156
+- 总时间: 22.34 秒
+- 平均时间: 143.21 ms
+- 最大时间: 890.12 ms
+- 扫描行数: 67,890
+- 返回行数: 42
+- 缓存命中率: 38.45%
 
-**Bottleneck**: Multiple joins with sequential scans on `training_runs`
+**瓶颈**: 多个 JOIN 加上 `training_runs` 的顺序扫描
 
-**Recommendation**: Index on `training_runs(version_id)` for join optimization
+**建议**: `training_runs(version_id)` 上的索引用于 JOIN 优化
 
 ---
 
-## Query 4: Active Deployments by Environment
+## 查询 4: 按环境的活跃部署
 
-**Query**:
+**查询**:
 ```sql
 SELECT m.model_name, mv.semver, d.status, d.deployed_at
 FROM deployments d
@@ -506,287 +434,258 @@ WHERE d.environment_id = 1 AND d.status = 'active'
 ORDER BY d.deployed_at DESC;
 ```
 
-**Metrics**:
-- Calls: 421
-- Total Time: 18.92 seconds
-- Avg Time: 44.94 ms
-- Max Time: 234.56 ms
-- Rows Scanned: 20,128
-- Rows Returned: 12
-- Cache Hit Ratio: 56.78%
+**指标**:
+- 调用次数: 421
+- 总时间: 18.92 秒
+- 平均时间: 44.94 ms
+- 最大时间: 234.56 ms
+- 扫描行数: 20,128
+- 返回行数: 12
+- 缓存命中率: 56.78%
 
-**Bottleneck**: Seq Scan filtering by `environment_id` and `status`
+**瓶颈**: 按 `environment_id` 和 `status` 过滤的 Seq Scan
 
-**Recommendation**: Partial index on active production deployments
+**建议**: 活跃生产部署上的 partial index
 
 ---
 
-## Summary of Optimization Targets
+## 优化目标摘要
 
-| Query | Avg Time (Before) | Target Time | Priority | Index Strategy |
+| 查询 | 平均时间 (优化前) | 目标时间 | 优先级 | 索引策略 |
 |-------|-------------------|-------------|----------|----------------|
-| Q1: Deployments Dashboard | 145ms | <30ms | HIGH | B-tree on deployed_at |
-| Q2: Training Runs by Exp | 32ms | <10ms | MEDIUM | Composite (experiment, created_at) |
-| Q3: Model Stats | 143ms | <50ms | HIGH | Foreign key indexes |
-| Q4: Active Deployments | 45ms | <15ms | MEDIUM | Partial index (env + status) |
+| Q1: 部署仪表盘 | 145ms | <30ms | 高 | deployed_at 的 B-tree |
+| Q2: 按实验的培训运行 | 32ms | <10ms | 中 | 复合 (experiment, created_at) |
+| Q3: 模型统计 | 143ms | <50ms | 高 | 外键索引 |
+| Q4: 活跃部署 | 45ms | <15ms | 中 | Partial index (env + status) |
 
-**Total Expected Improvement**: 75-85% reduction in query latency
+**预期总改进**: 查询延迟降低 75-85%
 ```
 
-### Checkpoint 1
+### 检查点 1
 
-✅ Verify your profiling setup:
+✅ 验证你的分析设置：
 
 ```bash
-# Check pg_stat_statements is enabled
 psql -h localhost -U ml_user -d ml_registry -c "SELECT COUNT(*) FROM pg_stat_statements;"
-
-# Verify baseline document exists
 ls -la docs/performance-baseline.md
-
-# Review captured slow queries
 grep "Avg Time" docs/performance-baseline.md
 ```
 
 ---
 
-## Part 2: Index Strategy and Implementation
+## 第 2 部分：索引策略与实现
 
-### Step 2.1: Understanding PostgreSQL Index Types
+### 步骤 2.1：理解 PostgreSQL 索引类型
 
-**Index Types and Use Cases:**
+**索引类型与使用场景：**
 
-| Index Type | Use Case | Example | Performance Characteristics |
+| 索引类型 | 使用场景 | 示例 | 性能特征 |
 |------------|----------|---------|----------------------------|
-| **B-tree** (default) | Equality, range queries, sorting | `created_at`, `status`, foreign keys | Best general-purpose, balanced read/write |
-| **Hash** | Equality only (=) | `uuid` lookups | Faster than B-tree for equality, no range support |
-| **GIN** (Generalized Inverted Index) | JSONB, arrays, full-text search | `metadata @> '{"framework": "pytorch"}'` | Large index size, slower writes, fast reads |
-| **GiST** (Generalized Search Tree) | Geometric data, ranges | PostGIS, `tsrange` overlap | Lossy, requires recheck |
-| **BRIN** (Block Range Index) | Large tables with natural ordering | Time-series `created_at` on append-only table | Tiny index size, fast writes, moderate reads |
-| **Partial** | Subset of rows | `WHERE status = 'active'` | Small index, very fast for filtered queries |
-| **Expression** | Function results | `LOWER(email)` | Index computed values |
+| **B-tree**（默认） | 等值、范围查询、排序 | `created_at`、`status`、外键 | 最佳通用，读写平衡 |
+| **Hash** | 仅等值（=） | `uuid` 查找 | 等值比 B-tree 快，不支持范围 |
+| **GIN**（通用倒排索引） | JSONB、数组、全文搜索 | `metadata @> '{"framework": "pytorch"}'` | 索引大，写入慢，读取快 |
+| **GiST**（通用搜索树） | 几何数据、范围 | PostGIS、`tsrange` 重叠 | 有损，需要重新检查 |
+| **BRIN**（块范围索引） | 具有自然顺序的大表 | 仅追加表上的 `created_at` | 索引极小，写入快，读取适中 |
+| **Partial** | 行子集 | `WHERE status = 'active'` | 索引小，过滤查询非常快 |
+| **Expression** | 函数结果 | `LOWER(email)` | 对计算值建索引 |
 
-### Step 2.2: Identify Index Candidates
+### 步骤 2.2：识别索引候选
 
-Use this decision tree:
+使用此决策树：
 
 ```
-Query has WHERE/JOIN clause?
-├─ YES: What columns are filtered/joined?
-│  ├─ Single column + range/sort → B-tree
-│  ├─ Multiple columns → Composite B-tree (order matters!)
-│  ├─ JSONB queries → GIN
-│  ├─ Equality only on UUID/hash → Hash
-│  └─ Time-series on large table → BRIN
-└─ NO: Query does aggregation?
-   └─ YES: Index columns used in GROUP BY/ORDER BY
+查询有 WHERE/JOIN 子句？
+├─ 是：过滤/连接的列是什么？
+│  ├─ 单列 + 范围/排序 → B-tree
+│  ├─ 多列 → 复合 B-tree（顺序很重要！）
+│  ├─ JSONB 查询 → GIN
+│  ├─ UUID/hash 仅等值 → Hash
+│  └─ 大表上的时间序列 → BRIN
+└─ 否：查询做聚合？
+   └─ 是：对 GROUP BY/ORDER BY 中的列建索引
 ```
 
-**Analyze Each Slow Query:**
+**分析每个慢查询：**
 
-**Query 1 Analysis**: Latest Deployments Dashboard
+**查询 1 分析**：最新部署仪表盘
 
 ```sql
-WHERE d.deployed_at > NOW() - INTERVAL '30 days'  -- Range filter
-ORDER BY d.deployed_at DESC                       -- Sorting
+WHERE d.deployed_at > NOW() - INTERVAL '30 days'
+ORDER BY d.deployed_at DESC
 ```
 
-**Decision**: B-tree index on `deployments(deployed_at DESC)`
-- **Why DESC?**: Matches ORDER BY direction, enables index-only scan
-- **Why B-tree?**: Range queries (>) and sorting
+**决策**：`deployments(deployed_at DESC)` 上的 B-tree 索引
+- **为什么 DESC？**：匹配 ORDER BY 方向，启用 index-only scan
+- **为什么 B-tree？**：范围查询（>）和排序
 
 ---
 
-**Query 2 Analysis**: Training Runs by Experiment
+**查询 2 分析**：按实验的培训运行
 
 ```sql
-WHERE experiment_name = $1                -- Equality filter
-  AND created_at > NOW() - INTERVAL '7 days'  -- Range filter
+WHERE experiment_name = $1                -- 等值过滤
+  AND created_at > NOW() - INTERVAL '7 days'  -- 范围过滤
 ORDER BY accuracy DESC NULLS LAST
 ```
 
-**Decision**: Composite index on `training_runs(experiment_name, created_at DESC, accuracy DESC)`
-- **Column order**: Most selective first (experiment_name), then range filter
-- **Include accuracy**: Supports ORDER BY, enables covering index
+**决策**：`training_runs(experiment_name, created_at DESC, accuracy DESC)` 上的复合索引
+- **列顺序**：选择性最高者优先（experiment_name），然后是范围过滤
+- **包含 accuracy**：支持 ORDER BY，启用覆盖索引
 
 ---
 
-**Query 3 Analysis**: Model Statistics
+**查询 3 分析**：模型统计
 
 ```sql
-LEFT JOIN training_runs tr ON tr.version_id = mv.version_id  -- Foreign key join
+LEFT JOIN training_runs tr ON tr.version_id = mv.version_id  -- 外键连接
 ```
 
-**Decision**: B-tree index on `training_runs(version_id)`
-- **Why?**: Foreign key joins are common, this enables nested loop joins
-- **Note**: This should have been created with the foreign key constraint!
+**决策**：`training_runs(version_id)` 上的 B-tree 索引
+- **为什么？**：外键连接很常见，这启用嵌套循环连接
+- **注意**：这应该在外键约束创建时就已创建！
 
 ---
 
-**Query 4 Analysis**: Active Deployments
+**查询 4 分析**：活跃部署
 
 ```sql
-WHERE d.environment_id = 1 AND d.status = 'active'  -- Filters on subset
+WHERE d.environment_id = 1 AND d.status = 'active'  -- 子集过滤
 ```
 
-**Decision**: Partial index on `deployments(version_id, deployed_at DESC) WHERE environment_id = 1 AND status = 'active'`
-- **Why partial?**: Only ~5% of deployments match filter
-- **Benefit**: Smaller index, faster updates on non-production deployments
+**决策**：`deployments(version_id, deployed_at DESC) WHERE environment_id = 1 AND status = 'active'` 上的 partial index
+- **为什么 partial？**：仅约 5% 的部署匹配过滤条件
+- **好处**：索引更小，非生产部署的更新更快
 
-### Step 2.3: Calculate Index Selectivity
+### 步骤 2.3：计算索引选择性
 
-Before creating indexes, estimate their effectiveness:
+在创建索引前，估计其效果：
 
 ```sql
--- Check column selectivity (lower = more selective = better index)
-SELECT
-    'deployed_at' as column_name,
-    COUNT(DISTINCT deployed_at)::float / COUNT(*)::float as selectivity,
-    COUNT(*) as total_rows
+-- 检查列选择性（越低 = 越具选择性 = 索引越好）
+SELECT 'deployed_at' as column_name,
+       COUNT(DISTINCT deployed_at)::float / COUNT(*)::float as selectivity,
+       COUNT(*) as total_rows
 FROM deployments
 UNION ALL
-SELECT
-    'status',
-    COUNT(DISTINCT status)::float / COUNT(*)::float,
-    COUNT(*)
-FROM deployments
+SELECT 'status', COUNT(DISTINCT status)::float / COUNT(*)::float, COUNT(*) FROM deployments
 UNION ALL
-SELECT
-    'environment_id',
-    COUNT(DISTINCT environment_id)::float / COUNT(*)::float,
-    COUNT(*)
-FROM deployments;
+SELECT 'environment_id', COUNT(DISTINCT environment_id)::float / COUNT(*)::float, COUNT(*) FROM deployments;
 ```
 
-**Example Output:**
-
+**示例输出：**
 ```
  column_name    | selectivity | total_rows
 ----------------+-------------+------------
- deployed_at    |       0.956 |      20128  ← High selectivity, good for index
- status         |       0.032 |      20128  ← Low selectivity (only 5 statuses)
- environment_id |       0.015 |      20128  ← Low selectivity (only 3 environments)
+ deployed_at    |       0.956 |      20128  ← 高选择性，适合索引
+ status         |       0.032 |      20128  ← 低选择性（仅有 5 种状态）
+ environment_id |       0.015 |      20128  ← 低选择性（仅有 3 个环境）
 ```
 
-**Interpretation:**
-- **High selectivity (>0.8)**: Excellent index candidate
-- **Medium selectivity (0.3-0.8)**: Good for composite indexes or partial indexes
-- **Low selectivity (<0.3)**: Use only in composite indexes or with partial index
+**解读：**
+- **高选择性（>0.8）**：优秀索引候选
+- **中等选择性（0.3-0.8）**：适合复合索引或 partial index
+- **低选择性（<0.3）**：仅在复合索引或 partial index 中使用
 
-### Step 2.4: Create Index Strategy Document
+### 步骤 2.4：创建索引策略文档
 
-Create `docs/index-strategy.md`:
+创建 `docs/index-strategy.md`：
 
 ```markdown
-# Index Strategy for ML Model Registry
+# ML 模型注册索引策略
 
-## Indexing Principles
+## 索引原则
 
-1. **Index Foreign Keys**: Enable efficient joins
-2. **Index WHERE Clauses**: Columns frequently filtered
-3. **Index ORDER BY**: Support sorting without in-memory sort
-4. **Composite Indexes**: Column order = selectivity (high → low)
-5. **Covering Indexes**: Include columns to enable index-only scans
-6. **Partial Indexes**: Filter to subset when possible
-7. **Monitor Size**: Each index adds write overhead and storage
+1. **索引外键**：实现高效 JOIN
+2. **索引 WHERE 子句**：频繁过滤的列
+3. **索引 ORDER BY**：无需内存排序
+4. **复合索引**：列顺序 = 选择性（高 → 低）
+5. **覆盖索引**：包含列以实现 index-only scan
+6. **Partial Index**：尽可能过滤到子集
+7. **监控大小**：每个索引增加写入开销和存储
 
 ---
 
-## Proposed Indexes
+## 建议的索引
 
-### Priority 1: Foreign Key Indexes (Missing!)
+### 优先级 1: 外键索引（缺失！）
 
-These should have been created automatically but weren't:
-
-| Table | Column | Type | Rationale |
+| 表 | 列 | 类型 | 理由 |
 |-------|--------|------|-----------|
-| `model_versions` | `model_id` | B-tree | FK join to models |
-| `training_runs` | `version_id` | B-tree | FK join to model_versions |
-| `deployments` | `version_id` | B-tree | FK join to model_versions |
-| `deployments` | `environment_id` | B-tree | FK join to environments |
-| `approvals` | `version_id` | B-tree | FK join to model_versions |
+| `model_versions` | `model_id` | B-tree | 到 models 的 FK 连接 |
+| `training_runs` | `version_id` | B-tree | 到 model_versions 的 FK 连接 |
+| `deployments` | `version_id` | B-tree | 到 model_versions 的 FK 连接 |
+| `deployments` | `environment_id` | B-tree | 到 environments 的 FK 连接 |
+| `approvals` | `version_id` | B-tree | 到 model_versions 的 FK 连接 |
 
-**Impact**: Enable nested loop joins instead of hash joins (10-50x faster for small result sets)
+**影响**: 启用嵌套循环连接替代 hash join（小结果集快 10-50 倍）
 
 ---
 
-### Priority 2: Time-Range Query Indexes
+### 优先级 2: 时间范围查询索引
 
-| Table | Index Definition | Type | Use Case |
+| 表 | 索引定义 | 类型 | 使用场景 |
 |-------|------------------|------|----------|
-| `deployments` | `(deployed_at DESC)` | B-tree | Dashboard queries filtering recent deployments |
-| `training_runs` | `(created_at DESC)` | B-tree | Recent training runs, time-series analytics |
-| `training_runs` | `(started_at)` | BRIN | Large table, append-only pattern |
-| `model_versions` | `(registered_at DESC)` | B-tree | Latest version queries |
+| `deployments` | `(deployed_at DESC)` | B-tree | 查询最近部署的仪表盘 |
+| `training_runs` | `(created_at DESC)` | B-tree | 最近的培训运行，时间序列分析 |
+| `training_runs` | `(started_at)` | BRIN | 大表，仅追加模式 |
+| `model_versions` | `(registered_at DESC)` | B-tree | 最新版本查询 |
 
-**Impact**: Eliminate sequential scans on time-range filters (100x+ faster)
+**影响**: 消除时间范围过滤上的顺序扫描（快 100 倍以上）
 
 ---
 
-### Priority 3: Composite Indexes for Common Query Patterns
+### 优先级 3: 常见查询模式的复合索引
 
-| Table | Index Definition | Covering Columns | Query Pattern |
+| 表 | 索引定义 | 覆盖列 | 查询模式 |
 |-------|------------------|------------------|---------------|
-| `training_runs` | `(experiment_name, created_at DESC)` | `accuracy, status` | Experiment dashboard |
-| `training_runs` | `(model_name, status)` | `accuracy, created_at` | Model success rate |
-| `deployments` | `(environment_id, status, deployed_at DESC)` | `version_id` | Active deployments by env |
+| `training_runs` | `(experiment_name, created_at DESC)` | `accuracy, status` | 实验仪表盘 |
+| `training_runs` | `(model_name, status)` | `accuracy, created_at` | 模型成功率 |
+| `deployments` | `(environment_id, status, deployed_at DESC)` | `version_id` | 按环境的活跃部署 |
 
-**Impact**: Support multiple filters + sort in single index scan
+**影响**: 在单次索引扫描中支持多个过滤 + 排序
 
 ---
 
-### Priority 4: Partial Indexes for Hot Queries
+### 优先级 4: 热查询的 Partial Index
 
-| Table | Index Definition | Filter Condition | Size Reduction |
+| 表 | 索引定义 | 过滤条件 | 大小减少 |
 |-------|------------------|------------------|----------------|
-| `deployments` | `(version_id, deployed_at DESC)` | `WHERE environment_id = 1 AND status = 'active'` | 95% smaller |
-| `training_runs` | `(model_name, created_at DESC)` | `WHERE status = 'succeeded'` | 80% smaller |
-| `approvals` | `(version_id, approved_at DESC)` | `WHERE status = 'approved'` | 70% smaller |
+| `deployments` | `(version_id, deployed_at DESC)` | `WHERE environment_id = 1 AND status = 'active'` | 减小 95% |
+| `training_runs` | `(model_name, created_at DESC)` | `WHERE status = 'succeeded'` | 减小 80% |
+| `approvals` | `(version_id, approved_at DESC)` | `WHERE status = 'approved'` | 减小 70% |
 
-**Impact**: Dramatically smaller indexes, faster updates, targeted queries
-
----
-
-### Priority 5: JSONB Indexes for Metadata Queries
-
-| Table | Index Definition | Type | Query Pattern |
-|-------|------------------|------|---------------|
-| `training_runs` | `USING GIN (hyperparameters)` | GIN | Search by hyperparameter values |
-| `training_runs` | `USING GIN (metrics)` | GIN | Find runs with specific metrics |
-| `model_versions` | `USING GIN (metadata_)` | GIN | Search model metadata |
-
-**Impact**: Enable fast JSONB queries (`@>`, `?`, `?&` operators)
+**影响**: 大幅减小索引，更快的更新，定向查询
 
 ---
 
-## Index Size Estimates
+## 索引大小估算
 
-| Index Category | Count | Estimated Size | Write Overhead |
+| 索引类别 | 数量 | 估计大小 | 写入开销 |
 |----------------|-------|----------------|----------------|
-| Foreign Keys | 5 | ~50 MB | +5% write time |
-| Time-Range | 4 | ~80 MB | +8% write time |
-| Composite | 3 | ~120 MB | +12% write time |
-| Partial | 3 | ~30 MB | +2% write time (filtered) |
-| JSONB | 3 | ~200 MB | +20% write time |
-| **Total** | **18** | **~480 MB** | **+47% write overhead** |
+| 外键 | 5 | ~50 MB | +5% 写入时间 |
+| 时间范围 | 4 | ~80 MB | +8% 写入时间 |
+| 复合 | 3 | ~120 MB | +12% 写入时间 |
+| Partial | 3 | ~30 MB | +2% 写入时间（已过滤） |
+| JSONB | 3 | ~200 MB | +20% 写入时间 |
+| **总计** | **18** | **~480 MB** | **+47% 写入开销** |
 
-**Trade-off Analysis**: 480 MB additional storage and ~50% slower writes for 10-100x faster reads
+**权衡分析**: 480 MB 额外存储和约 50% 更慢写入，换 10-100 倍更快读取
 
-**Recommendation**: Implement Priority 1-3 immediately, evaluate Priority 4-5 based on workload
+**建议**: 立即实施优先级 1-3，根据工作负载评估优先级 4-5
 
 ---
 
-## Maintenance Plan
+## 维护计划
 
-- **REINDEX**: Monthly for heavily updated indexes
-- **VACUUM ANALYZE**: Weekly or after bulk operations
-- **Monitor Bloat**: Index bloat > 50% requires REINDEX
-- **Track Unused Indexes**: Remove if `idx_scan = 0` after 30 days
+- **REINDEX**: 对频繁更新的索引每月执行
+- **VACUUM ANALYZE**: 每周或在批量操作后执行
+- **监控膨胀**: 索引膨胀 > 50% 需要 REINDEX
+- **跟踪未使用的索引**: 如果 30 天后 `idx_scan = 0` 则删除
 ```
 
-### Step 2.5: Implement Indexes (DDL Script)
+### 步骤 2.5：实现索引（DDL 脚本）
 
-Create `sql/50_indexes.sql`:
+创建 `sql/50_indexes.sql`：
 
 ```sql
 -- =============================================================================
@@ -798,10 +697,8 @@ Create `sql/50_indexes.sql`:
 -- Estimated execution time: 5-15 minutes (depending on data volume)
 -- =============================================================================
 
--- Enable timing
 \timing on
 
--- Show progress
 \echo '================================'
 \echo 'Creating Performance Indexes'
 \echo '================================'
@@ -845,7 +742,7 @@ CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_training_runs_created_at_desc
 \echo '[8/18] Creating BRIN index on training_runs(started_at)...'
 CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_training_runs_started_at_brin
     ON training_runs USING BRIN (started_at)
-    WITH (pages_per_range = 128);  -- Tune based on table size
+    WITH (pages_per_range = 128);
 
 \echo '[9/18] Creating index on model_versions(registered_at DESC)...'
 CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_model_versions_registered_at_desc
@@ -858,7 +755,7 @@ CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_model_versions_registered_at_desc
 \echo '[10/18] Creating composite index on training_runs(experiment_name, created_at)...'
 CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_training_runs_exp_created
     ON training_runs (experiment_name, created_at DESC)
-    INCLUDE (accuracy, status);  -- Covering index for SELECT fields
+    INCLUDE (accuracy, status);
 
 \echo '[11/18] Creating composite index on training_runs(model_name, status)...'
 CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_training_runs_model_status
@@ -914,11 +811,8 @@ CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_model_versions_metadata_gin
 \echo 'Verifying Indexes'
 \echo '================================'
 
-SELECT
-    schemaname,
-    tablename,
-    indexname,
-    pg_size_pretty(pg_relation_size(indexrelid)) as index_size
+SELECT schemaname, tablename, indexname,
+       pg_size_pretty(pg_relation_size(indexrelid)) as index_size
 FROM pg_indexes
 LEFT JOIN pg_class ON pg_class.relname = indexname
 WHERE schemaname = 'public'
@@ -944,51 +838,35 @@ ANALYZE VERBOSE approvals;
 \echo '================================'
 ```
 
-**Execute the script:**
+**执行脚本：**
 
 ```bash
-# Apply indexes (this will take 5-15 minutes)
 psql -h localhost -U ml_user -d ml_registry -f sql/50_indexes.sql
 
-# Monitor progress in another terminal
+# 在另一个终端监控进度
 watch -n 2 "psql -h localhost -U ml_user -d ml_registry -c \"
-    SELECT
-        now() - query_start AS duration,
-        state,
-        query
+    SELECT now() - query_start AS duration, state, query
     FROM pg_stat_activity
     WHERE query LIKE '%CREATE INDEX%' AND state != 'idle';
 \""
 ```
 
-### Step 2.6: Verify Index Usage
+### 步骤 2.6：验证索引使用
 
-After creating indexes, verify they're being used:
+创建索引后，验证它们是否被使用：
 
 ```sql
--- Check index sizes
-SELECT
-    schemaname,
-    tablename,
-    indexname,
-    pg_size_pretty(pg_relation_size(indexrelid)) as size,
-    idx_scan as scans,
-    idx_tup_read as tuples_read,
-    idx_tup_fetch as tuples_fetched
+-- 检查索引大小
+SELECT schemaname, tablename, indexname,
+       pg_size_pretty(pg_relation_size(indexrelid)) as size,
+       idx_scan as scans, idx_tup_read as tuples_read, idx_tup_fetch as tuples_fetched
 FROM pg_stat_user_indexes
 WHERE schemaname = 'public'
 ORDER BY pg_relation_size(indexrelid) DESC;
-```
 
-**Re-run slow query with EXPLAIN:**
-
-```sql
+-- 使用 EXPLAIN 重新运行慢查询
 EXPLAIN (ANALYZE, BUFFERS, VERBOSE)
-SELECT
-    m.model_name,
-    mv.semver,
-    d.status,
-    d.deployed_at
+SELECT m.model_name, mv.semver, d.status, d.deployed_at
 FROM deployments d
 INNER JOIN model_versions mv ON d.version_id = mv.version_id
 INNER JOIN models m ON mv.model_id = m.model_id
@@ -997,51 +875,43 @@ ORDER BY d.deployed_at DESC
 LIMIT 50;
 ```
 
-**Expected Plan (After Optimization):**
+**预期计划（优化后）：**
 
 ```
 Limit  (cost=45.67..46.05 rows=50 width=120) (actual time=8.234..8.567 rows=50 loops=1)
   Buffers: shared hit=156 read=12
   ->  Nested Loop  (cost=1.23..89.45 rows=4450 width=120) (actual time=0.345..8.123 rows=50 loops=1)
-        Buffers: shared hit=156 read=12
         ->  Nested Loop  (cost=0.82..45.67 rows=4450 width=88) (actual time=0.234..5.678 rows=50 loops=1)
-              Buffers: shared hit=98 read=12
               ->  Index Scan Backward using idx_deployments_deployed_at_desc on deployments d
                   (cost=0.42..23.45 rows=4450 width=56) (actual time=0.123..2.345 rows=50 loops=1)
                     Index Cond: (deployed_at > (now() - '30 days'::interval))
-                    Buffers: shared hit=12 read=4
               ->  Index Scan using model_versions_pkey on model_versions mv
                   (cost=0.40..0.48 rows=1 width=32) (actual time=0.034..0.035 rows=1 loops=50)
                     Index Cond: (version_id = d.version_id)
-                    Buffers: shared hit=86 read=8
         ->  Index Scan using models_pkey on models m
               (cost=0.41..0.49 rows=1 width=40) (actual time=0.023..0.024 rows=1 loops=50)
               Index Cond: (model_id = mv.model_id)
-              Buffers: shared hit=58
 Planning Time: 0.876 ms
 Execution Time: 8.678 ms
 ```
 
-**Improvements:**
-- ✅ **Execution time**: 145ms → 8.7ms (16x faster!)
-- ✅ **Index scans** instead of sequential scans
-- ✅ **Nested loops** instead of hash joins (better for LIMIT queries)
-- ✅ **Buffer usage**: 5,877 blocks → 168 blocks (35x less I/O)
-- ✅ **Backward index scan** leverages DESC index
+**改进：**
+- ✅ **执行时间**：145ms → 8.7ms（快 16 倍！）
+- ✅ **索引扫描**替代了顺序扫描
+- ✅ **嵌套循环**替代了 hash join（更适合 LIMIT 查询）
+- ✅ **缓冲区使用**：5,877 blocks → 168 blocks（I/O 减少 35 倍）
+- ✅ **反向索引扫描**利用了 DESC 索引
 
-### Checkpoint 2
+### 检查点 2
 
-✅ Verify indexes are working:
+✅ 验证索引在运行：
 
 ```bash
-# Check all indexes were created
 psql -h localhost -U ml_user -d ml_registry -c "
     SELECT COUNT(*) as total_indexes
     FROM pg_indexes
     WHERE schemaname = 'public' AND indexname LIKE 'idx_%';
 "
-
-# Verify index usage
 psql -h localhost -U ml_user -d ml_registry -c "
     SELECT tablename, indexname, idx_scan
     FROM pg_stat_user_indexes
@@ -1053,25 +923,19 @@ psql -h localhost -U ml_user -d ml_registry -c "
 
 ---
 
-## Part 3: Performance Measurement and Validation
+## 第 3 部分：性能测量与验证
 
-### Step 3.1: Re-run Workload After Optimization
+### 步骤 3.1：优化后重新运行工作负载
 
 ```bash
-# Clear pg_stat_statements to get fresh metrics
 psql -h localhost -U ml_user -d ml_registry -c "SELECT pg_stat_statements_reset();"
-
-# Run workload again
 python scripts/generate_workload.py 60 10
 
-# Capture new metrics
 psql -h localhost -U ml_user -d ml_registry -c "
-    SELECT
-        LEFT(query, 80) as query_preview,
-        calls,
-        ROUND(mean_exec_time::numeric, 2) as avg_ms,
-        ROUND(max_exec_time::numeric, 2) as max_ms,
-        ROUND(100.0 * shared_blks_hit / NULLIF(shared_blks_hit + shared_blks_read, 0), 1) AS cache_hit_pct
+    SELECT LEFT(query, 80) as query_preview, calls,
+           ROUND(mean_exec_time::numeric, 2) as avg_ms,
+           ROUND(max_exec_time::numeric, 2) as max_ms,
+           ROUND(100.0 * shared_blks_hit / NULLIF(shared_blks_hit + shared_blks_read, 0), 1) AS cache_hit_pct
     FROM pg_stat_statements
     WHERE query NOT LIKE '%pg_stat%'
     ORDER BY mean_exec_time DESC
@@ -1079,185 +943,171 @@ psql -h localhost -U ml_user -d ml_registry -c "
 "
 ```
 
-### Step 3.2: Create Before/After Comparison
+### 步骤 3.2：创建前后对比
 
-Create `docs/performance-results.md`:
+创建 `docs/performance-results.md`：
 
 ```markdown
-# Performance Optimization Results
+# 性能优化结果
 
-**Optimization Date**: 2025-10-23
-**Method**: Index implementation (18 indexes created)
-**Test Duration**: 60 seconds @ 10 QPS
+**优化日期**: 2025-10-23
+**方法**: 索引实现（创建了 18 个索引）
+**测试时长**: 60 秒 @ 10 QPS
 
 ---
 
-## Summary of Improvements
+## 改进摘要
 
-| Metric | Before | After | Improvement |
+| 指标 | 优化前 | 优化后 | 改进 |
 |--------|--------|-------|-------------|
-| **Avg Query Latency (P50)** | 145ms | 12ms | **92% faster** |
-| **Max Query Latency (P99)** | 1,250ms | 45ms | **96% faster** |
-| **Cache Hit Ratio** | 45% | 94% | **+49 percentage points** |
-| **Queries >1s** | 18 (7.3%) | 0 (0%) | **100% eliminated** |
-| **Total Query Time** | 35.67s | 2.89s | **92% reduction** |
-| **Database CPU Usage** | 78% | 23% | **-55 percentage points** |
+| **平均查询延迟 (P50)** | 145ms | 12ms | **快 92%** |
+| **最大查询延迟 (P99)** | 1,250ms | 45ms | **快 96%** |
+| **缓存命中率** | 45% | 94% | **+49 个百分点** |
+| **>1s 的查询** | 18 (7.3%) | 0 (0%) | **100% 消除** |
+| **总查询时间** | 35.67s | 2.89s | **减少 92%** |
+| **数据库 CPU 使用率** | 78% | 23% | **-55 个百分点** |
 
 ---
 
-## Per-Query Improvements
+## 各查询改进
 
-### Query 1: Latest Deployments Dashboard
+### 查询 1: 最新部署仪表盘
 
-| Metric | Before | After | Improvement |
+| 指标 | 优化前 | 优化后 | 改进 |
 |--------|--------|-------|-------------|
-| Avg Time | 145.58ms | 8.67ms | **94% faster** |
-| Max Time | 1,250.34ms | 23.45ms | **98% faster** |
-| Cache Hit | 45.23% | 95.67% | +50.44pp |
-| Execution Plan | Seq Scan → Sort | Index Scan (backwards) | ✅ |
+| 平均时间 | 145.58ms | 8.67ms | **快 94%** |
+| 最大时间 | 1,250.34ms | 23.45ms | **快 98%** |
+| 缓存命中 | 45.23% | 95.67% | +50.44pp |
+| 执行计划 | Seq Scan → Sort | Index Scan (反向) | ✅ |
 
-**Index Used**: `idx_deployments_deployed_at_desc`
+**使用的索引**: `idx_deployments_deployed_at_desc`
 
 ---
 
-### Query 2: Training Runs by Experiment
+### 查询 2: 按实验的培训运行
 
-| Metric | Before | After | Improvement |
+| 指标 | 优化前 | 优化后 | 改进 |
 |--------|--------|-------|-------------|
-| Avg Time | 31.90ms | 5.12ms | **84% faster** |
-| Max Time | 456.78ms | 18.90ms | **96% faster** |
-| Cache Hit | 78.92% | 97.34% | +18.42pp |
-| Execution Plan | Seq Scan → Filter | Index Scan | ✅ |
+| 平均时间 | 31.90ms | 5.12ms | **快 84%** |
+| 最大时间 | 456.78ms | 18.90ms | **快 96%** |
+| 缓存命中 | 78.92% | 97.34% | +18.42pp |
+| 执行计划 | Seq Scan → Filter | Index Scan | ✅ |
 
-**Index Used**: `idx_training_runs_exp_created` (composite + covering)
+**使用的索引**: `idx_training_runs_exp_created`（复合 + 覆盖）
 
 ---
 
-### Query 3: Model Statistics Aggregation
+### 查询 3: 模型统计聚合
 
-| Metric | Before | After | Improvement |
+| 指标 | 优化前 | 优化后 | 改进 |
 |--------|--------|-------|-------------|
-| Avg Time | 143.21ms | 18.34ms | **87% faster** |
-| Max Time | 890.12ms | 67.89ms | **92% faster** |
-| Cache Hit | 38.45% | 91.23% | +52.78pp |
-| Execution Plan | Hash Join | Nested Loop (indexed) | ✅ |
+| 平均时间 | 143.21ms | 18.34ms | **快 87%** |
+| 最大时间 | 890.12ms | 67.89ms | **快 92%** |
+| 缓存命中 | 38.45% | 91.23% | +52.78pp |
+| 执行计划 | Hash Join | Nested Loop (带索引) | ✅ |
 
-**Indexes Used**: `idx_training_runs_version_id`, `idx_model_versions_model_id`
+**使用的索引**: `idx_training_runs_version_id`、`idx_model_versions_model_id`
 
 ---
 
-### Query 4: Active Deployments by Environment
+### 查询 4: 按环境的活跃部署
 
-| Metric | Before | After | Improvement |
+| 指标 | 优化前 | 优化后 | 改进 |
 |--------|--------|-------|-------------|
-| Avg Time | 44.94ms | 2.34ms | **95% faster** |
-| Max Time | 234.56ms | 8.12ms | **97% faster** |
-| Cache Hit | 56.78% | 98.45% | +41.67pp |
-| Execution Plan | Seq Scan → Filter | Partial Index Scan | ✅ |
+| 平均时间 | 44.94ms | 2.34ms | **快 95%** |
+| 最大时间 | 234.56ms | 8.12ms | **快 97%** |
+| 缓存命中 | 56.78% | 98.45% | +41.67pp |
+| 执行计划 | Seq Scan → Filter | Partial Index Scan | ✅ |
 
-**Index Used**: `idx_deployments_prod_active` (partial index)
+**使用的索引**: `idx_deployments_prod_active`（partial index）
 
 ---
 
-## Index Effectiveness Analysis
+## 索引效果分析
 
-| Index | Size | Scans | Tuples Read | Effectiveness |
+| 索引 | 大小 | 扫描 | 读取元组 | 效果 |
 |-------|------|-------|-------------|---------------|
-| `idx_deployments_deployed_at_desc` | 8.2 MB | 245 | 12,250 | ⭐⭐⭐⭐⭐ High |
-| `idx_training_runs_exp_created` | 15.4 MB | 892 | 17,840 | ⭐⭐⭐⭐⭐ High |
-| `idx_training_runs_version_id` | 12.1 MB | 1,248 | 67,890 | ⭐⭐⭐⭐⭐ High |
-| `idx_deployments_prod_active` | 0.9 MB | 421 | 5,052 | ⭐⭐⭐⭐⭐ High (partial) |
-| `idx_model_versions_model_id` | 6.7 MB | 2,134 | 89,234 | ⭐⭐⭐⭐⭐ High |
-| `idx_training_runs_hyperparameters_gin` | 45.2 MB | 0 | 0 | ⚠️ Unused (consider dropping) |
-| `idx_training_runs_metrics_gin` | 38.9 MB | 0 | 0 | ⚠️ Unused (consider dropping) |
+| `idx_deployments_deployed_at_desc` | 8.2 MB | 245 | 12,250 | ⭐⭐⭐⭐⭐ 高 |
+| `idx_training_runs_exp_created` | 15.4 MB | 892 | 17,840 | ⭐⭐⭐⭐⭐ 高 |
+| `idx_training_runs_version_id` | 12.1 MB | 1,248 | 67,890 | ⭐⭐⭐⭐⭐ 高 |
+| `idx_deployments_prod_active` | 0.9 MB | 421 | 5,052 | ⭐⭐⭐⭐⭐ 高 (partial) |
+| `idx_model_versions_model_id` | 6.7 MB | 2,134 | 89,234 | ⭐⭐⭐⭐⭐ 高 |
+| `idx_training_runs_hyperparameters_gin` | 45.2 MB | 0 | 0 | ⚠️ 未使用（考虑删除） |
+| `idx_training_runs_metrics_gin` | 38.9 MB | 0 | 0 | ⚠️ 未使用（考虑删除） |
 
 ---
 
-## Cost-Benefit Analysis
+## 成本效益分析
 
-**Benefits**:
-- 92% average query latency reduction
-- Zero query timeouts
-- 94% cache hit ratio (near optimal)
-- 55% reduction in CPU usage
-- Enabled scaling to 10x current traffic
+**收益**:
+- 平均查询延迟降低 92%
+- 零查询超时
+- 缓存命中率 94%（接近最优）
+- CPU 使用率减少 55%
+- 支持扩展到当前流量的 10 倍
 
-**Costs**:
-- 478 MB additional storage (index size)
-- ~47% increase in INSERT/UPDATE time (measured)
-- ~8 minutes for index creation (one-time)
-- Ongoing maintenance (REINDEX monthly)
+**成本**:
+- 478 MB 额外存储（索引大小）
+- INSERT/UPDATE 时间增加约 47%（已测量）
+- 索引创建约 8 分钟（一次性）
+- 持续维护（每月 REINDEX）
 
-**Recommendation**: **Massive win**. Trade-off heavily favors indexes for read-heavy ML registry workload.
-
----
-
-## Lessons Learned
-
-1. **Foreign key indexes are critical**: Biggest wins came from indexing FK columns
-2. **Composite indexes beat multiple single-column indexes**: Query planner uses one well-designed composite index vs multiple separate indexes
-3. **Partial indexes are underused**: 95% size reduction for hot queries
-4. **JSONB indexes are expensive**: Only create if you have queries using them
-5. **Measure, don't guess**: EXPLAIN ANALYZE revealed actual bottlenecks
+**建议**: **巨大胜利**。对于读取密集型的 ML 注册工作负载，权衡明显偏向索引。
 
 ---
 
-## Next Steps
+## 经验教训
 
-1. ✅ Monitor index usage for 7 days
-2. ✅ Drop unused JSONB indexes (`idx_training_runs_hyperparameters_gin`, `idx_training_runs_metrics_gin`)
-3. ✅ Set up automated alerts for slow queries (>100ms)
-4. ✅ Schedule monthly REINDEX for high-churn tables
-5. ✅ Document index maintenance in runbook
+1. **外键索引至关重要**：最大改进来自索引 FK 列
+2. **复合索引优于多个单列索引**：查询计划器使用一个精心设计的复合索引 vs 多个单独索引
+3. **Partial Index 被低估**：热查询大小减少 95%
+4. **JSONB 索引成本高**：仅当你有使用它们的查询时才创建
+5. **测量而非猜测**：EXPLAIN ANALYZE 揭示了实际瓶颈
+
+---
+
+## 后续步骤
+
+1. ✅ 监控索引使用 7 天
+2. ✅ 删除未使用的 JSONB 索引
+3. ✅ 为慢查询设置自动告警（>100ms）
+4. ✅ 为高更新表安排每月 REINDEX
+5. ✅ 在 runbook 中记录索引维护
 ```
 
-### Step 3.3: Identify Unused Indexes
+### 步骤 3.3：识别未使用的索引
 
-After running for a week, check for unused indexes:
+运行一周后，检查未使用的索引：
 
 ```sql
--- Find indexes that have never been scanned
-SELECT
-    schemaname,
-    tablename,
-    indexname,
-    pg_size_pretty(pg_relation_size(indexrelid)) as size,
-    idx_scan as scans,
-    idx_tup_read as tuples_read
+-- 查找从未被扫描过的索引
+SELECT schemaname, tablename, indexname,
+       pg_size_pretty(pg_relation_size(indexrelid)) as size,
+       idx_scan as scans, idx_tup_read as tuples_read
 FROM pg_stat_user_indexes
 WHERE schemaname = 'public'
   AND idx_scan = 0
   AND indexname LIKE 'idx_%'
 ORDER BY pg_relation_size(indexrelid) DESC;
-```
 
-**Drop unused indexes:**
-
-```sql
--- If confirmed unused after 30 days
+-- 删除未使用的索引
 DROP INDEX CONCURRENTLY IF EXISTS idx_training_runs_hyperparameters_gin;
 DROP INDEX CONCURRENTLY IF EXISTS idx_training_runs_metrics_gin;
 ```
 
-### Checkpoint 3
+### 检查点 3
 
-✅ Validate performance improvements:
+✅ 验证性能改进：
 
 ```bash
-# Compare before/after metrics
 diff docs/performance-baseline.md docs/performance-results.md
-
-# Check for unused indexes
 psql -h localhost -U ml_user -d ml_registry -c "
     SELECT COUNT(*) as unused_indexes
     FROM pg_stat_user_indexes
     WHERE idx_scan = 0 AND indexname LIKE 'idx_%';
 "
-
-# Verify cache hit ratio improved
 psql -h localhost -U ml_user -d ml_registry -c "
-    SELECT
-        ROUND(100.0 * sum(blks_hit) / NULLIF(sum(blks_hit + blks_read), 0), 2) AS cache_hit_ratio
+    SELECT ROUND(100.0 * sum(blks_hit) / NULLIF(sum(blks_hit + blks_read), 0), 2) AS cache_hit_ratio
     FROM pg_stat_database
     WHERE datname = 'ml_registry';
 "
@@ -1265,29 +1115,29 @@ psql -h localhost -U ml_user -d ml_registry -c "
 
 ---
 
-## Part 4: Database Maintenance and Monitoring
+## 第 4 部分：数据库维护与监控
 
-### Step 4.1: Understanding VACUUM and ANALYZE
+### 步骤 4.1：理解 VACUUM 和 ANALYZE
 
-**PostgreSQL Maintenance Concepts:**
+**PostgreSQL 维护概念：**
 
-1. **VACUUM**: Reclaims space from dead tuples (deleted/updated rows)
-   - **VACUUM**: Mark space as reusable (non-blocking)
-   - **VACUUM FULL**: Rewrite table to compact space (blocks writes, use sparingly)
-   - **Autovacuum**: Automatic background vacuum process
+1. **VACUUM**：回收死元组的空间（已删除/更新的行）
+   - **VACUUM**：将空间标记为可重用（非阻塞）
+   - **VACUUM FULL**：重写表以压缩空间（阻塞写入，谨慎使用）
+   - **Autovacuum**：自动后台 vacuum 进程
 
-2. **ANALYZE**: Update table statistics for query planner
-   - Tracks data distribution for optimization decisions
-   - Should run after bulk inserts/updates
-   - Automatically runs with autovacuum
+2. **ANALYZE**：更新查询计划器的表统计信息
+   - 跟踪数据分布以进行优化决策
+   - 应在批量插入/更新后运行
+   - 随 autovacuum 自动运行
 
-3. **REINDEX**: Rebuild bloated indexes
-   - Fixes index bloat from many updates
-   - Use `REINDEX CONCURRENTLY` (PostgreSQL 12+) to avoid blocking
+3. **REINDEX**：重建膨胀的索引
+   - 修复来自大量更新的索引膨胀
+   - 使用 `REINDEX CONCURRENTLY`（PostgreSQL 12+）避免阻塞
 
-### Step 4.2: Manual Maintenance Operations
+### 步骤 4.2：手动维护操作
 
-Create `scripts/maintenance.sql`:
+创建 `scripts/maintenance.sql`：
 
 ```sql
 -- =============================================================================
@@ -1299,10 +1149,6 @@ Create `scripts/maintenance.sql`:
 \echo '================================'
 \echo 'Running Database Maintenance'
 \echo '================================'
-
--- =============================================================================
--- Step 1: Vacuum with Statistics Update
--- =============================================================================
 
 \echo '\n[1/4] VACUUM ANALYZE: models...'
 VACUUM (VERBOSE, ANALYZE, SKIP_LOCKED) models;
@@ -1316,28 +1162,18 @@ VACUUM (VERBOSE, ANALYZE, SKIP_LOCKED) training_runs;
 \echo '[4/4] VACUUM ANALYZE: deployments...'
 VACUUM (VERBOSE, ANALYZE, SKIP_LOCKED) deployments;
 
--- =============================================================================
--- Step 2: Check for Bloat
--- =============================================================================
-
 \echo '\n================================'
 \echo 'Checking Table Bloat'
 \echo '================================'
 
-SELECT
-    schemaname,
-    tablename,
-    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS total_size,
-    pg_size_pretty(pg_relation_size(schemaname||'.'||tablename)) AS table_size,
-    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename) - pg_relation_size(schemaname||'.'||tablename)) AS index_size,
-    ROUND(100 * (pg_total_relation_size(schemaname||'.'||tablename) - pg_relation_size(schemaname||'.'||tablename))::numeric / NULLIF(pg_total_relation_size(schemaname||'.'||tablename), 0), 2) AS index_ratio
+SELECT schemaname, tablename,
+       pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS total_size,
+       pg_size_pretty(pg_relation_size(schemaname||'.'||tablename)) AS table_size,
+       pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename) - pg_relation_size(schemaname||'.'||tablename)) AS index_size,
+       ROUND(100 * (pg_total_relation_size(schemaname||'.'||tablename) - pg_relation_size(schemaname||'.'||tablename))::numeric / NULLIF(pg_total_relation_size(schemaname||'.'||tablename), 0), 2) AS index_ratio
 FROM pg_tables
 WHERE schemaname = 'public'
 ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
-
--- =============================================================================
--- Step 3: Check for Index Bloat (requires pgstattuple extension)
--- =============================================================================
 
 CREATE EXTENSION IF NOT EXISTS pgstattuple;
 
@@ -1345,42 +1181,29 @@ CREATE EXTENSION IF NOT EXISTS pgstattuple;
 \echo 'Checking Index Bloat'
 \echo '================================'
 
-SELECT
-    schemaname,
-    tablename,
-    indexname,
-    pg_size_pretty(pg_relation_size(indexrelid)) AS index_size,
-    ROUND((pgstatindex(indexrelid)).avg_leaf_density, 2) AS leaf_density,
-    CASE
-        WHEN (pgstatindex(indexrelid)).avg_leaf_density < 70 THEN 'High Bloat - Consider REINDEX'
-        WHEN (pgstatindex(indexrelid)).avg_leaf_density < 85 THEN 'Moderate Bloat'
-        ELSE 'Healthy'
-    END AS status
+SELECT schemaname, tablename, indexname,
+       pg_size_pretty(pg_relation_size(indexrelid)) AS index_size,
+       ROUND((pgstatindex(indexrelid)).avg_leaf_density, 2) AS leaf_density,
+       CASE
+           WHEN (pgstatindex(indexrelid)).avg_leaf_density < 70 THEN '高膨胀 - 考虑 REINDEX'
+           WHEN (pgstatindex(indexrelid)).avg_leaf_density < 85 THEN '中等膨胀'
+           ELSE '健康'
+       END AS status
 FROM pg_indexes
 JOIN pg_class ON pg_class.relname = indexname
 WHERE schemaname = 'public'
   AND indexname LIKE 'idx_%'
-  AND pg_relation_size(indexrelid) > 1024 * 1024  -- Only check indexes > 1MB
+  AND pg_relation_size(indexrelid) > 1024 * 1024
 ORDER BY (pgstatindex(indexrelid)).avg_leaf_density ASC;
-
--- =============================================================================
--- Step 4: Update Extended Statistics (for multi-column correlations)
--- =============================================================================
 
 \echo '\n================================'
 \echo 'Creating Extended Statistics'
 \echo '================================'
 
--- Create extended statistics for correlated columns
 CREATE STATISTICS IF NOT EXISTS training_runs_exp_created_stats (dependencies)
-    ON experiment_name, created_at
-    FROM training_runs;
-
+    ON experiment_name, created_at FROM training_runs;
 CREATE STATISTICS IF NOT EXISTS deployments_env_status_stats (dependencies)
-    ON environment_id, status
-    FROM deployments;
-
--- Update statistics
+    ON environment_id, status FROM deployments;
 ANALYZE training_runs;
 ANALYZE deployments;
 
@@ -1389,58 +1212,44 @@ ANALYZE deployments;
 \echo '================================'
 ```
 
-**Execute maintenance:**
+**执行维护：**
 
 ```bash
 psql -h localhost -U ml_user -d ml_registry -f scripts/maintenance.sql
 ```
 
-### Step 4.3: Configure Autovacuum
+### 步骤 4.3：配置 Autovacuum
 
-Edit `postgresql.conf`:
+编辑 `postgresql.conf`：
 
 ```conf
 # Autovacuum Configuration (aggressive for high-write workload)
 autovacuum = on
-autovacuum_max_workers = 4  # Number of parallel workers
-autovacuum_naptime = 30s    # Check interval (default 1min)
+autovacuum_max_workers = 4
+autovacuum_naptime = 30s
 
-# Trigger vacuum when 20% of table is dead tuples OR 10,000 rows
 autovacuum_vacuum_scale_factor = 0.2
 autovacuum_vacuum_threshold = 10000
 
-# Trigger analyze when 10% of table changes OR 5,000 rows
 autovacuum_analyze_scale_factor = 0.1
 autovacuum_analyze_threshold = 5000
-
-# Per-table overrides for high-churn tables
-# ALTER TABLE training_runs SET (autovacuum_vacuum_scale_factor = 0.1);
-# ALTER TABLE deployments SET (autovacuum_vacuum_scale_factor = 0.1);
 ```
 
-**Monitor autovacuum activity:**
+**监控 autovacuum 活动：**
 
 ```sql
--- Check last autovacuum/analyze times
-SELECT
-    schemaname,
-    relname,
-    last_vacuum,
-    last_autovacuum,
-    last_analyze,
-    last_autoanalyze,
-    n_tup_ins as inserts,
-    n_tup_upd as updates,
-    n_tup_del as deletes,
-    n_dead_tup as dead_tuples
+SELECT schemaname, relname, last_vacuum, last_autovacuum,
+       last_analyze, last_autoanalyze,
+       n_tup_ins as inserts, n_tup_upd as updates,
+       n_tup_del as deletes, n_dead_tup as dead_tuples
 FROM pg_stat_user_tables
 WHERE schemaname = 'public'
 ORDER BY n_dead_tup DESC;
 ```
 
-### Step 4.4: Set Up Monitoring with Prometheus
+### 步骤 4.4：使用 Prometheus 设置监控
 
-Create `docker-compose.monitoring.yml`:
+创建 `docker-compose.monitoring.yml`：
 
 ```yaml
 version: '3.8'
@@ -1497,11 +1306,9 @@ networks:
     external: true
 ```
 
-Create `monitoring/postgres_queries.yaml`:
+创建 `monitoring/postgres_queries.yaml`：
 
 ```yaml
-# Custom PostgreSQL metrics for ML model registry
-
 pg_database_size:
   query: "SELECT pg_database_size(current_database()) as bytes"
   metrics:
@@ -1521,8 +1328,7 @@ pg_slow_queries:
 
 pg_cache_hit_ratio:
   query: |
-    SELECT
-      ROUND(100.0 * sum(blks_hit) / NULLIF(sum(blks_hit + blks_read), 0), 2) AS ratio
+    SELECT ROUND(100.0 * sum(blks_hit) / NULLIF(sum(blks_hit + blks_read), 0), 2) AS ratio
     FROM pg_stat_database
     WHERE datname = current_database()
   metrics:
@@ -1532,9 +1338,8 @@ pg_cache_hit_ratio:
 
 pg_table_sizes:
   query: |
-    SELECT
-      schemaname || '.' || tablename as table_name,
-      pg_total_relation_size(schemaname||'.'||tablename) as bytes
+    SELECT schemaname || '.' || tablename as table_name,
+           pg_total_relation_size(schemaname||'.'||tablename) as bytes
     FROM pg_tables
     WHERE schemaname = 'public'
   metrics:
@@ -1547,10 +1352,8 @@ pg_table_sizes:
 
 pg_index_usage:
   query: |
-    SELECT
-      schemaname || '.' || indexname as index_name,
-      idx_scan as scans,
-      pg_relation_size(indexrelid) as bytes
+    SELECT schemaname || '.' || indexname as index_name,
+           idx_scan as scans, pg_relation_size(indexrelid) as bytes
     FROM pg_stat_user_indexes
     WHERE schemaname = 'public'
   metrics:
@@ -1573,9 +1376,7 @@ pg_deadlocks:
 
 pg_connections:
   query: |
-    SELECT
-      state,
-      COUNT(*) as count
+    SELECT state, COUNT(*) as count
     FROM pg_stat_activity
     WHERE datname = current_database()
     GROUP BY state
@@ -1588,122 +1389,37 @@ pg_connections:
         description: "Number of connections in this state"
 ```
 
-Create `monitoring/prometheus.yml`:
-
-```yaml
-global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
-
-scrape_configs:
-  - job_name: 'postgres'
-    static_configs:
-      - targets: ['postgres-exporter:9187']
-        labels:
-          environment: 'development'
-          database: 'ml_registry'
-```
-
-**Start monitoring stack:**
+**启动监控栈：**
 
 ```bash
 docker-compose -f docker-compose.monitoring.yml up -d
-
-# Access Grafana
 open http://localhost:3000  # admin/admin
-
-# Access Prometheus
 open http://localhost:9090
 ```
 
-### Step 4.5: Create Grafana Dashboard
+### 步骤 4.5：创建 Grafana 仪表盘
 
-Create `monitoring/grafana-dashboards/postgres-performance.json`:
+创建 `monitoring/grafana-dashboards/postgres-performance.json`：
 
 ```json
 {
   "dashboard": {
     "title": "ML Registry Database Performance",
     "panels": [
-      {
-        "title": "Query Latency (P50, P95, P99)",
-        "targets": [
-          {
-            "expr": "histogram_quantile(0.50, rate(pg_stat_statements_exec_time_bucket[5m]))",
-            "legendFormat": "P50"
-          },
-          {
-            "expr": "histogram_quantile(0.95, rate(pg_stat_statements_exec_time_bucket[5m]))",
-            "legendFormat": "P95"
-          },
-          {
-            "expr": "histogram_quantile(0.99, rate(pg_stat_statements_exec_time_bucket[5m]))",
-            "legendFormat": "P99"
-          }
-        ]
-      },
-      {
-        "title": "Cache Hit Ratio",
-        "targets": [
-          {
-            "expr": "pg_cache_hit_ratio",
-            "legendFormat": "Cache Hit %"
-          }
-        ],
-        "thresholds": [
-          {"value": 90, "color": "green"},
-          {"value": 80, "color": "yellow"},
-          {"value": 0, "color": "red"}
-        ]
-      },
-      {
-        "title": "Slow Queries (>100ms)",
-        "targets": [
-          {
-            "expr": "pg_slow_queries",
-            "legendFormat": "Slow Queries"
-          }
-        ]
-      },
-      {
-        "title": "Database Size",
-        "targets": [
-          {
-            "expr": "pg_database_size_bytes",
-            "legendFormat": "Database Size"
-          }
-        ]
-      },
-      {
-        "title": "Active Connections",
-        "targets": [
-          {
-            "expr": "sum(pg_connections{state='active'})",
-            "legendFormat": "Active"
-          },
-          {
-            "expr": "sum(pg_connections{state='idle'})",
-            "legendFormat": "Idle"
-          }
-        ]
-      },
-      {
-        "title": "Deadlocks",
-        "targets": [
-          {
-            "expr": "rate(pg_deadlocks[5m])",
-            "legendFormat": "Deadlocks/sec"
-          }
-        ]
-      }
+      {"title": "Query Latency (P50, P95, P99)", "targets": [{"expr": "histogram_quantile(0.50, rate(pg_stat_statements_exec_time_bucket[5m]))", "legendFormat": "P50"}, {"expr": "histogram_quantile(0.95, rate(pg_stat_statements_exec_time_bucket[5m]))", "legendFormat": "P95"}, {"expr": "histogram_quantile(0.99, rate(pg_stat_statements_exec_time_bucket[5m]))", "legendFormat": "P99"}]},
+      {"title": "Cache Hit Ratio", "targets": [{"expr": "pg_cache_hit_ratio", "legendFormat": "Cache Hit %"}], "thresholds": [{"value": 90, "color": "green"}, {"value": 80, "color": "yellow"}, {"value": 0, "color": "red"}]},
+      {"title": "Slow Queries (>100ms)", "targets": [{"expr": "pg_slow_queries", "legendFormat": "Slow Queries"}]},
+      {"title": "Database Size", "targets": [{"expr": "pg_database_size_bytes", "legendFormat": "Database Size"}]},
+      {"title": "Active Connections", "targets": [{"expr": "sum(pg_connections{state='active'})", "legendFormat": "Active"}, {"expr": "sum(pg_connections{state='idle'})", "legendFormat": "Idle"}]},
+      {"title": "Deadlocks", "targets": [{"expr": "rate(pg_deadlocks[5m])", "legendFormat": "Deadlocks/sec"}]}
     ]
   }
 }
 ```
 
-### Step 4.6: Configure Alerting Rules
+### 步骤 4.6：配置告警规则
 
-Create `monitoring/alert-rules.yml`:
+创建 `monitoring/alert-rules.yml`：
 
 ```yaml
 groups:
@@ -1713,88 +1429,57 @@ groups:
       - alert: HighQueryLatency
         expr: histogram_quantile(0.99, rate(pg_stat_statements_exec_time_bucket[5m])) > 1000
         for: 5m
-        labels:
-          severity: warning
-        annotations:
-          summary: "P99 query latency above 1 second"
-          description: "Database queries are slow (P99: {{ $value }}ms)"
-
+        labels: {severity: warning}
+        annotations: {summary: "P99 query latency above 1 second", description: "Database queries are slow (P99: {{ $value }}ms)"}
       - alert: LowCacheHitRatio
         expr: pg_cache_hit_ratio < 85
         for: 10m
-        labels:
-          severity: warning
-        annotations:
-          summary: "Cache hit ratio below 85%"
-          description: "Too many disk reads (cache hit: {{ $value }}%)"
-
+        labels: {severity: warning}
+        annotations: {summary: "Cache hit ratio below 85%", description: "Too many disk reads (cache hit: {{ $value }}%)"}
       - alert: HighConnectionCount
         expr: sum(pg_connections) > 80
         for: 5m
-        labels:
-          severity: warning
-        annotations:
-          summary: "High number of database connections"
-          description: "Connection count: {{ $value }} (limit: 100)"
-
+        labels: {severity: warning}
+        annotations: {summary: "High number of database connections", description: "Connection count: {{ $value }} (limit: 100)"}
       - alert: DeadlocksDetected
         expr: rate(pg_deadlocks[5m]) > 0
         for: 1m
-        labels:
-          severity: critical
-        annotations:
-          summary: "Database deadlocks detected"
-          description: "Deadlock rate: {{ $value }}/sec"
-
-      - alert: AutovacuumNotRunning
-        expr: time() - pg_stat_user_tables_last_autovacuum > 86400
-        for: 1h
-        labels:
-          severity: warning
-        annotations:
-          summary: "Autovacuum hasn't run in 24 hours"
-          description: "Table {{ $labels.table }} needs vacuuming"
+        labels: {severity: critical}
+        annotations: {summary: "Database deadlocks detected", description: "Deadlock rate: {{ $value }}/sec"}
 ```
 
-### Checkpoint 4
+### 检查点 4
 
-✅ Verify maintenance and monitoring:
+✅ 验证维护和监控：
 
 ```bash
-# Check autovacuum is running
 psql -h localhost -U ml_user -d ml_registry -c "
     SELECT COUNT(*) as autovacuum_workers
     FROM pg_stat_activity
     WHERE query LIKE '%autovacuum%';
 "
-
-# Verify Prometheus is scraping metrics
 curl -s http://localhost:9090/api/v1/query?query=pg_cache_hit_ratio | jq '.data.result[0].value[1]'
-
-# Check Grafana dashboard is accessible
 curl -s http://localhost:3000/api/health | jq '.'
 ```
 
 ---
 
-## Part 5: Advanced Optimization Techniques
+## 第 5 部分：高级优化技术
 
-### Step 5.1: Query Rewriting for Performance
+### 步骤 5.1：查询重写以提高性能
 
-**Common Performance Anti-Patterns:**
+**常见性能反模式：**
 
-**❌ Bad: OR conditions with different columns**
+**❌ 不好：不同列上的 OR 条件**
 
 ```sql
--- Forces sequential scan
 SELECT * FROM training_runs
 WHERE model_name = 'fraud-detection' OR experiment_name = 'exp-001';
 ```
 
-**✅ Good: Use UNION for OR conditions**
+**✅ 好：对 OR 条件使用 UNION**
 
 ```sql
--- Can use indexes
 SELECT * FROM training_runs WHERE model_name = 'fraud-detection'
 UNION
 SELECT * FROM training_runs WHERE experiment_name = 'exp-001';
@@ -1802,18 +1487,15 @@ SELECT * FROM training_runs WHERE experiment_name = 'exp-001';
 
 ---
 
-**❌ Bad: NOT IN subquery**
+**❌ 不好：NOT IN 子查询**
 
 ```sql
--- Slow for large subqueries
-SELECT * FROM models
-WHERE model_id NOT IN (SELECT model_id FROM model_versions);
+SELECT * FROM models WHERE model_id NOT IN (SELECT model_id FROM model_versions);
 ```
 
-**✅ Good: Use LEFT JOIN with NULL check**
+**✅ 好：使用 LEFT JOIN 加 NULL 检查**
 
 ```sql
--- Much faster
 SELECT m.*
 FROM models m
 LEFT JOIN model_versions mv ON m.model_id = mv.model_id
@@ -1822,19 +1504,15 @@ WHERE mv.model_id IS NULL;
 
 ---
 
-**❌ Bad: SELECT * with OFFSET for pagination**
+**❌ 不好：使用 OFFSET 的 SELECT * 分页**
 
 ```sql
--- Scans all preceding rows
-SELECT * FROM training_runs
-ORDER BY created_at DESC
-LIMIT 20 OFFSET 10000;  -- Slow for high offsets
+SELECT * FROM training_runs ORDER BY created_at DESC LIMIT 20 OFFSET 10000;
 ```
 
-**✅ Good: Keyset pagination**
+**✅ 好：Keyset 分页**
 
 ```sql
--- Uses index, constant time
 SELECT * FROM training_runs
 WHERE created_at < '2024-01-15 10:00:00'
 ORDER BY created_at DESC
@@ -1843,136 +1521,59 @@ LIMIT 20;
 
 ---
 
-**❌ Bad: Function calls in WHERE clause**
+**❌ 不好：WHERE 子句中的函数调用**
 
 ```sql
--- Prevents index usage
-SELECT * FROM training_runs
-WHERE DATE(created_at) = '2024-01-15';
+SELECT * FROM training_runs WHERE DATE(created_at) = '2024-01-15';
 ```
 
-**✅ Good: Range query**
+**✅ 好：范围查询**
 
 ```sql
--- Uses index on created_at
 SELECT * FROM training_runs
 WHERE created_at >= '2024-01-15' AND created_at < '2024-01-16';
 ```
 
-### Step 5.2: Partitioning for Large Tables
+### 步骤 5.2：大表分区
 
-For tables > 10M rows or > 50GB, consider partitioning:
+对于 > 1000 万行或 > 50GB 的表，考虑分区：
 
 ```sql
--- Create partitioned table for training_runs
 CREATE TABLE training_runs_partitioned (
-    run_id UUID PRIMARY KEY,
-    model_name TEXT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    -- ... other columns
+    run_id UUID PRIMARY KEY, model_name TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL
 ) PARTITION BY RANGE (created_at);
 
--- Create monthly partitions
 CREATE TABLE training_runs_2024_01 PARTITION OF training_runs_partitioned
     FOR VALUES FROM ('2024-01-01') TO ('2024-02-01');
 
 CREATE TABLE training_runs_2024_02 PARTITION OF training_runs_partitioned
     FOR VALUES FROM ('2024-02-01') TO ('2024-03-01');
-
--- Create index on each partition (automatically inherited)
-CREATE INDEX ON training_runs_partitioned (created_at DESC);
-CREATE INDEX ON training_runs_partitioned (experiment_name, created_at DESC);
-
--- Automatic partition management (PostgreSQL 13+)
-CREATE OR REPLACE FUNCTION create_monthly_partitions()
-RETURNS void AS $$
-DECLARE
-    start_date DATE;
-    end_date DATE;
-    partition_name TEXT;
-BEGIN
-    -- Create partitions for next 3 months
-    FOR i IN 0..2 LOOP
-        start_date := DATE_TRUNC('month', NOW() + (i || ' months')::INTERVAL);
-        end_date := start_date + INTERVAL '1 month';
-        partition_name := 'training_runs_' || TO_CHAR(start_date, 'YYYY_MM');
-
-        IF NOT EXISTS (SELECT 1 FROM pg_tables WHERE tablename = partition_name) THEN
-            EXECUTE format(
-                'CREATE TABLE %I PARTITION OF training_runs_partitioned FOR VALUES FROM (%L) TO (%L)',
-                partition_name, start_date, end_date
-            );
-            RAISE NOTICE 'Created partition: %', partition_name;
-        END IF;
-    END LOOP;
-END;
-$$ LANGUAGE plpgsql;
-
--- Schedule with pg_cron or external scheduler
-SELECT create_monthly_partitions();
 ```
 
-**Benefits of Partitioning:**
-- ✅ Queries with time filters only scan relevant partitions (partition pruning)
-- ✅ Easier maintenance (drop old partitions instead of DELETE)
-- ✅ Parallel query execution across partitions
-- ✅ Smaller indexes per partition
+### 步骤 5.3：使用 PgBouncer 的连接池
 
-### Step 5.3: Connection Pooling with PgBouncer
-
-For applications with many short-lived connections, add connection pooling:
-
-Create `docker-compose.pgbouncer.yml`:
+对于有许多短连接的应用，添加连接池：
 
 ```yaml
-version: '3.8'
-
 services:
   pgbouncer:
     image: edoburu/pgbouncer:latest
-    container_name: pgbouncer
     environment:
       DATABASE_URL: "postgresql://ml_user:ml_password@ml-registry-postgres:5432/ml_registry"
-      POOL_MODE: transaction  # or session, statement
+      POOL_MODE: transaction
       MAX_CLIENT_CONN: 1000
       DEFAULT_POOL_SIZE: 25
-      RESERVE_POOL_SIZE: 5
-      RESERVE_POOL_TIMEOUT: 3
       SERVER_IDLE_TIMEOUT: 600
       MAX_DB_CONNECTIONS: 100
-    ports:
-      - "6432:6432"
-    networks:
-      - ml-registry-network
-
-networks:
-  ml-registry-network:
-    external: true
+    ports: ["6432:6432"]
 ```
 
-**Update application connection string:**
+### 步骤 5.4：用于扩展读取的只读副本
 
-```python
-# Before: Direct PostgreSQL connection
-DATABASE_URL = "postgresql://ml_user:ml_password@localhost:5432/ml_registry"
-
-# After: Through PgBouncer
-DATABASE_URL = "postgresql://ml_user:ml_password@localhost:6432/ml_registry"
-```
-
-**Benefits:**
-- ✅ Reduce connection overhead (connection creation is expensive)
-- ✅ Handle connection spikes without exhausting database connections
-- ✅ Support > 1000 application connections with only 100 database connections
-
-### Step 5.4: Read Replicas for Scaling Reads
-
-For read-heavy workloads, set up streaming replication:
+对于读取密集型工作负载，设置流复制：
 
 ```yaml
-# docker-compose.replicas.yml
-version: '3.8'
-
 services:
   postgres-primary:
     image: postgres:14
@@ -1980,362 +1581,235 @@ services:
       POSTGRES_USER: ml_user
       POSTGRES_PASSWORD: ml_password
       POSTGRES_DB: ml_registry
-      POSTGRES_INITDB_ARGS: "-c wal_level=replica -c max_wal_senders=3"
-    volumes:
-      - postgres-primary-data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    ports: ["5432:5432"]
 
   postgres-replica:
     image: postgres:14
-    environment:
-      PGUSER: replicator
-      PGPASSWORD: replicator_password
-    command: |
-      bash -c "
-      until pg_basebackup -h postgres-primary -D /var/lib/postgresql/data -U replicator -v -P --wal-method=stream; do
-        echo 'Waiting for primary to be ready...'
-        sleep 5
-      done
-      echo 'standby_mode = on' > /var/lib/postgresql/data/recovery.conf
-      echo 'primary_conninfo = \"host=postgres-primary port=5432 user=replicator password=replicator_password\"' >> /var/lib/postgresql/data/recovery.conf
-      postgres
-      "
-    volumes:
-      - postgres-replica-data:/var/lib/postgresql/data
-    ports:
-      - "5433:5432"
-    depends_on:
-      - postgres-primary
-
-volumes:
-  postgres-primary-data:
-  postgres-replica-data:
+    ports: ["5433:5432"]
+    depends_on: [postgres-primary]
 ```
 
-**Application Configuration:**
+### 检查点 5
 
-```python
-# Write to primary
-PRIMARY_DB_URL = "postgresql://ml_user:ml_password@localhost:5432/ml_registry"
-
-# Read from replica
-REPLICA_DB_URL = "postgresql://ml_user:ml_password@localhost:5433/ml_registry"
-
-# SQLAlchemy configuration
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-primary_engine = create_engine(PRIMARY_DB_URL)
-replica_engine = create_engine(REPLICA_DB_URL)
-
-# Use replica for read-only queries
-ReadSession = sessionmaker(bind=replica_engine)
-
-def get_models_readonly():
-    with ReadSession() as session:
-        return session.query(Model).all()
-```
-
-### Checkpoint 5
-
-✅ Verify advanced optimizations:
+✅ 验证高级优化：
 
 ```bash
-# Check if partitioning is enabled (if implemented)
 psql -h localhost -U ml_user -d ml_registry -c "
     SELECT tablename, pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename))
-    FROM pg_tables
-    WHERE schemaname = 'public' AND tablename LIKE '%_partition_%'
+    FROM pg_tables WHERE schemaname = 'public' AND tablename LIKE '%_partition_%'
     ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
-"
-
-# Test PgBouncer connection (if running)
-psql -h localhost -p 6432 -U ml_user -d ml_registry -c "SELECT 1;"
-
-# Check replication lag (if replicas configured)
-psql -h localhost -U ml_user -d ml_registry -c "
-    SELECT client_addr, state, sync_state,
-           pg_wal_lsn_diff(pg_current_wal_lsn(), sent_lsn) AS lag_bytes
-    FROM pg_stat_replication;
 "
 ```
 
 ---
 
-## Part 6: Production Runbook and Documentation
+## 第 6 部分：生产 Runbook 与文档
 
-### Step 6.1: Create Performance Tuning Runbook
+### 步骤 6.1：创建性能调优 Runbook
 
-Create `docs/runbook-performance-tuning.md`:
+创建 `docs/runbook-performance-tuning.md`：
 
 ```markdown
-# Database Performance Tuning Runbook
+# 数据库性能调优 Runbook
 
-## Quick Reference
+## 快速参考
 
-| Issue | Symptom | Action | Priority |
+| 问题 | 症状 | 操作 | 优先级 |
 |-------|---------|--------|----------|
-| Slow queries | P99 > 500ms | Run EXPLAIN ANALYZE, check indexes | 🔴 HIGH |
-| Low cache hit ratio | < 90% | Increase `shared_buffers`, check query patterns | 🟡 MEDIUM |
-| High connections | > 80% of max | Add PgBouncer, check connection leaks | 🔴 HIGH |
-| Table bloat | > 50% | Run VACUUM FULL during maintenance window | 🟡 MEDIUM |
-| Index bloat | Leaf density < 70% | REINDEX CONCURRENTLY | 🟠 LOW |
-| Deadlocks | > 0/hour | Review transaction logic, add retries | 🔴 HIGH |
+| 慢查询 | P99 > 500ms | 运行 EXPLAIN ANALYZE，检查索引 | 🔴 高 |
+| 缓存命中率低 | < 90% | 增加 `shared_buffers`，检查查询模式 | 🟡 中 |
+| 高连接数 | > 80% 最大值 | 添加 PgBouncer，检查连接泄漏 | 🔴 高 |
+| 表膨胀 | > 50% | 在维护窗口运行 VACUUM FULL | 🟡 中 |
+| 索引膨胀 | 叶密度 < 70% | REINDEX CONCURRENTLY | 🟠 低 |
+| 死锁 | > 0/小时 | 检查事务逻辑，添加重试 | 🔴 高 |
 
 ---
 
-## Procedure 1: Investigate Slow Query
+## 过程 1：调查慢查询
 
-**Trigger**: Alert fires for query latency > 500ms
+**触发**: 查询延迟 > 500ms 的告警触发
 
-**Steps**:
+**步骤**:
 
-1. **Identify slow queries:**
+1. **识别慢查询:**
    ```sql
    SELECT query, calls, mean_exec_time, max_exec_time
-   FROM pg_stat_statements
-   WHERE mean_exec_time > 100
-   ORDER BY mean_exec_time DESC
-   LIMIT 10;
+   FROM pg_stat_statements WHERE mean_exec_time > 100
+   ORDER BY mean_exec_time DESC LIMIT 10;
    ```
 
-2. **Capture execution plan:**
+2. **捕获执行计划:**
    ```sql
    EXPLAIN (ANALYZE, BUFFERS, VERBOSE) <slow_query>;
    ```
 
-3. **Check for missing indexes:**
-   - Look for "Seq Scan" on large tables
-   - Check "rows" vs "actual rows" mismatch (stale statistics)
-   - Verify indexes exist on WHERE/JOIN columns
+3. **检查缺失的索引:**
+   - 在大表上查找 "Seq Scan"
+   - 检查 "rows" vs "actual rows" 不匹配（统计信息过期）
+   - 验证 WHERE/JOIN 列上是否存在索引
 
-4. **Apply fix:**
-   - **If missing index**: `CREATE INDEX CONCURRENTLY ...`
-   - **If stale stats**: `ANALYZE <table>;`
-   - **If bad query**: Rewrite using techniques from Part 5
+4. **应用修复:**
+   - **如果缺失索引**: `CREATE INDEX CONCURRENTLY ...`
+   - **如果统计信息过期**: `ANALYZE <table>;`
+   - **如果查询糟糕**: 使用第 5 部分中的技术重写
 
-5. **Verify improvement:**
-   - Re-run EXPLAIN ANALYZE
-   - Monitor metrics for 24 hours
-   - Document in `docs/performance-improvements.md`
+5. **验证改进:**
+   - 重新运行 EXPLAIN ANALYZE
+   - 监控指标 24 小时
+   - 记录在 `docs/performance-improvements.md`
 
-**Rollback Plan**: `DROP INDEX CONCURRENTLY IF EXISTS <index_name>;`
+**回滚计划**: `DROP INDEX CONCURRENTLY IF EXISTS <index_name>;`
 
 ---
 
-## Procedure 2: Handle Table Bloat
+## 过程 2：处理表膨胀
 
-**Trigger**: Table size increased by > 2x without corresponding data growth
+**触发**: 表大小增加了 > 2 倍而没有相应的数据增长
 
-**Steps**:
+**步骤**:
 
-1. **Check bloat:**
+1. **检查膨胀:**
    ```sql
-   SELECT
-       tablename,
-       pg_size_pretty(pg_total_relation_size(tablename)) as size,
-       n_dead_tup,
-       ROUND(100 * n_dead_tup::numeric / NULLIF(n_live_tup + n_dead_tup, 0), 2) as dead_pct
-   FROM pg_stat_user_tables
-   WHERE schemaname = 'public'
+   SELECT tablename, pg_size_pretty(pg_total_relation_size(tablename)) as size,
+          n_dead_tup, ROUND(100 * n_dead_tup::numeric / NULLIF(n_live_tup + n_dead_tup, 0), 2) as dead_pct
+   FROM pg_stat_user_tables WHERE schemaname = 'public'
    ORDER BY n_dead_tup DESC;
    ```
 
-2. **If dead_pct > 20%**, run VACUUM:
+2. **如果 dead_pct > 20%**，运行 VACUUM:
    ```sql
    VACUUM (VERBOSE, ANALYZE) training_runs;
    ```
 
-3. **If bloat persists**, schedule VACUUM FULL (requires maintenance window):
+3. **如果膨胀持续存在**，安排 VACUUM FULL（需要维护窗口）:
    ```sql
-   -- ⚠️ Locks table for writes
    VACUUM FULL training_runs;
    ```
 
-4. **Tune autovacuum** to prevent recurrence:
+4. **调整 autovacuum** 以防止复发:
    ```sql
-   ALTER TABLE training_runs SET (
-       autovacuum_vacuum_scale_factor = 0.1,
-       autovacuum_vacuum_threshold = 5000
-   );
+   ALTER TABLE training_runs SET (autovacuum_vacuum_scale_factor = 0.1, autovacuum_vacuum_threshold = 5000);
    ```
 
 ---
 
-## Procedure 3: Emergency Performance Triage
+## 过程 3：紧急性能分类
 
-**Trigger**: Database CPU > 90%, queries timing out
+**触发**: 数据库 CPU > 90%，查询超时
 
-**Immediate Actions (within 5 minutes)**:
+**立即操作（5 分钟内）**:
 
-1. **Identify blocking queries:**
+1. **识别阻塞查询:**
    ```sql
    SELECT pid, query, state, wait_event_type, wait_event
-   FROM pg_stat_activity
-   WHERE state != 'idle'
-   ORDER BY query_start;
+   FROM pg_stat_activity WHERE state != 'idle' ORDER BY query_start;
    ```
 
-2. **Kill long-running queries** (if safe):
+2. **杀死长时间运行的查询**（如果安全）:
    ```sql
    SELECT pg_terminate_backend(pid)
-   FROM pg_stat_activity
-   WHERE state = 'active'
+   FROM pg_stat_activity WHERE state = 'active'
      AND query_start < NOW() - INTERVAL '5 minutes'
      AND query NOT LIKE '%pg_stat_activity%';
    ```
 
-3. **Check for lock contention:**
-   ```sql
-   SELECT
-       blocked_locks.pid AS blocked_pid,
-       blocked_activity.query AS blocked_query,
-       blocking_locks.pid AS blocking_pid,
-       blocking_activity.query AS blocking_query
-   FROM pg_catalog.pg_locks blocked_locks
-   JOIN pg_catalog.pg_stat_activity blocked_activity ON blocked_activity.pid = blocked_locks.pid
-   JOIN pg_catalog.pg_locks blocking_locks ON blocking_locks.locktype = blocked_locks.locktype
-   JOIN pg_catalog.pg_stat_activity blocking_activity ON blocking_activity.pid = blocking_locks.pid
-   WHERE NOT blocked_locks.granted;
-   ```
+3. **检查锁争用:**
 
-4. **Enable query logging** temporarily:
+4. **临时启用查询日志:**
    ```sql
-   ALTER SYSTEM SET log_min_duration_statement = 0;  -- Log all queries
+   ALTER SYSTEM SET log_min_duration_statement = 0;
    SELECT pg_reload_conf();
    ```
 
-5. **Escalate** to DBA if issue persists after 15 minutes
-
-**Follow-up Actions (within 24 hours)**:
-
-- Review slow query log
-- Update indexes based on patterns
-- Consider adding read replicas
-- Document incident in postmortem
+5. **如果 15 分钟后问题仍然存在**，升级到 DBA
 
 ---
 
-## Procedure 4: Monthly Maintenance
+## 过程 4：每月维护
 
-**Schedule**: First Sunday of each month, 2 AM UTC
+**日程**: 每月第一个星期日，UTC 凌晨 2 点
 
-**Checklist**:
+**检查清单**:
 
-- [ ] Run `scripts/maintenance.sql`
-- [ ] Check for unused indexes (`idx_scan = 0`)
-- [ ] REINDEX bloated indexes (leaf_density < 70%)
-- [ ] Review pg_stat_statements for new slow queries
-- [ ] Update `docs/performance-baseline.md` with current metrics
-- [ ] Verify backup restoration (restore to test database)
-- [ ] Review alert threshold (adjust based on traffic changes)
-
-**Estimated Duration**: 30-60 minutes
-
----
-
-## Emergency Contacts
-
-- **Primary DBA**: dba@company.com (Pager: +1-XXX-XXX-XXXX)
-- **Backup DBA**: backup-dba@company.com
-- **Escalation**: #database-oncall Slack channel
-
----
-
-## References
-
-- [PostgreSQL Documentation: Performance Tips](https://www.postgresql.org/docs/current/performance-tips.html)
-- [pgAnalyze: Index Advisor](https://pganalyze.com/)
-- [Postgres EXPLAIN Visualizer](https://explain.depesz.com/)
+- [ ] 运行 `scripts/maintenance.sql`
+- [ ] 检查未使用的索引（`idx_scan = 0`）
+- [ ] REINDEX 膨胀索引（leaf_density < 70%）
+- [ ] 检查 pg_stat_statements 中新的慢查询
+- [ ] 使用当前指标更新 `docs/performance-baseline.md`
+- [ ] 验证备份恢复（恢复到测试数据库）
+- [ ] 检查告警阈值（根据流量变化调整）
 ```
 
-### Step 6.2: Document Optimization History
+### 步骤 6.2：记录优化历史
 
-Create `docs/performance-improvements.md`:
+创建 `docs/performance-improvements.md`：
 
 ```markdown
-# Performance Optimization History
+# 性能优化历史
 
-## 2025-10-23: Initial Index Creation
+## 2025-10-23：初始索引创建
 
-**Problem**: Dashboard queries timing out (P99 > 1,000ms)
+**问题**: 仪表盘查询超时（P99 > 1,000ms）
 
-**Root Cause**: Missing indexes on foreign keys and time-range filters
+**根因**: 外键和时间范围过滤器上缺少索引
 
-**Solution**: Created 18 indexes covering:
-- Foreign key columns (5 indexes)
-- Time-range queries (4 indexes)
-- Composite indexes (3 indexes)
-- Partial indexes (3 indexes)
-- JSONB indexes (3 indexes)
+**解决方案**: 创建了 18 个索引，涵盖：
+- 外键列（5 个索引）
+- 时间范围查询（4 个索引）
+- 复合索引（3 个索引）
+- Partial index（3 个索引）
+- JSONB 索引（3 个索引）
 
-**Results**:
-- 92% reduction in average query latency
-- 96% reduction in P99 latency
-- Cache hit ratio improved from 45% to 94%
-- Zero query timeouts
-
-**Metrics**: See `docs/performance-results.md`
-
-**Indexes Created**: See `sql/50_indexes.sql`
+**结果**:
+- 平均查询延迟降低 92%
+- P99 延迟降低 96%
+- 缓存命中率从 45% 提高到 94%
+- 零查询超时
 
 ---
 
-## Future Optimization Candidates
+## 未来优化候选
 
-1. **Partition training_runs table** (Priority: MEDIUM)
-   - Rationale: Table approaching 10M rows
-   - Expected benefit: 50% faster time-range queries
-   - Estimated effort: 4 hours (migration script + testing)
+1. **分区 training_runs 表**（优先级：中）
+   - 理由：表接近 1000 万行
+   - 预期收益：时间范围查询快 50%
+   - 预计工作量：4 小时
 
-2. **Add read replica** (Priority: HIGH if traffic > 100 QPS)
-   - Rationale: Read-heavy workload (95% reads)
-   - Expected benefit: 2x read capacity
-   - Estimated effort: 8 hours (setup + application changes)
+2. **添加只读副本**（如果流量 > 100 QPS，优先级：高）
+   - 理由：读取密集型工作负载（95% 读取）
+   - 预期收益：读取能力提升 2 倍
+   - 预计工作量：8 小时
 
-3. **Implement PgBouncer** (Priority: LOW currently)
-   - Rationale: Connection count stable (< 50)
-   - Revisit when: Connections > 80
-
-4. **JSONB index optimization** (Priority: LOW)
-   - Current status: JSONB indexes unused
-   - Action: Monitor for 30 days, drop if still unused
+3. **实现 PgBouncer**（当前优先级：低）
+   - 理由：连接数稳定（< 50）
+   - 重新考虑时机：连接数 > 80
 ```
 
-### Checkpoint 6
+### 检查点 6
 
-✅ Verify runbook completeness:
+✅ 验证 runbook 完整性：
 
 ```bash
-# Check all documentation exists
 ls -la docs/runbook-performance-tuning.md
 ls -la docs/performance-improvements.md
 ls -la docs/index-strategy.md
-
-# Verify maintenance script exists
 ls -la scripts/maintenance.sql
-
-# Test maintenance script (dry run)
-psql -h localhost -U ml_user -d ml_registry -f scripts/maintenance.sql --dry-run
 ```
 
 ---
 
-## Part 7: Hands-on Challenges
+## 第 7 部分：动手挑战
 
-### Challenge 1: Optimize a Complex Analytical Query
+### 挑战 1：优化复杂分析查询
 
-**Problem**: The following query is slow (avg 850ms):
+**问题**: 以下查询速度慢（平均 850ms）：
 
 ```sql
-SELECT
-    m.model_name,
-    COUNT(DISTINCT d.deployment_id) as total_deployments,
-    COUNT(DISTINCT d.deployment_id) FILTER (WHERE d.status = 'active') as active_deployments,
-    MAX(d.deployed_at) as last_deployment,
-    AVG(tr.accuracy) FILTER (WHERE tr.status = 'succeeded') as avg_accuracy,
-    COUNT(DISTINCT tr.run_id) as total_runs
+SELECT m.model_name, COUNT(DISTINCT d.deployment_id) as total_deployments,
+       COUNT(DISTINCT d.deployment_id) FILTER (WHERE d.status = 'active') as active_deployments,
+       MAX(d.deployed_at) as last_deployment,
+       AVG(tr.accuracy) FILTER (WHERE tr.status = 'succeeded') as avg_accuracy,
+       COUNT(DISTINCT tr.run_id) as total_runs
 FROM models m
 LEFT JOIN model_versions mv ON m.model_id = mv.model_id
 LEFT JOIN deployments d ON mv.version_id = d.version_id
@@ -2346,155 +1820,140 @@ HAVING COUNT(DISTINCT d.deployment_id) > 0
 ORDER BY total_deployments DESC;
 ```
 
-**Tasks**:
-1. Run EXPLAIN ANALYZE and identify bottlenecks
-2. Create necessary indexes
-3. Consider query rewrite (CTEs, subqueries, materialized view)
-4. Measure before/after improvement
-5. Document your solution
+**任务**:
+1. 运行 EXPLAIN ANALYZE 并识别瓶颈
+2. 创建必要的索引
+3. 考虑查询重写（CTE、子查询、物化视图）
+4. 测量前后改进
+5. 记录你的解决方案
 
-**Target**: < 100ms execution time
+**目标**: < 100ms 执行时间
 
-<details>
-<summary>Click for Solution Hints</summary>
+### 挑战 2：设计分区策略
 
-**Hints**:
-- Consider filtering early (WHERE before JOIN)
-- Use window functions instead of multiple aggregations
-- Create covering index on (created_at, model_id) for models table
-- Consider materialized view refreshed hourly
+**问题**: `training_runs` 表有 5000 万行，每天增长 10 万行
 
-</details>
+**任务**:
+1. 设计月度分区策略
+2. 编写迁移脚本将现有表转换为分区表
+3. 创建自动创建未来分区的函数
+4. 使用 EXPLAIN 测试分区裁剪
+5. 记录保留策略（保留 12 个月，归档更早的）
 
----
+**交付物**: `sql/60_partition_training_runs.sql`
 
-### Challenge 2: Design Partitioning Strategy
+### 挑战 3：实现查询结果缓存
 
-**Problem**: `training_runs` table has 50M rows and growing by 100K/day
+**问题**: 仪表盘统计查询每小时运行 1000 次，但数据每 5 分钟才变化一次
 
-**Tasks**:
-1. Design monthly partitioning strategy
-2. Write migration script to convert existing table to partitioned table
-3. Create function to auto-create future partitions
-4. Test partition pruning with EXPLAIN
-5. Document retention policy (keep 12 months, archive older)
+**任务**:
+1. 为仪表盘统计创建物化视图
+2. 设置刷新任务（pg_cron 或应用级）
+3. 修改应用程序以查询物化视图
+4. 测量缓存命中率
+5. 比较与直接查询的性能
 
-**Deliverable**: `sql/60_partition_training_runs.sql`
-
----
-
-### Challenge 3: Implement Query Result Caching
-
-**Problem**: Dashboard stats query runs 1000x/hour but data changes only every 5 minutes
-
-**Tasks**:
-1. Create materialized view for dashboard stats
-2. Set up refresh job (pg_cron or application-level)
-3. Modify application to query materialized view
-4. Measure cache hit rate
-5. Compare performance vs direct query
-
-**Target**: 99% cache hit rate, <5ms query time
+**目标**: 99% 缓存命中率，<5ms 查询时间
 
 ---
 
-## Part 8: Summary and Next Steps
+## 第 8 部分：总结与后续步骤
 
-### What You've Learned
+### 学到的内容
 
-✅ **Database profiling** with pg_stat_statements and EXPLAIN ANALYZE
-✅ **Index strategy design** for different query patterns
-✅ **Performance measurement** with before/after metrics
-✅ **Maintenance procedures** (VACUUM, ANALYZE, REINDEX)
-✅ **Monitoring setup** with Prometheus and Grafana
-✅ **Production runbooks** for performance issues
-✅ **Advanced techniques** (partitioning, connection pooling, replication)
+✅ **数据库分析**：使用 pg_stat_statements 和 EXPLAIN ANALYZE
+✅ **索引策略设计**：针对不同查询模式
+✅ **性能测量**：前后对比指标
+✅ **维护程序**（VACUUM、ANALYZE、REINDEX）
+✅ **监控设置**：使用 Prometheus 和 Grafana
+✅ **生产 Runbook**：性能问题处理
+✅ **高级技术**：分区、连接池、复制
 
-### Key Takeaways
+### 关键要点
 
-1. **Measure before optimizing**: Use EXPLAIN ANALYZE to find actual bottlenecks
-2. **Indexes are powerful but not free**: 50% write overhead for 10-100x read speedup
-3. **Foreign key indexes are critical**: Always index FK columns
-4. **Composite indexes beat multiple single-column indexes**: Column order matters
-5. **Partial indexes are underused**: Target hot queries with filtered indexes
-6. **Monitoring prevents regressions**: Set up alerts before performance degrades
-7. **Maintenance is essential**: VACUUM, ANALYZE, and REINDEX keep database healthy
+1. **先测量再优化**：使用 EXPLAIN ANALYZE 找到实际瓶颈
+2. **索引很强大但非免费**：50% 写入开销换 10-100 倍读取加速
+3. **外键索引至关重要**：始终对 FK 列建索引
+4. **复合索引优于多个单列索引**：列顺序很重要
+5. **Partial Index 被低估**：用过滤索引瞄准热查询
+6. **监控防止退化**：在性能下降前设置告警
+7. **维护必不可少**：VACUUM、ANALYZE 和 REINDEX 保持数据库健康
 
-### Performance Achievements
+### 性能成果
 
-| Metric | Before | After | Improvement |
+| 指标 | 优化前 | 优化后 | 改进 |
 |--------|--------|-------|-------------|
-| Avg Query Latency | 145ms | 12ms | **92% faster** |
-| P99 Latency | 1,250ms | 45ms | **96% faster** |
-| Cache Hit Ratio | 45% | 94% | **+49pp** |
-| Slow Queries (>1s) | 7.3% | 0% | **100% eliminated** |
-| Database CPU | 78% | 23% | **-55pp** |
+| 平均查询延迟 | 145ms | 12ms | **快 92%** |
+| P99 延迟 | 1,250ms | 45ms | **快 96%** |
+| 缓存命中率 | 45% | 94% | **+49pp** |
+| 慢查询（>1s） | 7.3% | 0% | **100% 消除** |
+| 数据库 CPU | 78% | 23% | **-55pp** |
 
-### Production Readiness Checklist
+### 生产就绪检查清单
 
-Before deploying to production:
+部署到生产前：
 
-- [ ] All indexes created with `CONCURRENTLY`
-- [ ] EXPLAIN ANALYZE confirms index usage
-- [ ] Before/after metrics documented
-- [ ] Monitoring dashboard configured
-- [ ] Alert rules configured and tested
-- [ ] Runbook documented and reviewed
-- [ ] Maintenance schedule established
-- [ ] Backup/restore tested
-- [ ] Performance regression tests added to CI/CD
-- [ ] Team trained on troubleshooting procedures
+- [ ] 所有索引用 `CONCURRENTLY` 创建
+- [ ] EXPLAIN ANALYZE 确认索引使用
+- [ ] 前后指标已记录
+- [ ] 监控仪表盘已配置
+- [ ] 告警规则已配置并测试
+- [ ] Runbook 已记录并审查
+- [ ] 维护计划已建立
+- [ ] 备份/恢复已测试
+- [ ] 性能回归测试已添加到 CI/CD
+- [ ] 团队已接受故障处理程序培训
 
-### Next Steps
+### 后续步骤
 
-**Module 009: Monitoring & Logging Basics**
-- Instrument database queries in application code
-- Set up distributed tracing (OpenTelemetry)
-- Create custom metrics for business KPIs
-- Implement log aggregation (ELK, Loki)
+**模块 009：监控与日志基础**
+- 在应用代码中仪表化数据库查询
+- 设置分布式追踪（OpenTelemetry）
+- 为业务 KPI 创建自定义指标
+- 实现日志聚合（ELK、Loki）
 
-**Module 010: Cloud Platforms**
-- Deploy to managed PostgreSQL (AWS RDS, GCP Cloud SQL)
-- Configure automated backups and point-in-time recovery
-- Set up cross-region replication
-- Optimize costs (reserved instances, storage tiers)
+**模块 010：云平台**
+- 部署到托管 PostgreSQL（AWS RDS、GCP Cloud SQL）
+- 配置自动备份和时间点恢复
+- 设置跨区域复制
+- 优化成本（预留实例、存储分层）
 
-**Real-World Projects**:
-- Build complete ML platform with optimized database backend
-- Implement auto-scaling based on query load
-- Create multi-tenant database architecture
+**实际项目**：
+- 使用优化数据库后端构建完整 ML 平台
+- 基于查询负载实现自动扩展
+- 创建多租户数据库架构
 
-### Resources
+### 资源
 
-**Books**:
+**书籍**：
 - "PostgreSQL 14 Internals" by Egor Rogov
 - "The Art of PostgreSQL" by Dimitri Fontaine
 
-**Tools**:
-- [pgAnalyze](https://pganalyze.com/) - Query performance monitoring
-- [pghero](https://github.com/ankane/pghero) - Database health dashboard
-- [pgBadger](https://github.com/darold/pgbadger) - Log analyzer
-- [EXPLAIN Visualizer](https://explain.depesz.com/) - Visual query plans
+**工具**：
+- [pgAnalyze](https://pganalyze.com/) - 查询性能监控
+- [pghero](https://github.com/ankane/pghero) - 数据库健康仪表盘
+- [pgBadger](https://github.com/darold/pgbadger) - 日志分析器
+- [EXPLAIN Visualizer](https://explain.depesz.com/) - 可视化查询计划
 
-**Documentation**:
+**文档**：
 - [PostgreSQL Performance Tips](https://www.postgresql.org/docs/current/performance-tips.html)
 - [Index Types](https://www.postgresql.org/docs/current/indexes-types.html)
 - [EXPLAIN Documentation](https://www.postgresql.org/docs/current/sql-explain.html)
 
 ---
 
-## Congratulations!
+## 恭喜！
 
-You've completed Exercise 05 and mastered database performance optimization! You now have:
+你已完成练习 05，掌握了数据库性能优化！你现在拥有：
 
-- Production-ready indexing strategy
-- Comprehensive monitoring setup
-- Performance runbook for operations
-- Before/after metrics proving 92% improvement
-- Advanced techniques for scaling beyond current workload
+- 生产级索引策略
+- 全面的监控设置
+- 运维性能 Runbook
+- 前后指标，证明 92% 改进
+- 超越当前工作负载的高级技术
 
-**You're ready to manage production ML infrastructure databases!**
+**你已准备好管理生产 ML 基础设施数据库！**
 
 ---
 
-**Exercise 05 Complete** | [Return to Module 008 Overview](../README.md) | Next: [Module 009: Monitoring Basics](../../mod-009-monitoring-basics/README.md)
+**练习 05 完成** | [返回模块 008 概述](../README.md) | 下一步：[模块 009：监控基础](../../mod-009-monitoring-basics/README.md)

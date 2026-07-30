@@ -1,904 +1,904 @@
-# Requirements Specification: Production-Ready ML System
+# 需求规格说明：生产级 ML 系统
 
-**Project:** Project 05 - Production ML System (Capstone)
-**Version:** 1.0
-**Last Updated:** October 18, 2025
-
----
-
-## Table of Contents
-
-1. [Overview](#overview)
-2. [Functional Requirements](#functional-requirements)
-3. [Non-Functional Requirements](#non-functional-requirements)
-4. [Technical Requirements](#technical-requirements)
-5. [Security Requirements](#security-requirements)
-6. [Operational Requirements](#operational-requirements)
-7. [Acceptance Criteria](#acceptance-criteria)
+**项目：** 项目 05 - 生产 ML 系统（结业项目）
+**版本：** 1.0
+**最后更新：** 2025年10月18日
 
 ---
 
-## Overview
+## 目录
 
-This document specifies the complete requirements for a production-ready ML system that integrates model serving, orchestration, ML pipelines, and observability into a unified, scalable, and secure platform.
-
-### Scope
-
-The system must:
-- Serve ML predictions via RESTful API
-- Automatically train and deploy models
-- Scale based on demand
-- Maintain 99.9% uptime
-- Provide complete observability
-- Follow security best practices
-
-### Out of Scope (for this project)
-
-- Multi-region deployment
-- Custom ML model development (use pre-trained models)
-- Real-time streaming predictions
-- Model interpretability/explainability features
-- Mobile SDK development
+1. [概述](#overview)
+2. [功能性需求](#functional-requirements)
+3. [非功能性需求](#non-functional-requirements)
+4. [技术需求](#technical-requirements)
+5. [安全需求](#security-requirements)
+6. [运维需求](#operational-requirements)
+7. [验收标准](#acceptance-criteria)
 
 ---
 
-## Functional Requirements
+## 概述
 
-### FR-1: Complete System Integration
+本文档规定了生产级 ML 系统的完整需求，该系统将模型服务、编排、ML 流水线和可观测性集成到一个统一、可扩展且安全的平台中。
 
-**Priority:** CRITICAL
+### 范围
 
-#### FR-1.1: API Integration
-- **Description:** Integrate model serving API from Project 1 with Kubernetes orchestration
-- **Requirements:**
-  - API runs in Kubernetes pods
-  - Health checks configured (liveness and readiness)
-  - Service mesh or load balancer distributes traffic
-  - Configuration loaded from ConfigMaps
-  - Secrets loaded from Kubernetes Secrets
-- **Acceptance Criteria:**
-  - API accessible via Kubernetes Service
-  - Multiple replicas running concurrently
-  - Health checks passing
-  - Configuration externalized
+系统必须：
+- 通过 RESTful API 提供 ML 预测服务
+- 自动训练和部署模型
+- 根据需求自动扩缩容
+- 维持 99.9% 可用性
+- 提供完整的可观测性
+- 遵循安全最佳实践
 
-#### FR-1.2: ML Pipeline Integration
-- **Description:** Connect ML training pipeline to automated deployment workflow
-- **Requirements:**
-  - Airflow DAG triggers model training on schedule
-  - Trained models registered in MLflow Model Registry
-  - Best models automatically deployed to staging
-  - Manual approval required for production
-  - Model versioning tracked end-to-end
-- **Acceptance Criteria:**
-  - Pipeline runs on schedule (e.g., weekly)
-  - Models registered with metadata
-  - Staging deployment automatic
-  - Production deployment requires approval
-  - Version history tracked
+### 不在范围内（针对本项目）
 
-#### FR-1.3: Monitoring Integration
-- **Description:** Integrate monitoring across all system components
-- **Requirements:**
-  - Prometheus scrapes metrics from all services
-  - Grafana dashboards show unified view
-  - Logs aggregated in centralized system (ELK)
-  - Alerts configured for critical failures
-  - Distributed tracing (optional but recommended)
-- **Acceptance Criteria:**
-  - All services instrumented
-  - Metrics visible in Grafana
-  - Logs searchable
-  - Alerts fire on test failures
-  - End-to-end request tracing
-
-#### FR-1.4: Unified Configuration Management
-- **Description:** Centralize configuration for all environments
-- **Requirements:**
-  - Environment-specific configurations (dev, staging, production)
-  - No hardcoded values in code
-  - Secrets managed securely
-  - Configuration versioned in Git
-  - Changes traceable via Git history
-- **Acceptance Criteria:**
-  - Single source of truth for configs
-  - Environment parity maintained
-  - No secrets in Git
-  - Configuration changes tracked
-
-#### FR-1.5: Single Deployment Workflow
-- **Description:** Deploy entire stack with single command
-- **Requirements:**
-  - Helm chart or Kustomize for deployment
-  - All dependencies handled automatically
-  - Idempotent deployment (safe to re-run)
-  - Deployment order managed (database → API → monitoring)
-  - Verification tests run after deployment
-- **Acceptance Criteria:**
-  - One command deploys full stack
-  - Deployment succeeds consistently
-  - Failed deployments cleaned up
-  - Post-deployment tests pass
+- 多区域部署
+- 自定义 ML 模型开发（使用预训练模型）
+- 实时流式预测
+- 模型可解释性功能
+- 移动端 SDK 开发
 
 ---
 
-### FR-2: CI/CD Pipeline
+## 功能性需求
 
-**Priority:** CRITICAL
+### FR-1：完整系统集成
 
-#### FR-2.1: Continuous Integration (CI)
-- **Description:** Automated testing and validation on every commit
-- **Requirements:**
-  - Code quality checks (linting, formatting, type checking)
-  - Security scanning (static analysis, dependency scanning)
-  - Unit tests (>80% code coverage)
-  - Integration tests
-  - Docker image building
-  - Image vulnerability scanning
-- **Acceptance Criteria:**
-  - CI runs automatically on push/PR
-  - All checks must pass to merge
-  - Coverage reports generated
-  - Vulnerabilities detected and reported
-  - Build artifacts tagged with commit SHA
+**优先级：** 关键
 
-#### FR-2.2: Continuous Deployment - Staging
-- **Description:** Automatic deployment to staging environment
-- **Requirements:**
-  - Triggers on merge to main/develop branch
-  - Deploys to staging Kubernetes cluster
-  - Runs smoke tests after deployment
-  - Runs integration tests
-  - Runs load tests
-  - Notification on success/failure
-- **Acceptance Criteria:**
-  - Staging updates within 10 minutes of merge
-  - All tests pass
-  - Rollback on failure
-  - Team notified of deployment status
+#### FR-1.1：API 集成
+- **描述：** 将项目 1 的模型服务 API 与 Kubernetes 编排集成
+- **要求：**
+  - API 在 Kubernetes Pod 中运行
+  - 配置健康检查（存活和就绪）
+  - 服务网格或负载均衡器分发流量
+  - 从 ConfigMap 加载配置
+  - 从 Kubernetes Secrets 加载密钥
+- **验收标准：**
+  - 通过 Kubernetes Service 可访问 API
+  - 同时运行多个副本
+  - 健康检查通过
+  - 配置外部化
 
-#### FR-2.3: Continuous Deployment - Production
-- **Description:** Controlled deployment to production with approval
-- **Requirements:**
-  - Manual approval gate (team lead or manager)
-  - Canary deployment strategy (10% → 100%)
-  - Monitor error rates during rollout
-  - Automatic rollback on errors
-  - Promotion only if metrics healthy
-  - Comprehensive logging of deployment
-- **Acceptance Criteria:**
-  - Approval required before production deploy
-  - Canary deployment tested
-  - Rollback works automatically
-  - Zero downtime during deployment
-  - Deployment time <10 minutes
+#### FR-1.2：ML 流水线集成
+- **描述：** 将 ML 训练流水线连接到自动化部署工作流
+- **要求：**
+  - Airflow DAG 按计划触发模型训练
+  - 训练完成的模型注册到 MLflow Model Registry
+  - 最佳模型自动部署到预发布环境
+  - 生产环境需要手动审批
+  - 端到端跟踪模型版本
+- **验收标准：**
+  - 流水线按计划运行（例如每周）
+  - 模型附带元数据注册
+  - 预发布部署自动化
+  - 生产部署需要审批
+  - 版本历史可追溯
 
-#### FR-2.4: Automated Model Deployment
-- **Description:** Deploy ML models from registry to serving infrastructure
-- **Requirements:**
-  - Models pulled from MLflow Model Registry
-  - ConfigMap updated with new model version
-  - Pods restarted to load new model
-  - A/B testing framework for model comparison
-  - Model rollback capability
-- **Acceptance Criteria:**
-  - New models deployed automatically
-  - Pods pick up new models
-  - A/B tests split traffic correctly
-  - Rollback completes in <5 minutes
+#### FR-1.3：监控集成
+- **描述：** 集成所有系统组件的监控
+- **要求：**
+  - Prometheus 从所有服务采集指标
+  - Grafana 仪表盘展示统一视图
+  - 日志聚合到集中式系统（ELK）
+  - 配置关键故障告警
+  - 分布式追踪（可选但推荐）
+- **验收标准：**
+  - 所有服务已接入监控
+  - 指标在 Grafana 中可见
+  - 日志可搜索
+  - 告警在测试故障时触发
+  - 端到端请求追踪
+
+#### FR-1.4：统一配置管理
+- **描述：** 集中管理所有环境的配置
+- **要求：**
+  - 环境特定配置（开发、预发布、生产）
+  - 代码中无硬编码值
+  - 密钥安全管理
+  - 配置在 Git 中版本管理
+  - 变更可通过 Git 历史追溯
+- **验收标准：**
+  - 配置的唯一真实来源
+  - 保持环境一致性
+  - Git 中无密钥
+  - 配置变更可追踪
+
+#### FR-1.5：单命令部署工作流
+- **描述：** 通过单条命令部署整个堆栈
+- **要求：**
+  - 使用 Helm chart 或 Kustomize 进行部署
+  - 自动处理所有依赖
+  - 幂等部署（可安全重试）
+  - 管理部署顺序（数据库 → API → 监控）
+  - 部署后运行验证测试
+- **验收标准：**
+  - 单条命令部署完整堆栈
+  - 部署始终成功
+  - 失败的部署被清理
+  - 部署后测试通过
 
 ---
 
-### FR-3: High Availability & Reliability
+### FR-2：CI/CD 流水线
 
-**Priority:** CRITICAL
+**优先级：** 关键
 
-#### FR-3.1: Multi-Replica Deployment
-- **Description:** Run multiple replicas for fault tolerance
-- **Requirements:**
-  - Minimum 3 replicas in production
-  - Replicas distributed across nodes/zones
-  - Anti-affinity rules prevent co-location
-  - Resource requests and limits set
-- **Acceptance Criteria:**
-  - 3+ replicas running
-  - Spread across nodes
-  - Single node failure doesn't impact service
-  - Resource limits enforced
+#### FR-2.1：持续集成（CI）
+- **描述：** 每次提交时自动进行测试和验证
+- **要求：**
+  - 代码质量检查（代码检查、格式化、类型检查）
+  - 安全扫描（静态分析、依赖扫描）
+  - 单元测试（>80% 代码覆盖率）
+  - 集成测试
+  - Docker 镜像构建
+  - 镜像漏洞扫描
+- **验收标准：**
+  - CI 在推送/PR 时自动运行
+  - 所有检查必须通过才能合并
+  - 生成覆盖率报告
+  - 检测并报告漏洞
+  - 构建产物使用 commit SHA 标记
 
-#### FR-3.2: Zero-Downtime Updates
-- **Description:** Deploy updates without service interruption
-- **Requirements:**
-  - Rolling update strategy
+#### FR-2.2：持续部署 - 预发布
+- **描述：** 自动部署到预发布环境
+- **要求：**
+  - 在合并到 main/develop 分支时触发
+  - 部署到预发布 Kubernetes 集群
+  - 部署后运行冒烟测试
+  - 运行集成测试
+  - 运行负载测试
+  - 成功/失败时发送通知
+- **验收标准：**
+  - 合并后 10 分钟内更新预发布环境
+  - 所有测试通过
+  - 失败时自动回滚
+  - 团队收到部署状态通知
+
+#### FR-2.3：持续部署 - 生产
+- **描述：** 需审批的受控生产部署
+- **要求：**
+  - 手动审批门（团队负责人或经理）
+  - 金丝雀部署策略（10% → 100%）
+  - 部署期间监控错误率
+  - 出错时自动回滚
+  - 仅当指标健康时才推进
+  - 部署的全面日志记录
+- **验收标准：**
+  - 生产部署前需要审批
+  - 金丝雀部署已测试
+  - 自动回滚正常工作
+  - 部署期间零停机
+  - 部署时间 <10 分钟
+
+#### FR-2.4：自动模型部署
+- **描述：** 将模型从注册表部署到服务基础设施
+- **要求：**
+  - 从 MLflow Model Registry 拉取模型
+  - 用新模型版本更新 ConfigMap
+  - 重启 Pod 以加载新模型
+  - A/B 测试框架用于模型比较
+  - 模型回滚能力
+- **验收标准：**
+  - 新模型自动部署
+  - Pod 加载新模型
+  - A/B 测试正确分流流量
+  - 回滚在 <5 分钟内完成
+
+---
+
+### FR-3：高可用性与可靠性
+
+**优先级：** 关键
+
+#### FR-3.1：多副本部署
+- **描述：** 运行多个副本以实现容错
+- **要求：**
+  - 生产环境至少 3 个副本
+  - 副本分布在多个节点/可用区
+  - 反亲和规则防止副本共置
+  - 设置资源请求和限制
+- **验收标准：**
+  - 运行 3 个以上副本
+  - 分布在多个节点上
+  - 单节点故障不影响服务
+  - 执行资源限制
+
+#### FR-3.2：零停机更新
+- **描述：** 在不中断服务的情况下部署更新
+- **要求：**
+  - 滚动更新策略
   - maxSurge: 1, maxUnavailable: 0
-  - Health checks prevent premature traffic
-  - Old pods drained before termination
-- **Acceptance Criteria:**
-  - Updates complete without 5xx errors
-  - No dropped requests during update
-  - Gradual traffic shift
-  - Old version drains cleanly
+  - 健康检查防止过早流量接入
+  - 旧 Pod 在终止前排空
+- **验收标准：**
+  - 更新完成无 5xx 错误
+  - 更新期间无请求丢失
+  - 流量逐步切换
+  - 旧版本平滑排空
 
-#### FR-3.3: Auto-Healing
-- **Description:** Automatically recover from pod failures
-- **Requirements:**
-  - Liveness probes restart unhealthy pods
-  - Readiness probes remove pods from load balancer
-  - CrashLoopBackoff detection and alerting
-  - Automatic pod restart
-- **Acceptance Criteria:**
-  - Failed pods restart within 30 seconds
-  - Unhealthy pods removed from rotation
-  - Service continues during pod failures
-  - Alerts sent on repeated failures
+#### FR-3.3：自动自愈
+- **描述：** 从 Pod 故障中自动恢复
+- **要求：**
+  - 存活探测重启不健康的 Pod
+  - 就绪探测将 Pod 从负载均衡器移除
+  - CrashLoopBackoff 检测与告警
+  - Pod 自动重启
+- **验收标准：**
+  - 故障 Pod 在 30 秒内重启
+  - 不健康的 Pod 从轮替中移除
+  - Pod 故障期间服务持续可用
+  - 重复故障时发送告警
 
-#### FR-3.4: Load Balancing
-- **Description:** Distribute traffic evenly across replicas
-- **Requirements:**
-  - Kubernetes Service load balancing
-  - Session affinity if needed
-  - Connection draining on pod termination
-  - Fair distribution of requests
-- **Acceptance Criteria:**
-  - Traffic distributed evenly
-  - No single pod overloaded
-  - Graceful connection handling
-  - Load metrics tracked
+#### FR-3.4：负载均衡
+- **描述：** 在副本之间均匀分发流量
+- **要求：**
+  - Kubernetes Service 负载均衡
+  - 按需启用会话亲和性
+  - Pod 终止时排空连接
+  - 请求公平分配
+- **验收标准：**
+  - 流量均匀分布
+  - 无单个 Pod 过载
+  - 优雅的连接处理
+  - 跟踪负载指标
 
-#### FR-3.5: Auto-Scaling
-- **Description:** Scale replicas based on load
-- **Requirements:**
-  - Horizontal Pod Autoscaler (HPA) configured
-  - Scale on CPU (70%) and memory (80%)
-  - Min replicas: 3, max replicas: 20
-  - Custom metrics (requests/second) optional
-  - Scale-up/down delays configured
-- **Acceptance Criteria:**
-  - HPA scales up under load
-  - HPA scales down when idle
-  - Scaling completes within 2 minutes
-  - No flapping (rapid scale up/down)
+#### FR-3.5：自动扩缩容
+- **描述：** 根据负载自动调整副本数
+- **要求：**
+  - 配置 Horizontal Pod Autoscaler（HPA）
+  - 基于 CPU（70%）和内存（80%）扩缩容
+  - 最小副本数：3，最大副本数：20
+  - 可选自定义指标（请求数/秒）
+  - 配置扩缩容延迟
+- **验收标准：**
+  - HPA 在负载高时扩容
+  - HPA 在空闲时缩容
+  - 扩缩容在 2 分钟内完成
+  - 无频繁抖动（快速扩缩容）
 
-#### FR-3.6: Circuit Breaker
-- **Description:** Prevent cascade failures from dependencies
-- **Requirements:**
-  - Circuit breaker for database connections
-  - Circuit breaker for MLflow API calls
-  - Retry logic with exponential backoff
-  - Fallback responses when circuit open
-- **Acceptance Criteria:**
-  - Circuit opens on repeated failures
-  - Fallback responses served
-  - Circuit closes when dependency recovers
-  - Metrics track circuit state
-
----
-
-### FR-4: Security Implementation
-
-**Priority:** CRITICAL
-
-#### FR-4.1: API Authentication
-- **Description:** Require authentication for all API endpoints
-- **Requirements:**
-  - API key authentication (header: X-API-Key)
-  - Multiple API keys supported (admin, client)
-  - Keys stored in Kubernetes Secrets
-  - OAuth 2.0 optional but recommended
-  - Rate limiting per API key
-- **Acceptance Criteria:**
-  - Unauthenticated requests rejected (401)
-  - Invalid API keys rejected (403)
-  - Different keys have different permissions
-  - Rate limits enforced per key
-
-#### FR-4.2: TLS/HTTPS Encryption
-- **Description:** Encrypt all external communication
-- **Requirements:**
-  - cert-manager for automatic certificate management
-  - Let's Encrypt for certificates
-  - TLS termination at Ingress
-  - HTTP → HTTPS redirect
-  - Certificate auto-renewal
-- **Acceptance Criteria:**
-  - All external traffic uses HTTPS
-  - Certificates valid and trusted
-  - HTTP redirects to HTTPS
-  - Auto-renewal working (test with staging cert)
-
-#### FR-4.3: Secrets Management
-- **Description:** Securely manage sensitive credentials
-- **Requirements:**
-  - Kubernetes Secrets for sensitive data
-  - No secrets in Git repository
-  - Sealed Secrets or Vault recommended
-  - Secrets injected as environment variables
-  - Principle of least privilege
-- **Acceptance Criteria:**
-  - No secrets in code or Git
-  - Secrets encrypted at rest
-  - Pods access only needed secrets
-  - Secret rotation procedure documented
-
-#### FR-4.4: Network Policies
-- **Description:** Restrict pod-to-pod communication
-- **Requirements:**
-  - NetworkPolicy for each service
-  - Default deny ingress/egress
-  - Explicit allow rules for necessary communication
-  - Namespace isolation
-  - DNS always allowed
-- **Acceptance Criteria:**
-  - Policies enforced (test with kubectl)
-  - Unauthorized communication blocked
-  - Necessary communication allowed
-  - Policies documented
-
-#### FR-4.5: RBAC (Role-Based Access Control)
-- **Description:** Control access to Kubernetes resources
-- **Requirements:**
-  - ServiceAccount for each application
-  - Roles with minimal permissions
-  - RoleBindings for associations
-  - No default ServiceAccount usage
-  - Audit logs enabled
-- **Acceptance Criteria:**
-  - Each pod uses custom ServiceAccount
-  - Pods cannot access unauthorized resources
-  - RBAC tested and verified
-  - Permissions documented
-
-#### FR-4.6: Input Validation
-- **Description:** Validate and sanitize all inputs
-- **Requirements:**
-  - File type validation (images only)
-  - File size limits (max 10MB)
-  - MIME type checking
-  - SQL injection prevention
-  - XSS prevention
-- **Acceptance Criteria:**
-  - Invalid files rejected
-  - Oversized files rejected
-  - Malicious inputs sanitized
-  - Error messages don't leak information
-
-#### FR-4.7: Rate Limiting
-- **Description:** Prevent abuse and DoS attacks
-- **Requirements:**
-  - Global rate limit: 100 req/minute
-  - Endpoint-specific limits (/predict: 10 req/minute)
-  - Rate limit by IP and API key
-  - 429 response on limit exceeded
-  - Rate limit headers in response
-- **Acceptance Criteria:**
-  - Limits enforced
-  - Excessive requests blocked
-  - Legitimate traffic unaffected
-  - Metrics track rate limiting
+#### FR-3.6：断路器
+- **描述：** 防止依赖项引发级联故障
+- **要求：**
+  - 数据库连接的断路器
+  - MLflow API 调用的断路器
+  - 带指数退避的重试逻辑
+  - 断路器打开时的降级响应
+- **验收标准：**
+  - 重复故障时断路器打开
+  - 返回降级响应
+  - 依赖恢复后断路器关闭
+  - 指标跟踪断路器状态
 
 ---
 
-### FR-5: Automated ML Lifecycle
+### FR-4：安全实现
 
-**Priority:** HIGH
+**优先级：** 关键
 
-#### FR-5.1: Scheduled Model Retraining
-- **Description:** Automatically retrain models on schedule
-- **Requirements:**
-  - Airflow DAG scheduled weekly
-  - Data drift detection triggers retraining
-  - Manual trigger also available
-  - Training pipeline runs end-to-end
-  - Results logged to MLflow
-- **Acceptance Criteria:**
-  - Training runs on schedule
-  - Drift detection working
-  - Manual trigger works
-  - All runs logged
+#### FR-4.1：API 认证
+- **描述：** 要求所有 API 端点进行认证
+- **要求：**
+  - API 密钥认证（请求头: X-API-Key）
+  - 支持多个 API 密钥（管理员、客户端）
+  - 密钥存储在 Kubernetes Secrets 中
+  - OAuth 2.0 可选但推荐
+  - 每个 API 密钥限流
+- **验收标准：**
+  - 未认证请求被拒绝（401）
+  - 无效 API 密钥被拒绝（403）
+  - 不同密钥具有不同权限
+  - 每个密钥执行限流
 
-#### FR-5.2: Automated Model Evaluation
-- **Description:** Evaluate and register trained models
-- **Requirements:**
-  - Models evaluated on holdout test set
-  - Metrics: accuracy, precision, recall, F1
-  - Comparison to production model
-  - Registration only if improvement
-  - Metadata tracked (dataset version, hyperparameters)
-- **Acceptance Criteria:**
-  - Evaluation automated
-  - Only good models registered
-  - Metadata complete
-  - Comparison metrics shown
+#### FR-4.2：TLS/HTTPS 加密
+- **描述：** 加密所有外部通信
+- **要求：**
+  - cert-manager 用于自动证书管理
+  - Let's Encrypt 获取证书
+  - 在 Ingress 终止 TLS
+  - HTTP → HTTPS 重定向
+  - 证书自动续期
+- **验收标准：**
+  - 所有外部流量使用 HTTPS
+  - 证书有效且受信任
+  - HTTP 重定向到 HTTPS
+  - 自动续期正常工作（使用预发布证书测试）
 
-#### FR-5.3: Automated Staging Deployment
-- **Description:** Deploy approved models to staging
-- **Requirements:**
-  - Models tagged "Staging" in MLflow
-  - Automatic deployment to staging environment
-  - Smoke tests after deployment
-  - Integration tests verify functionality
-- **Acceptance Criteria:**
-  - Staging deployment automatic
-  - Tests pass before promotion
-  - Failed deployments rolled back
-  - Team notified of status
+#### FR-4.3：密钥管理
+- **描述：** 安全管理敏感凭据
+- **要求：**
+  - 使用 Kubernetes Secrets 存储敏感数据
+  - Git 仓库中无密钥
+  - 推荐使用 Sealed Secrets 或 Vault
+  - 密钥以环境变量形式注入
+  - 最小权限原则
+- **验收标准：**
+  - 代码或 Git 中无密钥
+  - 密钥静态加密
+  - Pod 仅访问所需密钥
+  - 记录密钥轮换流程
 
-#### FR-5.4: A/B Testing Framework
-- **Description:** Compare model versions in production
-- **Requirements:**
-  - Traffic splitting between model versions
-  - Metrics tracked per version
-  - Statistical significance testing
-  - Manual promotion of winner
-- **Acceptance Criteria:**
-  - Traffic splits correctly (e.g., 90/10)
-  - Metrics separated by version
-  - Statistical tests implemented
-  - Promotion workflow clear
+#### FR-4.4：网络策略
+- **描述：** 限制 Pod 间通信
+- **要求：**
+  - 每个服务配置 NetworkPolicy
+  - 默认拒绝入站/出站
+  - 显式允许必要通信
+  - 命名空间隔离
+  - DNS 始终允许
+- **验收标准：**
+  - 策略已执行（使用 kubectl 测试）
+  - 未授权通信被阻止
+  - 必要通信被允许
+  - 策略已记录
 
-#### FR-5.5: Model Versioning and Rollback
-- **Description:** Track and rollback model versions
-- **Requirements:**
-  - All models versioned in MLflow
-  - ConfigMap tracks current version
-  - Rollback script changes version
-  - Pods automatically reload
-- **Acceptance Criteria:**
-  - Version history complete
-  - Rollback completes in <5 minutes
-  - Pods pick up rolled-back version
-  - No data loss during rollback
+#### FR-4.5：RBAC（基于角色的访问控制）
+- **描述：** 控制对 Kubernetes 资源的访问
+- **要求：**
+  - 每个应用使用 ServiceAccount
+  - 角色具有最小权限
+  - RoleBinding 进行关联
+  - 不使用默认 ServiceAccount
+  - 启用审计日志
+- **验收标准：**
+  - 每个 Pod 使用自定义 ServiceAccount
+  - Pod 无法访问未授权资源
+  - RBAC 经过测试和验证
+  - 权限已记录
 
-#### FR-5.6: Data Pipeline Automation
-- **Description:** Automate data ingestion and processing
-- **Requirements:**
-  - Daily data ingestion from source
-  - Data validation checks
-  - Data versioning with DVC
-  - Feature engineering automated
-  - Failed pipeline alerts team
-- **Acceptance Criteria:**
-  - Data pipeline runs daily
-  - Validation catches issues
-  - Data versioned
-  - Team alerted on failures
+#### FR-4.6：输入验证
+- **描述：** 验证并清理所有输入
+- **要求：**
+  - 文件类型验证（仅限图片）
+  - 文件大小限制（最大 10MB）
+  - MIME 类型检查
+  - SQL 注入防护
+  - XSS 防护
+- **验收标准：**
+  - 无效文件被拒绝
+  - 超大文件被拒绝
+  - 恶意输入被清理
+  - 错误消息不泄露信息
 
----
-
-### FR-6: Complete Observability
-
-**Priority:** HIGH
-
-#### FR-6.1: Metrics Collection
-- **Description:** Collect metrics from all components
-- **Requirements:**
-  - Prometheus scrapes all services
-  - Application metrics (request rate, latency, errors)
-  - Infrastructure metrics (CPU, memory, disk)
-  - ML metrics (prediction latency, model accuracy)
-  - Custom metrics for business logic
-- **Acceptance Criteria:**
-  - All services instrumented
-  - Metrics available in Prometheus
-  - Retention: 30 days
-  - Query performance acceptable
-
-#### FR-6.2: Centralized Logging
-- **Description:** Aggregate logs in searchable system
-- **Requirements:**
-  - ELK stack (Elasticsearch, Logstash, Kibana)
-  - All pod logs collected
-  - Structured logging (JSON format)
-  - Log levels: DEBUG, INFO, WARN, ERROR
-  - Search and filter capabilities
-- **Acceptance Criteria:**
-  - Logs from all pods aggregated
-  - Search works across all logs
-  - Retention: 30 days
-  - Performance acceptable
-
-#### FR-6.3: Distributed Tracing (Optional)
-- **Description:** Trace requests across services
-- **Requirements:**
-  - Jaeger or Zipkin integration
-  - Trace ID propagation
-  - Trace context in logs
-  - Performance impact <5%
-- **Acceptance Criteria:**
-  - End-to-end traces visible
-  - Latency breakdown shown
-  - Error traces captured
-  - Overhead acceptable
-
-#### FR-6.4: Alerting
-- **Description:** Alert on critical failures
-- **Requirements:**
-  - Alertmanager for routing
-  - Alerts for: downtime, high error rate, high latency, disk space
-  - Multiple notification channels (Slack, email, PagerDuty)
-  - Alert severity levels
-  - Alert silencing and acknowledgment
-- **Acceptance Criteria:**
-  - Alerts fire on test failures
-  - Notifications received
-  - No false positives
-  - Alert documentation complete
-
-#### FR-6.5: Dashboards
-- **Description:** Visualize system health for stakeholders
-- **Requirements:**
-  - Grafana dashboards for each component
-  - Executive summary dashboard
-  - SLO/SLI dashboard
-  - ML pipeline dashboard
-  - Real-time updates
-- **Acceptance Criteria:**
-  - 4+ dashboards created
-  - Visualizations clear
-  - Auto-refresh enabled
-  - Shared with team
-
-#### FR-6.6: SLO/SLI Tracking
-- **Description:** Track Service Level Objectives and Indicators
-- **Requirements:**
-  - SLO: 99.9% uptime
-  - SLI: Availability, latency (P95, P99), error rate
-  - Error budget calculation
-  - Monthly SLO reports
-- **Acceptance Criteria:**
-  - SLIs measured continuously
-  - SLO compliance tracked
-  - Error budget visible
-  - Reports generated monthly
+#### FR-4.7：限流
+- **描述：** 防止滥用和 DoS 攻击
+- **要求：**
+  - 全局限流：100 请求/分钟
+  - 端点特定限制（/predict: 10 请求/分钟）
+  - 按 IP 和 API 密钥限流
+  - 超过限制时返回 429 响应
+  - 响应中包含限流头
+- **验收标准：**
+  - 限制已执行
+  - 过多请求被阻止
+  - 合法流量不受影响
+  - 指标跟踪限流情况
 
 ---
 
-## Non-Functional Requirements
+### FR-5：自动化 ML 生命周期
 
-### NFR-1: Performance
+**优先级：** 高
 
-**Priority:** HIGH
+#### FR-5.1：定时模型重新训练
+- **描述：** 按计划自动重新训练模型
+- **要求：**
+  - Airflow DAG 每周执行一次
+  - 数据漂移检测触发重新训练
+  - 也支持手动触发
+  - 训练流水线端到端运行
+  - 结果记录到 MLflow
+- **验收标准：**
+  - 训练按计划运行
+  - 漂移检测正常工作
+  - 手动触发正常工作
+  - 所有运行都已记录
 
-| Metric | Target | Measurement |
+#### FR-5.2：自动模型评估
+- **描述：** 评估并注册训练好的模型
+- **要求：**
+  - 在预留测试集上评估模型
+  - 指标：准确率、精确率、召回率、F1
+  - 与生产模型进行比较
+  - 仅在性能提升时注册
+  - 跟踪元数据（数据集版本、超参数）
+- **验收标准：**
+  - 评估自动化
+  - 仅注册优秀模型
+  - 元数据完整
+  - 显示对比指标
+
+#### FR-5.3：自动预发布部署
+- **描述：** 将获批模型部署到预发布环境
+- **要求：**
+  - 模型在 MLflow 中标记为"Staging"
+  - 自动部署到预发布环境
+  - 部署后运行冒烟测试
+  - 集成测试验证功能
+- **验收标准：**
+  - 预发布部署自动化
+  - 推进前测试通过
+  - 失败的部署已回滚
+  - 团队收到状态通知
+
+#### FR-5.4：A/B 测试框架
+- **描述：** 在生产环境中比较模型版本
+- **要求：**
+  - 在模型版本之间分流流量
+  - 按版本跟踪指标
+  - 统计显著性测试
+  - 手动推进优胜版本
+- **验收标准：**
+  - 流量正确分流（例如 90/10）
+  - 指标按版本分离
+  - 实现统计检验
+  - 推进工作流清晰
+
+#### FR-5.5：模型版本控制与回滚
+- **描述：** 跟踪和回滚模型版本
+- **要求：**
+  - 所有模型在 MLflow 中版本管理
+  - ConfigMap 跟踪当前版本
+  - 回滚脚本更改版本
+  - Pod 自动重新加载
+- **验收标准：**
+  - 版本历史完整
+  - 回滚在 <5 分钟内完成
+  - Pod 加载回滚后的版本
+  - 回滚期间无数据丢失
+
+#### FR-5.6：数据流水线自动化
+- **描述：** 自动化数据摄入与处理
+- **要求：**
+  - 每日从数据源摄入数据
+  - 数据验证检查
+  - 使用 DVC 进行数据版本控制
+  - 特征工程自动化
+  - 流水线失败时告警团队
+- **验收标准：**
+  - 数据流水线每日运行
+  - 验证捕获问题
+  - 数据已版本化
+  - 团队在失败时收到告警
+
+---
+
+### FR-6：完整可观测性
+
+**优先级：** 高
+
+#### FR-6.1：指标收集
+- **描述：** 从所有组件收集指标
+- **要求：**
+  - Prometheus 采集所有服务
+  - 应用指标（请求率、延迟、错误）
+  - 基础设施指标（CPU、内存、磁盘）
+  - ML 指标（预测延迟、模型准确率）
+  - 业务逻辑的自定义指标
+- **验收标准：**
+  - 所有服务已接入
+  - 指标在 Prometheus 中可用
+  - 保留期：30 天
+  - 查询性能可接受
+
+#### FR-6.2：集中式日志
+- **描述：** 将日志聚合到可搜索的系统
+- **要求：**
+  - ELK 栈（Elasticsearch、Logstash、Kibana）
+  - 收集所有 Pod 日志
+  - 结构化日志（JSON 格式）
+  - 日志级别：DEBUG、INFO、WARN、ERROR
+  - 搜索和过滤功能
+- **验收标准：**
+  - 所有 Pod 的日志已聚合
+  - 搜索功能覆盖所有日志
+  - 保留期：30 天
+  - 性能可接受
+
+#### FR-6.3：分布式追踪（可选）
+- **描述：** 跨服务追踪请求
+- **要求：**
+  - Jaeger 或 Zipkin 集成
+  - Trace ID 传播
+  - 日志中的 Trace 上下文
+  - 性能影响 <5%
+- **验收标准：**
+  - 端到端追踪可见
+  - 延迟分解显示
+  - 错误追踪已捕获
+  - 开销可接受
+
+#### FR-6.4：告警
+- **描述：** 对关键故障进行告警
+- **要求：**
+  - Alertmanager 用于路由
+  - 告警类型：宕机、高错误率、高延迟、磁盘空间
+  - 多种通知渠道（Slack、邮件、PagerDuty）
+  - 告警严重级别
+  - 告警静默和确认
+- **验收标准：**
+  - 告警在测试故障时触发
+  - 通知已接收
+  - 无误报
+  - 告警文档完整
+
+#### FR-6.5：仪表盘
+- **描述：** 为利益相关者可视化系统健康状态
+- **要求：**
+  - 每个组件的 Grafana 仪表盘
+  - 执行摘要仪表盘
+  - SLO/SLI 仪表盘
+  - ML 流水线仪表盘
+  - 实时更新
+- **验收标准：**
+  - 创建 4 个以上仪表盘
+  - 可视化清晰
+  - 启用自动刷新
+  - 与团队共享
+
+#### FR-6.6：SLO/SLI 跟踪
+- **描述：** 跟踪服务等级目标与指标
+- **要求：**
+  - SLO：99.9% 可用性
+  - SLI：可用性、延迟（P95、P99）、错误率
+  - 错误预算计算
+  - 月度 SLO 报告
+- **验收标准：**
+  - SLI 持续测量
+  - SLO 合规性跟踪
+  - 错误预算可见
+  - 每月生成报告
+
+---
+
+## 非功能性需求
+
+### NFR-1：性能
+
+**优先级：** 高
+
+| 指标 | 目标 | 测量方式 |
 |--------|--------|-------------|
-| API Latency (P95) | <500ms | Prometheus histogram |
-| API Latency (P99) | <1s | Prometheus histogram |
-| Throughput | 1000+ req/sec | Load test (k6) |
-| Model Inference | <100ms per prediction | Application metric |
-| Pipeline Execution | <2 hours | Airflow DAG run time |
-| System Startup | <5 minutes | Deployment logs |
+| API 延迟（P95） | <500ms | Prometheus 直方图 |
+| API 延迟（P99） | <1s | Prometheus 直方图 |
+| 吞吐量 | 1000+ req/sec | 负载测试（k6） |
+| 模型推理 | <100ms 每次预测 | 应用指标 |
+| 流水线执行 | <2 小时 | Airflow DAG 运行时间 |
+| 系统启动 | <5 分钟 | 部署日志 |
 
-**Acceptance Criteria:**
-- Load tests demonstrate targets met
-- Performance regression tests in CI
-- Metrics tracked continuously
-- Performance degradation alerts configured
+**验收标准：**
+- 负载测试证明达到目标
+- CI 中包含性能回归测试
+- 指标持续跟踪
+- 配置性能退化告警
 
 ---
 
-### NFR-2: Reliability
+### NFR-2：可靠性
 
-**Priority:** CRITICAL
+**优先级：** 关键
 
-| Metric | Target | Measurement |
+| 指标 | 目标 | 测量方式 |
 |--------|--------|-------------|
-| Uptime | 99.9% (< 43 min/month downtime) | Uptime monitoring |
-| Data Durability | 99.999% (no data loss) | Database replication |
-| Mean Time to Recovery (MTTR) | <2 minutes | Incident logs |
-| Backup Frequency | Daily | Backup cron job |
-| Backup Retention | 30 days | S3/GCS lifecycle |
-| Failed Request Rate | <0.1% | Error rate metric |
+| 可用性 | 99.9%（每月宕机 <43 分钟） | 可用性监控 |
+| 数据持久性 | 99.999%（无数据丢失） | 数据库复制 |
+| 平均恢复时间（MTTR） | <2 分钟 | 事件日志 |
+| 备份频率 | 每日 | 备份 CronJob |
+| 备份保留期 | 30 天 | S3/GCS 生命周期 |
+| 失败请求率 | <0.1% | 错误率指标 |
 
-**Acceptance Criteria:**
-- Uptime SLO met over 30 days
-- No data loss in testing
-- Auto-recovery tested
-- Backups verified (restore test)
+**验收标准：**
+- 30 天内满足可用性 SLO
+- 测试中无数据丢失
+- 自动恢复已测试
+- 备份已验证（恢复测试）
 
 ---
 
-### NFR-3: Scalability
+### NFR-3：可扩展性
 
-**Priority:** HIGH
+**优先级：** 高
 
-| Dimension | Minimum | Maximum | Auto-Scale |
+| 维度 | 最小值 | 最大值 | 自动扩缩容 |
 |-----------|---------|---------|------------|
-| Pod Replicas | 3 | 20 | Yes (HPA) |
-| Traffic Spike | 1x | 10x | Yes |
-| Dataset Size | 1GB | 10GB | N/A |
-| Concurrent Users | 100 | 1000+ | Yes |
-| Model Size | 100MB | 1GB | N/A |
+| Pod 副本数 | 3 | 20 | 是（HPA） |
+| 流量峰值 | 1x | 10x | 是 |
+| 数据集大小 | 1GB | 10GB | 不适用 |
+| 并发用户数 | 100 | 1000+ | 是 |
+| 模型大小 | 100MB | 1GB | 不适用 |
 
-**Acceptance Criteria:**
-- HPA scales to 20 replicas under load
-- 10x traffic spike handled
-- 10GB dataset processed successfully
-- 1000 concurrent users supported
+**验收标准：**
+- HPA 在负载下扩容至 20 个副本
+- 可处理 10x 流量峰值
+- 成功处理 10GB 数据集
+- 支持 1000 并发用户
 
 ---
 
-### NFR-4: Maintainability
+### NFR-4：可维护性
 
-**Priority:** MEDIUM
+**优先级：** 中
 
-| Aspect | Target | Verification |
+| 方面 | 目标 | 验证方式 |
 |--------|--------|--------------|
-| Code Coverage | >80% | pytest-cov |
-| Documentation Coverage | 100% of public APIs | Manual review |
-| Deployment Time | <10 minutes | Deployment logs |
-| Configuration Changes | No code change required | Config externalization |
-| Mean Time to Understand (MTTU) | <2 hours for new developer | Onboarding test |
+| 代码覆盖率 | >80% | pytest-cov |
+| 文档覆盖率 | 100% 的公共 API | 人工审查 |
+| 部署时间 | <10 分钟 | 部署日志 |
+| 配置变更 | 无需更改代码 | 配置外部化 |
+| 平均理解时间（MTTU） | 新开发者 <2 小时 | 入职测试 |
 
-**Acceptance Criteria:**
-- Code coverage >80%
-- All APIs documented
-- Deployment <10 minutes
-- Configurations externalized
-- Onboarding guide tested
+**验收标准：**
+- 代码覆盖率 >80%
+- 所有 API 已记录
+- 部署 <10 分钟
+- 配置已外部化
+- 入职指南已测试
 
 ---
 
-### NFR-5: Security
+### NFR-5：安全
 
-**Priority:** CRITICAL
+**优先级：** 关键
 
-| Requirement | Implementation | Verification |
+| 需求 | 实现方式 | 验证方式 |
 |-------------|----------------|--------------|
-| Authentication | API keys | Test suite |
-| Encryption in Transit | TLS 1.2+ | SSL Labs scan |
-| Encryption at Rest | Encrypted volumes | Cloud provider config |
-| Secrets Management | Kubernetes Secrets | No secrets in Git |
-| Access Control | RBAC | kubectl auth can-i |
-| Vulnerability Scanning | Trivy (CI) | CI pipeline |
-| Audit Logging | All API calls logged | Log analysis |
-| Compliance | OWASP Top 10 | Security audit |
+| 认证 | API 密钥 | 测试套件 |
+| 传输加密 | TLS 1.2+ | SSL Labs 扫描 |
+| 静态加密 | 加密卷 | 云提供商配置 |
+| 密钥管理 | Kubernetes Secrets | Git 中无密钥 |
+| 访问控制 | RBAC | kubectl auth can-i |
+| 漏洞扫描 | Trivy（CI） | CI 流水线 |
+| 审计日志 | 记录所有 API 调用 | 日志分析 |
+| 合规性 | OWASP Top 10 | 安全审计 |
 
-**Acceptance Criteria:**
-- All endpoints require authentication
-- TLS grade A or higher
-- Data encrypted at rest
-- No secrets in Git
-- RBAC tested and working
-- No high/critical vulnerabilities
-- Audit logs complete
+**验收标准：**
+- 所有端点需要认证
+- TLS 等级 A 或更高
+- 数据静态加密
+- Git 中无密钥
+- RBAC 已测试并正常工作
+- 无高/关键漏洞
+- 审计日志完整
 
 ---
 
-## Technical Requirements
+## 技术需求
 
-### Technology Stack
+### 技术栈
 
-#### Required Technologies (From Previous Projects)
+#### 必需技术（来自先前项目）
 
-| Component | Technology | Version |
+| 组件 | 技术 | 版本 |
 |-----------|------------|---------|
-| Programming Language | Python | 3.11+ |
-| Web Framework | Flask or FastAPI | Latest |
-| ML Framework | PyTorch or TensorFlow | Latest |
-| Container | Docker | 20.10+ |
-| Orchestration | Kubernetes | 1.28+ |
-| Package Manager | Helm | 3.12+ |
-| Experiment Tracking | MLflow | 2.8+ |
-| Workflow Orchestration | Airflow or Prefect | Latest |
-| Data Versioning | DVC | 3.0+ |
-| Metrics | Prometheus | 2.47+ |
-| Visualization | Grafana | 10.0+ |
-| Logging | ELK Stack | 8.0+ |
+| 编程语言 | Python | 3.11+ |
+| Web 框架 | Flask 或 FastAPI | 最新 |
+| ML 框架 | PyTorch 或 TensorFlow | 最新 |
+| 容器 | Docker | 20.10+ |
+| 编排 | Kubernetes | 1.28+ |
+| 包管理器 | Helm | 3.12+ |
+| 实验跟踪 | MLflow | 2.8+ |
+| 工作流编排 | Airflow 或 Prefect | 最新 |
+| 数据版本控制 | DVC | 3.0+ |
+| 指标 | Prometheus | 2.47+ |
+| 可视化 | Grafana | 10.0+ |
+| 日志 | ELK Stack | 8.0+ |
 
-#### Additional Technologies (New for This Project)
+#### 新增技术（本项目的额外内容）
 
-| Component | Technology | Purpose |
+| 组件 | 技术 | 用途 |
 |-----------|------------|---------|
-| CI/CD | GitHub Actions or GitLab CI | Automation |
-| Secrets Management | Kubernetes Secrets or HashiCorp Vault | Security |
-| Certificate Management | cert-manager | TLS automation |
-| Load Testing | k6 or Locust | Performance testing |
-| Security Scanning | Trivy, Bandit | Vulnerability detection |
+| CI/CD | GitHub Actions 或 GitLab CI | 自动化 |
+| 密钥管理 | Kubernetes Secrets 或 HashiCorp Vault | 安全 |
+| 证书管理 | cert-manager | TLS 自动化 |
+| 负载测试 | k6 或 Locust | 性能测试 |
+| 安全扫描 | Trivy、Bandit | 漏洞检测 |
 
-### Infrastructure Requirements
+### 基础设施需求
 
-#### Development Environment
-- Local Kubernetes (Minikube, kind, Docker Desktop)
-- 16GB+ RAM
-- 50GB+ disk space
+#### 开发环境
+- 本地 Kubernetes（Minikube、kind、Docker Desktop）
+- 16GB+ 内存
+- 50GB+ 磁盘空间
 
-#### Staging Environment
-- Kubernetes cluster (3 nodes, 8GB RAM each)
-- Container registry
-- Load balancer
-- Persistent storage (50GB)
+#### 预发布环境
+- Kubernetes 集群（3 节点，每节点 8GB 内存）
+- 容器仓库
+- 负载均衡器
+- 持久化存储（50GB）
 
-#### Production Environment
-- Kubernetes cluster (5+ nodes, 16GB RAM each)
-- Multi-zone deployment
-- Container registry
-- Load balancer with DDoS protection
-- Persistent storage (200GB+)
-- Database (PostgreSQL with replication)
-- Object storage (S3/GCS)
-
----
-
-## Security Requirements
-
-### Data Security
-
-1. **Encryption in Transit**
-   - All external traffic: TLS 1.2+
-   - Internal traffic: mTLS (optional but recommended)
-
-2. **Encryption at Rest**
-   - Database: Encrypted volumes
-   - Object storage: Server-side encryption
-   - Kubernetes secrets: Encrypted in etcd
-
-3. **Data Privacy**
-   - No PII logged
-   - Data retention policies enforced
-   - GDPR compliance (if applicable)
-
-### Application Security
-
-1. **Input Validation**
-   - File type whitelisting
-   - File size limits
-   - SQL injection prevention
-   - XSS prevention
-
-2. **Output Encoding**
-   - JSON responses properly encoded
-   - Error messages don't leak sensitive info
-
-3. **Authentication & Authorization**
-   - API key authentication
-   - RBAC for Kubernetes
-   - Principle of least privilege
-
-### Infrastructure Security
-
-1. **Network Security**
-   - NetworkPolicies enforced
-   - Ingress firewall rules
-   - No unnecessary exposed ports
-
-2. **Container Security**
-   - Non-root user in containers
-   - Read-only root filesystem
-   - No privileged containers
-   - Image scanning in CI
-
-3. **Secrets Management**
-   - Kubernetes Secrets (minimum)
-   - HashiCorp Vault (recommended)
-   - No secrets in Git
-   - Secret rotation documented
-
-### Compliance
-
-1. **Audit Logging**
-   - All API calls logged
-   - Authentication attempts logged
-   - Configuration changes logged
-   - Logs tamper-proof (immutable storage)
-
-2. **Vulnerability Management**
-   - Weekly dependency scans
-   - Monthly security reviews
-   - CVE monitoring
-   - Patch management process
+#### 生产环境
+- Kubernetes 集群（5+ 节点，每节点 16GB 内存）
+- 多可用区部署
+- 容器仓库
+- 带 DDoS 保护的负载均衡器
+- 持久化存储（200GB+）
+- 数据库（带复制的 PostgreSQL）
+- 对象存储（S3/GCS）
 
 ---
 
-## Operational Requirements
+## 安全需求
 
-### Deployment
+### 数据安全
 
-1. **Deployment Process**
-   - Automated via CI/CD
-   - Canary or blue/green strategy
-   - Rollback capability
-   - Zero downtime
+1. **传输加密**
+   - 所有外部流量：TLS 1.2+
+   - 内部流量：mTLS（可选但推荐）
 
-2. **Environments**
-   - Development (local)
-   - Staging (cloud)
-   - Production (cloud)
+2. **静态加密**
+   - 数据库：加密卷
+   - 对象存储：服务端加密
+   - Kubernetes Secrets：在 etcd 中加密
 
-3. **Deployment Documentation**
-   - Step-by-step guide
-   - Rollback procedure
-   - Troubleshooting guide
+3. **数据隐私**
+   - 不记录 PII
+   - 执行数据保留策略
+   - GDPR 合规（如适用）
 
-### Monitoring
+### 应用安全
 
-1. **Health Checks**
-   - Liveness probes
-   - Readiness probes
-   - Startup probes (for slow-starting apps)
+1. **输入验证**
+   - 文件类型白名单
+   - 文件大小限制
+   - SQL 注入防护
+   - XSS 防护
 
-2. **Metrics**
-   - Infrastructure metrics (CPU, memory, disk, network)
-   - Application metrics (requests, latency, errors)
-   - Business metrics (predictions/day, model accuracy)
+2. **输出编码**
+   - JSON 响应正确编码
+   - 错误消息不泄露敏感信息
 
-3. **Alerting**
-   - Critical alerts (downtime, high error rate)
-   - Warning alerts (high latency, disk space)
-   - On-call rotation (if team-based)
+3. **认证与授权**
+   - API 密钥认证
+   - Kubernetes RBAC
+   - 最小权限原则
 
-### Backup & Recovery
+### 基础设施安全
 
-1. **Backup**
-   - Daily automated backups
-   - Database, configurations, models
-   - 30-day retention
-   - Offsite storage (different region)
+1. **网络安全**
+   - 执行 NetworkPolicy
+   - Ingress 防火墙规则
+   - 无不必要的暴露端口
 
-2. **Recovery**
-   - RTO (Recovery Time Objective): <1 hour
-   - RPO (Recovery Point Objective): <24 hours
-   - Documented recovery procedures
-   - Tested quarterly
+2. **容器安全**
+   - 容器中使用非 root 用户
+   - 只读根文件系统
+   - 无特权容器
+   - CI 中的镜像扫描
 
-### Incident Response
+3. **密钥管理**
+   - Kubernetes Secrets（最低要求）
+   - HashiCorp Vault（推荐）
+   - Git 中无密钥
+   - 记录密钥轮换流程
 
-1. **Runbooks**
-   - Common failure scenarios
-   - Step-by-step remediation
-   - Escalation procedures
+### 合规性
 
-2. **Post-Mortems**
-   - Incident timeline
-   - Root cause analysis
-   - Action items
-   - Blameless culture
+1. **审计日志**
+   - 记录所有 API 调用
+   - 记录认证尝试
+   - 记录配置变更
+   - 日志防篡改（不可变存储）
 
----
-
-## Acceptance Criteria
-
-### Minimum Viable Product (MVP)
-
-To pass this capstone project, you must demonstrate:
-
-1. ✅ **System Integration**: All 4 previous projects integrated and working together
-2. ✅ **CI Pipeline**: Automated testing and building on every commit
-3. ✅ **CD Pipeline**: Automated deployment to staging, manual to production
-4. ✅ **High Availability**: 3+ replicas, auto-scaling, zero-downtime updates
-5. ✅ **Security**: Authentication, TLS, secrets management, RBAC
-6. ✅ **Monitoring**: Metrics, logs, dashboards, alerts
-7. ✅ **Documentation**: README, architecture, deployment guide, DR plan
-8. ✅ **Demo**: Live demonstration of the system
-
-### Excellence Criteria (Portfolio-Quality)
-
-For a portfolio-ready project that impresses employers:
-
-1. 🌟 **Production Deployment**: Live system on cloud (GKE/EKS/AKS)
-2. 🌟 **Automated ML Lifecycle**: End-to-end automation from training to deployment
-3. 🌟 **A/B Testing**: Working A/B testing framework for models
-4. 🌟 **Advanced Monitoring**: Distributed tracing, custom metrics, SLO tracking
-5. 🌟 **Security Hardening**: Network policies, Pod Security Standards, vulnerability scanning
-6. 🌟 **Performance**: Load tests showing 1000+ req/sec, P95 <500ms
-7. 🌟 **Comprehensive Docs**: Architecture diagrams, API docs, runbooks, troubleshooting
-8. 🌟 **Professional Demo**: Recorded video, presentation slides, blog post
+2. **漏洞管理**
+   - 每周依赖扫描
+   - 每月安全审查
+   - CVE 监控
+   - 补丁管理流程
 
 ---
 
-## Revision History
+## 运维需求
 
-| Version | Date | Changes | Author |
+### 部署
+
+1. **部署流程**
+   - 通过 CI/CD 自动化
+   - 金丝雀或蓝绿部署策略
+   - 回滚能力
+   - 零停机
+
+2. **环境**
+   - 开发（本地）
+   - 预发布（云端）
+   - 生产（云端）
+
+3. **部署文档**
+   - 分步指南
+   - 回滚流程
+   - 故障排查指南
+
+### 监控
+
+1. **健康检查**
+   - 存活探测
+   - 就绪探测
+   - 启动探测（适用于启动缓慢的应用）
+
+2. **指标**
+   - 基础设施指标（CPU、内存、磁盘、网络）
+   - 应用指标（请求数、延迟、错误）
+   - 业务指标（预测数/天、模型准确率）
+
+3. **告警**
+   - 关键告警（宕机、高错误率）
+   - 警告告警（高延迟、磁盘空间）
+   - 值班轮换（如果是团队制）
+
+### 备份与恢复
+
+1. **备份**
+   - 每日自动备份
+   - 数据库、配置、模型
+   - 30 天保留期
+   - 异地存储（不同区域）
+
+2. **恢复**
+   - RTO（恢复时间目标）：<1 小时
+   - RPO（恢复点目标）：<24 小时
+   - 已记录的恢复流程
+   - 每季度测试
+
+### 事件响应
+
+1. **Runbook**
+   - 常见故障场景
+   - 分步修复方案
+   - 升级流程
+
+2. **事后分析**
+   - 事件时间线
+   - 根因分析
+   - 行动项
+   - 无责备文化
+
+---
+
+## 验收标准
+
+### 最小可行产品（MVP）
+
+要通过此结业项目，你必须展示：
+
+1. ✅ **系统集成**：所有前 4 个项目已集成并协同工作
+2. ✅ **CI 流水线**：每次提交自动测试和构建
+3. ✅ **CD 流水线**：自动部署到预发布，手动部署到生产
+4. ✅ **高可用性**：3 个以上副本、自动扩缩容、零停机更新
+5. ✅ **安全**：认证、TLS、密钥管理、RBAC
+6. ✅ **监控**：指标、日志、仪表盘、告警
+7. ✅ **文档**：README、架构文档、部署指南、灾难恢复计划
+8. ✅ **演示**：系统实时演示
+
+### 卓越标准（作品集级）
+
+打造令雇主印象深刻的作品集就绪项目：
+
+1. 🌟 **生产部署**：云端在线系统（GKE/EKS/AKS）
+2. 🌟 **自动化 ML 生命周期**：从训练到部署的端到端自动化
+3. 🌟 **A/B 测试**：可工作的模型 A/B 测试框架
+4. 🌟 **高级监控**：分布式追踪、自定义指标、SLO 跟踪
+5. 🌟 **安全加固**：网络策略、Pod 安全标准、漏洞扫描
+6. 🌟 **性能**：负载测试显示 1000+ req/sec，P95 <500ms
+7. 🌟 **全面文档**：架构图、API 文档、Runbook、故障排查
+8. 🌟 **专业演示**：录制视频、演示幻灯片、博客文章
+
+---
+
+## 修订历史
+
+| 版本 | 日期 | 变更 | 作者 |
 |---------|------|---------|--------|
-| 1.0 | 2025-10-18 | Initial requirements specification | AI Infra Curriculum Team |
+| 1.0 | 2025-10-18 | 初始需求规格说明 | AI Infra 课程团队 |
 
 ---
 
-**Next Steps:**
-1. Review this requirements document thoroughly
-2. Create a project plan with milestones
-3. Set up development environment
-4. Begin Phase 1: System Integration
-5. Track progress against these requirements
-6. Adjust as needed based on learning
+**后续步骤：**
+1. 仔细审阅本文档的需求
+2. 创建包含里程碑的项目计划
+3. 设置开发环境
+4. 开始阶段 1：系统集成
+5. 根据这些需求跟踪进度
+6. 根据学习情况调整
 
-Good luck! 🚀
+祝你好运！🚀

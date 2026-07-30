@@ -1,61 +1,61 @@
-# Exercise 06: Git for ML Workflows - DVC and Model Versioning
+# 练习 06：用于 ML 工作流的 Git - DVC 与模型版本控制
 
-## Overview
+## 概述
 
-**Difficulty**: Intermediate to Advanced
-**Estimated Time**: 90-120 minutes
-**Prerequisites**: Exercise 05 - Collaboration, Lecture 04 - Advanced Git for ML
+**难度**：中级到高级
+**预计时间**：90-120 分钟
+**前置条件**：练习 05 - 协作，讲座 04 - 用于 ML 的高级 Git
 
-In this exercise, you'll learn ML-specific Git workflows including data versioning with DVC (Data Version Control), managing large model files with Git LFS, experiment tracking, and maintaining reproducibility in ML projects.
+在本练习中，你将学习 ML 特定的 Git 工作流，包括使用 DVC（Data Version Control）进行数据版本控制、使用 Git LFS 管理大型模型文件、实验跟踪以及在 ML 项目中维护可重现性。
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
+完成本练习后，你将：
 
-- Set up and use DVC for data versioning
-- Track large model files with Git LFS
-- Version control ML experiments
-- Maintain reproducibility with Git
-- Manage model artifacts and datasets
-- Create reproducible ML pipelines
-- Track model lineage and provenance
-- Implement ML-specific Git hooks
+- 设置并使用 DVC 进行数据版本控制
+- 使用 Git LFS 跟踪大型模型文件
+- 版本控制 ML 实验
+- 使用 Git 维护可重现性
+- 管理模型制品和数据集
+- 创建可重现的 ML 流水线
+- 跟踪模型溯源
+- 实现 ML 特定的 Git hooks
 
-## Scenario
+## 场景
 
-You're building a production ML system that needs to track:
-- Training datasets (multiple versions)
-- Model weights and checkpoints
-- Experiment configurations
-- Training scripts and hyperparameters
-- Model evaluation metrics
+你正在构建一个需要跟踪以下内容的生产级 ML 系统：
+- 训练数据集（多个版本）
+- 模型权重和检查点
+- 实验配置
+- 训练脚本和超参数
+- 模型评估指标
 
-You need version control for both code AND data, ensuring reproducibility and traceability.
+你需要对代码和数据进行版本控制，确保可重现性和可追溯性。
 
-## Prerequisites
+## 前置条件
 
 ```bash
-# Install DVC
-pip install dvc dvc-s3  # Or dvc-gs for Google Cloud, dvc-azure for Azure
+# 安装 DVC
+pip install dvc dvc-s3  # 或者 dvc-gs 用于 Google Cloud，dvc-azure 用于 Azure
 
-# Install Git LFS
-# Mac:
+# 安装 Git LFS
+# Mac：
 brew install git-lfs
 
-# Linux:
+# Linux：
 # sudo apt-get install git-lfs
 
-# Windows:
-# Download from https://git-lfs.github.com/
+# Windows：
+# 从 https://git-lfs.github.com/ 下载
 
-# Initialize Git LFS
+# 初始化 Git LFS
 git lfs install
 
-# Verify installations
+# 验证安装
 dvc version
 git lfs version
 
-# Create project
+# 创建项目
 mkdir ml-classification-project
 cd ml-classification-project
 git init
@@ -64,39 +64,39 @@ git config init.defaultBranch main
 
 ---
 
-## Part 1: Setting Up DVC for Data Versioning
+## 第一部分：设置 DVC 进行数据版本控制
 
-### Task 1.1: Initialize DVC
+### 任务 1.1：初始化 DVC
 
-Set up DVC for tracking data.
+设置 DVC 以跟踪数据。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Initialize DVC in your Git repo
+# 在 Git 仓库中初始化 DVC
 dvc init
 
-# This creates .dvc directory and .dvcignore
+# 这会创建 .dvc 目录和 .dvcignore
 ls -la
 
-# Commit DVC initialization
+# 提交 DVC 初始化
 git status
 git add .dvc .dvcignore
 git commit -m "init: initialize DVC for data versioning"
 
-# Configure DVC remote storage (local for now)
+# 配置 DVC 远程存储（目前使用本地）
 mkdir -p /tmp/dvc-storage
 dvc remote add -d local /tmp/dvc-storage
 
-# Commit remote configuration
+# 提交远程配置
 git add .dvc/config
 git commit -m "config: add DVC remote storage"
 
-# View DVC configuration
+# 查看 DVC 配置
 cat .dvc/config
 ```
 
-**Output:**
+**输出：**
 ```
 ['remote "local"']
     url = /tmp/dvc-storage
@@ -106,17 +106,17 @@ cat .dvc/config
 
 ---
 
-### Task 1.2: Track Dataset with DVC
+### 任务 1.2：使用 DVC 跟踪数据集
 
-Version control your training data.
+版本控制你的训练数据。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create a sample dataset
+# 创建示例数据集
 mkdir -p data/raw
 
-# Generate sample training data
+# 生成示例训练数据
 cat > data/raw/train.csv << 'EOF'
 id,feature1,feature2,label
 1,0.5,0.3,0
@@ -133,20 +133,20 @@ id,feature1,feature2,label
 103,0.3,0.3,0
 EOF
 
-# Add dataset to DVC tracking
+# 将数据集加入 DVC 跟踪
 dvc add data/raw/train.csv
 dvc add data/raw/test.csv
 
-# This creates .dvc files
+# 这会创建 .dvc 文件
 ls data/raw/
 
-# Output: train.csv  train.csv.dvc  test.csv  test.csv.dvc
+# 输出：train.csv  train.csv.dvc  test.csv  test.csv.dvc
 
-# The .dvc file contains metadata about the data
+# .dvc 文件包含关于数据的元数据
 cat data/raw/train.csv.dvc
 ```
 
-**Output:**
+**输出：**
 ```yaml
 outs:
 - md5: abc123def456...
@@ -155,7 +155,7 @@ outs:
 ```
 
 ```bash
-# Add .dvc files to Git (not the actual data!)
+# 将 .dvc 文件添加到 Git（而不是实际数据！）
 git add data/raw/*.dvc data/.gitignore
 git commit -m "data: add initial training and test datasets
 
@@ -165,92 +165,92 @@ Datasets:
 
 Tracked with DVC for version control."
 
-# Push data to DVC remote
+# 将数据推送到 DVC 远程
 dvc push
 
-# The actual CSV files are in DVC storage, not Git!
+# 实际的 CSV 文件在 DVC 存储中，而不是 Git！
 ```
 
 ---
 
-### Task 1.3: Version Dataset Changes
+### 任务 1.3：版本控制数据集变更
 
-Track dataset evolution.
+跟踪数据集的演进。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Update the dataset (simulate data collection)
+# 更新数据集（模拟数据收集）
 cat >> data/raw/train.csv << 'EOF'
 6,0.4,0.5,1
 7,0.6,0.3,1
 8,0.1,0.2,0
 EOF
 
-# Update DVC tracking
+# 更新 DVC 跟踪
 dvc add data/raw/train.csv
 
-# The .dvc file changes (new MD5 hash)
+# .dvc 文件发生了变化（新的 MD5 哈希）
 git diff data/raw/train.csv.dvc
 
-# Commit the change
+# 提交变更
 git add data/raw/train.csv.dvc
 git commit -m "data: expand training set to 8 samples
 
 Added 3 more training examples for better model coverage."
 
-# Push new version to DVC storage
+# 推送新版本到 DVC 存储
 dvc push
 
-# Now you have versioned datasets!
+# 现在你有版本化的数据集了！
 git log --oneline -- data/raw/train.csv.dvc
 ```
 
 ---
 
-### Task 1.4: Retrieve Old Dataset Versions
+### 任务 1.4：检索旧版本数据集
 
-Time-travel your data.
+时光穿梭你的数据。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Check out old version of dataset
+# 检出旧版本的 dataset
 git checkout HEAD~1 data/raw/train.csv.dvc
 
-# Pull the old data
+# 拉取旧数据
 dvc checkout data/raw/train.csv.dvc
 
-# View the data (should be 5 rows again)
+# 查看数据（应该又是 5 行）
 wc -l data/raw/train.csv
 
-# Return to latest
+# 返回到最新版本
 git checkout main data/raw/train.csv.dvc
 dvc checkout
 ```
 
 ---
 
-## Part 2: Git LFS for Large Model Files
+## 第二部分：用于大型模型文件的 Git LFS
 
-### Task 2.1: Set Up Git LFS
+### 任务 2.1：设置 Git LFS
 
-Configure LFS for model files.
+为模型文件配置 LFS。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Track model files with LFS
+# 使用 LFS 跟踪模型文件
 git lfs track "*.h5"
 git lfs track "*.pkl"
 git lfs track "*.pth"
 git lfs track "*.onnx"
 git lfs track "*.pb"
 
-# This creates .gitattributes
+# 这会创建 .gitattributes
 cat .gitattributes
 
-# Commit LFS configuration
+# 提交 LFS 配置
 git add .gitattributes
 git commit -m "config: track model files with Git LFS
 
@@ -264,24 +264,24 @@ Configure LFS for:
 
 ---
 
-### Task 2.2: Version Model Checkpoints
+### 任务 2.2：版本控制模型检查点
 
-Track model weights with LFS.
+使用 LFS 跟踪模型权重。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create models directory
+# 创建模型目录
 mkdir -p models/resnet50
 
-# Simulate model training and saving
+# 模拟模型训练和保存
 cat > models/resnet50/model_v1.0.0.pth << 'EOF'
 # This would be actual PyTorch weights
 # Simulating with dummy file for exercise
 model_checkpoint_v1.0.0
 EOF
 
-# Create model metadata
+# 创建模型元数据
 cat > models/resnet50/model_v1.0.0.json << 'EOF'
 {
   "model_name": "resnet50",
@@ -306,7 +306,7 @@ cat > models/resnet50/model_v1.0.0.json << 'EOF'
 }
 EOF
 
-# Add to Git (LFS will handle the .pth file)
+# 添加到 Git（LFS 会处理 .pth 文件）
 git add models/
 git commit -m "model: add ResNet-50 v1.0.0
 
@@ -317,20 +317,20 @@ Initial model checkpoint:
 
 Model weights tracked with Git LFS."
 
-# LFS automatically pushes large files to LFS storage
+# LFS 自动将大文件推送到 LFS 存储
 git push  # (if you have remote configured)
 ```
 
 ---
 
-### Task 2.3: Tag Model Releases
+### 任务 2.3：标记模型发布
 
-Create tagged releases for models.
+为模型创建标记发布。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Tag the model version
+# 标记模型版本
 git tag -a model-v1.0.0 -m "Model Release v1.0.0
 
 ResNet-50 image classifier
@@ -347,28 +347,28 @@ Deployment:
 - Input: 224x224 RGB images
 - Output: 1000-class predictions"
 
-# View tag
+# 查看标签
 git show model-v1.0.0
 
-# List all model tags
+# 列出所有模型标签
 git tag -l "model-*"
 ```
 
 ---
 
-## Part 3: Experiment Tracking with Git
+## 第三部分：使用 Git 进行实验跟踪
 
-### Task 3.1: Version Experiment Configurations
+### 任务 3.1：版本控制实验配置
 
-Track ML experiments.
+跟踪 ML 实验。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create experiments directory
+# 创建实验目录
 mkdir -p experiments
 
-# Experiment 1: Baseline
+# 实验 1：基线
 cat > experiments/exp-001-baseline.yaml << 'EOF'
 experiment:
   id: "exp-001"
@@ -423,7 +423,7 @@ Experiment ID: exp-001
 Test accuracy: 84.8%
 Training time: 48.5 hours on 4 GPUs"
 
-# Experiment 2: Increased learning rate
+# 实验 2：增加学习率
 cat > experiments/exp-002-higher-lr.yaml << 'EOF'
 experiment:
   id: "exp-002"
@@ -484,23 +484,23 @@ Changed:
 
 Result: Improved accuracy with faster convergence."
 
-# View experiment history
+# 查看实验历史
 git log --oneline -- experiments/
 ```
 
 ---
 
-### Task 3.2: Branch Per Experiment
+### 任务 3.2：每个实验一个分支
 
-Use branches for experimental work.
+使用分支进行实验性工作。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create experiment branch
+# 创建实验分支
 git switch -c experiment/data-augmentation
 
-# Add new augmentation strategy
+# 添加新的增强策略
 cat > experiments/exp-003-augmentation.yaml << 'EOF'
 experiment:
   id: "exp-003"
@@ -570,26 +570,26 @@ Added augmentations:
 
 Trade-off: +5 hours training time but better accuracy."
 
-# If experiment succeeds, merge to main
+# 如果实验成功，合并到 main
 git switch main
 git merge experiment/data-augmentation --no-edit
 
-# Tag successful experiment
+# 标记成功的实验
 git tag -a exp-003-success -m "Successful experiment: advanced augmentation"
 ```
 
 ---
 
-## Part 4: Reproducibility
+## 第四部分：可重现性
 
-### Task 4.1: Lock Dependencies
+### 任务 4.1：锁定依赖
 
-Ensure reproducible environments.
+确保可重现的环境。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create comprehensive requirements
+# 创建全面的依赖文件
 cat > requirements.txt << 'EOF'
 # Core ML Framework
 torch==2.1.0
@@ -614,17 +614,13 @@ python-dotenv==1.0.0
 tqdm==4.66.1
 EOF
 
-# Lock exact versions with pip freeze
-pip install -r requirements.txt
-pip freeze > requirements.lock
-
 git add requirements.txt requirements.lock
 git commit -m "deps: lock dependency versions for reproducibility
 
 Added requirements.lock with exact versions to ensure
 identical environments across training runs."
 
-# Create environment.yaml for conda users
+# 为 conda 用户创建 environment.yaml
 cat > environment.yaml << 'EOF'
 name: ml-classification
 channels:
@@ -651,14 +647,14 @@ git commit -m "deps: add conda environment specification"
 
 ---
 
-### Task 4.2: Document Training Process
+### 任务 4.2：记录训练过程
 
-Create reproducible training documentation.
+创建可重现的训练文档。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create training README
+# 创建训练 README
 cat > experiments/README.md << 'EOF'
 # Experiment Tracking
 
@@ -754,19 +750,19 @@ git commit -m "docs: add experiment reproduction guide"
 
 ---
 
-## Part 5: ML-Specific Git Hooks
+## 第五部分：ML 特定的 Git Hooks
 
-### Task 5.1: Pre-Commit Validation
+### 任务 5.1：Pre-Commit 验证
 
-Prevent common ML mistakes.
+预防常见的 ML 错误。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Install pre-commit framework
+# 安装 pre-commit 框架
 pip install pre-commit
 
-# Create pre-commit configuration
+# 创建 pre-commit 配置
 cat > .pre-commit-config.yaml << 'EOF'
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -809,7 +805,7 @@ repos:
         files: experiments/.*\.yaml$
 EOF
 
-# Create validation scripts
+# 创建验证脚本
 mkdir -p scripts
 
 cat > scripts/check_model_metadata.py << 'EOF'
@@ -891,7 +887,7 @@ EOF
 
 chmod +x scripts/*.py
 
-# Install pre-commit hooks
+# 安装 pre-commit hooks
 pre-commit install
 
 git add .pre-commit-config.yaml scripts/
@@ -905,22 +901,22 @@ Hooks:
 - Experiment config validation
 - Prevent large files in Git"
 
-# Test pre-commit
+# 测试 pre-commit
 # pre-commit run --all-files
 ```
 
 ---
 
-## Part 6: DVC Pipelines
+## 第六部分：DVC 流水线
 
-### Task 6.1: Define ML Pipeline
+### 任务 6.1：定义 ML 流水线
 
-Create reproducible ML pipeline with DVC.
+使用 DVC 创建可重现的 ML 流水线。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create pipeline stages
+# 创建流水线阶段
 dvc stage add -n prepare \
     -d data/raw \
     -o data/processed \
@@ -939,11 +935,11 @@ dvc stage add -n evaluate \
     -M evaluation.json \
     python evaluate.py
 
-# This creates dvc.yaml
+# 这会创建 dvc.yaml
 cat dvc.yaml
 ```
 
-**Output:**
+**输出：**
 ```yaml
 stages:
   prepare:
@@ -973,7 +969,7 @@ stages:
 ```
 
 ```bash
-# Run pipeline
+# 运行流水线
 # dvc repro
 
 git add dvc.yaml dvc.lock
@@ -989,38 +985,38 @@ Fully reproducible with 'dvc repro'"
 
 ---
 
-## Validation
+## 验证
 
-### Verify Your Setup
+### 验证你的设置
 
 ```bash
-# Check DVC configuration
+# 检查 DVC 配置
 dvc status
 dvc dag  # View pipeline DAG
 
-# Check Git LFS
+# 检查 Git LFS
 git lfs ls-files
 
-# Check pre-commit
+# 检查 pre-commit
 pre-commit run --all-files
 
-# View experiment history
+# 查看实验历史
 git log --oneline -- experiments/
 
-# View model tags
+# 查看模型标签
 git tag -l "model-*"
 
-# Check data versioning
+# 检查数据版本控制
 git log --oneline -- data/
 ```
 
 ---
 
-## Challenge Tasks
+## 挑战任务
 
-### Challenge 1: Implement Model Registry
+### 挑战 1：实现模型注册表
 
-Create a model registry with metadata:
+创建带有元数据的模型注册表：
 
 ```bash
 # models/registry.json
@@ -1037,33 +1033,33 @@ Create a model registry with metadata:
 }
 ```
 
-### Challenge 2: Automate Experiment Tracking
+### 挑战 2：自动化实验跟踪
 
-Create script to automatically log experiments to MLflow/W&B with Git commit info.
+创建脚本以自动将实验记录到 MLflow/W&B，并包含 Git commit 信息。
 
-### Challenge 3: Data Quality Checks
+### 挑战 3：数据质量检查
 
-Add DVC pipeline stage for data validation before training.
+在训练前添加 DVC 流水线阶段进行数据验证。
 
 ---
 
-## Troubleshooting
+## 故障排除
 
-**Issue**: "DVC remote storage full"
+**问题**："DVC 远程存储已满"
 ```bash
-# Clean up old data versions
+# 清理旧数据版本
 dvc gc -w  # Garbage collect
 ```
 
-**Issue**: "Git LFS quota exceeded"
+**问题**："Git LFS 配额超限"
 ```bash
-# Prune old LFS objects
+# 修剪旧的 LFS 对象
 git lfs prune
 ```
 
-**Issue**: "Cannot reproduce experiment"
+**问题**："无法重现实验"
 ```bash
-# Ensure exact commit and data version
+# 确保精确的 commit 和数据版本
 git checkout <commit>
 dvc checkout
 pip install -r requirements.lock
@@ -1071,43 +1067,43 @@ pip install -r requirements.lock
 
 ---
 
-## Reflection Questions
+## 反思问题
 
-1. **Why use DVC instead of committing data to Git?**
-2. **When should you use Git LFS vs. DVC?**
-3. **How does versioning experiments help ML development?**
-4. **What makes an ML experiment reproducible?**
-5. **How do you track model lineage from data to deployment?**
+1. **为什么使用 DVC 而不是将数据提交到 Git？**
+2. **何时使用 Git LFS vs. DVC？**
+3. **版本控制实验如何帮助 ML 开发？**
+4. **什么使 ML 实验可重现？**
+5. **如何跟踪从数据到部署的模型溯源？**
 
 ---
 
-## Summary
+## 总结
 
-Congratulations! You've mastered ML-specific Git workflows:
+恭喜！你已经掌握了 ML 特定的 Git 工作流：
 
-- ✅ Data versioning with DVC
-- ✅ Model tracking with Git LFS
-- ✅ Experiment versioning and tracking
-- ✅ Reproducibility with locked dependencies
-- ✅ ML pipelines with DVC
-- ✅ Pre-commit hooks for ML
-- ✅ Model and data provenance
+- ✅ 使用 DVC 进行数据版本控制
+- ✅ 使用 Git LFS 进行模型跟踪
+- ✅ 实验版本控制和跟踪
+- ✅ 使用锁定依赖实现可重现性
+- ✅ 使用 DVC 的 ML 流水线
+- ✅ ML 的 Pre-commit hooks
+- ✅ 模型和数据溯源
 
-### Key Commands
+### 学会的关键命令
 
 ```bash
-dvc init                      # Initialize DVC
-dvc add <file>                # Track file with DVC
-dvc push/pull                 # Sync DVC storage
-git lfs track <pattern>       # Track with LFS
-git tag model-v1.0.0          # Tag model versions
-dvc repro                     # Reproduce pipeline
-pre-commit install            # Setup hooks
+dvc init                      # 初始化 DVC
+dvc add <file>                # 使用 DVC 跟踪文件
+dvc push/pull                 # 同步 DVC 存储
+git lfs track <pattern>       # 使用 LFS 跟踪
+git tag model-v1.0.0          # 标记模型版本
+dvc repro                     # 重现流水线
+pre-commit install            # 设置 hooks
 ```
 
-### Next Steps
+### 下一步
 
-- Exercise 07: Advanced Git techniques
-- Apply to your ML projects
+- 练习 07：高级 Git 技术
+- 应用到你的 ML 项目
 
-**Outstanding work!** You can now manage ML projects with proper version control.
+**出色的工作！** 你现在可以使用适当的版本控制来管理 ML 项目了。

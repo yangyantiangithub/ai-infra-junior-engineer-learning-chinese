@@ -1,124 +1,124 @@
-# Disaster Recovery Plan: Production ML System
+# 灾难恢复计划：生产 ML 系统
 
-**Last Updated:** October 18, 2025
-**Version:** 1.0
-**Classification:** CONFIDENTIAL
-
----
-
-## Table of Contents
-
-1. [Overview](#overview)
-2. [Recovery Objectives](#recovery-objectives)
-3. [Backup Strategy](#backup-strategy)
-4. [Recovery Procedures](#recovery-procedures)
-5. [Testing Schedule](#testing-schedule)
-6. [Roles and Responsibilities](#roles-and-responsibilities)
+**最后更新：** 2025年10月18日
+**版本：** 1.0
+**分类：** 机密
 
 ---
 
-## Overview
+## 目录
 
-This Disaster Recovery (DR) plan outlines procedures to recover the Production ML System in case of catastrophic failures including:
-
-- Complete cluster failure
-- Data center outage
-- Ransomware attack
-- Accidental data deletion
-- Regional cloud provider outage
-- Cascading system failures
-
-### Scope
-
-**In Scope:**
-- Kubernetes cluster and workloads
-- PostgreSQL database (MLflow metadata)
-- Object storage (S3/MinIO) - models and artifacts
-- Configuration (Git repositories)
-- Secrets and credentials
-
-**Out of Scope:**
-- Cloud provider infrastructure (assumed recoverable via IaC)
-- Network infrastructure
-- Third-party SaaS services
+1. [概述](#overview)
+2. [恢复目标](#recovery-objectives)
+3. [备份策略](#backup-strategy)
+4. [恢复流程](#recovery-procedures)
+5. [测试计划](#testing-schedule)
+6. [角色与职责](#roles-and-responsibilities)
 
 ---
 
-## Recovery Objectives
+## 概述
 
-### RTO (Recovery Time Objective)
+本灾难恢复（DR）计划概述了在发生灾难性故障时恢复生产 ML 系统的流程，包括：
 
-Maximum acceptable downtime before system must be restored:
+- 完整集群故障
+- 数据中心宕机
+- 勒索软件攻击
+- 意外数据删除
+- 区域云服务商宕机
+- 级联系统故障
 
-| Component | RTO | Priority |
+### 范围
+
+**范围内：**
+- Kubernetes 集群和工作负载
+- PostgreSQL 数据库（MLflow 元数据）
+- 对象存储（S3/MinIO）— 模型和工件
+- 配置（Git 仓库）
+- 密钥和凭据
+
+**范围外：**
+- 云提供商基础设施（假设可通过 IaC 恢复）
+- 网络基础设施
+- 第三方 SaaS 服务
+
+---
+
+## 恢复目标
+
+### RTO（恢复时间目标）
+
+系统必须恢复前的最大可接受停机时间：
+
+| 组件 | RTO | 优先级 |
 |-----------|-----|----------|
-| **ML API (Production)** | 1 hour | Critical |
-| **MLflow** | 4 hours | High |
-| **Monitoring** | 8 hours | Medium |
-| **ML Pipeline** | 24 hours | Low |
+| **ML API（生产）** | 1 小时 | 关键 |
+| **MLflow** | 4 小时 | 高 |
+| **监控** | 8 小时 | 中 |
+| **ML 流水线** | 24 小时 | 低 |
 
-### RPO (Recovery Point Objective)
+### RPO（恢复点目标）
 
-Maximum acceptable data loss:
+最大可接受数据丢失量：
 
-| Component | RPO | Backup Frequency |
+| 组件 | RPO | 备份频率 |
 |-----------|-----|------------------|
-| **PostgreSQL** | 24 hours | Daily |
-| **Model Artifacts** | 24 hours | Daily |
-| **Configuration** | 0 (Git history) | Continuous |
-| **Logs** | 1 week | Weekly archive |
+| **PostgreSQL** | 24 小时 | 每日 |
+| **模型工件** | 24 小时 | 每日 |
+| **配置** | 0（Git 历史） | 持续 |
+| **日志** | 1 周 | 每周归档 |
 
-### Service Level Agreement (SLA)
+### 服务等级协议（SLA）
 
-- **Production API Availability:** 99.9% uptime
-- **Data Durability:** 99.999% (no data loss)
-- **Mean Time to Recovery:** < 2 hours
+- **生产 API 可用性：** 99.9% 可用性
+- **数据持久性：** 99.999%（无数据丢失）
+- **平均恢复时间：** < 2 小时
 
 ---
 
-## Backup Strategy
+## 备份策略
 
-### What to Backup
+### 需要备份的内容
 
-1. **Kubernetes Resources**
-   - Deployments, Services, ConfigMaps
-   - Ingress, Secrets (encrypted)
-   - Persistent Volume Claims
+1. **Kubernetes 资源**
+   - Deployment、Service、ConfigMap
+   - Ingress、Secret（加密）
+   - PersistentVolumeClaim
 
-2. **Databases**
-   - PostgreSQL (MLflow metadata)
-   - Full database dump
-   - Transaction logs
+2. **数据库**
+   - PostgreSQL（MLflow 元数据）
+   - 完整数据库转储
+   - 事务日志
 
-3. **Object Storage**
-   - Model artifacts (S3/MinIO)
-   - Training datasets
-   - Experiment logs
+3. **对象存储**
+   - 模型工件（S3/MinIO）
+   - 训练数据集
+   - 实验日志
 
-4. **Configuration**
-   - Git repositories (GitHub)
-   - Infrastructure as Code (Terraform/Pulumi)
-   - Helm charts and values
+4. **配置**
+   - Git 仓库（GitHub）
+   - 基础设施即代码（Terraform/Pulumi）
+   - Helm chart 和 values
 
-5. **Secrets** (Encrypted)
-   - API keys
-   - Database credentials
-   - TLS certificates
+5. **密钥（加密）**
+   - API 密钥
+   - 数据库凭据
+   - TLS 证书
 
-### Backup Schedule
+### 备份计划
 
-| Backup Type | Frequency | Retention | Storage Location |
+| 备份类型 | 频率 | 保留期 | 存储位置 |
 |-------------|-----------|-----------|------------------|
-| **Kubernetes Manifests** | Daily | 30 days | S3 (us-west-2) |
-| **PostgreSQL Full** | Daily 2 AM UTC | 30 days | S3 (us-west-2 + us-east-1) |
-| **PostgreSQL Incremental** | Hourly | 7 days | S3 (us-west-2) |
-| **Model Artifacts** | Daily | 90 days | S3 (us-west-2 + us-east-1) |
-| **Git Repositories** | Continuous | Unlimited | GitHub + Mirror |
-| **Secrets (Encrypted)** | Weekly | 30 days | S3 (encrypted) + Vault |
+| **Kubernetes 清单** | 每日 | 30 天 | S3（us-west-2） |
+| **PostgreSQL 完整备份** | 每日 UTC 时间凌晨 2 点 | 30 天 | S3（us-west-2 + us-east-1） |
+| **PostgreSQL 增量备份** | 每小时 | 7 天 | S3（us-west-2） |
+| **模型工件** | 每日 | 90 天 | S3（us-west-2 + us-east-1） |
+| **Git 仓库** | 持续 | 无限制 | GitHub + 镜像 |
+| **密钥（加密）** | 每周 | 30 天 | S3（加密）+ Vault |
 
-### Backup Automation
+### 备份自动化
 
-#### Daily Kubernetes Backup Script
+#### 每日 Kubernetes 备份脚本
 
 ```bash
 #!/bin/bash
@@ -128,39 +128,39 @@ BACKUP_DATE=$(date +%Y%m%d-%H%M%S)
 BACKUP_DIR="/backups/${BACKUP_DATE}"
 S3_BUCKET="s3://ml-system-backups"
 
-# Create backup directory
+# 创建备份目录
 mkdir -p ${BACKUP_DIR}
 
-# Backup all resources in production namespace
+# 备份生产命名空间中的所有资源
 kubectl get all -n ml-system-production -o yaml > ${BACKUP_DIR}/all-resources.yaml
 kubectl get configmap -n ml-system-production -o yaml > ${BACKUP_DIR}/configmaps.yaml
 kubectl get secret -n ml-system-production -o yaml > ${BACKUP_DIR}/secrets.yaml
 kubectl get pvc -n ml-system-production -o yaml > ${BACKUP_DIR}/pvcs.yaml
 kubectl get ingress -n ml-system-production -o yaml > ${BACKUP_DIR}/ingress.yaml
 
-# Backup PostgreSQL
+# 备份 PostgreSQL
 kubectl exec -n ml-system-production postgresql-0 -- \
   pg_dump -U mlflow mlflow > ${BACKUP_DIR}/mlflow-db.sql
 
-# Compress backup
+# 压缩备份
 tar -czf ${BACKUP_DIR}.tar.gz ${BACKUP_DIR}
 
-# Upload to S3 (primary region)
+# 上传到 S3（主区域）
 aws s3 cp ${BACKUP_DIR}.tar.gz ${S3_BUCKET}/${BACKUP_DATE}.tar.gz
 
-# Replicate to secondary region
+# 复制到辅助区域
 aws s3 cp ${S3_BUCKET}/${BACKUP_DATE}.tar.gz \
   s3://ml-system-backups-dr/$(basename ${BACKUP_DIR}).tar.gz \
   --source-region us-west-2 \
   --region us-east-1
 
-# Cleanup local backup (keep only last 7 days)
+# 清理本地备份（仅保留最近 7 天）
 find /backups -type d -mtime +7 -exec rm -rf {} \;
 
-echo "Backup completed: ${BACKUP_DATE}"
+echo "备份完成：${BACKUP_DATE}"
 ```
 
-#### Automated Backup Cron Job
+#### 自动备份 CronJob
 
 ```yaml
 apiVersion: batch/v1
@@ -169,7 +169,7 @@ metadata:
   name: backup-cronjob
   namespace: ml-system-production
 spec:
-  schedule: "0 2 * * *"  # Daily at 2 AM UTC
+  schedule: "0 2 * * *"  # 每日 UTC 时间凌晨 2 点
   jobTemplate:
     spec:
       template:
@@ -189,52 +189,52 @@ spec:
           restartPolicy: OnFailure
 ```
 
-### Backup Verification
+### 备份验证
 
-**Weekly verification:**
-- Restore backup to test environment
-- Verify data integrity
-- Test application functionality
-- Document any issues
+**每周验证：**
+- 将备份恢复到测试环境
+- 验证数据完整性
+- 测试应用功能
+- 记录任何问题
 
 ```bash
-# Verification script
+# 验证脚本
 #!/bin/bash
 # /scripts/verify-backup.sh
 
 LATEST_BACKUP=$(aws s3 ls s3://ml-system-backups/ | sort | tail -n 1 | awk '{print $4}')
 
-# Download backup
+# 下载备份
 aws s3 cp s3://ml-system-backups/${LATEST_BACKUP} /tmp/
 
-# Extract
+# 解压
 tar -xzf /tmp/${LATEST_BACKUP} -C /tmp/
 
-# Restore to test namespace
+# 恢复到测试命名空间
 kubectl apply -f /tmp/backups/*/all-resources.yaml --namespace=ml-system-test
 
-# Run smoke tests
+# 运行冒烟测试
 pytest tests/integration/test_e2e.py --api-url=https://test.example.com
 
-echo "Backup verification completed"
+echo "备份验证完成"
 ```
 
 ---
 
-## Recovery Procedures
+## 恢复流程
 
-### Scenario 1: Single Pod Failure
+### 场景 1：单个 Pod 故障
 
-**Symptoms:** One or more pods crash or become unresponsive
+**症状：** 一个或多个 Pod 崩溃或无响应
 
-**RTO:** < 2 minutes (automatic)
+**RTO：** < 2 分钟（自动）
 
-**Recovery:**
-1. Kubernetes automatically restarts failed pods
-2. Health checks remove unhealthy pods from service
-3. No manual intervention required
+**恢复：**
+1. Kubernetes 自动重启故障 Pod
+2. 健康检查将不健康 Pod 从服务中移除
+3. 无需手动干预
 
-**Verification:**
+**验证：**
 ```bash
 kubectl get pods -n ml-system-production
 kubectl logs -n ml-system-production <pod-name>
@@ -242,31 +242,31 @@ kubectl logs -n ml-system-production <pod-name>
 
 ---
 
-### Scenario 2: Node Failure
+### 场景 2：节点故障
 
-**Symptoms:** Entire node becomes unavailable
+**症状：** 整个节点不可用
 
-**RTO:** < 5 minutes (automatic)
+**RTO：** < 5 分钟（自动）
 
-**Recovery:**
-1. Kubernetes detects node failure
-2. Reschedules pods to healthy nodes
-3. Services continue with reduced capacity
-4. Auto-scaling may trigger to add capacity
+**恢复：**
+1. Kubernetes 检测到节点故障
+2. 将 Pod 重新调度到健康节点
+3. 服务以降低的容量继续运行
+4. 自动扩缩容可能触发以增加容量
 
-**Manual intervention (if needed):**
+**手动干预（如果需要）：**
 ```bash
-# Drain failing node
+# 排空故障节点
 kubectl drain <node-name> --ignore-daemonsets --delete-emptydir-data
 
-# Delete node
+# 删除节点
 kubectl delete node <node-name>
 
-# Add new node (via cloud provider)
-# Node auto-joins cluster via autoscaling group
+# 添加新节点（通过云提供商）
+# 节点通过自动扩缩组自动加入集群
 ```
 
-**Verification:**
+**验证：**
 ```bash
 kubectl get nodes
 kubectl get pods -n ml-system-production -o wide
@@ -274,400 +274,400 @@ kubectl get pods -n ml-system-production -o wide
 
 ---
 
-### Scenario 3: Database Failure
+### 场景 3：数据库故障
 
-**Symptoms:** PostgreSQL pod crashes or data corruption
+**症状：** PostgreSQL Pod 崩溃或数据损坏
 
-**RTO:** < 30 minutes
+**RTO：** < 30 分钟
 
-**Recovery:**
+**恢复：**
 
-#### Step 1: Identify Failure
+#### 步骤 1：识别故障
 ```bash
-# Check database pod
+# 检查数据库 Pod
 kubectl get pods -n ml-system-production | grep postgres
 
-# Check logs
+# 检查日志
 kubectl logs -n ml-system-production postgresql-0
 ```
 
-#### Step 2: Attempt Automatic Recovery
-If using replicated PostgreSQL:
+#### 步骤 2：尝试自动恢复
+如果使用带复制的 PostgreSQL：
 ```bash
-# Promote replica to primary
-# (This depends on your PostgreSQL setup: Patroni, Stolon, etc.)
+# 将副本提升为主节点
+# （这取决于你的 PostgreSQL 设置：Patroni、Stolon 等）
 ```
 
-#### Step 3: Restore from Backup
+#### 步骤 3：从备份恢复
 ```bash
-# Get latest backup
+# 获取最新备份
 LATEST_BACKUP=$(aws s3 ls s3://ml-system-backups/ | grep mlflow-db | sort | tail -n 1 | awk '{print $4}')
 
-# Download backup
+# 下载备份
 aws s3 cp s3://ml-system-backups/${LATEST_BACKUP} /tmp/mlflow-db.sql.gz
 
-# Extract
+# 解压
 gunzip /tmp/mlflow-db.sql.gz
 
-# Delete existing database (if corrupted)
+# 删除现有数据库（如果已损坏）
 kubectl exec -n ml-system-production postgresql-0 -- dropdb -U mlflow mlflow
 
-# Create new database
+# 创建新数据库
 kubectl exec -n ml-system-production postgresql-0 -- createdb -U mlflow mlflow
 
-# Restore from backup
+# 从备份恢复
 kubectl exec -i -n ml-system-production postgresql-0 -- \
   psql -U mlflow mlflow < /tmp/mlflow-db.sql
 ```
 
-#### Step 4: Verify Recovery
+#### 步骤 4：验证恢复
 ```bash
-# Check database connectivity
+# 检查数据库连接
 kubectl exec -n ml-system-production postgresql-0 -- psql -U mlflow -c "SELECT COUNT(*) FROM experiments;"
 
-# Restart ML API pods to reconnect
+# 重启 ML API Pod 以重新连接
 kubectl rollout restart deployment/ml-api -n ml-system-production
 ```
 
-**Data Loss:** Up to 24 hours (last backup)
+**数据丢失：** 最多 24 小时（上一次备份）
 
 ---
 
-### Scenario 4: Complete Cluster Failure
+### 场景 4：完整集群故障
 
-**Symptoms:** Entire Kubernetes cluster unavailable
+**症状：** 整个 Kubernetes 集群不可用
 
-**RTO:** < 1 hour
+**RTO：** < 1 小时
 
-**Recovery:**
+**恢复：**
 
-#### Step 1: Provision New Cluster
+#### 步骤 1：部署新集群
 
 ```bash
-# If using managed Kubernetes (GKE/EKS/AKS):
-# Create new cluster via cloud provider console or CLI
+# 如果使用托管 Kubernetes（GKE/EKS/AKS）：
+# 通过云提供商控制台或 CLI 创建新集群
 
-# Example for GKE:
+# GKE 示例：
 gcloud container clusters create ml-cluster-dr \
   --zone us-east1-a \
   --num-nodes 5 \
   --machine-type n1-standard-8 \
   --enable-autoscaling --min-nodes 3 --max-nodes 20
 
-# Get credentials
+# 获取凭据
 gcloud container clusters get-credentials ml-cluster-dr --zone us-east1-a
 ```
 
-#### Step 2: Install Core Infrastructure
+#### 步骤 2：安装核心基础设施
 
 ```bash
-# Install NGINX Ingress
+# 安装 NGINX Ingress
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm install ingress-nginx ingress-nginx/ingress-nginx \
   --namespace ingress-nginx \
   --create-namespace
 
-# Install cert-manager
+# 安装 cert-manager
 helm repo add jetstack https://charts.jetstack.io
 helm install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --create-namespace \
   --set installCRDs=true
 
-# Install Prometheus/Grafana
+# 安装 Prometheus/Grafana
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm install prometheus prometheus-community/kube-prometheus-stack \
   --namespace monitoring \
   --create-namespace
 ```
 
-#### Step 3: Restore Application
+#### 步骤 3：恢复应用
 
 ```bash
-# Download latest backup
+# 下载最新备份
 LATEST_BACKUP=$(aws s3 ls s3://ml-system-backups/ | sort | tail -n 1 | awk '{print $4}')
 aws s3 cp s3://ml-system-backups/${LATEST_BACKUP} /tmp/
 tar -xzf /tmp/${LATEST_BACKUP} -C /tmp/
 
-# Create namespace
+# 创建命名空间
 kubectl create namespace ml-system-production
 
-# Restore secrets (decrypt first if encrypted)
+# 恢复密钥（如果加密，先解密）
 kubectl apply -f /tmp/backups/*/secrets.yaml
 
-# Restore ConfigMaps
+# 恢复 ConfigMap
 kubectl apply -f /tmp/backups/*/configmaps.yaml
 
-# Restore PVCs
+# 恢复 PVC
 kubectl apply -f /tmp/backups/*/pvcs.yaml
 
-# Restore application
+# 恢复应用
 kubectl apply -f /tmp/backups/*/all-resources.yaml
 
-# Wait for pods to be ready
+# 等待 Pod 就绪
 kubectl wait --for=condition=Ready pods -l app=ml-api \
   -n ml-system-production --timeout=10m
 ```
 
-#### Step 4: Restore Database
+#### 步骤 4：恢复数据库
 
 ```bash
-# Restore PostgreSQL (same as Scenario 3, Step 3)
+# 恢复 PostgreSQL（同场景 3 步骤 3）
 ```
 
-#### Step 5: Update DNS
+#### 步骤 5：更新 DNS
 
 ```bash
-# Get new LoadBalancer IP
+# 获取新的 LoadBalancer IP
 NEW_IP=$(kubectl get svc ingress-nginx-controller -n ingress-nginx \
   -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
-# Update DNS A record to point to NEW_IP
-# (Do this in your DNS provider)
+# 更新 DNS A 记录指向 NEW_IP
+# （在你的 DNS 提供商处操作）
 
-echo "Update DNS: api.example.com → ${NEW_IP}"
+echo "更新 DNS：api.example.com → ${NEW_IP}"
 ```
 
-#### Step 6: Verify Recovery
+#### 步骤 6：验证恢复
 
 ```bash
-# Wait for DNS propagation
+# 等待 DNS 传播
 # dig api.example.com
 
-# Test endpoint
+# 测试端点
 curl https://api.example.com/health
 
-# Run integration tests
+# 运行集成测试
 export API_URL=https://api.example.com
 export API_KEY=$PRODUCTION_API_KEY
 pytest tests/integration/test_e2e.py -v
 ```
 
-#### Step 7: Monitor
+#### 步骤 7：监控
 
-- Watch Grafana dashboards
-- Check error rates and latency
-- Review logs for issues
-- Monitor for 24 hours
+- 查看 Grafana 仪表盘
+- 检查错误率和延迟
+- 审查日志中的问题
+- 监控 24 小时
 
 ---
 
-### Scenario 5: Ransomware Attack / Data Deletion
+### 场景 5：勒索软件攻击 / 数据删除
 
-**Symptoms:** Unexpected data deletion, encryption, or corruption
+**症状：** 意外数据删除、加密或损坏
 
-**RTO:** < 4 hours
+**RTO：** < 4 小时
 
-**Recovery:**
+**恢复：**
 
-#### Step 1: Isolate and Assess
+#### 步骤 1：隔离与评估
 
 ```bash
-# Immediately isolate affected systems
-# Disconnect from network if needed
+# 立即隔离受影响的系统
+# 如有必要，断开网络连接
 
-# Assess damage
-# Identify what data/systems are affected
+# 评估损害
+# 确定受影响的数据/系统
 ```
 
-#### Step 2: Restore from Immutable Backup
+#### 步骤 2：从不可变备份恢复
 
 ```bash
-# Use backup from BEFORE the attack
-# Backups should be in immutable storage (S3 Object Lock)
+# 使用攻击前的备份
+# 备份应存储在不可变存储中（S3 Object Lock）
 
-# List available backups
+# 列出可用备份
 aws s3 ls s3://ml-system-backups/ | grep $(date -d '7 days ago' +%Y%m%d)
 
-# Restore from pre-attack backup
-# Follow steps from Scenario 4
+# 从攻击前备份恢复
+# 按照场景 4 的步骤操作
 ```
 
-#### Step 3: Security Review
+#### 步骤 3：安全审查
 
-- Change all credentials and API keys
-- Rotate TLS certificates
-- Review audit logs
-- Identify attack vector
-- Patch vulnerabilities
+- 更改所有凭据和 API 密钥
+- 轮换 TLS 证书
+- 审查审计日志
+- 确定攻击向量
+- 修补漏洞
 
-#### Step 4: Verify Data Integrity
+#### 步骤 4：验证数据完整性
 
 ```bash
-# Check restored data integrity
-# Compare checksums with known good backups
-# Run data validation tests
+# 检查恢复的数据完整性
+# 与已知良好备份的校验和进行比较
+# 运行数据验证测试
 ```
 
 ---
 
-## Testing Schedule
+## 测试计划
 
-### Backup Testing
+### 备份测试
 
-| Test Type | Frequency | Responsible | Duration |
+| 测试类型 | 频率 | 负责人 | 时长 |
 |-----------|-----------|-------------|----------|
-| **Backup verification** | Weekly | DevOps | 30 min |
-| **Single pod recovery** | Monthly | DevOps | 15 min |
-| **Database restore** | Quarterly | DevOps + DBA | 2 hours |
-| **Full DR exercise** | Annually | All teams | 8 hours |
+| **备份验证** | 每周 | DevOps | 30 分钟 |
+| **单 Pod 恢复** | 每月 | DevOps | 15 分钟 |
+| **数据库恢复** | 每季度 | DevOps + DBA | 2 小时 |
+| **完整 DR 演练** | 每年 | 所有团队 | 8 小时 |
 
-### Annual DR Exercise
+### 年度 DR 演练
 
-**Date:** First Saturday of Q1 (January)
-**Duration:** 8 hours
-**Participants:** DevOps, SRE, Engineering, Management
+**日期：** 第一季度（一月）的第一个周六
+**时长：** 8 小时
+**参与人员：** DevOps、SRE、工程、管理
 
-**Procedure:**
-1. **Simulate failure** - Take down production cluster (during maintenance window)
-2. **Execute recovery** - Follow DR procedures
-3. **Verify functionality** - Run full test suite
-4. **Document issues** - Record any problems encountered
-5. **Update plan** - Revise DR plan based on learnings
-6. **Report results** - Present to leadership
-
----
-
-## Roles and Responsibilities
-
-### Incident Commander
-- **Primary:** Engineering Manager
-- **Backup:** Senior DevOps Engineer
-- **Responsibilities:**
-  - Declare disaster
-  - Coordinate recovery efforts
-  - Communicate with stakeholders
-  - Make decisions on recovery strategy
-
-### Recovery Team
-
-**DevOps Engineers:**
-- Execute recovery procedures
-- Restore infrastructure
-- Verify system health
-
-**Database Administrators:**
-- Restore databases
-- Verify data integrity
-- Optimize queries post-recovery
-
-**Software Engineers:**
-- Verify application functionality
-- Fix any issues discovered
-- Support testing
-
-**SRE/On-Call:**
-- Monitor recovery progress
-- Escalate issues
-- Provide 24/7 coverage
-
-### Communication
-
-**Internal:**
-- Status updates every 30 minutes
-- Slack #incident-response channel
-- Email updates to leadership
-
-**External:**
-- Status page updates (status.example.com)
-- Customer notifications (if SLA impacted)
-- Post-mortem report (public if appropriate)
+**流程：**
+1. **模拟故障** — 关闭生产集群（在维护窗口内）
+2. **执行恢复** — 按照 DR 流程操作
+3. **验证功能** — 运行完整测试套件
+4. **记录问题** — 记录遇到的任何问题
+5. **更新计划** — 根据经验教训修订 DR 计划
+6. **报告结果** — 向领导层汇报
 
 ---
 
-## Emergency Contacts
+## 角色与职责
 
-| Role | Name | Phone | Email |
+### 事件指挥官
+- **主要负责人：** 工程经理
+- **后备人员：** 高级 DevOps 工程师
+- **职责：**
+  - 宣告灾难
+  - 协调恢复工作
+  - 与利益相关者沟通
+  - 就恢复策略做出决策
+
+### 恢复团队
+
+**DevOps 工程师：**
+- 执行恢复流程
+- 恢复基础设施
+- 验证系统健康状态
+
+**数据库管理员：**
+- 恢复数据库
+- 验证数据完整性
+- 恢复后优化查询
+
+**软件工程师：**
+- 验证应用功能
+- 修复发现的任何问题
+- 支持测试
+
+**SRE/值班人员：**
+- 监控恢复进度
+- 升级问题
+- 提供 24/7 覆盖
+
+### 沟通
+
+**内部：**
+- 每 30 分钟更新状态
+- Slack #incident-response 频道
+- 向领导层发送邮件更新
+
+**外部：**
+- 状态页面更新（status.example.com）
+- 客户通知（如果 SLA 受影响）
+- 事后分析报告（如果合适则公开）
+
+---
+
+## 紧急联系信息
+
+| 角色 | 姓名 | 电话 | 邮箱 |
 |------|------|-------|-------|
-| **Incident Commander** | TBD | TBD | TBD |
-| **DevOps Lead** | TBD | TBD | TBD |
-| **Engineering Manager** | TBD | TBD | TBD |
-| **CTO** | TBD | TBD | TBD |
-| **Cloud Provider Support** | - | - | support@cloudprovider.com |
-| **Security Team** | - | - | security@example.com |
+| **事件指挥官** | 待定 | 待定 | 待定 |
+| **DevOps 负责人** | 待定 | 待定 | 待定 |
+| **工程经理** | 待定 | 待定 | 待定 |
+| **CTO** | 待定 | 待定 | 待定 |
+| **云提供商支持** | - | - | support@cloudprovider.com |
+| **安全团队** | - | - | security@example.com |
 
-**Emergency Escalation:**
-1. On-call engineer (PagerDuty)
-2. DevOps lead
-3. Engineering manager
+**紧急升级路径：**
+1. 值班工程师（PagerDuty）
+2. DevOps 负责人
+3. 工程经理
 4. CTO
 
 ---
 
-## Post-Recovery
+## 恢复后操作
 
-### Immediate Actions (0-4 hours)
+### 立即行动（0-4 小时）
 
-1. **Verify system health**
-   - All services operational
-   - No data loss or corruption
-   - Performance metrics normal
+1. **验证系统健康状态**
+   - 所有服务正常运行
+   - 无数据丢失或损坏
+   - 性能指标正常
 
-2. **Monitor continuously**
-   - Watch for anomalies
-   - Check error rates
-   - Review logs
+2. **持续监控**
+   - 关注异常情况
+   - 检查错误率
+   - 审查日志
 
-3. **Communicate status**
-   - Update status page
-   - Notify stakeholders
-   - Send all-clear message
+3. **沟通状态**
+   - 更新状态页面
+   - 通知利益相关者
+   - 发送解除警报消息
 
-### Short-term Actions (4-24 hours)
+### 短期行动（4-24 小时）
 
-1. **Root cause analysis**
-   - Identify what caused the failure
-   - Document timeline
-   - Collect evidence
+1. **根因分析**
+   - 确定故障原因
+   - 记录时间线
+   - 收集证据
 
-2. **Assess impact**
-   - Calculate downtime
-   - Measure data loss
-   - Estimate business impact
+2. **评估影响**
+   - 计算停机时间
+   - 衡量数据丢失
+   - 估算业务影响
 
-3. **Create action items**
-   - Preventive measures
-   - Process improvements
-   - Infrastructure changes
+3. **创建行动项**
+   - 预防措施
+   - 流程改进
+   - 基础设施变更
 
-### Long-term Actions (1-4 weeks)
+### 长期行动（1-4 周）
 
-1. **Post-mortem**
-   - Write detailed report
-   - Share with team
-   - Present to leadership
+1. **事后分析**
+   - 撰写详细报告
+   - 与团队分享
+   - 向领导层汇报
 
-2. **Implement improvements**
-   - Fix root causes
-   - Update runbooks
-   - Enhance monitoring
+2. **实施改进**
+   - 修复根因
+   - 更新 Runbook
+   - 增强监控
 
-3. **Update DR plan**
-   - Incorporate lessons learned
-   - Revise procedures
-   - Update documentation
+3. **更新 DR 计划**
+   - 纳入经验教训
+   - 修订流程
+   - 更新文档
 
-4. **Training**
-   - Train team on new procedures
-   - Conduct tabletop exercises
-   - Update knowledge base
-
----
-
-## Continuous Improvement
-
-This DR plan should be reviewed and updated:
-
-- **Quarterly:** After each DR test
-- **After incidents:** Following any actual disaster recovery
-- **With changes:** When system architecture changes
-- **Annually:** Comprehensive review
-
-**Document Version:** 1.0
-**Last Tested:** [To be filled after first test]
-**Next Review:** January 18, 2026
-**Owner:** DevOps Team
+4. **培训**
+   - 培训团队新流程
+   - 进行桌面推演
+   - 更新知识库
 
 ---
 
-**Remember:** Practice makes perfect. The more you test your DR procedures, the smoother actual recovery will be!
+## 持续改进
+
+此 DR 计划应定期审查和更新：
+
+- **每季度：** 每次 DR 测试后
+- **事件后：** 任何实际灾难恢复后
+- **变更时：** 系统架构变更时
+- **每年：** 全面审查
+
+**文档版本：** 1.0
+**上次测试时间：** [首次测试后填写]
+**下次审查：** 2026年1月18日
+**负责人：** DevOps 团队
+
+---
+
+**记住：** 熟能生巧。你越频繁地测试 DR 流程，实际恢复时就越顺利！

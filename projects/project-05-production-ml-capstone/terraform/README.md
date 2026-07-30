@@ -1,31 +1,31 @@
-# Terraform — Project 05 Capstone
+# Terraform — 项目 05 结业项目
 
-This is the Infrastructure-as-Code layer for the Project 05 capstone. It provisions everything below the Kubernetes deployments: network, cluster, managed databases, IAM, secrets.
+这是项目 05 结业项目的基础设施即代码层。它配置 Kubernetes 部署以下的所有内容：网络、集群、托管数据库、IAM、密钥。
 
-## Layout
+## 目录结构
 
 ```
 terraform/
-├── modules/                    # Reusable composable modules
-│   ├── vpc/                    # VPC, subnets, route tables, NAT
-│   ├── eks/                    # EKS cluster + managed node groups
-│   ├── rds/                    # PostgreSQL for application data
-│   └── iam/                    # IRSA roles, KMS keys
-└── environments/               # One root module per environment
+├── modules/                    # 可复用的组合模块
+│   ├── vpc/                    # VPC、子网、路由表、NAT
+│   ├── eks/                    # EKS 集群 + 托管节点组
+│   ├── rds/                    # 应用数据的 PostgreSQL
+│   └── iam/                    # IRSA 角色、KMS 密钥
+└── environments/               # 每个环境一个根模块
     ├── dev/
     ├── staging/
     └── prod/
 ```
 
-Each environment is a separate Terraform state, isolated by an S3 backend and DynamoDB lock table.
+每个环境是一个独立的 Terraform 状态，通过 S3 后端和 DynamoDB 锁表隔离。
 
-## Why three environments
+## 为什么需要三个环境
 
-- **dev** — small, ephemeral. Single-AZ. No HA. Frequent destroy/recreate.
-- **staging** — production-shaped. Multi-AZ. Real but scaled-down resources. Where releases land before prod.
-- **prod** — full HA. Locked-down state file. Changes go through CODEOWNERS review.
+- **dev** — 小型、临时。单可用区。无高可用。频繁销毁/重建。
+- **staging** — 生产级形态。多可用区。真实但缩放的资源。发布在进入生产前在此落地。
+- **prod** — 完整高可用。锁定状态文件。变更需通过 CODEOWNERS 审查。
 
-## Module usage example
+## 模块使用示例
 
 ```hcl
 # environments/prod/main.tf
@@ -64,9 +64,9 @@ module "eks" {
 }
 ```
 
-## State backend
+## 状态后端
 
-Use a per-environment S3 backend with DynamoDB locking. Never commit `*.tfstate`.
+使用每个环境的 S3 后端配合 DynamoDB 锁。切勿提交 `*.tfstate`。
 
 ```hcl
 terraform {
@@ -80,7 +80,7 @@ terraform {
 }
 ```
 
-## Standard flow
+## 标准流程
 
 ```bash
 cd terraform/environments/dev
@@ -89,10 +89,10 @@ terraform plan -out=plan.tfplan
 terraform apply plan.tfplan
 ```
 
-Never run `terraform apply` without first reviewing a `terraform plan`. CI should enforce plan-on-PR, apply-on-merge.
+切勿在未先审查 `terraform plan` 的情况下运行 `terraform apply`。CI 应强制在 PR 上执行 plan，合并后执行 apply。
 
-## Common gotchas
+## 常见陷阱
 
-- **EKS cluster updates take 20+ minutes.** Don't block CI on `terraform apply`; run it on a longer-timeout pipeline.
-- **Don't destroy state-bearing resources** (RDS, S3 buckets) from `terraform destroy`. Use `lifecycle { prevent_destroy = true }`.
-- **Secrets in state.** The Terraform state file contains secret values. Encrypt at rest, restrict access by IAM, never download to local disk on a shared workstation.
+- **EKS 集群更新需要 20 分钟以上。** 不要让 CI 被 `terraform apply` 阻塞；请在超时时间更长的流水线上运行。
+- **不要从 `terraform destroy` 中销毁有状态资源**（RDS、S3 存储桶）。使用 `lifecycle { prevent_destroy = true }`。
+- **状态中的密钥。** Terraform 状态文件包含机密值。静态加密，通过 IAM 限制访问，切勿下载到共享工作站上的本地磁盘。

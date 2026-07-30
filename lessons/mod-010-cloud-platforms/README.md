@@ -1,945 +1,943 @@
-# Module 010: Cloud Platforms Fundamentals
+# Module 010: 云平台基础
 
-## Module Overview
+## 模块概述
 
-Cloud computing is the foundation of modern AI/ML infrastructure. This module provides comprehensive training in cloud platform fundamentals, focusing on the major cloud providers (AWS, Google Cloud, Azure) with hands-on emphasis on AWS. You'll learn core cloud services, infrastructure management, cost optimization, and how to deploy applications and ML workloads to the cloud.
+云计算是现代 AI/ML 基础设施的基础。本模块提供云平台基础的综合培训，聚焦主流云服务商（AWS、Google Cloud、Azure），并以 AWS 为实操重点。你将学习核心云服务、基础设施管理、成本优化，以及如何将应用和 ML 工作负载部署到云端。
 
-You'll understand cloud computing models, virtual machines, storage systems, networking, identity management, and serverless computing. These skills are essential for building scalable, resilient AI infrastructure and managing production ML systems in the cloud.
+你将了解云计算模型、虚拟机、存储系统、网络、身份管理和无服务器计算。这些技能对于构建可扩展、弹性的 AI 基础设施和管理生产级 ML 系统至关重要。
 
-By the end of this module, you'll be confident provisioning cloud resources, deploying applications, managing cloud infrastructure, and applying cloud services to AI/ML workflows.
+完成本模块后，你将能够自信地配置云资源、部署应用、管理云基础设施，并将云服务应用于 AI/ML 工作流。
 
-## Learning Objectives
+## 学习目标
 
-By completing this module, you will be able to:
+完成本模块后，你将能够：
 
-1. **Understand cloud computing fundamentals** including IaaS, PaaS, SaaS models
-2. **Navigate major cloud platforms** (AWS, GCP, Azure) and their service offerings
-3. **Manage compute resources** including EC2, virtual machines, and containers
-4. **Configure cloud storage** including object storage, block storage, and databases
-5. **Set up cloud networking** including VPCs, subnets, security groups, and load balancers
-6. **Implement IAM** (Identity and Access Management) for security
-7. **Use Infrastructure as Code** with tools like Terraform
-8. **Optimize cloud costs** and understand pricing models
-9. **Deploy applications to cloud** including containerized and serverless applications
-10. **Leverage cloud services for ML** including managed ML platforms and GPU instances
+1. **理解云计算基础**，包括 IaaS、PaaS、SaaS 模型
+2. **掌握主流云平台**（AWS、GCP、Azure）及其服务
+3. **管理计算资源**，包括 EC2、虚拟机和容器
+4. **配置云存储**，包括对象存储、块存储和数据库
+5. **搭建云网络**，包括 VPC、子网、安全组和负载均衡器
+6. **实现 IAM**（身份和访问管理）保障安全
+7. **使用基础设施即代码**，如 Terraform 等工具
+8. **优化云成本**并理解定价模型
+9. **部署应用到云端**，包括容器化和无服务器应用
+10. **利用云服务支持 ML**，包括托管 ML 平台和 GPU 实例
 
-## Prerequisites
+## 前置要求
 
-- Completion of Module 002 (Linux Essentials) required
-- Completion of Module 005 (Docker and Containers) recommended
-- Completion of Module 003 (Git Version Control) recommended
-- Basic networking knowledge
-- Understanding of virtualization concepts
+- 需要完成模块 002（Linux 基础）
+- 建议完成模块 005（Docker 和容器）
+- 建议完成模块 003（Git 版本控制）
+- 基础网络知识
+- 理解虚拟化概念
 
-**Recommended Setup:**
-- AWS Free Tier account (primary focus)
-- Google Cloud Free Tier account (optional)
-- Azure Free Tier account (optional)
-- AWS CLI installed and configured
-- Terraform installed
-- SSH key pair generated
-- Credit card for account verification (free tier won't charge)
+**推荐配置：**
+- AWS 免费套餐账户（主要）
+- Google Cloud 免费套餐账户（可选）
+- Azure 免费套餐账户（可选）
+- 安装并配置 AWS CLI
+- 安装 Terraform
+- 生成 SSH 密钥对
+- 信用卡用于账户验证（免费套餐不会收费）
 
-## Time Commitment
+## 时间投入
 
-- **Total Estimated Time:** 45-55 hours
-- **Lectures & Reading:** 18-22 hours
-- **Hands-on Exercises:** 22-28 hours
-- **Projects:** 5-8 hours
+- **预计总时间：** 45-55 小时
+- **讲座与阅读：** 18-22 小时
+- **动手练习：** 22-28 小时
+- **项目：** 5-8 小时
 
-**Recommended Pace:**
-- Part-time (5-10 hrs/week): 5-7 weeks
-- Full-time (20-30 hrs/week): 2-3 weeks
+**推荐节奏：**
+- 兼职（5-10 小时/周）：5-7 周
+- 全职（20-30 小时/周）：2-3 周
 
-Cloud expertise requires extensive hands-on practice. Expect to spend significant time in cloud consoles and experimenting with services.
+云专业知识需要大量的动手实践。预计需要在云控制台和服务实验中投入大量时间。
 
-## Module Structure
+## 模块结构
 
-### Week 1-2: Cloud Fundamentals and Compute
-- **Topics:** Cloud concepts, compute services, virtual machines
-- **Key Skills:** EC2 management, instance types, SSH access
-- **Practice:** Launching instances, managing compute resources
+### 第 1-2 周：云基础与计算
+- **主题：** 云概念、计算服务、虚拟机
+- **关键技能：** EC2 管理、实例类型、SSH 访问
+- **实践：** 启动实例、管理计算资源
 
-### Week 3: Storage and Databases
-- **Topics:** Object storage, block storage, managed databases
-- **Key Skills:** S3, EBS, RDS configuration and management
-- **Practice:** Data storage scenarios, database deployment
+### 第 3 周：存储与数据库
+- **主题：** 对象存储、块存储、托管数据库
+- **关键技能：** S3、EBS、RDS 配置与管理
+- **实践：** 数据存储场景、数据库部署
 
-### Week 4: Networking and Security
-- **Topics:** VPCs, subnets, security groups, IAM
-- **Key Skills:** Network configuration, security best practices
-- **Practice:** Secure network architecture, IAM policies
+### 第 4 周：网络与安全
+- **主题：** VPC、子网、安全组、IAM
+- **关键技能：** 网络配置、安全最佳实践
+- **实践：** 安全网络架构、IAM 策略
 
-### Week 5: Deployment and ML Services
-- **Topics:** IaC, container services, ML platforms, cost optimization
-- **Key Skills:** Terraform, ECS/EKS, SageMaker basics, billing
-- **Practice:** Infrastructure automation, ML workload deployment
+### 第 5 周：部署与 ML 服务
+- **主题：** IaC、容器服务、ML 平台、成本优化
+- **关键技能：** Terraform、ECS/EKS、SageMaker 基础、账单
+- **实践：** 基础设施自动化、ML 工作负载部署
 
-## Detailed Topic Breakdown
+## 详细主题分解
 
-### 1. Cloud Computing Fundamentals (5-6 hours)
+### 1. 云计算基础（5-6 小时）
 
-#### 1.1 Introduction to Cloud Computing
-- What is cloud computing?
-- History and evolution of cloud
-- Benefits of cloud computing
-- Cloud vs on-premises
-- Cloud adoption considerations
-- Cloud-native applications
-- Multi-cloud and hybrid cloud
+#### 1.1 云计算简介
+- 什么是云计算？
+- 云的历史与演进
+- 云计算的优势
+- 云 vs 本地部署
+- 上云考量
+- 云原生应用
+- 多云与混合云
 
-#### 1.2 Cloud Service Models
-- Infrastructure as a Service (IaaS)
-- Platform as a Service (PaaS)
-- Software as a Service (SaaS)
-- Function as a Service (FaaS)
-- Choosing the right model
-- Service model examples
-- Trade-offs and considerations
+#### 1.2 云服务模型
+- 基础设施即服务（IaaS）
+- 平台即服务（PaaS）
+- 软件即服务（SaaS）
+- 函数即服务（FaaS）
+- 选择合适模型
+- 服务模型示例
+- 权衡与考量
 
-#### 1.3 Cloud Deployment Models
-- Public cloud
-- Private cloud
-- Hybrid cloud
-- Multi-cloud strategies
-- Edge computing
-- Deployment model selection
-- Compliance and regulatory considerations
+#### 1.3 云部署模型
+- 公有云
+- 私有云
+- 混合云
+- 多云策略
+- 边缘计算
+- 部署模型选择
+- 合规与监管考量
 
-#### 1.4 Major Cloud Providers Overview
-- Amazon Web Services (AWS)
-- Google Cloud Platform (GCP)
+#### 1.4 主要云服务商概览
+- Amazon Web Services（AWS）
+- Google Cloud Platform（GCP）
 - Microsoft Azure
-- Service comparison
-- Strengths and use cases
-- Vendor lock-in considerations
-- Certification paths
+- 服务对比
+- 优势与用例
+- 供应商锁定考量
+- 认证路径
 
-#### 1.5 Cloud Economics
-- Pay-as-you-go pricing
-- Reserved instances
-- Spot/preemptible instances
-- Commitment-based discounts
-- Total cost of ownership (TCO)
-- Cloud cost optimization
-- FinOps principles
+#### 1.5 云经济学
+- 按需付费定价
+- 预留实例
+- Spot/抢占式实例
+- 基于承诺的折扣
+- 总拥有成本（TCO）
+- 云成本优化
+- FinOps 原则
 
-### 2. Getting Started with AWS (6-7 hours)
+### 2. AWS 入门（6-7 小时）
 
-#### 2.1 AWS Fundamentals
-- AWS account creation
+#### 2.1 AWS 基础
+- AWS 账户创建
 - AWS Management Console
-- AWS regions and availability zones
-- AWS global infrastructure
-- AWS service categories
-- AWS Free Tier
-- Account security basics
+- AWS 区域和可用区
+- AWS 全球基础设施
+- AWS 服务分类
+- AWS 免费套餐
+- 账户安全基础
 
-#### 2.2 AWS CLI and SDKs
-- Installing AWS CLI
-- Configuring credentials
-- AWS CLI basics
-- Common CLI commands
-- AWS SDKs (boto3 for Python)
-- Programmatic access
-- CLI scripting
+#### 2.2 AWS CLI 和 SDK
+- 安装 AWS CLI
+- 配置凭证
+- AWS CLI 基础
+- 常用 CLI 命令
+- AWS SDK（Python 的 boto3）
+- 编程访问
+- CLI 脚本
 
-#### 2.3 AWS Identity and Access Management (IAM)
-- IAM fundamentals
-- Users, groups, and roles
-- IAM policies
-- Policy syntax and structure
-- Permission boundaries
-- Best practices (least privilege)
-- MFA (Multi-Factor Authentication)
-- Service roles
+#### 2.3 AWS 身份和访问管理（IAM）
+- IAM 基础
+- 用户、组和角色
+- IAM 策略
+- 策略语法和结构
+- 权限边界
+- 最佳实践（最小权限）
+- MFA（多因素认证）
+- 服务角色
 
-#### 2.4 AWS Resource Organization
+#### 2.4 AWS 资源组织
 - AWS Organizations
-- Service Control Policies (SCPs)
-- Resource tagging
-- Cost allocation tags
-- Account structure strategies
-- Billing and cost management
+- 服务控制策略（SCP）
+- 资源标签
+- 成本分配标签
+- 账户结构策略
+- 账单和成本管理
 - AWS Resource Groups
 
-#### 2.5 AWS Support and Documentation
-- AWS documentation
-- AWS Support tiers
+#### 2.5 AWS 支持与文档
+- AWS 文档
+- AWS 支持层级
 - Trusted Advisor
 - Personal Health Dashboard
-- AWS forums and communities
+- AWS 论坛和社区
 - Architecture Center
 - Well-Architected Framework
 
-### 3. Compute Services (8-10 hours)
+### 3. 计算服务（8-10 小时）
 
-#### 3.1 Amazon EC2 Fundamentals
-- EC2 overview and concepts
-- Instance types and families
-- AMIs (Amazon Machine Images)
-- Launching instances
-- Instance lifecycle
-- Instance metadata
-- User data scripts
-- EC2 pricing models
+#### 3.1 Amazon EC2 基础
+- EC2 概述与概念
+- 实例类型与系列
+- AMI（Amazon Machine Images）
+- 启动实例
+- 实例生命周期
+- 实例元数据
+- User data 脚本
+- EC2 定价模型
 
-#### 3.2 EC2 Management
-- Connecting to instances (SSH)
-- Security groups
-- Key pairs
-- Elastic IPs
-- Instance states
-- Monitoring with CloudWatch
-- EC2 tags and organization
-- Termination protection
+#### 3.2 EC2 管理
+- 连接实例（SSH）
+- 安全组
+- 密钥对
+- 弹性 IP
+- 实例状态
+- 使用 CloudWatch 监控
+- EC2 标签与组织
+- 终止保护
 
-#### 3.3 EC2 Instance Types
-- General purpose (T, M families)
-- Compute optimized (C family)
-- Memory optimized (R, X families)
-- Accelerated computing (P, G families for ML)
-- Storage optimized (I, D families)
-- Choosing instance types
-- Instance sizing
-- Cost vs performance trade-offs
+#### 3.3 EC2 实例类型
+- 通用型（T、M 系列）
+- 计算优化型（C 系列）
+- 内存优化型（R、X 系列）
+- 加速计算型（用于 ML 的 P、G 系列）
+- 存储优化型（I、D 系列）
+- 选择实例类型
+- 实例规格
+- 成本与性能权衡
 
-#### 3.4 EC2 Storage Options
-- Instance store
-- EBS (Elastic Block Store)
-- EBS volume types (gp3, io2, st1, sc1)
-- EBS snapshots
-- EBS encryption
-- Volume attachment and management
-- Snapshot strategies
+#### 3.4 EC2 存储选项
+- 实例存储
+- EBS（Elastic Block Store）
+- EBS 卷类型（gp3、io2、st1、sc1）
+- EBS 快照
+- EBS 加密
+- 卷挂载与管理
+- 快照策略
 
 #### 3.5 Auto Scaling
-- Auto Scaling concepts
+- Auto Scaling 概念
 - Launch templates
-- Auto Scaling groups
-- Scaling policies
-- Target tracking scaling
-- Scheduled scaling
-- Health checks
-- Integration with load balancers
+- Auto Scaling 组
+- 扩缩容策略
+- 目标跟踪扩缩容
+- 定时扩缩容
+- 健康检查
+- 与负载均衡器集成
 
-#### 3.6 Load Balancing
-- Elastic Load Balancing (ELB)
-- Application Load Balancer (ALB)
-- Network Load Balancer (NLB)
+#### 3.6 负载均衡
+- Elastic Load Balancing（ELB）
+- Application Load Balancer（ALB）
+- Network Load Balancer（NLB）
 - Gateway Load Balancer
-- Target groups
-- Health checks
-- SSL/TLS termination
-- Load balancer monitoring
+- 目标组
+- 健康检查
+- SSL/TLS 终止
+- 负载均衡器监控
 
-#### 3.7 Container Services
-- Amazon ECS (Elastic Container Service)
-- ECS concepts (clusters, tasks, services)
-- Fargate vs EC2 launch types
-- Amazon EKS (Elastic Kubernetes Service)
-- Container registries (ECR)
-- When to use containers
-- Container orchestration comparison
+#### 3.7 容器服务
+- Amazon ECS（Elastic Container Service）
+- ECS 概念（集群、任务、服务）
+- Fargate vs EC2 启动类型
+- Amazon EKS（Elastic Kubernetes Service）
+- 容器镜像仓库（ECR）
+- 何时使用容器
+- 容器编排对比
 
-#### 3.8 Serverless Computing
-- AWS Lambda fundamentals
-- Lambda functions
-- Triggers and events
-- Lambda pricing
-- Use cases for serverless
-- Lambda limitations
-- Serverless frameworks
-- Lambda for ML inference
+#### 3.8 无服务器计算
+- AWS Lambda 基础
+- Lambda 函数
+- 触发器与事件
+- Lambda 定价
+- 无服务器用例
+- Lambda 限制
+- 无服务器框架
+- Lambda 用于 ML 推理
 
-### 4. Storage Services (6-8 hours)
+### 4. 存储服务（6-8 小时）
 
-#### 4.1 Amazon S3 (Simple Storage Service)
-- S3 concepts (buckets, objects, keys)
-- Creating buckets
-- Uploading and downloading objects
-- S3 storage classes
-- Object lifecycle policies
-- Versioning
-- S3 encryption
-- S3 access control
+#### 4.1 Amazon S3（Simple Storage Service）
+- S3 概念（存储桶、对象、键）
+- 创建存储桶
+- 上传和下载对象
+- S3 存储类
+- 对象生命周期策略
+- 版本控制
+- S3 加密
+- S3 访问控制
 
-#### 4.2 S3 Advanced Features
-- S3 static website hosting
-- S3 event notifications
+#### 4.2 S3 高级功能
+- S3 静态网站托管
+- S3 事件通知
 - S3 Transfer Acceleration
 - S3 Select
 - S3 Batch Operations
-- Multipart uploads
-- Pre-signed URLs
-- S3 for data lakes
+- 分段上传
+- 预签名 URL
+- 用于数据湖的 S3
 
-#### 4.3 EBS (Elastic Block Store)
-- EBS fundamentals
-- Volume types and performance
-- Creating and attaching volumes
-- EBS snapshots
-- Snapshot lifecycle
-- EBS encryption
-- Volume resizing
-- EBS optimization
+#### 4.3 EBS（Elastic Block Store）
+- EBS 基础
+- 卷类型与性能
+- 创建和挂载卷
+- EBS 快照
+- 快照生命周期
+- EBS 加密
+- 卷扩容
+- EBS 优化
 
-#### 4.4 Amazon EFS (Elastic File System)
-- EFS overview
-- Creating file systems
-- Mount targets
-- EFS performance modes
-- EFS storage classes
+#### 4.4 Amazon EFS（Elastic File System）
+- EFS 概述
+- 创建文件系统
+- 挂载目标
+- EFS 性能模式
+- EFS 存储类
 - EFS vs EBS vs S3
-- Use cases for EFS
-- EFS with containers
+- EFS 用例
+- 与容器配合使用的 EFS
 
 #### 4.5 Storage Gateway
-- Storage Gateway overview
+- Storage Gateway 概述
 - File Gateway
 - Volume Gateway
 - Tape Gateway
-- Hybrid storage use cases
-- On-premises integration
+- 混合存储用例
+- 本地集成
 
-### 5. Database Services (5-7 hours)
+### 5. 数据库服务（5-7 小时）
 
-#### 5.1 Amazon RDS (Relational Database Service)
-- RDS overview
-- Supported database engines
-- Creating RDS instances
-- Multi-AZ deployments
-- Read replicas
-- RDS backup and restore
-- RDS security
-- RDS monitoring and performance
+#### 5.1 Amazon RDS（Relational Database Service）
+- RDS 概述
+- 支持的数据库引擎
+- 创建 RDS 实例
+- Multi-AZ 部署
+- 只读副本
+- RDS 备份与恢复
+- RDS 安全
+- RDS 监控与性能
 
-#### 5.2 RDS Database Engines
-- PostgreSQL on RDS
-- MySQL on RDS
-- MariaDB on RDS
-- Oracle on RDS
-- SQL Server on RDS
-- Choosing database engine
-- Migration strategies
+#### 5.2 RDS 数据库引擎
+- RDS 上的 PostgreSQL
+- RDS 上的 MySQL
+- RDS 上的 MariaDB
+- RDS 上的 Oracle
+- RDS 上的 SQL Server
+- 选择数据库引擎
+- 迁移策略
 
 #### 5.3 Amazon Aurora
-- Aurora overview
-- Aurora architecture
+- Aurora 概述
+- Aurora 架构
 - Aurora Serverless
 - Aurora Global Database
 - Aurora vs RDS
-- Performance characteristics
-- Aurora pricing
+- 性能特性
+- Aurora 定价
 
-#### 5.4 NoSQL Databases
+#### 5.4 NoSQL 数据库
 - Amazon DynamoDB
-- DynamoDB concepts (tables, items, attributes)
-- Primary keys
-- Indexes (GSI, LSI)
-- DynamoDB capacity modes
+- DynamoDB 概念（表、项、属性）
+- 主键
+- 索引（GSI、LSI）
+- DynamoDB 容量模式
 - DynamoDB Streams
-- DynamoDB for ML
-- DocumentDB (MongoDB-compatible)
-- ElastiCache (Redis, Memcached)
+- 用于 ML 的 DynamoDB
+- DocumentDB（兼容 MongoDB）
+- ElastiCache（Redis、Memcached）
 
-#### 5.5 Data Warehousing and Analytics
+#### 5.5 数据仓库与分析
 - Amazon Redshift
-- Data warehouse concepts
-- Redshift architecture
+- 数据仓库概念
+- Redshift 架构
 - Redshift Spectrum
 - Amazon Athena
-- Query S3 with SQL
-- Data lake analytics
-- QuickSight for visualization
+- 使用 SQL 查询 S3
+- 数据湖分析
+- QuickSight 可视化
 
-### 6. Networking (6-8 hours)
+### 6. 网络（6-8 小时）
 
-#### 6.1 Amazon VPC (Virtual Private Cloud)
-- VPC fundamentals
-- CIDR blocks
-- Subnets (public and private)
-- Creating VPCs
-- Default VPC
-- VPC components
-- VPC best practices
-- Network design patterns
+#### 6.1 Amazon VPC（Virtual Private Cloud）
+- VPC 基础
+- CIDR 块
+- 子网（公有和私有）
+- 创建 VPC
+- 默认 VPC
+- VPC 组件
+- VPC 最佳实践
+- 网络设计模式
 
-#### 6.2 Internet Connectivity
-- Internet Gateways
-- NAT Gateways
-- NAT Instances
-- Egress-only Internet Gateways
-- Public vs private subnets
-- Route tables
-- Routing configuration
+#### 6.2 互联网连接
+- Internet Gateway
+- NAT Gateway
+- NAT Instance
+- Egress-only Internet Gateway
+- 公有 vs 私有子网
+- 路由表
+- 路由配置
 
-#### 6.3 Security Groups and NACLs
-- Security group fundamentals
-- Inbound and outbound rules
-- Security group best practices
-- Network ACLs (NACLs)
-- Stateful vs stateless
-- NACL rules
-- Security layers
+#### 6.3 安全组与 NACL
+- 安全组基础
+- 入站和出站规则
+- 安全组最佳实践
+- Network ACL（NACL）
+- 有状态 vs 无状态
+- NACL 规则
+- 安全层级
 
-#### 6.4 VPC Connectivity
-- VPC peering
+#### 6.4 VPC 连接
+- VPC 对等连接
 - Transit Gateway
-- VPN connections
+- VPN 连接
 - AWS Direct Connect
 - PrivateLink
-- VPC endpoints
-- Hybrid connectivity
+- VPC 端点
+- 混合连接
 
-#### 6.5 DNS and Content Delivery
+#### 6.5 DNS 与内容分发
 - Amazon Route 53
-- DNS fundamentals
-- Hosted zones
-- Routing policies
-- Health checks
-- CloudFront (CDN)
-- CloudFront distributions
-- Edge locations
+- DNS 基础
+- 托管区域
+- 路由策略
+- 健康检查
+- CloudFront（CDN）
+- CloudFront 分发
+- 边缘节点
 
-#### 6.6 Network Monitoring
+#### 6.6 网络监控
 - VPC Flow Logs
-- Traffic analysis
-- Network performance monitoring
-- CloudWatch metrics
-- Network troubleshooting
-- Security monitoring
+- 流量分析
+- 网络性能监控
+- CloudWatch 指标
+- 网络故障排查
+- 安全监控
 
-### 7. Infrastructure as Code (5-6 hours)
+### 7. 基础设施即代码（5-6 小时）
 
-#### 7.1 IaC Fundamentals
-- What is Infrastructure as Code?
-- Benefits of IaC
-- IaC tools comparison
-- Declarative vs imperative
-- State management
-- IaC best practices
-- Version control for infrastructure
+#### 7.1 IaC 基础
+- 什么是基础设施即代码？
+- IaC 的优势
+- IaC 工具对比
+- 声明式 vs 命令式
+- 状态管理
+- IaC 最佳实践
+- 基础设施的版本控制
 
 #### 7.2 AWS CloudFormation
-- CloudFormation overview
-- Templates (JSON and YAML)
-- Stacks
-- Resources and properties
-- Parameters and outputs
-- Intrinsic functions
-- Stack updates
-- Change sets
+- CloudFormation 概述
+- 模板（JSON 和 YAML）
+- 堆栈
+- 资源和属性
+- 参数和输出
+- 内置函数
+- 堆栈更新
+- 变更集
 
-#### 7.3 Terraform Basics
-- Terraform overview
-- Installing Terraform
-- HCL (HashiCorp Configuration Language)
-- Providers and resources
-- Terraform workflow (init, plan, apply)
-- Terraform state
-- Variables and outputs
-- Modules
+#### 7.3 Terraform 基础
+- Terraform 概述
+- 安装 Terraform
+- HCL（HashiCorp Configuration Language）
+- 提供者和资源
+- Terraform 工作流（init、plan、apply）
+- Terraform 状态
+- 变量和输出
+- 模块
 
-#### 7.4 Terraform for AWS
-- AWS provider configuration
-- Creating EC2 instances with Terraform
-- VPC configuration
-- S3 buckets with Terraform
-- RDS with Terraform
-- Terraform best practices
-- Remote state storage
+#### 7.4 用于 AWS 的 Terraform
+- AWS 提供者配置
+- 使用 Terraform 创建 EC2 实例
+- VPC 配置
+- 使用 Terraform 管理 S3 存储桶
+- 使用 Terraform 管理 RDS
+- Terraform 最佳实践
+- 远程状态存储
 - Terraform workspaces
 
-#### 7.5 CI/CD for Infrastructure
-- GitOps for infrastructure
-- Automated deployments
-- Testing infrastructure code
-- Infrastructure pipelines
-- Drift detection
-- Policy as code
-- Security scanning
+#### 7.5 基础设施的 CI/CD
+- GitOps 用于基础设施
+- 自动化部署
+- 测试基础设施代码
+- 基础设施流水线
+- 漂移检测
+- 策略即代码
+- 安全扫描
 
-### 8. ML and AI Services (5-7 hours)
+### 8. ML 与 AI 服务（5-7 小时）
 
-#### 8.1 AWS ML Services Overview
-- AWS AI/ML service portfolio
+#### 8.1 AWS ML 服务概览
+- AWS AI/ML 服务组合
 - SageMaker
 - Rekognition
 - Comprehend
 - Translate
 - Transcribe
 - Polly
-- Choosing the right service
+- 选择合适的服务
 
-#### 8.2 Amazon SageMaker Basics
-- SageMaker overview
+#### 8.2 Amazon SageMaker 基础
+- SageMaker 概述
 - SageMaker Studio
-- Notebook instances
-- Training jobs
-- Hyperparameter tuning
-- Model hosting
+- Notebook 实例
+- 训练作业
+- 超参数调优
+- 模型托管
 - SageMaker Pipelines
-- SageMaker pricing
+- SageMaker 定价
 
-#### 8.3 ML Infrastructure on AWS
-- EC2 with GPUs (P and G instances)
-- Deep Learning AMIs
-- ECS/EKS for ML workloads
-- Batch processing for ML
-- Data storage for ML (S3, EFS)
-- Distributed training
-- Model serving architectures
+#### 8.3 AWS 上的 ML 基础设施
+- 配备 GPU 的 EC2（P 和 G 实例）
+- Deep Learning AMI
+- 用于 ML 工作负载的 ECS/EKS
+- 用于 ML 的批处理
+- 用于 ML 的数据存储（S3、EFS）
+- 分布式训练
+- 模型服务架构
 
-#### 8.4 ML Workflow on AWS
-- Data ingestion (S3, Kinesis)
-- Data processing (EMR, Glue)
-- Feature engineering
-- Model training
-- Model registry
-- Model deployment
-- Monitoring and retraining
-- End-to-end pipeline
+#### 8.4 AWS 上的 ML 工作流
+- 数据摄取（S3、Kinesis）
+- 数据处理（EMR、Glue）
+- 特征工程
+- 模型训练
+- 模型注册表
+- 模型部署
+- 监控与重新训练
+- 端到端流水线
 
-### 9. Monitoring and Management (4-5 hours)
+### 9. 监控与管理（4-5 小时）
 
 #### 9.1 Amazon CloudWatch
-- CloudWatch overview
-- Metrics
-- Alarms
-- Dashboards
+- CloudWatch 概述
+- 指标
+- 告警
+- 仪表盘
 - CloudWatch Logs
-- Log groups and streams
+- 日志组和流
 - CloudWatch Insights
 - CloudWatch Events/EventBridge
 
-#### 9.2 AWS Monitoring Best Practices
-- What to monitor
-- Custom metrics
-- Log aggregation
-- Application monitoring
-- Infrastructure monitoring
-- Cost monitoring
-- Security monitoring
-- Performance monitoring
+#### 9.2 AWS 监控最佳实践
+- 监控什么
+- 自定义指标
+- 日志聚合
+- 应用监控
+- 基础设施监控
+- 成本监控
+- 安全监控
+- 性能监控
 
 #### 9.3 AWS Systems Manager
-- Systems Manager overview
+- Systems Manager 概述
 - Parameter Store
 - Session Manager
 - Patch Manager
 - Run Command
 - State Manager
-- Fleet management
+- 舰队管理
 
-#### 9.4 Cost Management
+#### 9.4 成本管理
 - AWS Cost Explorer
-- Cost and Usage Reports
-- Budgets and alerts
-- Cost optimization strategies
-- Right-sizing
-- Reserved Instances
+- 成本和用量报告
+- 预算与告警
+- 成本优化策略
+- 合理调整规格
+- 预留实例
 - Savings Plans
-- Spot Instances for cost savings
+- 使用 Spot 实例节省成本
 
-### 10. Security and Compliance (4-5 hours)
+### 10. 安全与合规（4-5 小时）
 
-#### 10.1 AWS Security Fundamentals
-- Shared responsibility model
-- Security pillars
-- Defense in depth
-- Security best practices
-- Compliance frameworks
-- AWS security services
+#### 10.1 AWS 安全基础
+- 共享责任模型
+- 安全支柱
+- 纵深防御
+- 安全最佳实践
+- 合规框架
+- AWS 安全服务
 
-#### 10.2 Identity and Access Management Deep Dive
-- IAM policy types
-- Policy evaluation logic
-- Cross-account access
-- Identity federation
+#### 10.2 深入身份和访问管理
+- IAM 策略类型
+- 策略评估逻辑
+- 跨账户访问
+- 身份联合
 - AWS SSO
-- IAM roles for services
-- Permission boundaries
-- Access analyzer
+- 服务的 IAM 角色
+- 权限边界
+- Access Analyzer
 
-#### 10.3 Data Protection
-- Encryption at rest
-- Encryption in transit
-- KMS (Key Management Service)
+#### 10.3 数据保护
+- 静态加密
+- 传输加密
+- KMS（Key Management Service）
 - Secrets Manager
 - Certificate Manager
-- Data classification
-- Backup strategies
+- 数据分类
+- 备份策略
 
-#### 10.4 Security Services
-- AWS WAF (Web Application Firewall)
-- AWS Shield (DDoS protection)
+#### 10.4 安全服务
+- AWS WAF（Web Application Firewall）
+- AWS Shield（DDoS 防护）
 - Amazon GuardDuty
 - AWS Security Hub
 - Amazon Inspector
 - AWS Config
-- CloudTrail for auditing
-- Macie for data discovery
+- 用于审计的 CloudTrail
+- 用于数据发现的 Macie
 
-#### 10.5 Compliance
-- Compliance programs
+#### 10.5 合规
+- 合规计划
 - Artifact
-- Compliance documentation
-- GDPR considerations
-- HIPAA on AWS
+- 合规文档
+- GDPR 考量
+- AWS 上的 HIPAA
 - PCI DSS
-- Audit and governance
+- 审计与治理
 
-### 11. Multi-Cloud Comparison (3-4 hours)
+### 11. 多云对比（3-4 小时）
 
-#### 11.1 Google Cloud Platform (GCP) Overview
-- GCP service overview
+#### 11.1 Google Cloud Platform（GCP）概述
+- GCP 服务概览
 - Compute Engine
 - Cloud Storage
 - Cloud SQL
 - BigQuery
-- GKE (Google Kubernetes Engine)
+- GKE（Google Kubernetes Engine）
 - Vertex AI
-- GCP vs AWS comparison
+- GCP vs AWS 对比
 
-#### 11.2 Microsoft Azure Overview
-- Azure service overview
+#### 11.2 Microsoft Azure 概述
+- Azure 服务概览
 - Virtual Machines
 - Blob Storage
 - Azure SQL
 - Azure Kubernetes Service
 - Azure Machine Learning
-- Azure vs AWS comparison
+- Azure vs AWS 对比
 
-#### 11.3 Multi-Cloud Strategy
-- Reasons for multi-cloud
-- Multi-cloud challenges
-- Abstraction layers
-- Cloud-agnostic tools
-- Data gravity
-- Vendor diversity
-- Multi-cloud management
+#### 11.3 多云策略
+- 采用多云的原因
+- 多云的挑战
+- 抽象层
+- 云无关工具
+- 数据引力
+- 供应商多样性
+- 多云管理
 
-## Lecture Outline
+## 讲座大纲
 
+### 讲座 1：云计算基础（90 分钟）
+- 云计算简介
+- 服务和部署模型
+- 主要云服务商
+- 云经济学
+- AWS 账户设置
+- **实验：** 创建 AWS 账户并探索控制台
 
-### Lecture 1: Cloud Computing Fundamentals (90 min)
-- Introduction to cloud computing
-- Service and deployment models
-- Major cloud providers
-- Cloud economics
-- AWS account setup
-- **Lab:** Creating AWS account and exploring console
+### 讲座 2：AWS 计算服务（120 分钟）
+- EC2 基础
+- 实例类型与选择
+- 启动实例
+- 安全组
+- 负载均衡基础
+- **实验：** 启动并连接到 EC2 实例
 
-### Lecture 2: AWS Compute Services (120 min)
-- EC2 fundamentals
-- Instance types and selection
-- Launching instances
-- Security groups
-- Load balancing basics
-- **Lab:** Launching and connecting to EC2 instances
+### 讲座 3：AWS 存储服务（120 分钟）
+- S3 基础
+- EBS 概述
+- 存储类选择
+- 数据生命周期管理
+- 存储最佳实践
+- **实验：** 使用 S3 和 EBS
 
-### Lecture 3: AWS Storage Services (120 min)
-- S3 fundamentals
-- EBS overview
-- Storage class selection
-- Data lifecycle management
-- Storage best practices
-- **Lab:** Working with S3 and EBS
+### 讲座 4：AWS 网络（120 分钟）
+- VPC 基础
+- 子网和路由
+- 互联网连接
+- 安全组和 NACL
+- VPC 设计模式
+- **实验：** 构建 VPC
 
-### Lecture 4: AWS Networking (120 min)
-- VPC fundamentals
-- Subnets and routing
-- Internet connectivity
-- Security groups and NACLs
-- VPC design patterns
-- **Lab:** Building a VPC
+### 讲座 5：AWS 数据库（90 分钟）
+- RDS 基础
+- 数据库引擎选择
+- DynamoDB 基础
+- 云数据库设计
+- 备份与恢复
+- **实验：** 部署 RDS 实例
 
-### Lecture 5: AWS Databases (90 min)
-- RDS fundamentals
-- Database engine selection
-- DynamoDB basics
-- Database design for cloud
-- Backup and recovery
-- **Lab:** Deploying RDS instance
+### 讲座 6：IAM 与安全（90 分钟）
+- IAM 深入
+- 策略创建
+- 安全最佳实践
+- 加密
+- 合规
+- **实验：** 实施 IAM 策略
 
-### Lecture 6: IAM and Security (90 min)
-- IAM deep dive
-- Policy creation
-- Security best practices
-- Encryption
-- Compliance
-- **Lab:** Implementing IAM policies
-
-### Lecture 7: Infrastructure as Code (120 min)
-- IaC fundamentals
-- Terraform basics
+### 讲座 7：基础设施即代码（120 分钟）
+- IaC 基础
+- Terraform 基础
 - AWS CloudFormation
-- Terraform for AWS
-- IaC best practices
-- **Lab:** Deploying infrastructure with Terraform
+- 用于 AWS 的 Terraform
+- IaC 最佳实践
+- **实验：** 使用 Terraform 部署基础设施
 
-### Lecture 8: Container and Serverless Services (90 min)
-- ECS and EKS overview
-- Container deployment
-- Lambda fundamentals
-- Serverless patterns
-- When to use each
-- **Lab:** Deploying containerized application
+### 讲座 8：容器与无服务器服务（90 分钟）
+- ECS 和 EKS 概述
+- 容器部署
+- Lambda 基础
+- 无服务器模式
+- 何时使用哪种
+- **实验：** 部署容器化应用
 
-### Lecture 9: ML Services on AWS (120 min)
-- AWS ML service portfolio
-- SageMaker overview
-- GPU instances for ML
-- ML workflow on AWS
-- ML infrastructure patterns
-- **Lab:** Running ML workload on AWS
+### 讲座 9：AWS 上的 ML 服务（120 分钟）
+- AWS ML 服务组合
+- SageMaker 概述
+- 用于 ML 的 GPU 实例
+- AWS 上的 ML 工作流
+- ML 基础设施模式
+- **实验：** 在 AWS 上运行 ML 工作负载
 
-### Lecture 10: Monitoring and Cost Optimization (90 min)
-- CloudWatch fundamentals
-- Cost management
-- Monitoring best practices
-- Optimization strategies
+### 讲座 10：监控与成本优化（90 分钟）
+- CloudWatch 基础
+- 成本管理
+- 监控最佳实践
+- 优化策略
 - Well-Architected Framework
-- **Lab:** Setting up monitoring and cost alerts
+- **实验：** 设置监控和成本告警
 
-## Hands-On Exercises
+## 动手练习
 
+### 练习分类
 
-### Exercise Categories
+#### 入门（5 个练习）
+1. AWS 账户设置与配置
+2. AWS CLI 配置
+3. 创建 IAM 用户和角色
+4. AWS 控制台导航
+5. 资源标签策略
 
-#### Getting Started (5 exercises)
-1. AWS account setup and configuration
-2. AWS CLI configuration
-3. Creating IAM users and roles
-4. AWS console navigation
-5. Resource tagging strategy
+#### 计算（8 个练习）
+6. 启动 EC2 实例
+7. 实例类型选择
+8. 安全组配置
+9. SSH 密钥管理
+10. 负载均衡器设置
+11. Auto Scaling 配置
+12. 使用 ECS 部署容器
+13. 创建 Lambda 函数
 
-#### Compute (8 exercises)
-6. Launching EC2 instances
-7. Instance type selection
-8. Security group configuration
-9. SSH key management
-10. Load balancer setup
-11. Auto Scaling configuration
-12. Container deployment with ECS
-13. Lambda function creation
+#### 存储（6 个练习）
+14. S3 存储桶创建与管理
+15. S3 生命周期策略
+16. EBS 卷管理
+17. EBS 快照策略
+18. EFS 设置与挂载
+19. 存储类选择
 
-#### Storage (6 exercises)
-14. S3 bucket creation and management
-15. S3 lifecycle policies
-16. EBS volume management
-17. EBS snapshot strategy
-18. EFS setup and mounting
-19. Storage class selection
+#### 网络（6 个练习）
+20. VPC 创建
+21. 子网设计
+22. Internet Gateway 设置
+23. NAT Gateway 配置
+24. 安全组设计
+25. Route 53 DNS 配置
 
-#### Networking (6 exercises)
-20. VPC creation
-21. Subnet design
-22. Internet Gateway setup
-23. NAT Gateway configuration
-24. Security group design
-25. Route 53 DNS configuration
+#### 数据库（5 个练习）
+26. RDS 实例部署
+27. 数据库备份与恢复
+28. DynamoDB 表创建
+29. 数据库安全配置
+30. 只读副本设置
 
-#### Databases (5 exercises)
-26. RDS instance deployment
-27. Database backup and restore
-28. DynamoDB table creation
-29. Database security configuration
-30. Read replica setup
+#### IaC（6 个练习）
+31. 第一个 Terraform 配置
+32. 使用 Terraform 管理 EC2
+33. 使用 Terraform 管理 VPC
+34. 完整基础设施堆栈
+35. Terraform 模块
+36. 基础设施 CI/CD
 
-#### IaC (6 exercises)
-31. First Terraform configuration
-32. EC2 with Terraform
-33. VPC with Terraform
-34. Complete infrastructure stack
-35. Terraform modules
-36. Infrastructure CI/CD
-
-#### ML Workloads (4 exercises)
-37. GPU instance setup
+#### ML 工作负载（4 个练习）
+37. GPU 实例设置
 38. SageMaker notebook
-39. Model training on AWS
-40. Model deployment and serving
+39. 在 AWS 上训练模型
+40. 模型部署与提供服务
 
-## Assessment and Evaluation
+## 评估与考核
 
-### Knowledge Checks
-- Quiz after each major section
-- Service selection scenarios
-- Architecture design questions
-- Security best practices
-- Cost optimization strategies
+### 知识检测
+- 每个主要部分后的小测验
+- 服务选择场景
+- 架构设计问题
+- 安全最佳实践
+- 成本优化策略
 
-### Practical Assessments
-- **Compute:** Deploy web application on EC2 with load balancer
-- **Storage:** Implement comprehensive storage strategy
-- **Networking:** Design and implement VPC architecture
-- **IaC:** Deploy infrastructure using Terraform
-- **ML:** Deploy ML model serving infrastructure
+### 实践评估
+- **计算：** 在 EC2 上部署带负载均衡器的 Web 应用
+- **存储：** 实施全面的存储策略
+- **网络：** 设计和实现 VPC 架构
+- **IaC：** 使用 Terraform 部署基础设施
+- **ML：** 部署 ML 模型服务基础设施
 
-### Competency Criteria
-To complete this module successfully, you should be able to:
-- Navigate AWS console and CLI confidently
-- Provision and manage compute resources
-- Configure storage solutions appropriately
-- Design and implement VPC architectures
-- Apply IAM best practices
-- Use Infrastructure as Code effectively
-- Deploy containerized applications
-- Leverage cloud services for ML workloads
-- Monitor and optimize costs
-- Implement security best practices
+### 能力标准
+要成功完成本模块，你应该能够：
+- 自信地使用 AWS 控制台和 CLI
+- 配置和管理计算资源
+- 适当配置存储方案
+- 设计和实现 VPC 架构
+- 应用 IAM 最佳实践
+- 有效使用基础设施即代码
+- 部署容器化应用
+- 利用云服务处理 ML 工作负载
+- 监控并优化成本
+- 实施安全最佳实践
 
-### Capstone Project
-**Cloud-Based ML Application:**
-Deploy complete ML application on AWS featuring:
-- VPC with public and private subnets
-- EC2 instances with Auto Scaling
+### 结业项目
+**基于云的 ML 应用：**
+在 AWS 上部署完整的 ML 应用，包括：
+- 带公有和私有子网的 VPC
+- 带 Auto Scaling 的 EC2 实例
 - Application Load Balancer
-- RDS database
-- S3 for data and model storage
-- ML model serving (SageMaker or custom)
-- CloudWatch monitoring
-- IAM security configuration
-- Infrastructure as Code (Terraform)
-- Cost optimization implementation
-- Complete documentation
+- RDS 数据库
+- 用于数据和模型存储的 S3
+- ML 模型服务（SageMaker 或自定义）
+- CloudWatch 监控
+- IAM 安全配置
+- 基础设施即代码（Terraform）
+- 成本优化实现
+- 完整文档
 
-## Resources and References
+## 资源与参考
 
-> **Note:** See `resources/recommended-reading.md` for a comprehensive list of learning materials, books, and online resources.
+> **注意：** 详细的学习资料、书籍和在线资源列表请参见 `resources/recommended-reading.md`。
 
-### Essential Resources
-- AWS Documentation
+### 核心资源
+- AWS 文档
 - AWS Well-Architected Framework
-- AWS Free Tier guide
-- Terraform documentation
+- AWS 免费套餐指南
+- Terraform 文档
 
-### Recommended Books
-- "Amazon Web Services in Action" by Michael Wittig and Andreas Wittig
-- "AWS Certified Solutions Architect Study Guide"
-- "Terraform: Up & Running" by Yevgeniy Brikman
+### 推荐书籍
+- 《Amazon Web Services in Action》— Michael Wittig 和 Andreas Wittig
+- 《AWS Certified Solutions Architect Study Guide》
+- 《Terraform: Up & Running》— Yevgeniy Brikman
 
-### Online Learning
-- AWS Training and Certification
+### 在线学习
+- AWS 培训与认证
 - A Cloud Guru
 - Linux Academy
-- AWS YouTube channel
-- AWS workshops and tutorials
+- AWS YouTube 频道
+- AWS 研讨会和教程
 
-### Certifications
+### 认证
 - AWS Certified Cloud Practitioner
 - AWS Certified Solutions Architect - Associate
 - AWS Certified Developer - Associate
 - Terraform Associate Certification
 
-### Tools
+### 工具
 - AWS CLI
 - Terraform
-- AWS SDK for Python (boto3)
+- AWS SDK for Python（boto3）
 - AWS CloudFormation Designer
-- Infracost (cost estimation)
+- Infracost（成本估算）
 
-## Getting Started
+## 开始入门
 
-### Step 1: Create AWS Account
-1. Sign up for AWS Free Tier
-2. Verify email and payment method
-3. Set up root account MFA
-4. Create IAM admin user
-5. Install AWS CLI
+### 第 1 步：创建 AWS 账户
+1. 注册 AWS 免费套餐
+2. 验证邮箱和支付方式
+3. 为根账户设置 MFA
+4. 创建 IAM 管理员用户
+5. 安装 AWS CLI
 
-### Step 2: Configure Local Environment
-1. Install and configure AWS CLI
-2. Set up AWS credentials
-3. Install Terraform
-4. Generate SSH key pair
-5. Explore AWS console
+### 第 2 步：配置本地环境
+1. 安装并配置 AWS CLI
+2. 设置 AWS 凭证
+3. 安装 Terraform
+4. 生成 SSH 密钥对
+5. 探索 AWS 控制台
 
-### Step 3: Begin with Lecture 1
-- Learn cloud fundamentals
-- Understand AWS services
-- Complete account setup
-- Launch first resource
+### 第 3 步：从讲座 1 开始
+- 学习云基础
+- 了解 AWS 服务
+- 完成账户设置
+- 启动第一个资源
 
-### Step 4: Build Progressively
-- Work through exercises sequentially
-- Experiment with services
-- Build increasingly complex architectures
-- Apply learning to projects
-- Monitor costs carefully
+### 第 4 步：循序渐进
+- 按顺序完成练习
+- 尝试各种服务
+- 构建越来越复杂的架构
+- 将学习应用到项目
+- 仔细监控成本
 
-## Tips for Success
+## 成功提示
 
-1. **Monitor Costs:** Set up billing alerts immediately
-2. **Use Free Tier:** Leverage free tier for learning
-3. **Clean Up Resources:** Always terminate unused resources
-4. **Tag Everything:** Use tags for organization and cost tracking
-5. **Use IaC:** Practice Infrastructure as Code from the start
-6. **Security First:** Apply least privilege from day one
-7. **Read Documentation:** AWS docs are comprehensive
-8. **Experiment Safely:** Use separate accounts for experimentation
-9. **Join Communities:** AWS forums and user groups
-10. **Pursue Certifications:** Validate knowledge with certifications
+1. **监控成本：** 立即设置账单告警
+2. **使用免费套餐：** 利用免费套餐学习
+3. **清理资源：** 始终终止未使用的资源
+4. **给所有资源打标签：** 使用标签进行组织和成本追踪
+5. **使用 IaC：** 从一开始就实践基础设施即代码
+6. **安全优先：** 从第一天起就应用最小权限
+7. **阅读文档：** AWS 文档很全面
+8. **安全实验：** 使用单独的账户进行实验
+9. **加入社区：** AWS 论坛和用户组
+10. **考取认证：** 用认证来验证知识
 
-## Cost Management
+## 成本管理
 
-**Important:** While using AWS Free Tier, be aware:
-- EC2: 750 hours/month of t2.micro or t3.micro
-- S3: 5GB storage, 20,000 GET requests, 2,000 PUT requests
-- RDS: 750 hours of db.t2.micro, db.t3.micro, or db.t4g.micro
-- Always set up billing alarms
-- Delete resources after exercises
-- Use cost calculators before deployment
+**重要：** 使用 AWS 免费套餐时，请注意：
+- EC2：每月 750 小时 t2.micro 或 t3.micro
+- S3：5GB 存储、20000 次 GET 请求、2000 次 PUT 请求
+- RDS：每月 750 小时 db.t2.micro、db.t3.micro 或 db.t4g.micro
+- 始终设置账单告警
+- 练习结束后删除资源
+- 部署前使用成本计算器
 
-## Next Steps
+## 后续步骤
 
-After completing this module, you'll be ready to:
-- Build production infrastructure
-- Prepare for AWS certifications
-- Advanced topics: Kubernetes, serverless architectures, ML at scale
-- Apply cloud knowledge to all future projects
+完成本模块后，你将能够：
+- 构建生产基础设施
+- 准备 AWS 认证
+- 高级主题：Kubernetes、无服务器架构、大规模 ML
+- 将云知识应用到所有未来项目中
 
-## Development Status
+## 开发状态
 
-**Current Status:** Template phase - comprehensive structure in place
+**当前状态：** 模板阶段 — 结构已全面就绪
 
-**Available Now:**
-- Complete module structure
-- Detailed topic breakdown
-- Lecture outline
-- Exercise framework
+**现已有：**
+- 完整模块结构
+- 详细主题分解
+- 讲座大纲
+- 练习框架
 
-**In Development:**
-- Full lecture notes with diagrams
-- Step-by-step AWS exercises
-- Terraform examples
-- Architecture diagrams
-- Cost optimization guides
-- ML deployment patterns
-- Complete project templates
+**开发中：**
+- 完整的讲座笔记（含图）
+- 分步 AWS 练习
+- Terraform 示例
+- 架构图
+- 成本优化指南
+- ML 部署模式
+- 完整项目模板
 
-**Planned Updates:**
-- GCP and Azure deep dives
-- Kubernetes on cloud
-- Serverless architectures
-- Multi-cloud strategies
-- Advanced ML services
-- Cloud security deep dive
+**计划更新：**
+- GCP 和 Azure 深入
+- Kubernetes 在云上
+- 无服务器架构
+- 多云策略
+- 高级 ML 服务
+- 云安全深入
 
-## Feedback and Contributions
+## 反馈与贡献
 
-Help improve this module:
-- Report issues
-- Share architecture patterns
-- Contribute Terraform modules
-- Suggest exercises
-- Share cost optimization tips
+帮助改进本模块：
+- 报告问题
+- 分享架构模式
+- 贡献 Terraform 模块
+- 建议练习
+- 分享成本优化技巧
 
 ---
 
-**Module Maintainer:** AI Infrastructure Curriculum Team
-**Contact:** ai-infra-curriculum@joshua-ferguson.com
-**Last Updated:** 2025-10-18
-**Version:** 1.0.0-template
+**模块维护者：** AI 基础设施课程团队
+**联系方式：** ai-infra-curriculum@joshua-ferguson.com
+**最后更新：** 2025-10-18
+**版本：** 1.0.0-template

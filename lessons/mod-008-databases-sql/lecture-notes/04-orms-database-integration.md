@@ -1,66 +1,66 @@
-# Lecture 04: ORMs and Database Integration
+# Lecture 04: ORM 与数据库集成
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [What is an ORM?](#what-is-an-orm)
-3. [Introduction to SQLAlchemy](#introduction-to-sqlalchemy)
-4. [Setting Up SQLAlchemy](#setting-up-sqlalchemy)
-5. [Defining Models](#defining-models)
-6. [CRUD Operations with ORM](#crud-operations-with-orm)
-7. [Querying with SQLAlchemy](#querying-with-sqlalchemy)
-8. [Relationships in SQLAlchemy](#relationships-in-sqlalchemy)
-9. [Migrations with Alembic](#migrations-with-alembic)
-10. [Connection Pooling](#connection-pooling)
-11. [Transaction Management](#transaction-management)
-12. [ORM Patterns for ML Applications](#orm-patterns-for-ml-applications)
-13. [Best Practices](#best-practices)
-14. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [引言](#introduction)
+2. [什么是 ORM？](#what-is-an-orm)
+3. [SQLAlchemy 简介](#introduction-to-sqlalchemy)
+4. [设置 SQLAlchemy](#setting-up-sqlalchemy)
+5. [定义模型](#defining-models)
+6. [使用 ORM 进行 CRUD 操作](#crud-operations-with-orm)
+7. [使用 SQLAlchemy 查询](#querying-with-sqlalchemy)
+8. [SQLAlchemy 中的关系](#relationships-in-sqlalchemy)
+9. [使用 Alembic 进行迁移](#migrations-with-alembic)
+10. [连接池](#connection-pooling)
+11. [事务管理](#transaction-management)
+12. [ML 应用的 ORM 模式](#orm-patterns-for-ml-applications)
+13. [最佳实践](#best-practices)
+14. [总结与关键要点](#summary-and-key-takeaways)
 
-## Introduction
+## 引言
 
-Object-Relational Mapping (ORM) bridges the gap between object-oriented programming and relational databases. Instead of writing raw SQL, you work with Python objects that automatically map to database tables. This makes development faster, safer, and more maintainable—especially critical for ML infrastructure applications.
+对象关系映射（ORM）弥合了面向对象编程与关系型数据库之间的鸿沟。你不必编写原始 SQL，而是使用自动映射到数据库表的 Python 对象。这使得开发更快、更安全、更易维护——对于 ML 基础设施应用尤其关键。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Understand what ORMs are and their advantages
-- Set up and configure SQLAlchemy
-- Define database models as Python classes
-- Perform CRUD operations using ORM
-- Write complex queries with SQLAlchemy
-- Implement relationships between models
-- Manage database migrations with Alembic
-- Use connection pooling and transactions
-- Apply ORM patterns to ML applications
+在本讲座结束时，你将：
+- 理解什么是 ORM 及其优势
+- 设置和配置 SQLAlchemy
+- 将数据库模型定义为 Python 类
+- 使用 ORM 执行 CRUD 操作
+- 使用 SQLAlchemy 编写复杂查询
+- 实现模型之间的关系
+- 使用 Alembic 管理数据库迁移
+- 使用连接池和事务
+- 将 ORM 模式应用于 ML 应用
 
-### Prerequisites
-- Lectures 01-03 (SQL fundamentals and advanced concepts)
-- Python programming proficiency
-- Understanding of classes and objects in Python
+### 前置条件
+- 讲座 01-03（SQL 基础与高级概念）
+- Python 编程熟练度
+- 理解 Python 中的类和对象
 
-### Estimated Time
-4-5 hours (including hands-on ORM practice)
+### 预计时间
+4-5 小时（包括动手 ORM 练习）
 
-## What is an ORM?
+## 什么是 ORM？
 
-### Definition
+### 定义
 
-An **Object-Relational Mapper (ORM)** is a library that:
-- Maps database tables to Python classes
-- Maps table rows to Python objects
-- Maps columns to object attributes
-- Converts between SQL and Python automatically
+**对象关系映射器（ORM）**是一个库，它：
+- 将数据库表映射到 Python 类
+- 将表行映射到 Python 对象
+- 将列映射到对象属性
+- 自动在 SQL 和 Python 之间转换
 
-### Without ORM (Raw SQL)
+### 没有 ORM（原始 SQL）
 
 ```python
 import sqlite3
 
-# Manual SQL with string formatting (error-prone!)
+# 手动 SQL 字符串格式化（容易出错！）
 conn = sqlite3.connect('database.db')
 cursor = conn.cursor()
 
-# Insert
+# 插入
 model_name = "BERT-base"
 framework = "PyTorch"
 cursor.execute(
@@ -68,11 +68,11 @@ cursor.execute(
     (model_name, framework)
 )
 
-# Query
+# 查询
 cursor.execute("SELECT * FROM models WHERE framework = ?", (framework,))
 rows = cursor.fetchall()
 
-# Manual object creation
+# 手动创建对象
 models = []
 for row in rows:
     model = {
@@ -86,124 +86,124 @@ conn.commit()
 conn.close()
 ```
 
-**Problems:**
-- SQL strings are error-prone
-- No type checking
-- Manual object construction
-- SQL injection risks
-- Database-specific SQL
+**问题：**
+- SQL 字符串容易出错
+- 无类型检查
+- 手动构造对象
+- SQL 注入风险
+- 数据库特定的 SQL
 
-### With ORM (SQLAlchemy)
+### 使用 ORM（SQLAlchemy）
 
 ```python
 from sqlalchemy.orm import Session
 from models import Model
 
-# Object-oriented approach
+# 面向对象的方法
 with Session(engine) as session:
-    # Create
+    # 创建
     model = Model(name="BERT-base", framework="PyTorch")
     session.add(model)
     session.commit()
 
-    # Query
+    # 查询
     pytorch_models = session.query(Model).filter_by(framework="PyTorch").all()
 
-    # Access as objects
+    # 作为对象访问
     for model in pytorch_models:
         print(f"{model.name} ({model.framework})")
 ```
 
-**Benefits:**
-- Pythonic code
-- Type safety
-- Automatic SQL generation
-- SQL injection protection
-- Database independence
+**优势：**
+- Pythonic 代码
+- 类型安全
+- 自动生成 SQL
+- SQL 注入防护
+- 数据库无关性
 
-### Advantages of ORMs
+### ORM 的优势
 
-1. **Productivity**: Write less code
-2. **Maintainability**: Easier to read and modify
-3. **Type Safety**: Catch errors at development time
-4. **Security**: Protection against SQL injection
-5. **Portability**: Switch databases easily
-6. **Abstraction**: Don't need to be SQL expert
-7. **Validation**: Built-in data validation
+1. **生产力**：编写更少的代码
+2. **可维护性**：更易阅读和修改
+3. **类型安全**：在开发时捕获错误
+4. **安全性**：防护 SQL 注入
+5. **可移植性**：轻松切换数据库
+6. **抽象性**：不需要成为 SQL 专家
+7. **验证**：内置数据验证
 
-### Disadvantages of ORMs
+### ORM 的劣势
 
-1. **Learning Curve**: Need to learn ORM API
-2. **Performance**: Can be slower than raw SQL for complex queries
-3. **Abstraction Leaks**: Sometimes need to drop to raw SQL
-4. **Overhead**: Extra layer between code and database
-5. **N+1 Queries**: Easy to accidentally create performance problems
+1. **学习曲线**：需要学习 ORM API
+2. **性能**：复杂查询可能比原始 SQL 慢
+3. **抽象泄漏**：有时需要回到原始 SQL
+4. **开销**：代码和数据库之间的额外层
+5. **N+1 查询**：容易意外产生性能问题
 
-## Introduction to SQLAlchemy
+## SQLAlchemy 简介
 
-### What is SQLAlchemy?
+### 什么是 SQLAlchemy？
 
-**SQLAlchemy** is the most popular Python ORM, consisting of:
+**SQLAlchemy** 是最流行的 Python ORM，由以下部分组成：
 
-1. **Core**: SQL generation and execution
-2. **ORM**: Object-relational mapping
-3. **Engine**: Database connection management
-4. **Session**: Transaction and query management
+1. **Core**：SQL 生成和执行
+2. **ORM**：对象关系映射
+3. **Engine**：数据库连接管理
+4. **Session**：事务和查询管理
 
-### SQLAlchemy Architecture
+### SQLAlchemy 架构
 
 ```
 ┌─────────────────────────────────────┐
-│  Your Python Application            │
+│  你的 Python 应用程序              │
 ├─────────────────────────────────────┤
-│  SQLAlchemy ORM Layer               │
-│  (Models, Queries, Sessions)        │
+│  SQLAlchemy ORM 层                  │
+│  （模型、查询、会话）              │
 ├─────────────────────────────────────┤
 │  SQLAlchemy Core                    │
-│  (SQL Expression Language)          │
+│  （SQL 表达式语言）                │
 ├─────────────────────────────────────┤
-│  Engine (Connection Pool)           │
+│  Engine（连接池）                  │
 ├─────────────────────────────────────┤
-│  DBAPI (psycopg2, sqlite3, etc.)   │
+│  DBAPI（psycopg2、sqlite3 等）     │
 ├─────────────────────────────────────┤
-│  Database (PostgreSQL, MySQL, etc.) │
+│  数据库（PostgreSQL、MySQL 等）    │
 └─────────────────────────────────────┘
 ```
 
-### Supported Databases
+### 支持的数据库
 
-- PostgreSQL (recommended for production)
+- PostgreSQL（推荐用于生产）
 - MySQL/MariaDB
-- SQLite (great for development)
+- SQLite（开发环境很好）
 - Oracle
 - Microsoft SQL Server
 
-## Setting Up SQLAlchemy
+## 设置 SQLAlchemy
 
-### Installation
+### 安装
 
 ```bash
-# Install SQLAlchemy
+# 安装 SQLAlchemy
 pip install sqlalchemy
 
-# Database drivers
+# 数据库驱动
 pip install psycopg2-binary  # PostgreSQL
 pip install pymysql          # MySQL
-# SQLite support is built-in
+# SQLite 支持是内置的
 ```
 
-### Creating Database Engine
+### 创建数据库引擎
 
 ```python
 from sqlalchemy import create_engine
 
-# SQLite (file-based)
+# SQLite（基于文件）
 engine = create_engine('sqlite:///ml_database.db', echo=True)
 
 # PostgreSQL
 engine = create_engine(
     'postgresql://username:password@localhost:5432/ml_database',
-    echo=True  # Log all SQL (for development)
+    echo=True  # 记录所有 SQL（用于开发）
 )
 
 # MySQL
@@ -213,53 +213,53 @@ engine = create_engine(
 )
 ```
 
-**Connection String Format:**
+**连接字符串格式：**
 ```
 dialect+driver://username:password@host:port/database
 ```
 
-### Creating Session Factory
+### 创建会话工厂
 
 ```python
 from sqlalchemy.orm import sessionmaker
 
-# Create session factory
+# 创建会话工厂
 SessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
     bind=engine
 )
 
-# Use session
+# 使用会话
 session = SessionLocal()
 try:
-    # Database operations
+    # 数据库操作
     pass
 finally:
     session.close()
 
-# Or use context manager (recommended)
+# 或者使用上下文管理器（推荐）
 with SessionLocal() as session:
-    # Database operations
-    pass  # Automatically closes
+    # 数据库操作
+    pass  # 自动关闭
 ```
 
-## Defining Models
+## 定义模型
 
-### Basic Model
+### 基本模型
 
 ```python
 from sqlalchemy import Column, Integer, String, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
-# Base class for all models
+# 所有模型的基类
 Base = declarative_base()
 
 class Model(Base):
     __tablename__ = 'models'
 
-    # Columns
+    # 列
     model_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(100), nullable=False, unique=True)
     framework = Column(String(50), nullable=False)
@@ -272,7 +272,7 @@ class Model(Base):
         return f"<Model(name='{self.name}', framework='{self.framework}')>"
 ```
 
-### Common Column Types
+### 常用列类型
 
 ```python
 from sqlalchemy import (
@@ -289,34 +289,34 @@ class Example(Base):
 
     id = Column(Integer, primary_key=True)
 
-    # Integers
+    # 整数
     count = Column(Integer)
     big_number = Column(BigInteger)
 
-    # Strings
+    # 字符串
     name = Column(String(100))       # VARCHAR(100)
-    description = Column(Text)       # Unlimited text
+    description = Column(Text)       # 无限制文本
 
-    # Numbers
-    accuracy = Column(Float)         # Floating point
-    price = Column(Numeric(10, 2))   # Decimal: 12345678.90
+    # 数字
+    accuracy = Column(Float)         # 浮点数
+    price = Column(Numeric(10, 2))   # 小数：12345678.90
 
-    # Boolean
+    # 布尔值
     is_active = Column(Boolean, default=True)
 
-    # Dates
+    # 日期
     created_date = Column(Date)
     created_at = Column(DateTime)
     created_time = Column(Time)
 
-    # JSON (PostgreSQL)
+    # JSON（PostgreSQL）
     metadata_json = Column(JSON)
 
-    # Array (PostgreSQL)
+    # 数组（PostgreSQL）
     tags = Column(ARRAY(String))
 ```
 
-### Column Constraints
+### 列约束
 
 ```python
 from sqlalchemy import CheckConstraint
@@ -335,39 +335,39 @@ class Model(Base):
     # DEFAULT
     status = Column(String(20), default='training')
 
-    # CHECK constraint
+    # CHECK 约束
     accuracy = Column(
         Float,
         CheckConstraint('accuracy >= 0 AND accuracy <= 1', name='accuracy_range')
     )
 
-    # Index
+    # 索引
     framework = Column(String(50), index=True)
 ```
 
-### Creating Tables
+### 创建表
 
 ```python
-# Create all tables
+# 创建所有表
 Base.metadata.create_all(engine)
 
-# Create specific table
+# 创建特定表
 Model.__table__.create(engine)
 
-# Drop all tables
+# 删除所有表
 Base.metadata.drop_all(engine)
 ```
 
-## CRUD Operations with ORM
+## 使用 ORM 进行 CRUD 操作
 
-### Create (INSERT)
+### 创建（INSERT）
 
 ```python
 from models import Model
 from sqlalchemy.orm import Session
 
 with Session(engine) as session:
-    # Create single object
+    # 创建单个对象
     model = Model(
         name="BERT-base",
         framework="PyTorch",
@@ -376,10 +376,10 @@ with Session(engine) as session:
     session.add(model)
     session.commit()
 
-    # Access auto-generated ID
+    # 访问自动生成的 ID
     print(f"Created model with ID: {model.model_id}")
 
-    # Create multiple objects
+    # 创建多个对象
     models = [
         Model(name="ResNet-50", framework="TensorFlow", accuracy=0.88),
         Model(name="GPT-2", framework="PyTorch", accuracy=0.95),
@@ -388,93 +388,93 @@ with Session(engine) as session:
     session.commit()
 ```
 
-### Read (SELECT)
+### 读取（SELECT）
 
 ```python
 with Session(engine) as session:
-    # Get all
+    # 获取所有
     all_models = session.query(Model).all()
 
-    # Get by primary key
+    # 通过主键获取
     model = session.query(Model).get(1)  # ID = 1
 
-    # Get first
+    # 获取第一个
     first_model = session.query(Model).first()
 
-    # Filter
+    # 过滤
     pytorch_models = session.query(Model).filter_by(framework="PyTorch").all()
 
-    # Complex filter
+    # 复杂过滤
     accurate_models = session.query(Model).filter(Model.accuracy > 0.90).all()
 
-    # Count
+    # 计数
     model_count = session.query(Model).count()
 ```
 
-### Update
+### 更新
 
 ```python
 with Session(engine) as session:
-    # Get and modify
+    # 获取并修改
     model = session.query(Model).filter_by(name="BERT-base").first()
     model.accuracy = 0.93
     model.version = "2.0.0"
     session.commit()
 
-    # Bulk update
+    # 批量更新
     session.query(Model).filter_by(framework="PyTorch").update({
         "status": "deployed"
     })
     session.commit()
 ```
 
-### Delete
+### 删除
 
 ```python
 with Session(engine) as session:
-    # Delete specific object
+    # 删除特定对象
     model = session.query(Model).filter_by(name="BERT-base").first()
     session.delete(model)
     session.commit()
 
-    # Bulk delete
+    # 批量删除
     session.query(Model).filter_by(status="archived").delete()
     session.commit()
 ```
 
-## Querying with SQLAlchemy
+## 使用 SQLAlchemy 查询
 
-### Basic Queries
+### 基本查询
 
 ```python
-# All records
+# 所有记录
 models = session.query(Model).all()
 
-# Specific columns
+# 特定列
 names = session.query(Model.name, Model.framework).all()
-# Returns list of tuples: [('BERT', 'PyTorch'), ...]
+# 返回元组列表：[('BERT', 'PyTorch'), ...]
 
-# One result
-model = session.query(Model).filter_by(name="BERT").one()  # Raises if 0 or >1
-model = session.query(Model).filter_by(name="BERT").one_or_none()  # None if not found
+# 单个结果
+model = session.query(Model).filter_by(name="BERT").one()  # 0 或 >1 时抛出异常
+model = session.query(Model).filter_by(name="BERT").one_or_none()  # 未找到时返回 None
 ```
 
-### Filtering
+### 过滤
 
 ```python
-# filter_by: Simple equality
+# filter_by：简单等值
 models = session.query(Model).filter_by(framework="PyTorch").all()
 
-# filter: Complex conditions
+# filter：复杂条件
 models = session.query(Model).filter(Model.accuracy > 0.90).all()
 
-# Multiple filters (AND)
+# 多个过滤条件（AND）
 models = session.query(Model).filter(
     Model.framework == "PyTorch",
     Model.accuracy > 0.90
 ).all()
 
-# OR condition
+# OR 条件
 from sqlalchemy import or_
 models = session.query(Model).filter(
     or_(
@@ -483,7 +483,7 @@ models = session.query(Model).filter(
     )
 ).all()
 
-# IN operator
+# IN 运算符
 from sqlalchemy import in_
 models = session.query(Model).filter(
     Model.framework.in_(['PyTorch', 'TensorFlow'])
@@ -499,38 +499,38 @@ models = session.query(Model).filter(Model.accuracy.between(0.85, 0.95)).all()
 models = session.query(Model).filter(Model.accuracy.is_(None)).all()
 ```
 
-### Ordering and Limiting
+### 排序与限制
 
 ```python
-# Order by
+# 排序
 models = session.query(Model).order_by(Model.accuracy.desc()).all()
 
-# Multiple order
+# 多条件排序
 models = session.query(Model).order_by(Model.framework, Model.accuracy.desc()).all()
 
-# Limit
+# 限制
 top_5 = session.query(Model).order_by(Model.accuracy.desc()).limit(5).all()
 
-# Offset (pagination)
+# 偏移（分页）
 page_2 = session.query(Model).limit(10).offset(10).all()
 ```
 
-### Aggregations
+### 聚合
 
 ```python
 from sqlalchemy import func
 
-# Count
+# 计数
 count = session.query(func.count(Model.model_id)).scalar()
 
-# Average
+# 平均值
 avg_accuracy = session.query(func.avg(Model.accuracy)).scalar()
 
-# Min and Max
+# 最小和最大
 min_acc = session.query(func.min(Model.accuracy)).scalar()
 max_acc = session.query(func.max(Model.accuracy)).scalar()
 
-# Group by
+# 分组
 results = session.query(
     Model.framework,
     func.count(Model.model_id).label('count'),
@@ -544,9 +544,9 @@ results = session.query(
 ).group_by(Model.framework).having(func.count(Model.model_id) > 1).all()
 ```
 
-## Relationships in SQLAlchemy
+## SQLAlchemy 中的关系
 
-### One-to-Many Relationship
+### 一对多关系
 
 ```python
 from sqlalchemy import ForeignKey
@@ -558,7 +558,7 @@ class Model(Base):
     model_id = Column(Integer, primary_key=True)
     name = Column(String(100))
 
-    # Relationship (one model has many experiments)
+    # 关系（一个模型有多个实验）
     experiments = relationship("Experiment", back_populates="model")
 
 class Experiment(Base):
@@ -568,14 +568,14 @@ class Experiment(Base):
     model_id = Column(Integer, ForeignKey('models.model_id'))
     accuracy = Column(Float)
 
-    # Relationship (many experiments belong to one model)
+    # 关系（多个实验属于一个模型）
     model = relationship("Model", back_populates="experiments")
 ```
 
-**Usage:**
+**用法：**
 ```python
 with Session(engine) as session:
-    # Create model with experiments
+    # 创建带有实验的模型
     model = Model(name="BERT")
     exp1 = Experiment(accuracy=0.92)
     exp2 = Experiment(accuracy=0.93)
@@ -586,20 +586,20 @@ with Session(engine) as session:
     session.add(model)
     session.commit()
 
-    # Access experiments
+    # 访问实验
     model = session.query(Model).filter_by(name="BERT").first()
     for exp in model.experiments:
         print(f"Experiment {exp.experiment_id}: {exp.accuracy}")
 
-    # Access model from experiment
+    # 从实验访问模型
     exp = session.query(Experiment).first()
     print(f"Model: {exp.model.name}")
 ```
 
-### Many-to-Many Relationship
+### 多对多关系
 
 ```python
-# Association table
+# 关联表
 model_tags = Table(
     'model_tags',
     Base.metadata,
@@ -613,7 +613,7 @@ class Model(Base):
     model_id = Column(Integer, primary_key=True)
     name = Column(String(100))
 
-    # Many-to-many
+    # 多对多
     tags = relationship("Tag", secondary=model_tags, back_populates="models")
 
 class Tag(Base):
@@ -622,14 +622,14 @@ class Tag(Base):
     tag_id = Column(Integer, primary_key=True)
     tag_name = Column(String(50))
 
-    # Many-to-many
+    # 多对多
     models = relationship("Model", secondary=model_tags, back_populates="tags")
 ```
 
-**Usage:**
+**用法：**
 ```python
 with Session(engine) as session:
-    # Create model and tags
+    # 创建模型和标签
     model = Model(name="BERT")
     tag1 = Tag(tag_name="NLP")
     tag2 = Tag(tag_name="Transformer")
@@ -639,50 +639,50 @@ with Session(engine) as session:
     session.add(model)
     session.commit()
 
-    # Query models by tag
+    # 按标签查询模型
     nlp_models = session.query(Model).join(Model.tags).filter(Tag.tag_name == "NLP").all()
 ```
 
-### Eager Loading (Avoid N+1 Queries)
+### 即时加载（避免 N+1 查询）
 
 ```python
 from sqlalchemy.orm import joinedload, selectinload
 
-# Without eager loading (N+1 problem):
+# 没有即时加载（N+1 问题）：
 models = session.query(Model).all()
-for model in models:  # 1 query
-    for exp in model.experiments:  # N queries (one per model)
+for model in models:  # 1 次查询
+    for exp in model.experiments:  # N 次查询（每个模型一次）
         print(exp.accuracy)
 
-# With joinedload (uses JOIN):
+# 使用 joinedload（使用 JOIN）：
 models = session.query(Model).options(joinedload(Model.experiments)).all()
-for model in models:  # 1 query total
+for model in models:  # 总共 1 次查询
     for exp in model.experiments:
         print(exp.accuracy)
 
-# With selectinload (uses separate SELECT IN):
+# 使用 selectinload（使用单独的 SELECT IN）：
 models = session.query(Model).options(selectinload(Model.experiments)).all()
 ```
 
-## Migrations with Alembic
+## 使用 Alembic 进行迁移
 
-### What is Alembic?
+### 什么是 Alembic？
 
-**Alembic** is a database migration tool for SQLAlchemy that:
-- Tracks schema changes over time
-- Allows upgrading/downgrading database schema
-- Works with version control
+**Alembic** 是 SQLAlchemy 的数据库迁移工具，它：
+- 跟踪 schema 随时间的变化
+- 允许升级/降级数据库 schema
+- 与版本控制系统配合使用
 
-### Setup Alembic
+### 设置 Alembic
 
 ```bash
-# Install
+# 安装
 pip install alembic
 
-# Initialize
+# 初始化
 alembic init alembic
 
-# Creates:
+# 创建：
 # alembic/
 # ├── env.py
 # ├── script.py.mako
@@ -690,32 +690,32 @@ alembic init alembic
 # alembic.ini
 ```
 
-### Configure Alembic
+### 配置 Alembic
 
-**alembic.ini:**
+**alembic.ini：**
 ```ini
-# Set database URL
+# 设置数据库 URL
 sqlalchemy.url = postgresql://user:password@localhost/ml_database
 ```
 
-**alembic/env.py:**
+**alembic/env.py：**
 ```python
-# Import your models
+# 导入你的模型
 from models import Base
 target_metadata = Base.metadata
 ```
 
-### Creating Migrations
+### 创建迁移
 
 ```bash
-# Auto-generate migration from model changes
+# 从模型变化自动生成迁移
 alembic revision --autogenerate -m "create models table"
 
-# Manual migration
+# 手动迁移
 alembic revision -m "add accuracy column"
 ```
 
-**Generated migration:**
+**生成的迁移：**
 ```python
 # alembic/versions/001_create_models_table.py
 def upgrade():
@@ -730,98 +730,98 @@ def downgrade():
     op.drop_table('models')
 ```
 
-### Running Migrations
+### 运行迁移
 
 ```bash
-# Upgrade to latest
+# 升级到最新
 alembic upgrade head
 
-# Upgrade to specific version
+# 升级到特定版本
 alembic upgrade abc123
 
-# Downgrade one version
+# 降级一个版本
 alembic downgrade -1
 
-# Show current version
+# 显示当前版本
 alembic current
 
-# Show migration history
+# 显示迁移历史
 alembic history
 ```
 
-## Connection Pooling
+## 连接池
 
-### What is Connection Pooling?
+### 什么是连接池？
 
-Reusing database connections instead of creating new ones for each query.
+重用数据库连接，而不是为每个查询创建新连接。
 
-**Benefits:**
-- Faster (no connection overhead)
-- Less resource usage
-- Handle more concurrent requests
+**优势：**
+- 更快（无连接开销）
+- 更少的资源使用
+- 处理更多并发请求
 
-### Configuring Pool
+### 配置池
 
 ```python
 from sqlalchemy import create_engine
 
 engine = create_engine(
     'postgresql://user:password@localhost/ml_database',
-    pool_size=5,        # Keep 5 connections open
-    max_overflow=10,    # Allow 10 additional connections if needed
-    pool_timeout=30,    # Wait 30s for available connection
-    pool_recycle=3600,  # Recycle connections after 1 hour
+    pool_size=5,        # 保持 5 个连接打开
+    max_overflow=10,    # 必要时允许 10 个额外连接
+    pool_timeout=30,    # 等待可用连接最多 30 秒
+    pool_recycle=3600,  # 1 小时后回收连接
 )
 ```
 
-### Pool Types
+### 池类型
 
 ```python
-# QueuePool (default for most databases)
+# QueuePool（大多数数据库默认）
 from sqlalchemy.pool import QueuePool
 engine = create_engine(..., poolclass=QueuePool)
 
-# NullPool (no pooling, new connection each time)
+# NullPool（无池化，每次新连接）
 from sqlalchemy.pool import NullPool
 engine = create_engine(..., poolclass=NullPool)
 
-# StaticPool (single connection, SQLite)
+# StaticPool（单个连接，SQLite）
 from sqlalchemy.pool import StaticPool
 engine = create_engine('sqlite://', poolclass=StaticPool)
 ```
 
-## Transaction Management
+## 事务管理
 
-### Basic Transaction
+### 基本事务
 
 ```python
 with Session(engine) as session:
     try:
-        # Multiple operations in one transaction
+        # 一个事务中的多个操作
         model1 = Model(name="BERT", framework="PyTorch")
         model2 = Model(name="GPT-2", framework="PyTorch")
 
         session.add(model1)
         session.add(model2)
 
-        session.commit()  # Both saved or both fail
+        session.commit()  # 要么全部保存，要么全部失败
     except Exception as e:
-        session.rollback()  # Undo all changes
+        session.rollback()  # 撤销所有更改
         raise e
 ```
 
-### Explicit Transactions
+### 显式事务
 
 ```python
 with Session(engine) as session:
-    with session.begin():  # Explicit transaction
+    with session.begin():  # 显式事务
         model = Model(name="BERT")
         session.add(model)
-        # Automatically commits if no exception
-        # Automatically rolls back if exception
+        # 如果没有异常则自动提交
+        # 如果有异常则自动回滚
 ```
 
-### Nested Transactions (Savepoints)
+### 嵌套事务（保存点）
 
 ```python
 with Session(engine) as session:
@@ -829,17 +829,17 @@ with Session(engine) as session:
         model = Model(name="BERT")
         session.add(model)
 
-        with session.begin_nested():  # Savepoint
+        with session.begin_nested():  # 保存点
             exp = Experiment(model_id=1, accuracy=0.92)
             session.add(exp)
-            # Can roll back to this point if needed
+            # 如果需要可以回滚到此点
 
         session.commit()
 ```
 
-## ORM Patterns for ML Applications
+## ML 应用的 ORM 模式
 
-### Pattern 1: Model Registry
+### 模式 1：模型注册
 
 ```python
 class MLModel(Base):
@@ -866,7 +866,7 @@ class ModelVersion(Base):
 
     model = relationship("MLModel", back_populates="versions")
 
-# Usage
+# 用法
 def register_model(session, name, framework, model_path):
     model = MLModel(
         name=name,
@@ -885,7 +885,7 @@ def get_latest_model(session, name):
     ).order_by(MLModel.created_at.desc()).first()
 ```
 
-### Pattern 2: Experiment Tracking
+### 模式 2：实验跟踪
 
 ```python
 class Experiment(Base):
@@ -922,7 +922,7 @@ class Metric(Base):
 
     experiment = relationship("Experiment", back_populates="metrics")
 
-# Usage
+# 用法
 def log_experiment(session, model_id, dataset, hyperparams, metrics):
     exp = Experiment(model_id=model_id, dataset=dataset)
 
@@ -939,7 +939,7 @@ def log_experiment(session, model_id, dataset, hyperparams, metrics):
     return exp
 ```
 
-### Pattern 3: Repository Pattern
+### 模式 3：仓库模式
 
 ```python
 class ModelRepository:
@@ -973,45 +973,45 @@ class ModelRepository:
         self.session.delete(model)
         self.session.commit()
 
-# Usage
+# 用法
 with Session(engine) as session:
     repo = ModelRepository(session)
 
-    # Create
+    # 创建
     model = MLModel(name="BERT", framework="PyTorch")
     repo.create(model)
 
-    # Get
+    # 获取
     model = repo.get_by_name("BERT")
 
-    # Update
+    # 更新
     model.accuracy = 0.95
     repo.update(model)
 
-    # Delete
+    # 删除
     repo.delete(model)
 ```
 
-## Best Practices
+## 最佳实践
 
-### 1. Use Context Managers
+### 1. 使用上下文管理器
 
 ```python
-# GOOD
+# 好
 with Session(engine) as session:
     model = session.query(Model).first()
-    # Session automatically closed
+    # 会话自动关闭
 
-# AVOID
+# 避免
 session = Session(engine)
 model = session.query(Model).first()
-session.close()  # Easy to forget!
+session.close()  # 容易忘记！
 ```
 
-### 2. Use Transactions
+### 2. 使用事务
 
 ```python
-# GOOD
+# 好
 with Session(engine) as session:
     try:
         model = Model(name="BERT")
@@ -1021,120 +1021,120 @@ with Session(engine) as session:
         session.rollback()
         raise
 
-# BETTER
+# 更好
 with Session(engine) as session:
     with session.begin():
         model = Model(name="BERT")
         session.add(model)
-        # Auto-commit or rollback
+        # 自动提交或回滚
 ```
 
-### 3. Avoid N+1 Queries
+### 3. 避免 N+1 查询
 
 ```python
-# BAD (N+1 queries)
+# 不好（N+1 查询）
 models = session.query(Model).all()
 for model in models:
-    for exp in model.experiments:  # Query per model!
+    for exp in model.experiments:  # 每个模型一次查询！
         print(exp.accuracy)
 
-# GOOD (2 queries)
+# 好（2 次查询）
 models = session.query(Model).options(selectinload(Model.experiments)).all()
 for model in models:
     for exp in model.experiments:
         print(exp.accuracy)
 ```
 
-### 4. Use Bulk Operations
+### 4. 使用批量操作
 
 ```python
-# SLOW
+# 慢
 for i in range(1000):
     model = Model(name=f"model_{i}")
     session.add(model)
-    session.commit()  # 1000 commits!
+    session.commit()  # 1000 次提交！
 
-# FAST
+# 快
 models = [Model(name=f"model_{i}") for i in range(1000)]
 session.bulk_save_objects(models)
-session.commit()  # 1 commit
+session.commit()  # 1 次提交
 ```
 
-### 5. Close Sessions
+### 5. 关闭会话
 
 ```python
-# Always close sessions
+# 始终关闭会话
 with Session(engine) as session:
-    # Do work
-    pass  # Auto-closes
+    # 执行工作
+    pass  # 自动关闭
 
-# For long-running apps, use scoped sessions
+# 对于长时间运行的应用，使用作用域会话
 from sqlalchemy.orm import scoped_session
 
 SessionLocal = scoped_session(sessionmaker(bind=engine))
 
-# Access session
+# 访问会话
 session = SessionLocal()
-# Work with session
-SessionLocal.remove()  # Close session
+# 使用会话
+SessionLocal.remove()  # 关闭会话
 ```
 
-## Summary and Key Takeaways
+## 总结与关键要点
 
-### What We Learned
+### 我们学到的
 
-1. **ORMs** map objects to database tables automatically
-2. **SQLAlchemy** is the standard Python ORM
-3. **Models** are Python classes that represent tables
-4. **Sessions** manage transactions and queries
-5. **Relationships** connect models (1:1, 1:N, M:N)
-6. **Migrations** track schema changes with Alembic
-7. **Pooling** reuses connections for performance
-8. **Transactions** ensure data integrity
+1. **ORM** 自动将对象映射到数据库表
+2. **SQLAlchemy** 是标准的 Python ORM
+3. **模型**是表示表的 Python 类
+4. **会话**管理事务和查询
+5. **关系**连接模型（1:1、1:N、M:N）
+6. **迁移**使用 Alembic 跟踪 schema 变化
+7. **连接池**为性能重用连接
+8. **事务**确保数据完整性
 
-### ORM vs Raw SQL
+### ORM vs 原始 SQL
 
-| Aspect | ORM | Raw SQL |
+| 方面 | ORM | 原始 SQL |
 |--------|-----|---------|
-| Productivity | High | Medium |
-| Type Safety | Yes | No |
-| Readability | High | Medium |
-| Performance | Good | Best |
-| Complexity | Medium | Low |
-| Portability | High | Low |
+| 生产力 | 高 | 中 |
+| 类型安全 | 是 | 否 |
+| 可读性 | 高 | 中 |
+| 性能 | 良好 | 最佳 |
+| 复杂性 | 中 | 低 |
+| 可移植性 | 高 | 低 |
 
-**Rule of thumb:** Use ORM for 90% of operations, raw SQL for complex/performance-critical queries.
+**经验法则：** 90% 的操作使用 ORM，复杂/性能关键的查询使用原始 SQL。
 
-### When to Use Each
+### 何时使用哪种
 
-**Use ORM when:**
-- CRUD operations
-- Standard queries
-- Type safety is important
-- Database portability matters
+**使用 ORM 的情况：**
+- CRUD 操作
+- 标准查询
+- 类型安全重要
+- 数据库可移植性重要
 
-**Use raw SQL when:**
-- Complex aggregations
-- Bulk operations
-- Performance-critical queries
-- Database-specific features needed
+**使用原始 SQL 的情况：**
+- 复杂聚合
+- 批量操作
+- 性能关键查询
+- 需要数据库特定特性
 
-### Next Steps
+### 后续步骤
 
-You now have all the database knowledge needed for ML infrastructure:
-- SQL basics and advanced queries
-- Database design and normalization
-- Query optimization
-- ORM integration
+你现在拥有 ML 基础设施所需的所有数据库知识：
+- SQL 基础和高级查询
+- 数据库设计和范式化
+- 查询优化
+- ORM 集成
 
-**Practice by building:**
-- Model registry application
-- Experiment tracking system
-- Prediction logging service
-- Dataset management tool
+**通过构建以下内容进行练习：**
+- 模型注册应用
+- 实验跟踪系统
+- 预测日志记录服务
+- 数据集管理工具
 
 ---
 
-**Estimated Study Time:** 4-5 hours
-**Hands-on Practice:** Complete Exercise 04: SQLAlchemy ORM
-**Final Assessment:** Module quiz covers all 4 lectures
+**预计学习时间：** 4-5 小时
+**动手练习：** 完成练习 04：SQLAlchemy ORM
+**最终评估：** 模块测验涵盖所有 4 个讲座

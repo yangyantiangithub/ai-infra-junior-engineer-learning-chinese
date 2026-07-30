@@ -1,329 +1,327 @@
-# Lecture 05: Multi-Cloud Strategies and Cost Optimization
+# Lecture 05：多云策略与成本优化
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Multi-Cloud Architecture](#multi-cloud-architecture)
-3. [Cloud Cost Fundamentals](#cloud-cost-fundamentals)
-4. [Cost Optimization for ML Workloads](#cost-optimization-for-ml-workloads)
-5. [FinOps for AI Infrastructure](#finops-for-ai-infrastructure)
-6. [Disaster Recovery and Business Continuity](#disaster-recovery-and-business-continuity)
-7. [Cloud Migration Strategies](#cloud-migration-strategies)
-8. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [简介](#简介)
+2. [多云架构](#多云架构)
+3. [云成本基础](#云成本基础)
+4. [ML 工作负载的成本优化](#ml-工作负载的成本优化)
+5. [AI 基础设施的 FinOps](#ai-基础设施的-finops)
+6. [灾难恢复与业务连续性](#灾难恢复与业务连续性)
+7. [云迁移策略](#云迁移策略)
+8. [总结与关键要点](#总结与关键要点)
 
-## Introduction
+## 简介
 
-Cloud costs for ML workloads can spiral out of control without proper planning. A single large GPU instance running 24/7 can cost $25,000/year. Multiply that across training, inference, and experimentation, and costs can easily reach six or seven figures.
+如果没有适当规划，ML 工作负载的云成本可能失控。单个大型 GPU 实例 24/7 运行每年可能花费 25,000 美元。再乘以训练、推理和实验，成本很容易达到六位数或七位数。
 
-This lecture covers strategies to optimize cloud spending, architect multi-cloud solutions, and ensure business continuity for ML infrastructure.
+本讲座涵盖优化云支出、设计多云解决方案以及确保 ML 基础设施业务连续性的策略。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Understand multi-cloud architecture patterns and trade-offs
-- Identify and optimize major cost drivers in ML workloads
-- Implement FinOps practices for AI infrastructure
-- Design disaster recovery strategies for ML systems
-- Plan and execute cloud migrations
-- Apply rightsizing, scheduling, and purchasing strategies
+到本讲座结束时，你将：
+- 理解多云架构模式及其权衡
+- 识别并优化 ML 工作负载中的主要成本驱动因素
+- 为 AI 基础设施实施 FinOps 实践
+- 设计 ML 系统的灾难恢复策略
+- 规划和执行云迁移
+- 应用合理调整规格、调度和购买策略
 
-### Prerequisites
-- Lectures 01-04 in this module (Cloud fundamentals, AWS services)
-- Understanding of ML workflows (training, inference, data storage)
-- Basic knowledge of cloud pricing models
+### 前置要求
+- 本模块的讲座 01-04（云基础、AWS 服务）
+- 理解 ML 工作流（训练、推理、数据存储）
+- 云定价模型的基础知识
 
-**Duration**: 90 minutes
-**Difficulty**: Intermediate
+**时长**：90 分钟
+**难度**：中级
 
 ---
 
-## 1. Multi-Cloud Architecture
+## 1. 多云架构
 
-### Why Multi-Cloud?
+### 为什么需要多云？
 
 ```
-Single Cloud Risks:
+单一云的风险：
 ┌────────────────────────────────────┐
-│ All ML infrastructure on AWS      │
+│ 所有 ML 基础设施都在 AWS 上      │
 │                                    │
-│ Risks:                             │
-│ ✗ Vendor lock-in                   │
-│ ✗ Single point of failure          │
-│ ✗ Price increases (no leverage)    │
-│ ✗ Limited by one vendor's features │
-│ ✗ Regional outage = total downtime │
+│ 风险：                             │
+│ ✗ 供应商锁定                      │
+│ ✗ 单点故障                        │
+│ ✗ 价格上涨（无谈判筹码）          │
+│ ✗ 受限于一个供应商的功能          │
+│ ✗ 区域性故障 = 完全停机           │
 └────────────────────────────────────┘
 
-Multi-Cloud Benefits:
+多云的优势：
 ┌────────────────────────────────────┐
-│ ML infrastructure across AWS/GCP   │
+│ ML 基础设施跨 AWS/GCP             │
 │                                    │
-│ Benefits:                          │
-│ ✓ Best-of-breed services           │
-│ ✓ Negotiating leverage             │
-│ ✓ Disaster recovery                │
-│ ✓ Regulatory compliance (data     │
-│   residency across regions)        │
+│ 优势：                            │
+│ ✓ 最佳服务组合                    │
+│ ✓ 谈判筹码                        │
+│ ✓ 灾难恢复                        │
+│ ✓ 监管合规（跨区域数据驻留）     │
 └────────────────────────────────────┘
 ```
 
-### Multi-Cloud Strategies
+### 多云策略
 
-#### 1. Best-of-Breed (Use Each Cloud's Strengths)
+#### 1. 最佳服务组合（使用每个云的优势）
 
 ```
-Architecture:
+架构：
 ┌─────────────────────────────────────┐
 │ AWS                                 │
-│ ├── S3: Data lake storage          │
-│ ├── EKS: Model serving (Kubernetes)│
-│ └── RDS: Metadata database         │
+│ ├── S3：数据湖存储                 │
+│ ├── EKS：模型服务（Kubernetes）    │
+│ └── RDS：元数据数据库              │
 └─────────────────────────────────────┘
 
 ┌─────────────────────────────────────┐
 │ GCP                                 │
-│ ├── Vertex AI: Model training      │
-│ ├── BigQuery: Data warehouse       │
-│ └── TPUs: Large model training     │
+│ ├── Vertex AI：模型训练            │
+│ ├── BigQuery：数据仓库             │
+│ └── TPU：大型模型训练              │
 └─────────────────────────────────────┘
 
 ┌─────────────────────────────────────┐
 │ Azure                               │
-│ ├── Azure ML: AutoML experiments   │
-│ └── Cognitive Services: Pre-trained │
-│     models                          │
+│ ├── Azure ML：AutoML 实验          │
+│ └── Cognitive Services：预训练模型  │
 └─────────────────────────────────────┘
 ```
 
-**Example rationale:**
-- AWS: Strong ecosystem, mature Kubernetes (EKS), best S3 pricing
-- GCP: Best for data analytics (BigQuery), TPUs for transformers
-- Azure: Enterprise integration (Active Directory), hybrid cloud
+**示例理由：**
+- AWS：强大的生态系统、成熟的 Kubernetes（EKS）、最佳 S3 定价
+- GCP：最适合数据分析（BigQuery）、用于 Transformer 的 TPU
+- Azure：企业集成（Active Directory）、混合云
 
-#### 2. Active-Passive Disaster Recovery
-
-```
-Primary: AWS (active)
-├── All production traffic
-├── 100% of inference requests
-└── All model training
-
-Secondary: GCP (passive/warm standby)
-├── Data replicated continuously
-├── Infrastructure ready (scaled to 0)
-└── Activated only during AWS outage
-```
-
-#### 3. Active-Active for High Availability
+#### 2. 主备灾难恢复
 
 ```
-Both clouds handle production traffic:
+主：AWS（活跃）
+├── 所有生产流量
+├── 100% 推理请求
+└── 所有模型训练
 
-AWS (60% traffic)          GCP (40% traffic)
-├── US-East users          ├── US-West users
-├── EU users               ├── Asia-Pacific users
-└── Shared data via        └── Shared data via
-    cross-cloud sync            cross-cloud sync
-
-Benefits:
-✓ Higher availability
-✓ Lower latency (geo-distribution)
-✗ Complex (data consistency, sync)
-✗ Higher cost (run both simultaneously)
+备：GCP（被动/温备）
+├── 数据持续复制
+├── 基础设施就绪（缩放到 0）
+└── 仅在 AWS 故障时激活
 ```
 
-### Multi-Cloud Challenges
+#### 3. 双活高可用
 
-1. **Data Synchronization**
+```
+两个云都处理生产流量：
+
+AWS（60% 流量）         GCP（40% 流量）
+├── 美东用户            ├── 美西用户
+├── 欧洲用户            ├── 亚太用户
+└── 通过跨云同步        └── 通过跨云同步
+    共享数据                共享数据
+
+优点：
+✓ 更高的可用性
+✓ 更低的延迟（地理分布）
+✗ 复杂（数据一致性、同步）
+✗ 更高的成本（同时运行两个）
+```
+
+### 多云挑战
+
+1. **数据同步**
    ```python
-   # Replicate data from AWS S3 to GCS
+   # 将数据从 AWS S3 复制到 GCS
    from google.cloud import storage as gcs_storage
    import boto3
 
    s3_client = boto3.client('s3')
    gcs_client = gcs_storage.Client()
 
-   # List AWS S3 objects
+   # 列出 AWS S3 对象
    objects = s3_client.list_objects_v2(Bucket='ml-models-aws')
 
    for obj in objects.get('Contents', []):
-       # Download from S3
+       # 从 S3 下载
        s3_obj = s3_client.get_object(
            Bucket='ml-models-aws',
            Key=obj['Key']
        )
 
-       # Upload to GCS
+       # 上传到 GCS
        bucket = gcs_client.bucket('ml-models-gcp')
        blob = bucket.blob(obj['Key'])
        blob.upload_from_string(s3_obj['Body'].read())
 
-   print(f"Synced {len(objects)} objects from AWS to GCP")
+   print(f"从 AWS 同步了 {len(objects)} 个对象到 GCP")
    ```
 
-2. **Identity and Access Management (IAM)**
+2. **身份和访问管理（IAM）**
    - AWS IAM ≠ GCP IAM ≠ Azure RBAC
-   - Use centralized identity provider (Okta, Azure AD)
-   - Implement SAML/OIDC for SSO
+   - 使用集中式身份提供商（Okta、Azure AD）
+   - 为 SSO 实施 SAML/OIDC
 
-3. **Networking**
+3. **网络**
    ```
-   Connect AWS VPC to GCP VPC:
+   连接 AWS VPC 到 GCP VPC：
    ┌─────────────┐         ┌─────────────┐
    │ AWS VPC     │         │ GCP VPC     │
    │ 10.0.0.0/16 │◄───────►│ 10.1.0.0/16 │
    └─────────────┘         └─────────────┘
-        VPN or Direct Connect / Cloud Interconnect
+        VPN 或 Direct Connect / Cloud Interconnect
    ```
 
-4. **Monitoring**
-   - Use cloud-agnostic tools: Prometheus, Grafana, Datadog
-   - Aggregate logs: ELK stack, Loki, Splunk
+4. **监控**
+   - 使用云无关工具：Prometheus、Grafana、Datadog
+   - 聚合日志：ELK 栈、Loki、Splunk
 
-### Multi-Cloud Decision Framework
+### 多云决策框架
 
-| Use Multi-Cloud If: | Avoid Multi-Cloud If: |
+| 使用多云当： | 避免多云当： |
 |---------------------|------------------------|
-| Critical uptime requirements (99.99%+) | Team is small (<10 engineers) |
-| Regulatory needs (data residency) | Cost is more important than availability |
-| Leverage best services from each | Complexity outweighs benefits |
-| Large enough to negotiate pricing | Already locked into one cloud |
+| 关键正常运行时间要求（99.99%+） | 团队规模小（<10 名工程师） |
+| 监管需求（数据驻留） | 成本比可用性更重要 |
+| 利用每个云的最佳服务 | 复杂性超过收益 |
+| 规模足够大可以谈判定价 | 已锁定在一个云中 |
 
 ---
 
-## 2. Cloud Cost Fundamentals
+## 2. 云成本基础
 
-### Cloud Pricing Models
+### 云定价模型
 
-#### On-Demand Instances
+#### 按需实例
 
-**Pros**: Flexibility, no commitment
-**Cons**: Most expensive (baseline)
-
-```
-AWS EC2 p3.2xlarge (1x V100 GPU):
-- On-demand: $3.06/hour
-- Cost per month (24/7): $2,203/month
-- Cost per year: $26,438/year
-```
-
-#### Reserved Instances (1-3 year commitment)
-
-**Savings**: 30-70% vs on-demand
+**优点**：灵活性、无承诺
+**缺点**：最贵（基准）
 
 ```
-AWS EC2 p3.2xlarge:
-- On-demand: $3.06/hour
-- 1-year reserved: $1.84/hour (40% savings)
-- 3-year reserved: $1.10/hour (64% savings)
-
-Annual cost (3-year reserved):
-$1.10 × 24 × 365 = $9,636 vs $26,438 on-demand
-Savings: $16,802/year (64%)
+AWS EC2 p3.2xlarge（1x V100 GPU）：
+- 按需：$3.06/小时
+- 每月成本（24/7）：$2,203/月
+- 每年成本：$26,438/年
 ```
 
-**Use for**: Baseline, predictable workloads (production inference)
+#### 预留实例（1-3 年承诺）
 
-#### Spot Instances (Spare capacity, can be interrupted)
-
-**Savings**: 50-90% vs on-demand
+**节省**：相比按需 30-70%
 
 ```
-AWS EC2 p3.2xlarge spot:
-- On-demand: $3.06/hour
-- Spot (avg): $0.92/hour (70% savings)
+AWS EC2 p3.2xlarge：
+- 按需：$3.06/小时
+- 1 年预留：$1.84/小时（节省 40%）
+- 3 年预留：$1.10/小时（节省 64%）
 
-But: Can be interrupted with 2-minute notice!
+年度成本（3 年预留）：
+$1.10 × 24 × 365 = $9,636 vs $26,438 按需
+节省：每年 $16,802（64%）
 ```
 
-**Use for**: Fault-tolerant workloads (training with checkpointing)
+**用于**：基线、可预测的工作负载（生产推理）
 
-#### Savings Plans (Flexible commitment)
+#### Spot 实例（备用容量，可中断）
 
-**AWS Compute Savings Plans**: Commit to $/hour for 1-3 years
+**节省**：相比按需 50-90%
 
 ```
-Commit to $1/hour for 3 years:
-- AWS applies discount to any compute usage
-- More flexible than reserved instances
-- 17-60% savings depending on commitment
+AWS EC2 p3.2xlarge spot：
+- 按需：$3.06/小时
+- Spot（平均）：$0.92/小时（节省 70%）
+
+但是：可能被中断，提前 2 分钟通知！
+```
+
+**用于**：容错工作负载（带 checkpointing 的训练）
+
+#### Savings Plans（灵活承诺）
+
+**AWS Compute Savings Plans**：承诺 $/小时 持续 1-3 年
+
+```
+承诺 $1/小时 持续 3 年：
+- AWS 将折扣应用于任何计算使用
+- 比预留实例更灵活
+- 根据承诺可节省 17-60%
 ```
 
 ---
 
-## 3. Cost Optimization for ML Workloads
+## 3. ML 工作负载的成本优化
 
-### Major Cost Drivers in ML
+### ML 中的主要成本驱动因素
 
 ```
-Typical ML Infrastructure Costs:
+典型 ML 基础设施成本：
 ┌────────────────────────────────────┐
-│ GPU Compute:          60%  $60k/yr │
-│ Storage (data/models): 20%  $20k/yr │
-│ Networking:           10%  $10k/yr │
-│ Managed Services:      7%   $7k/yr │
-│ Data Transfer:         3%   $3k/yr │
-│ Total:               100% $100k/yr │
+│ GPU 计算：         60%  $60k/年   │
+│ 存储（数据/模型）： 20%  $20k/年   │
+│ 网络：             10%  $10k/年   │
+│ 托管服务：          7%   $7k/年   │
+│ 数据传输：          3%   $3k/年   │
+│ 总计：            100% $100k/年   │
 └────────────────────────────────────┘
 ```
 
-### Optimization Strategy 1: Right-Sizing
+### 优化策略 1：合理调整规格
 
-**Problem**: Over-provisioned instances waste money
+**问题**：过度配置的实例浪费金钱
 
 ```python
-# Analyze actual usage
+# 分析实际使用情况
 import boto3
 from datetime import datetime, timedelta
 
 cloudwatch = boto3.client('cloudwatch')
 
-# Get CPU utilization for last 30 days
+# 获取过去 30 天的 CPU 利用率
 response = cloudwatch.get_metric_statistics(
     Namespace='AWS/EC2',
     MetricName='CPUUtilization',
     Dimensions=[{'Name': 'InstanceId', 'Value': 'i-1234567890'}],
     StartTime=datetime.now() - timedelta(days=30),
     EndTime=datetime.now(),
-    Period=3600,  # 1 hour
+    Period=3600,  # 1 小时
     Statistics=['Average', 'Maximum']
 )
 
 avg_cpu = sum(d['Average'] for d in response['Datapoints']) / len(response['Datapoints'])
-print(f"Average CPU: {avg_cpu:.1f}%")
+print(f"平均 CPU：{avg_cpu:.1f}%")
 
-# If avg_cpu < 20%, instance is over-provisioned!
+# 如果 avg_cpu < 20%，实例过度配置！
 ```
 
-**Action**: Downsize instance type
+**措施**：降低实例类型
 
 ```
-Current: ml.p3.8xlarge (4 GPUs) @ $12.24/hour
-Average GPU utilization: 30%
+当前：ml.p3.8xlarge（4 GPU）@ $12.24/小时
+平均 GPU 利用率：30%
 
-Rightsize to: ml.p3.2xlarge (1 GPU) @ $3.06/hour
-Savings: $9.18/hour × 720 hours/month = $6,610/month
+调整为：ml.p3.2xlarge（1 GPU）@ $3.06/小时
+节省：$9.18/小时 × 720 小时/月 = 每月 $6,610
 ```
 
-### Optimization Strategy 2: Auto-Scaling
+### 优化策略 2：自动扩缩容
 
-**Problem**: Fixed capacity wastes money during low-demand periods
+**问题**：固定容量在低需求期间浪费金钱
 
 ```python
-# Auto-scaling inference endpoints
+# 自动扩展推理端点
 import boto3
 
 autoscaling = boto3.client('application-autoscaling')
 
-# Register scalable target
+# 注册可扩展目标
 autoscaling.register_scalable_target(
     ServiceNamespace='sagemaker',
     ResourceId='endpoint/ml-inference-endpoint/variant/AllTraffic',
     ScalableDimension='sagemaker:variant:DesiredInstanceCount',
-    MinCapacity=1,  # Scale down to 1 instance during low traffic
-    MaxCapacity=10  # Scale up to 10 during peak
+    MinCapacity=1,  # 低流量时缩放到 1 个实例
+    MaxCapacity=10  # 高峰时扩展到 10 个
 )
 
-# Configure scaling policy (target 70% CPU)
+# 配置扩展策略（目标 70% CPU）
 autoscaling.put_scaling_policy(
     PolicyName='cpu-scaling-policy',
     ServiceNamespace='sagemaker',
@@ -331,29 +329,29 @@ autoscaling.put_scaling_policy(
     ScalableDimension='sagemaker:variant:DesiredInstanceCount',
     PolicyType='TargetTrackingScaling',
     TargetTrackingScalingPolicyConfiguration={
-        'TargetValue': 70.0,  # Target 70% CPU utilization
+        'TargetValue': 70.0,  # 目标 70% CPU 利用率
         'PredefinedMetricSpecification': {
             'PredefinedMetricType': 'SageMakerVariantInvocationsPerInstance'
         },
-        'ScaleInCooldown': 300,   # Wait 5 min before scaling down
-        'ScaleOutCooldown': 60    # Wait 1 min before scaling up
+        'ScaleInCooldown': 300,   # 缩减前等待 5 分钟
+        'ScaleOutCooldown': 60    # 扩展前等待 1 分钟
     }
 )
 ```
 
-**Savings**:
+**节省**：
 ```
-Without auto-scaling: 10 instances × 24/7 = 7,200 instance-hours/month
-With auto-scaling: Avg 4 instances = 2,880 instance-hours/month
-Savings: 60% reduction = $13,220/month saved
+无自动扩缩容：10 个实例 × 24/7 = 每月 7200 个实例小时
+有自动扩缩容：平均 4 个实例 = 每月 2880 个实例小时
+节省：减少 60% = 每月节省 $13,220
 ```
 
-### Optimization Strategy 3: Scheduled Scaling
+### 优化策略 3：定时扩缩容
 
-**Problem**: Dev/test environments run 24/7 unnecessarily
+**问题**：开发/测试环境不必要时 24/7 运行
 
 ```python
-# Stop instances outside business hours
+# 在非工作时间停止实例
 import boto3
 from datetime import datetime
 
@@ -362,26 +360,26 @@ ec2 = boto3.client('ec2')
 def lambda_handler(event, context):
     current_hour = datetime.now().hour
 
-    # Business hours: 9 AM - 6 PM PST
+    # 工作时间：上午 9 点 - 下午 6 点 PST
     if 9 <= current_hour < 18:
-        # Start dev instances
+        # 启动开发实例
         ec2.start_instances(InstanceIds=['i-dev-12345'])
     else:
-        # Stop dev instances
+        # 停止开发实例
         ec2.stop_instances(InstanceIds=['i-dev-12345'])
 ```
 
-**Savings**:
+**节省**：
 ```
-Without scheduling: 24 hours/day × 30 days = 720 hours/month
-With scheduling (9 AM - 6 PM): 9 hours/day × 22 workdays = 198 hours/month
-Savings: 72% reduction = $1,590/month per instance
+无调度：24 小时/天 × 30 天 = 每月 720 小时
+有调度（上午 9 点 - 下午 6 点）：9 小时/天 × 22 个工作日 = 每月 198 小时
+节省：减少 72% = 每个实例每月节省 $1,590
 ```
 
-### Optimization Strategy 4: Spot Instances for Training
+### 优化策略 4：为训练使用 Spot 实例
 
 ```python
-# Train with spot instances (AWS SageMaker)
+# 使用 Spot 实例训练（AWS SageMaker）
 import sagemaker
 
 estimator = sagemaker.estimator.Estimator(
@@ -389,42 +387,42 @@ estimator = sagemaker.estimator.Estimator(
     role='SageMakerRole',
     instance_count=4,
     instance_type='ml.p3.2xlarge',
-    use_spot_instances=True,  # Use spot!
-    max_run=3600,  # Max 1 hour
-    max_wait=7200,  # Wait up to 2 hours for spot capacity
-    checkpoint_s3_uri='s3://my-bucket/checkpoints/'  # Save checkpoints
+    use_spot_instances=True,  # 使用 Spot！
+    max_run=3600,  # 最多 1 小时
+    max_wait=7200,  # 最多等待 2 小时以获取 Spot 容量
+    checkpoint_s3_uri='s3://my-bucket/checkpoints/'  # 保存检查点
 )
 
 estimator.fit({'training': 's3://my-bucket/data'})
 ```
 
-**Savings**:
+**节省**：
 ```
-Training job: 4 × p3.2xlarge × 8 hours
-On-demand: $3.06/hour × 4 × 8 = $97.92
-Spot: $0.92/hour × 4 × 8 = $29.44
-Savings: $68.48 (70%)
+训练作业：4 × p3.2xlarge × 8 小时
+按需：$3.06/小时 × 4 × 8 = $97.92
+Spot：$0.92/小时 × 4 × 8 = $29.44
+节省：$68.48（70%）
 ```
 
-### Optimization Strategy 5: Storage Tiering
+### 优化策略 5：存储分层
 
-**Problem**: All data stored in expensive hot storage
+**问题**：所有数据都存储在昂贵的热存储中
 
 ```python
-# Move old models to cheaper storage
+# 将旧模型移到更便宜的存储
 import boto3
 from datetime import datetime, timedelta
 
 s3 = boto3.client('s3')
 
-# List models in S3
+# 列出 S3 中的模型
 response = s3.list_objects_v2(Bucket='ml-models')
 
 for obj in response.get('Contents', []):
     last_modified = obj['LastModified'].replace(tzinfo=None)
     age_days = (datetime.now() - last_modified).days
 
-    # Move models older than 90 days to Glacier
+    # 将 90 天前的模型移到 Glacier
     if age_days > 90:
         s3.copy_object(
             Bucket='ml-models',
@@ -432,45 +430,45 @@ for obj in response.get('Contents', []):
             CopySource={'Bucket': 'ml-models', 'Key': obj['Key']},
             StorageClass='GLACIER'
         )
-        print(f"Moved {obj['Key']} to Glacier (age: {age_days} days)")
+        print(f"已将 {obj['Key']} 移动到 Glacier（年龄：{age_days} 天）")
 ```
 
-**Storage Cost Comparison**:
+**存储成本对比**：
 ```
-S3 Standard: $0.023/GB/month
-S3 Infrequent Access: $0.0125/GB/month (46% savings)
-S3 Glacier: $0.004/GB/month (83% savings)
+S3 Standard：$0.023/GB/月
+S3 Infrequent Access：$0.0125/GB/月（节省 46%）
+S3 Glacier：$0.004/GB/月（节省 83%）
 
-1TB of old models:
-Standard: $23.60/month
-Glacier: $4.10/month
-Savings: $19.50/month ($234/year)
+1TB 旧模型：
+Standard：$23.60/月
+Glacier：$4.10/月
+节省：每月 $19.50（每年 $234）
 ```
 
 ---
 
-## 4. FinOps for AI Infrastructure
+## 4. AI 基础设施的 FinOps
 
-### What is FinOps?
+### 什么是 FinOps？
 
-**FinOps** (Financial Operations) brings financial accountability to cloud spending.
+**FinOps**（财务运营）将财务问责制引入云支出。
 
-**Principles**:
-1. **Teams collaborate** (engineering, finance, business)
-2. **Everyone owns their usage**
-3. **Centralized team drives FinOps**
-4. **Visibility** into spending
-5. **Decisions are driven by business value**
+**原则**：
+1. **团队协作**（工程、财务、业务）
+2. **每个人对自己的使用负责**
+3. **中央团队推动 FinOps**
+4. **支出可见性**
+5. **决策由业务价值驱动**
 
-### Cost Allocation and Tagging
+### 成本分配与标签
 
 ```python
-# Tag all resources for cost tracking
+# 为成本跟踪给所有资源打标签
 import boto3
 
 ec2 = boto3.client('ec2')
 
-# Tag instances
+# 给实例打标签
 ec2.create_tags(
     Resources=['i-1234567890'],
     Tags=[
@@ -483,24 +481,24 @@ ec2.create_tags(
 )
 ```
 
-**Cost Dashboard by Tag**:
+**按标签的成本仪表盘**：
 ```
-Cost by Project (Last 30 days):
-├── recommendation-system: $45,234 (45%)
-├── fraud-detection: $32,890 (33%)
-├── search-ranking: $15,432 (15%)
-└── experimentation: $7,123 (7%)
+按项目划分的成本（最近 30 天）：
+├── recommendation-system：$45,234（45%）
+├── fraud-detection：$32,890（33%）
+├── search-ranking：$15,432（15%）
+└── experimentation：$7,123（7%）
 
-Cost by Environment:
-├── production: $75,234 (75%)
-├── staging: $15,432 (15%)
-└── dev: $10,023 (10%)
+按环境划分的成本：
+├── production：$75,234（75%）
+├── staging：$15,432（15%）
+└── dev：$10,023（10%）
 ```
 
-### Budgets and Alerts
+### 预算与告警
 
 ```python
-# Set budget with alerts
+# 设置带告警的预算
 import boto3
 
 budgets = boto3.client('budgets')
@@ -510,7 +508,7 @@ budgets.create_budget(
     Budget={
         'BudgetName': 'ML-Platform-Monthly',
         'BudgetLimit': {
-            'Amount': '100000',  # $100k/month
+            'Amount': '100000',  # 每月 $100k
             'Unit': 'USD'
         },
         'TimeUnit': 'MONTHLY',
@@ -521,7 +519,7 @@ budgets.create_budget(
             'Notification': {
                 'NotificationType': 'ACTUAL',
                 'ComparisonOperator': 'GREATER_THAN',
-                'Threshold': 80,  # Alert at 80% of budget
+                'Threshold': 80,  # 达到预算 80% 时告警
                 'ThresholdType': 'PERCENTAGE'
             },
             'Subscribers': [
@@ -535,7 +533,7 @@ budgets.create_budget(
             'Notification': {
                 'NotificationType': 'FORECASTED',
                 'ComparisonOperator': 'GREATER_THAN',
-                'Threshold': 100,  # Forecast alert at 100%
+                'Threshold': 100,  # 预测达到 100% 时告警
                 'ThresholdType': 'PERCENTAGE'
             },
             'Subscribers': [
@@ -551,163 +549,163 @@ budgets.create_budget(
 
 ---
 
-## 5. Disaster Recovery and Business Continuity
+## 5. 灾难恢复与业务连续性
 
-### RPO and RTO Targets
-
-```
-RPO (Recovery Point Objective):
-How much data can you afford to lose?
-├── RPO = 1 hour → Lose max 1 hour of data
-└── Requires: Continuous replication or hourly backups
-
-RTO (Recovery Time Objective):
-How quickly must systems be back online?
-├── RTO = 4 hours → System back within 4 hours
-└── Requires: Warm standby or faster
-```
-
-### DR Strategies for ML
-
-#### Strategy 1: Backup and Restore (Lowest cost, highest RTO)
+### RPO 和 RTO 目标
 
 ```
-RPO: Hours to days
-RTO: Hours to days
-Cost: Low ($$$)
+RPO（恢复点目标）：
+你能承受损失多少数据？
+├── RPO = 1 小时 → 最多损失 1 小时数据
+└── 需要：持续复制或每小时备份
 
-Implementation:
-1. Daily model backups to S3
-2. Database backups to S3
-3. Infrastructure as Code in Git
-4. In disaster: Recreate from backups
-
-Best for: Non-critical systems
+RTO（恢复时间目标）：
+系统需在多快时间内恢复在线？
+├── RTO = 4 小时 → 4 小时内系统恢复
+└── 需要：温备或更快
 ```
 
-#### Strategy 2: Pilot Light (Low cost, medium RTO)
+### ML 的 DR 策略
+
+#### 策略 1：备份和恢复（成本最低，RTO 最长）
 
 ```
-RPO: Minutes
-RTO: Hours
-Cost: Low-Medium ($$$$)
+RPO：数小时到数天
+RTO：数小时到数天
+成本：低（$$$）
 
-Implementation:
-Primary AWS:
-├── Full production environment
-└── All traffic
+实施：
+1. 每日模型备份到 S3
+2. 数据库备份到 S3
+3. Git 中的基础设施即代码
+4. 灾难时：从备份重建
 
-Secondary GCP (minimal):
-├── Database replica (live)
-├── S3 → GCS replication (live)
-└── Infrastructure code ready (not running)
-
-In disaster:
-1. Scale up GCP infrastructure
-2. Point DNS to GCP
-3. Resume operations (1-4 hours)
-
-Best for: Important systems with moderate uptime needs
+最适合：非关键系统
 ```
 
-#### Strategy 3: Warm Standby (Medium cost, low RTO)
+#### 策略 2：Pilot Light（低成本，中等 RTO）
 
 ```
-RPO: Seconds
-RTO: Minutes
-Cost: Medium ($$$$$$)
+RPO：分钟
+RTO：数小时
+成本：低-中（$$$$）
 
-Implementation:
-Primary AWS:
-├── Full production (100% traffic)
+实施：
+主 AWS：
+├── 完整生产环境
+└── 所有流量
 
-Secondary GCP:
-├── Scaled-down replicas (running at 20% capacity)
-├── Live data replication
-└── Ready to scale up instantly
+备 GCP（最小化）：
+├── 数据库副本（实时）
+├── S3 → GCS 复制（实时）
+└── 基础设施代码就绪（未运行）
 
-In disaster:
-1. Scale up GCP to 100%
-2. Redirect traffic via DNS/load balancer
-3. Operational in <15 minutes
+灾难时：
+1. 扩展 GCP 基础设施
+2. 将 DNS 指向 GCP
+3. 恢复运营（1-4 小时）
 
-Best for: Business-critical ML services
+最适合：具有中等正常运行时间需求的重要系统
 ```
 
-#### Strategy 4: Multi-Region Active-Active (Highest cost, lowest RTO)
+#### 策略 3：温备（中等成本，低 RTO）
 
 ```
-RPO: Near-zero
-RTO: Seconds (automatic failover)
-Cost: High ($$$$$$$$)
+RPO：秒
+RTO：分钟
+成本：中（$$$$$$）
 
-Implementation:
-Both regions handle traffic simultaneously:
-AWS US-East:          AWS US-West:
-├── 50% traffic       ├── 50% traffic
-├── Live data sync ←→ └── Live data sync
+实施：
+主 AWS：
+├── 完整生产（100% 流量）
 
-In disaster (US-East fails):
-- US-West automatically handles 100% traffic
-- No manual intervention needed
-- Users may not notice outage
+备 GCP：
+├── 缩小的副本（以 20% 容量运行）
+├── 实时数据复制
+└── 准备就绪，可即时扩展
 
-Best for: Mission-critical systems
+灾难时：
+1. 将 GCP 扩展到 100%
+2. 通过 DNS/负载均衡器重定向流量
+3. <15 分钟内运营
+
+最适合：业务关键的 ML 服务
+```
+
+#### 策略 4：多区域双活（成本最高，RTO 最短）
+
+```
+RPO：接近零
+RTO：秒（自动故障转移）
+成本：高（$$$$$$$$）
+
+实施：
+两个区域同时处理流量：
+AWS 美东：          AWS 美西：
+├── 50% 流量        ├── 50% 流量
+├── 实时数据同步 ←→ └── 实时数据同步
+
+灾难时（美东故障）：
+- 美西自动处理 100% 流量
+- 无需手动干预
+- 用户可能不会注意到故障
+
+最适合：任务关键型系统
 ```
 
 ---
 
-## 6. Summary and Key Takeaways
+## 6. 总结与关键要点
 
-### Core Concepts
+### 核心概念
 
-1. **Multi-cloud** offers redundancy and flexibility
-   - Best-of-breed: Use each cloud's strengths
-   - Active-passive: Disaster recovery
-   - Consider complexity vs benefits
+1. **多云**提供冗余和灵活性
+   - 最佳服务组合：使用每个云的优势
+   - 主备：灾难恢复
+   - 考虑复杂性 vs 收益
 
-2. **Cost optimization** is critical for ML
-   - Right-size instances (analyze actual usage)
-   - Auto-scale inference endpoints
-   - Use spot instances for training
-   - Schedule dev/test environments
-   - Tier storage (S3 Standard → Glacier)
+2. **成本优化**对 ML 至关重要
+   - 合理调整实例规格（分析实际使用情况）
+   - 自动扩展推理端点
+   - 对训练使用 Spot 实例
+   - 调度开发/测试环境
+   - 存储分层（S3 Standard → Glacier）
 
-3. **FinOps** brings accountability
-   - Tag all resources for cost allocation
-   - Set budgets and alerts
-   - Regular cost reviews with teams
+3. **FinOps**带来问责制
+   - 为成本分配给所有资源打标签
+   - 设置预算和告警
+   - 与团队定期进行成本审查
 
-4. **Disaster recovery** ensures business continuity
-   - Define RPO/RTO targets
-   - Choose DR strategy based on criticality
-   - Test DR plan regularly
+4. **灾难恢复**确保业务连续性
+   - 定义 RPO/RTO 目标
+   - 根据关键性选择 DR 策略
+   - 定期测试 DR 计划
 
-### Practical Skills Gained
+### 获得的实践技能
 
-✅ Design multi-cloud architectures
-✅ Optimize ML workload costs (60-70% savings achievable)
-✅ Implement FinOps practices (tagging, budgets)
-✅ Plan disaster recovery strategies
-✅ Right-size, auto-scale, and schedule resources
+✅ 设计多云架构
+✅ 优化 ML 工作负载成本（可实现 60-70% 节省）
+✅ 实施 FinOps 实践（标签、预算）
+✅ 规划灾难恢复策略
+✅ 合理调整规格、自动扩展和调度资源
 
-### Common Pitfalls to Avoid
+### 应避免的常见陷阱
 
-❌ Running dev/test 24/7 (use scheduling)
-❌ Over-provisioning "just in case" (right-size)
-❌ Not using spot instances for training
-❌ Storing all data in hot storage
-❌ No cost tagging (can't track spending)
-❌ No disaster recovery plan
+❌ 开发/测试 24/7 运行（使用调度）
+❌ "以防万一"过度配置（合理调整规格）
+❌ 不为训练使用 Spot 实例
+❌ 将所有数据存储在热存储中
+❌ 无成本标签（无法跟踪支出）
+❌ 无灾难恢复计划
 
-### Next Steps
+### 下一步
 
-- **Analyze**: Review current cloud spending, identify top costs
-- **Optimize**: Implement auto-scaling and scheduling
-- **Tag**: Tag all resources for cost tracking
-- **Test**: Run DR drill to validate recovery procedures
+- **分析**：查看当前云支出，识别最高成本
+- **优化**：实施自动扩缩容和调度
+- **打标签**：为成本跟踪给所有资源打标签
+- **测试**：运行 DR 演习以验证恢复流程
 
-### Additional Resources
+### 其他资源
 
 - [AWS Cost Optimization Best Practices](https://aws.amazon.com/pricing/cost-optimization/)
 - [GCP Rightsizing Recommendations](https://cloud.google.com/compute/docs/instances/apply-sizing-recommendations-for-instances)
@@ -716,6 +714,6 @@ Best for: Mission-critical systems
 
 ---
 
-**Congratulations!** You now understand how to build cost-effective, resilient multi-cloud ML infrastructure with proper financial governance and disaster recovery.
+**恭喜！** 你现在了解了如何构建具有成本效益、弹性的多云 ML 基础设施，并具备适当的财务治理和灾难恢复能力。
 
-**Final Module Complete!**
+**最终模块完成！**

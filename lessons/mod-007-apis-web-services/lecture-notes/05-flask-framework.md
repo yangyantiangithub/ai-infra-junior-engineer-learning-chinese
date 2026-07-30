@@ -1,123 +1,123 @@
-# Lecture 05: Flask Framework
+# 讲座 05：Flask 框架
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [What is Flask?](#what-is-flask)
-3. [Flask vs FastAPI: When to Choose Which](#flask-vs-fastapi-when-to-choose-which)
-4. [Installation and Project Layout](#installation-and-project-layout)
-5. [Your First Flask Application](#your-first-flask-application)
-6. [Routing and View Functions](#routing-and-view-functions)
-7. [Request Handling](#request-handling)
-8. [Response Construction](#response-construction)
-9. [Application Factory Pattern and Blueprints](#application-factory-pattern-and-blueprints)
-10. [Configuration Management](#configuration-management)
-11. [Error Handling](#error-handling)
-12. [Middleware and Hooks](#middleware-and-hooks)
-13. [Flask Extensions](#flask-extensions)
-14. [Building a Flask ML API](#building-a-flask-ml-api)
-15. [Production Deployment](#production-deployment)
-16. [Testing Flask Applications](#testing-flask-applications)
-17. [Best Practices](#best-practices)
-18. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [介绍](#介绍)
+2. [什么是 Flask？](#什么是-flask)
+3. [Flask vs FastAPI：何时选择哪个](#flask-vs-fastapi何时选择哪个)
+4. [安装和项目布局](#安装和项目布局)
+5. [你的第一个 Flask 应用程序](#你的第一个-flask-应用程序)
+6. [路由和视图函数](#路由和视图函数)
+7. [请求处理](#请求处理)
+8. [响应构建](#响应构建)
+9. [应用工厂模式和 Blueprint](#应用工厂模式和-blueprint)
+10. [配置管理](#配置管理)
+11. [错误处理](#错误处理)
+12. [中间件和钩子](#中间件和钩子)
+13. [Flask 扩展](#flask-扩展)
+14. [构建 Flask ML API](#构建-flask-ml-api)
+15. [生产部署](#生产部署)
+16. [测试 Flask 应用程序](#测试-flask-应用程序)
+17. [最佳实践](#最佳实践)
+18. [总结和关键要点](#总结和关键要点)
 
-## Introduction
+## 介绍
 
-Flask is a lightweight, mature Python web framework that has powered production APIs for over a decade. While newer frameworks like FastAPI have captured attention in the ML community, Flask remains widely used in legacy systems, internal tooling, and any context where a simple, unopinionated, battle-tested framework is preferred.
+Flask 是一个轻量级、成熟的 Python Web 框架，已经为生产 API 提供动力超过十年。虽然像 FastAPI 这样的新框架在 ML 社区引起了关注，但 Flask 在遗留系统、内部工具以及任何需要简单、无偏见、经过实战检验的框架的场合中仍然被广泛使用。
 
-This lecture teaches Flask from the ground up, focused on the patterns you will actually encounter when deploying ML models behind Flask endpoints. By the end, you will be able to read existing Flask codebases, write new endpoints competently, and make an informed choice between Flask and FastAPI for new projects.
+本讲座从头开始教授 Flask，专注于你在 Flask endpoint 后部署 ML 模型时实际会遇到的模式。最后，你将能够阅读现有的 Flask 代码库、熟练地编写新的 endpoint，并在新项目中对 Flask 和 FastAPI 做出明智的选择。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Understand Flask's design philosophy and how it differs from FastAPI
-- Set up a Flask project with the application factory pattern
-- Define routes, view functions, and handle HTTP verbs correctly
-- Parse request bodies, query strings, headers, and uploaded files
-- Construct JSON, HTML, and streaming responses
-- Organize larger applications using Blueprints
-- Manage configuration safely across environments
-- Handle errors with custom error pages and JSON error responses
-- Use common extensions: Flask-RESTful, Flask-SQLAlchemy, Flask-CORS, Flask-Smorest
-- Build a complete ML inference endpoint in Flask
-- Deploy Flask behind Gunicorn or uWSGI
-- Test Flask applications with pytest
+在本讲座结束时，你将：
+- 理解 Flask 的设计理念及其与 FastAPI 的不同之处
+- 使用应用工厂模式设置 Flask 项目
+- 正确定义路由、视图函数和处理 HTTP 动词
+- 解析请求体、查询字符串、头部和上传的文件
+- 构建 JSON、HTML 和流式响应
+- 使用 Blueprint 组织大型应用程序
+- 安全地跨环境管理配置
+- 使用自定义错误页面和 JSON 错误响应处理错误
+- 使用常见扩展：Flask-RESTful、Flask-SQLAlchemy、Flask-CORS、Flask-Smorest
+- 在 Flask 中构建完整的 ML 推理 endpoint
+- 在 Gunicorn 或 uWSGI 后部署 Flask
+- 使用 pytest 测试 Flask 应用程序
 
-### Prerequisites
-- Module 001: Python Fundamentals
-- Module 007 - Lecture 01: API Fundamentals & REST
-- Module 007 - Lecture 02: FastAPI Framework (for comparison)
-- Basic understanding of WSGI
+### 先决条件
+- 模块 001：Python 基础
+- 模块 007 - 讲座 01：API 基础和 REST
+- 模块 007 - 讲座 02：FastAPI 框架（用于对比）
+- 对 WSGI 的基本理解
 
-### Estimated Time
-3 hours (including hands-on coding)
-
----
-
-## What is Flask?
-
-Flask is a **WSGI microframework** for Python created by Armin Ronacher in 2010. The term "microframework" describes its philosophy: Flask provides the minimum needed to build a web application — routing, request/response objects, templating via Jinja2, and a development server — and leaves everything else (database access, authentication, form validation) to extensions or your own code.
-
-### Key Characteristics
-
-1. **Minimal core, large ecosystem.** Flask itself is small (a few thousand lines). Functionality is added through well-curated extensions like Flask-SQLAlchemy, Flask-Login, Flask-Smorest.
-2. **WSGI-based.** Flask follows the Python Web Server Gateway Interface standard (PEP 3333), making it compatible with any WSGI server: Gunicorn, uWSGI, mod_wsgi, Waitress.
-3. **Synchronous by default.** Each request is handled by a worker thread or process. Flask 2.0+ supports `async def` view functions but does not run on an event loop the way FastAPI does.
-4. **Unopinionated.** Flask does not prescribe a project structure, ORM, or template engine. You assemble the stack you want.
-5. **Mature and stable.** With over a decade of production use, the framework's API is unlikely to surprise you and documentation is abundant.
-
-### Why Flask Still Matters in ML Infrastructure
-
-- **Legacy systems.** Many production ML services predate FastAPI and run on Flask. Familiarity is non-negotiable when working on existing platforms.
-- **Lightweight internal tools.** A simple admin endpoint, a model health checker, or a one-off batch trigger is often easier in Flask than in any heavier framework.
-- **Operator familiarity.** Operations teams who have run Flask + Gunicorn for years have well-developed runbooks, alerting, and tuning knowledge.
-- **WSGI ecosystem.** Tools like New Relic, Datadog APM, and many WAFs have first-class WSGI middleware support.
-- **Stable patterns.** When you don't need async I/O or auto-generated docs, Flask's simplicity reduces cognitive overhead.
+### 预计时间
+3 小时（包括动手编码）
 
 ---
 
-## Flask vs FastAPI: When to Choose Which
+## 什么是 Flask？
 
-| Aspect | Flask | FastAPI |
+Flask 是 Armin Ronacher 于 2010 年创建的 **WSGI 微框架**。"微框架"一词描述了它的哲学：Flask 提供构建 Web 应用程序所需的最少内容——路由、请求/响应对象、通过 Jinja2 的模板以及开发服务器——其余所有内容（数据库访问、认证、表单验证）都留给扩展或你自己的代码。
+
+### 主要特性
+
+1. **最小的核心、庞大的生态系统。** Flask 本身很小（几千行）。功能通过精心策划的扩展如 Flask-SQLAlchemy、Flask-Login、Flask-Smorest 添加。
+2. **基于 WSGI。** Flask 遵循 Python Web 服务器网关接口标准（PEP 3333），使其与任何 WSGI 服务器兼容：Gunicorn、uWSGI、mod_wsgi、Waitress。
+3. **默认同步。** 每个请求由一个工作线程或进程处理。Flask 2.0+ 支持 `async def` 视图函数，但不像 FastAPI 那样在事件循环上运行。
+4. **无偏见。** Flask 不规定项目结构、ORM 或模板引擎。你组装你想要的堆栈。
+5. **成熟稳定。** 经过十多年的生产使用，框架的 API 不太可能让你意外，文档也非常丰富。
+
+### 为什么 Flask 在 ML 基础设施中仍然重要
+
+- **遗留系统。** 许多生产 ML 服务先于 FastAPI 出现，并在 Flask 上运行。在处理现有平台时，熟悉它是必不可少的。
+- **轻量级内部工具。** 一个简单的管理 endpoint、模型健康检查器或一次性批处理触发器在 Flask 中通常比在任何更重的框架中更容易。
+- **运维熟悉度。** 多年来运行 Flask + Gunicorn 的运维团队拥有完善的 runbook、告警和调优知识。
+- **WSGI 生态系统。** 像 New Relic、Datadog APM 和许多 WAF 都有一流的 WSGI 中间件支持。
+- **稳定的模式。** 当你不需要异步 I/O 或自动生成文档时，Flask 的简单性减少了认知负担。
+
+---
+
+## Flask vs FastAPI：何时选择哪个
+
+| 方面 | Flask | FastAPI |
 |---|---|---|
-| Style | WSGI, synchronous | ASGI, async-native |
-| Speed | Adequate; bounded by sync I/O | Higher throughput for I/O-bound workloads |
-| Type hints | Optional, not enforced | Required for routing/validation |
-| Data validation | Manual or extensions (marshmallow, pydantic) | Built-in via Pydantic |
-| Auto-docs | Via extensions (Flask-Smorest, apispec) | Built-in OpenAPI + Swagger UI |
-| Async I/O | Limited (Flask 2.0+, but worker-bound) | First-class |
-| Maturity | Very mature (since 2010) | Mature (since 2018), growing fast |
-| Learning curve | Gentle | Slightly steeper (Pydantic, async) |
-| Best fit | Internal tools, legacy services, simple APIs | High-concurrency ML serving, modern greenfield APIs |
+| 风格 | WSGI、同步 | ASGI、异步原生 |
+| 速度 | 适当；受限于同步 I/O | I/O 密集型工作负载的更高吞吐量 |
+| 类型提示 | 可选、不强制 | 路由/验证必需 |
+| 数据验证 | 手动或扩展（marshmallow、pydantic） | 通过 Pydantic 内置 |
+| 自动文档 | 通过扩展（Flask-Smorest、apispec） | 内置 OpenAPI + Swagger UI |
+| 异步 I/O | 有限（Flask 2.0+，但受限于工作进程） | 一流支持 |
+| 成熟度 | 非常成熟（自 2010 年起） | 成熟（自 2018 年起），快速成长 |
+| 学习曲线 | 平缓 | 稍陡（Pydantic、async） |
+| 最适合 | 内部工具、遗留服务、简单 API | 高并发 ML 服务、现代新建 API |
 
-### Decision Guide
+### 决策指南
 
-**Choose Flask when:**
-- You're working on an existing Flask codebase.
-- Your endpoints are CPU-bound (model inference) rather than I/O-bound — async gives no benefit.
-- The team is already deeply experienced with Flask + Gunicorn ops.
-- You need a tiny, single-file service.
+**选择 Flask 当：**
+- 你在现有的 Flask 代码库上工作。
+- 你的 endpoint 是 CPU 密集型（模型推理）而非 I/O 密集型——异步没有好处。
+- 团队已经对 Flask + Gunicorn 运维有深入经验。
+- 你需要一个很小的单文件服务。
 
-**Choose FastAPI when:**
-- You're building a new high-traffic ML serving layer.
-- Your workload is I/O-bound (database calls, calls to other services, streaming).
-- You want auto-generated docs without configuring an extension.
-- You want stricter input validation by default.
+**选择 FastAPI 当：**
+- 你在构建新的高流量 ML 服务层。
+- 你的工作负载是 I/O 密集型（数据库调用、调用其他服务、流式传输）。
+- 你想要自动生成文档而不需要配置扩展。
+- 你希望默认有更严格的输入验证。
 
-For model inference specifically, the difference is often modest: model latency dominates framework overhead. Pick the one the team will maintain best.
+具体到模型推理，差异通常不大：模型延迟主导框架开销。选择团队最能维护的那个。
 
 ---
 
-## Installation and Project Layout
+## 安装和项目布局
 
 ```bash
-# Recommended: create a virtual environment first
+# 推荐：首先创建虚拟环境
 python -m venv .venv
 source .venv/bin/activate
 
 pip install flask
 ```
 
-Minimal project structure for a small service:
+小型服务的最小项目结构：
 
 ```
 myapi/
@@ -127,30 +127,30 @@ myapi/
     └── test_app.py
 ```
 
-For anything that will outlive a prototype, use the application factory pattern (covered below):
+对于任何会超越原型的项目，使用应用工厂模式（如下所述）：
 
 ```
 myapi/
 ├── app/
-│   ├── __init__.py          # create_app() factory
+│   ├── __init__.py          # create_app() 工厂
 │   ├── routes/
 │   │   ├── __init__.py
 │   │   ├── health.py
 │   │   └── predict.py
-│   ├── models/              # SQLAlchemy models, NOT ML models
+│   ├── models/              # SQLAlchemy 模型，不是 ML 模型
 │   ├── ml/
 │   │   ├── loader.py
 │   │   └── inference.py
 │   ├── schemas.py           # marshmallow/pydantic
 │   └── config.py
 ├── tests/
-├── wsgi.py                  # Gunicorn entrypoint
+├── wsgi.py                  # Gunicorn 入口点
 └── requirements.txt
 ```
 
 ---
 
-## Your First Flask Application
+## 你的第一个 Flask 应用程序
 
 ```python
 # app.py
@@ -166,30 +166,30 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
 ```
 
-Run it:
+运行它：
 
 ```bash
 python app.py
-# or
+# 或
 flask --app app run --debug
 ```
 
-Visit `http://localhost:8000/`.
+访问 `http://localhost:8000/`。
 
-### What's Happening
+### 发生了什么
 
-- `Flask(__name__)` creates the application object. The `__name__` argument tells Flask where to look for templates and static files.
-- `@app.route("/")` is a decorator that registers `index` as the view function for the path `/`.
-- `jsonify` converts a Python dict to a JSON response with `Content-Type: application/json`.
-- `app.run(...)` starts the **development server only.** Never use it in production.
+- `Flask(__name__)` 创建应用程序对象。`__name__` 参数告诉 Flask 在哪里查找模板和静态文件。
+- `@app.route("/")` 是一个装饰器，将 `index` 注册为路径 `/` 的视图函数。
+- `jsonify` 将 Python 字典转换为带有 `Content-Type: application/json` 的 JSON 响应。
+- `app.run(...)` 启动 **开发服务器。** 永远不要在生产中使用它。
 
 ---
 
-## Routing and View Functions
+## 路由和视图函数
 
-### HTTP Methods
+### HTTP 方法
 
-By default, a route accepts only `GET`. Use the `methods` argument for others:
+默认情况下，路由只接受 `GET`。对其他方法使用 `methods` 参数：
 
 ```python
 @app.route("/predict", methods=["POST"])
@@ -201,7 +201,7 @@ def model(model_id):
     ...
 ```
 
-You can also use the convenience decorators added in Flask 2.0:
+你也可以使用 Flask 2.0 中新增的便捷装饰器：
 
 ```python
 @app.get("/health")
@@ -213,7 +213,7 @@ def predict():
     ...
 ```
 
-### URL Variables and Converters
+### URL 变量和转换器
 
 ```python
 @app.get("/users/<int:user_id>")
@@ -222,13 +222,13 @@ def user(user_id: int):
 
 @app.get("/files/<path:filepath>")
 def file(filepath: str):
-    # 'path' converter allows slashes
+    # 'path' 转换器允许斜杠
     return {"path": filepath}
 ```
 
-Built-in converters: `string` (default), `int`, `float`, `path`, `uuid`. Custom converters can be registered on `app.url_map.converters`.
+内置转换器：`string`（默认）、`int`、`float`、`path`、`uuid`。自定义转换器可以在 `app.url_map.converters` 上注册。
 
-### url_for() — Build URLs, Don't Hardcode
+### url_for() — 构建 URL，不要硬编码
 
 ```python
 from flask import url_for
@@ -238,46 +238,46 @@ def index():
     return {"predict_url": url_for("predict", _external=True)}
 ```
 
-`url_for` looks up routes by view function name, so renaming a URL doesn't break links elsewhere.
+`url_for` 按视图函数名称查找路由，因此重命名 URL 不会破坏其他地方的链接。
 
 ---
 
-## Request Handling
+## 请求处理
 
-The request-bound `request` object exposes everything about the incoming request.
+与请求绑定的 `request` 对象暴露了关于传入请求的一切。
 
 ```python
 from flask import request
 
 @app.post("/predict")
 def predict():
-    # JSON body
+    # JSON 体
     payload = request.get_json(silent=True) or {}
 
-    # Query parameters: /predict?model=resnet50
+    # 查询参数：/predict?model=resnet50
     model_name = request.args.get("model", "default")
 
-    # Headers
+    # 头部
     auth = request.headers.get("Authorization")
 
-    # Path
+    # 路径
     path = request.path  # "/predict"
 
-    # Form data
+    # 表单数据
     # value = request.form["field_name"]
 
-    # Uploaded file (multipart/form-data)
+    # 上传的文件 (multipart/form-data)
     # f = request.files["file"]
     # f.save("/tmp/upload.bin")
 
     return {"model": model_name, "received": payload}
 ```
 
-### Parsing and Validating JSON
+### 解析和验证 JSON
 
-Raw `request.get_json()` returns whatever the client sent. You should validate. Two common approaches:
+原始的 `request.get_json()` 返回客户端发送的任何内容。你应该进行验证。两种常见方法：
 
-**Approach 1: Manual validation**
+**方法 1：手动验证**
 
 ```python
 @app.post("/predict")
@@ -293,7 +293,7 @@ def predict():
     return {"prediction": run_model(features)}
 ```
 
-**Approach 2: marshmallow schema**
+**方法 2：marshmallow schema**
 
 ```python
 from marshmallow import Schema, fields, ValidationError
@@ -314,28 +314,28 @@ def predict():
     return {"prediction": run_model(data["features"], data["model_version"])}
 ```
 
-For projects already using Pydantic, the `flask-pydantic` extension provides similar ergonomics.
+对于已经使用 Pydantic 的项目，`flask-pydantic` 扩展提供了类似的使用体验。
 
 ---
 
-## Response Construction
+## 响应构建
 
-A view function can return:
+视图函数可以返回：
 
 ```python
-# Tuple: (body, status, headers)
+# 元组：(body, status, headers)
 return {"ok": True}, 201, {"X-Request-Id": "abc"}
 
-# Dict — auto-converted to JSON (Flask 1.1+)
+# 字典 — 自动转换为 JSON (Flask 1.1+)
 return {"ok": True}
 
-# Flask Response object for full control
+# 用于完全控制的 Flask Response 对象
 from flask import make_response
 resp = make_response({"ok": True}, 200)
 resp.headers["X-Request-Id"] = "abc"
 return resp
 
-# Streaming response (e.g., large inference batches)
+# 流式响应（例如，大型推理批次）
 from flask import Response
 def generate():
     yield "["
@@ -346,29 +346,29 @@ def generate():
 return Response(generate(), mimetype="application/json")
 ```
 
-### Standard Status Codes
+### 标准状态码
 
-| Code | Use |
+| 状态码 | 用途 |
 |---|---|
-| 200 | Success with body |
-| 201 | Resource created (POST to a collection) |
-| 202 | Accepted, processing async |
-| 204 | Success, no body |
-| 400 | Bad client request (validation) |
-| 401 | Unauthenticated |
-| 403 | Authenticated but forbidden |
-| 404 | Resource not found |
-| 422 | Semantically invalid request |
-| 500 | Server error |
-| 503 | Temporarily unavailable (e.g., model not loaded) |
+| 200 | 成功带请求体 |
+| 201 | 资源已创建 (POST 到集合) |
+| 202 | 已接受，正在异步处理 |
+| 204 | 成功，无请求体 |
+| 400 | 客户端请求错误（验证） |
+| 401 | 未认证 |
+| 403 | 已认证但禁止 |
+| 404 | 资源未找到 |
+| 422 | 语义无效的请求 |
+| 500 | 服务器错误 |
+| 503 | 暂时不可用（例如，模型未加载） |
 
 ---
 
-## Application Factory Pattern and Blueprints
+## 应用工厂模式和 Blueprint
 
-For anything larger than a single file, organize with a factory and blueprints.
+对于大于单个文件的项目，使用工厂和 blueprint 进行组织。
 
-### Factory
+### 工厂
 
 ```python
 # app/__init__.py
@@ -402,7 +402,7 @@ def predict():
     return {"prediction": model.predict(payload["features"])}
 ```
 
-### WSGI Entry Point
+### WSGI 入口点
 
 ```python
 # wsgi.py
@@ -410,29 +410,29 @@ from app import create_app
 app = create_app("production")
 ```
 
-Run with Gunicorn:
+使用 Gunicorn 运行：
 
 ```bash
 gunicorn --workers 4 --bind 0.0.0.0:8000 wsgi:app
 ```
 
-Benefits:
-- Multiple app instances for tests with different configs.
-- Clear separation of concerns by feature area.
-- Easier to mount sub-apps and reuse routes.
+优点：
+- 用于不同配置测试的多个应用实例。
+- 按功能区域清晰分离关注点。
+- 更容易挂载子应用和复用路由。
 
 ---
 
-## Configuration Management
+## 配置管理
 
-Never hardcode secrets. Flask supports several config loading patterns.
+永远不要硬编码密钥。Flask 支持多种配置加载模式。
 
 ```python
-# Environment variables
+# 环境变量
 app.config["MODEL_PATH"] = os.environ["MODEL_PATH"]
 app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
 
-# From a Python class
+# 从 Python 类
 class ProductionConfig:
     DEBUG = False
     MODEL_PATH = os.environ["MODEL_PATH"]
@@ -440,18 +440,18 @@ class ProductionConfig:
 
 app.config.from_object(ProductionConfig)
 
-# From an env-prefixed loader (Flask 2.1+)
+# 从带环境前缀的加载器 (Flask 2.1+)
 app.config.from_prefixed_env(prefix="MYAPI")
 # MYAPI_MODEL_PATH=/models/v1 → app.config["MODEL_PATH"]
 ```
 
-For production, prefer environment variables managed by your orchestrator (Kubernetes secrets, AWS Secrets Manager). Never commit a `.env` with real secrets.
+对于生产环境，更倾向于使用由你的编排器管理的环境变量（Kubernetes secrets、AWS Secrets Manager）。永远不要提交包含真实密钥的 `.env`。
 
 ---
 
-## Error Handling
+## 错误处理
 
-### Custom Error Pages and JSON Errors
+### 自定义错误页面和 JSON 错误
 
 ```python
 from werkzeug.exceptions import HTTPException
@@ -470,7 +470,7 @@ def handle_unexpected(err):
     return {"error": "internal_server_error"}, 500
 ```
 
-### Aborting Early
+### 提前中止
 
 ```python
 from flask import abort
@@ -485,9 +485,9 @@ def get_model(model_id):
 
 ---
 
-## Middleware and Hooks
+## 中间件和钩子
 
-Flask calls these "request hooks":
+Flask 将这些称为"请求钩子"：
 
 ```python
 @app.before_request
@@ -501,11 +501,11 @@ def add_request_id(response):
 
 @app.teardown_request
 def cleanup(exc):
-    # Always runs, even on exception. Close DB sessions here.
+    # 始终运行，即使有异常。在此关闭数据库会话。
     pass
 ```
 
-For true WSGI middleware (e.g., Prometheus instrumentation), wrap `app.wsgi_app`:
+对于真正的 WSGI 中间件（例如，Prometheus 仪表化），包装 `app.wsgi_app`：
 
 ```python
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -514,23 +514,23 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
 ---
 
-## Flask Extensions
+## Flask 扩展
 
-The Flask ecosystem includes many high-quality extensions. The ones you'll meet most often in ML infrastructure:
+Flask 生态系统包括许多高质量的扩展。你在 ML 基础设施中最常遇到的：
 
-| Extension | Purpose |
+| 扩展 | 用途 |
 |---|---|
-| **Flask-SQLAlchemy** | ORM integration for relational databases |
-| **Flask-Migrate** | Alembic-backed schema migrations |
-| **Flask-Smorest** | OpenAPI generation + marshmallow integration (closest analog to FastAPI's auto-docs) |
-| **Flask-RESTful** | Class-based resource routing (older, still common) |
-| **Flask-CORS** | Cross-origin request handling |
-| **Flask-Login** | Session-based user authentication |
-| **Flask-JWT-Extended** | JWT-based authentication |
-| **Flask-Limiter** | Rate limiting |
-| **prometheus-flask-exporter** | `/metrics` endpoint for Prometheus scraping |
+| **Flask-SQLAlchemy** | 关系数据库的 ORM 集成 |
+| **Flask-Migrate** | 基于 Alembic 的 schema 迁移 |
+| **Flask-Smorest** | OpenAPI 生成 + marshmallow 集成（最接近 FastAPI 自动文档的方案） |
+| **Flask-RESTful** | 基于类的资源路由（较老，仍然常见） |
+| **Flask-CORS** | 跨域请求处理 |
+| **Flask-Login** | 基于会话的用户认证 |
+| **Flask-JWT-Extended** | 基于 JWT 的认证 |
+| **Flask-Limiter** | 速率限制 |
+| **prometheus-flask-exporter** | 用于 Prometheus 抓取的 `/metrics` endpoint |
 
-### Example: Flask-Smorest for Auto-Generated Docs
+### 示例：Flask-Smorest 用于自动生成文档
 
 ```python
 from flask import Flask
@@ -563,9 +563,9 @@ def predict(payload):
 api.register_blueprint(blp)
 ```
 
-Visit `/docs` and you'll have a Swagger UI comparable to FastAPI's.
+访问 `/docs`，你将拥有与 FastAPI 相当的 Swagger UI。
 
-### Example: Prometheus Metrics
+### 示例：Prometheus 指标
 
 ```python
 from prometheus_flask_exporter import PrometheusMetrics
@@ -574,13 +574,13 @@ metrics = PrometheusMetrics(app)
 metrics.info("app_info", "Model API", version="1.0.0")
 ```
 
-This exposes `/metrics` with request counts, latencies, and exception counters — ready for Prometheus to scrape.
+这会暴露带有请求计数、延迟和异常计数器的 `/metrics` —— 准备好供 Prometheus 抓取。
 
 ---
 
-## Building a Flask ML API
+## 构建 Flask ML API
 
-A realistic minimal ML serving endpoint:
+一个实际的最小 ML 服务 endpoint：
 
 ```python
 # app/ml/loader.py
@@ -656,19 +656,19 @@ def create_app(config):
     return app
 ```
 
-### Important Considerations for ML in Flask
+### Flask 中 ML 的重要考虑
 
-1. **Model loading.** Load the model once at startup or lazily on first request, behind a lock. Never reload per request.
-2. **Worker model.** Each Gunicorn worker is a separate Python process with its own model copy. Plan memory accordingly.
-3. **GIL and CPU work.** Inference is usually CPU-bound, which means the GIL serializes work within a worker. For higher throughput, increase worker count rather than threads.
-4. **Cold start.** First request after process start pays the model-load cost. Use a readiness probe that warms the model before traffic arrives.
-5. **Batch endpoints.** For high throughput, accept a batch of inputs per request instead of one prediction per request.
+1. **模型加载。** 在启动时或首次请求时惰性加载模型，在锁后。永远不要每次请求都重新加载。
+2. **工作进程模型。** 每个 Gunicorn 工作进程是一个单独的 Python 进程，拥有自己的模型副本。相应地规划内存。
+3. **GIL 和 CPU 工作。** 推理通常是 CPU 密集型，这意味着 GIL 会在工作进程内序列化工作。为了更高的吞吐量，增加工作进程数而不是线程数。
+4. **冷启动。** 进程启动后的第一个请求承担模型加载成本。使用 readiness 探针在流量到达之前预热模型。
+5. **批量 endpoint。** 为了高吞吐量，每个请求接受一批输入，而不是一次一个预测。
 
 ---
 
-## Production Deployment
+## 生产部署
 
-The Flask development server is not for production. Use a WSGI server like Gunicorn:
+Flask 开发服务器不用于生产。使用 WSGI 服务器如 Gunicorn：
 
 ```bash
 gunicorn \
@@ -681,17 +681,17 @@ gunicorn \
   wsgi:app
 ```
 
-### Worker Tuning
+### 工作进程调优
 
-- **Workers**: Start at `(2 × CPU cores) + 1` for I/O-bound workloads. For CPU-bound ML inference, use `CPU cores`, sometimes fewer.
-- **Threads**: Useful for I/O-bound work; less so for CPU-bound inference due to the GIL.
-- **Timeout**: Set above your p99 inference latency; below your load balancer's request timeout.
+- **工作进程数**：对于 I/O 密集型工作负载，从 `(2 × CPU 核心数) + 1` 开始。对于 CPU 密集型的 ML 推理，使用 `CPU 核心数`，有时更少。
+- **线程数**：对 I/O 密集型工作有用；对于 CPU 密集型推理，由于 GIL 的存在，效果较差。
+- **超时**：设置在你的 p99 推理延迟之上；在你的负载均衡器的请求超时之下。
 
-### Behind a Reverse Proxy
+### 在反向代理后
 
-Run NGINX or a cloud load balancer in front of Gunicorn for TLS termination, static asset serving, and connection pooling. Tell Flask to trust forwarded headers using `werkzeug.middleware.proxy_fix.ProxyFix`.
+在 Gunicorn 前运行 NGINX 或云负载均衡器，用于 TLS 终止、静态资产服务和连接池。使用 `werkzeug.middleware.proxy_fix.ProxyFix` 告诉 Flask 信任转发的头部。
 
-### Containerizing
+### 容器化
 
 ```dockerfile
 FROM python:3.11-slim
@@ -709,9 +709,9 @@ CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:8000", "wsgi:app"]
 
 ---
 
-## Testing Flask Applications
+## 测试 Flask 应用程序
 
-Flask provides a test client that runs your app in-process — no real network:
+Flask 提供了一个测试客户端，可以在进程中运行你的应用——不需要真实的网络：
 
 ```python
 # tests/test_predict.py
@@ -741,35 +741,35 @@ def test_predict_validation(client):
     assert r.status_code == 400
 ```
 
-Run with `pytest`. For load testing, use Locust (covered in `04-api-testing.md` exercises).
+使用 `pytest` 运行。对于负载测试，使用 Locust（在 `04-api-testing.md` 练习中涵盖）。
 
 ---
 
-## Best Practices
+## 最佳实践
 
-1. **Use the application factory.** Avoid module-level state that depends on environment.
-2. **Keep view functions thin.** Push business logic into separate modules.
-3. **Validate input.** Reject bad requests at the boundary with 400, never let bad data hit your model.
-4. **Return structured errors.** A consistent JSON error shape (`{"error": "...", "detail": "..."}`) is easier to consume.
-5. **Log structured.** Use `app.logger` with JSON formatting in production.
-6. **Instrument everything.** Add Prometheus metrics, distributed tracing, and structured request logs from day one.
-7. **Never run the dev server in production.** Always use Gunicorn or uWSGI.
-8. **Pin dependencies.** Use `requirements.txt` with explicit versions, generated by `pip-compile` or `poetry export`.
-9. **Health and readiness endpoints.** `/health` is always 200 if the process is up. `/ready` is 200 only when the model is loaded and dependencies are reachable.
-10. **Graceful shutdown.** Gunicorn handles `SIGTERM`. Make sure long-running predictions finish or are cancelled cleanly.
+1. **使用应用工厂。** 避免依赖于环境的模块级状态。
+2. **保持视图函数精简。** 将业务逻辑推入单独模块。
+3. **验证输入。** 在边界处以 400 拒绝坏请求，永远不要让坏数据到达你的模型。
+4. **返回结构化错误。** 一致的 JSON 错误形状（`{"error": "...", "detail": "..."}`）更易于使用。
+5. **结构化日志。** 在生产环境中使用 JSON 格式的 `app.logger`。
+6. **仪表化一切。** 从第一天起添加 Prometheus 指标、分布式追踪和结构化请求日志。
+7. **永远不要在生产中运行开发服务器。** 始终使用 Gunicorn 或 uWSGI。
+8. **锁定依赖。** 使用带有明确版本的 `requirements.txt`，由 `pip-compile` 或 `poetry export` 生成。
+9. **健康检查和就绪检查 endpoint。** 如果进程启动，`/health` 总是 200。仅当模型加载且依赖可访问时，`/ready` 才为 200。
+10. **优雅关闭。** Gunicorn 处理 `SIGTERM`。确保长时间运行的预测能够正常完成或被取消。
 
 ---
 
-## Summary and Key Takeaways
+## 总结和关键要点
 
-- Flask is a synchronous WSGI microframework — minimal core, extensions for everything else.
-- Choose Flask for simple services, legacy systems, and CPU-bound ML inference where async gives no benefit.
-- Use the application factory + blueprints for anything past a prototype.
-- Validate input with marshmallow, pydantic, or manual checks. Don't trust JSON payloads.
-- For auto-generated docs comparable to FastAPI, use **Flask-Smorest**.
-- Load ML models once per worker; never reload per request.
-- Deploy with Gunicorn behind NGINX or a cloud load balancer. Never use the development server in production.
-- Test with `app.test_client()` — fast, in-process, no network.
-- Instrument with `prometheus-flask-exporter` and structured logs from the start.
+- Flask 是一个同步 WSGI 微框架——最小的核心，通过扩展实现其他所有功能。
+- 选择 Flask 用于简单服务、遗留系统和 CPU 密集型的 ML 推理（异步没有好处）。
+- 对于任何超过原型规模的项目，使用应用工厂 + blueprint。
+- 使用 marshmallow、pydantic 或手动检查验证输入。不要信任 JSON 载荷。
+- 要获得与 FastAPI 相当的自动生成文档，使用 **Flask-Smorest**。
+- 每个工作进程加载 ML 模型一次；永远不要每次请求重新加载。
+- 使用 Gunicorn 部署，前方放置 NGINX 或云负载均衡器。永远不要在生产中使用开发服务器。
+- 使用 `app.test_client()` 进行测试——快速、进程内、无需网络。
+- 从第一天开始使用 `prometheus-flask-exporter` 和结构化日志进行仪表化。
 
-In the next module you will containerize this same Flask service and deploy it to Kubernetes alongside the FastAPI variant, allowing direct comparison of operations characteristics.
+在下一个模块中，你将容器化同样的 Flask 服务并将其部署到 Kubernetes，与 FastAPI 变体并列，从而可以直接比较运维特性。

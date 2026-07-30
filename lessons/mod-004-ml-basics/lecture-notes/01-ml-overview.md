@@ -1,51 +1,51 @@
-# Lecture 01: Machine Learning Overview for Infrastructure Engineers
+# 讲座 01：面向基础设施工程师的机器学习概述
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [What is Machine Learning?](#what-is-machine-learning)
-3. [The ML Workflow](#the-ml-workflow)
-4. [Types of Machine Learning](#types-of-machine-learning)
-5. [Common ML Tasks](#common-ml-tasks)
-6. [ML System Architecture](#ml-system-architecture)
-7. [Infrastructure Implications](#infrastructure-implications)
-8. [Summary](#summary)
-
----
-
-## Introduction
-
-### The Infrastructure Engineer's Perspective
-
-You don't need to be a machine learning expert to build ML infrastructure. But you do need to understand what's happening inside those "black boxes" you're deploying.
-
-Think of it like this:
-- **Web developers** don't need to understand TCP/IP packet routing, but they need to know HTTP basics
-- **Database administrators** don't need to write query optimizers, but they need to understand indexes
-- **ML infrastructure engineers** don't need to design neural networks, but they need to understand training vs inference
-
-This lecture gives you the ML knowledge you need—no more, no less—to be effective in AI infrastructure.
-
-### Learning Objectives
-
-By the end of this lecture, you will:
-- Understand what machine learning actually does (demystifying the hype)
-- Recognize the stages of ML workflows and where infrastructure fits
-- Distinguish between training and inference (critically important!)
-- Identify different types of ML and their infrastructure needs
-- Anticipate resource requirements based on ML task type
-- Communicate effectively with data scientists and ML engineers
+## 目录
+1. [引言](#引言)
+2. [什么是机器学习？](#什么是机器学习)
+3. [ML 工作流](#the-ml-workflow)
+4. [机器学习类型](#types-of-machine-learning)
+5. [常见 ML 任务](#common-ml-tasks)
+6. [ML 系统架构](#ml-system-architecture)
+7. [基础设施影响](#infrastructure-implications)
+8. [总结](#summary)
 
 ---
 
-## What is Machine Learning?
+## 引言
 
-### The Traditional Programming Paradigm
+### 基础设施工程师的视角
 
-Traditional programming is explicit rule-based logic:
+你不需要成为机器学习专家来构建 ML 基础设施。但你确实需要理解你正在部署的那些"黑盒"内部发生了什么。
+
+可以这样理解：
+- **Web 开发者**不需要理解 TCP/IP 包路由，但他们需要了解 HTTP 基础
+- **数据库管理员**不需要编写查询优化器，但他们需要理解索引
+- **ML 基础设施工程师**不需要设计神经网络，但他们需要理解训练与推理的区别
+
+本讲座为你提供所需的 ML 知识——不多不少——让你在 AI 基础设施领域高效工作。
+
+### 学习目标
+
+到本讲座结束时，你将能够：
+- 理解机器学习实际做了什么（揭开炒作的面纱）
+- 识别 ML 工作流的各个阶段以及基础设施的定位
+- 区分训练和推理（非常重要！）
+- 识别不同类型的 ML 及其基础设施需求
+- 根据 ML 任务类型预测资源需求
+- 与数据科学家和 ML 工程师有效沟通
+
+---
+
+## 什么是机器学习？
+
+### 传统编程范式
+
+传统编程是显式的基于规则的逻辑：
 
 ```python
 def classify_email(email_text: str) -> str:
-    """Traditional rule-based spam detection"""
+    """传统基于规则的垃圾邮件检测"""
     spam_keywords = ["free money", "click here", "win now"]
 
     for keyword in spam_keywords:
@@ -55,769 +55,769 @@ def classify_email(email_text: str) -> str:
     return "not spam"
 ```
 
-**Problems with this approach:**
-- Rules are brittle and easily circumvented
-- Requires manual updates for new patterns
-- Can't handle nuance or context
-- Doesn't improve with more data
+**这种方法的缺点：**
+- 规则脆弱且容易被绕过
+- 需要手动更新以应对新模式
+- 无法处理细微差别或上下文
+- 不会随着更多数据而改进
 
-### The Machine Learning Paradigm
+### 机器学习范式
 
-Machine learning learns patterns from data:
+机器学习从数据中学习模式：
 
 ```python
-# ML approach (conceptual)
+# ML 方法（概念性）
 training_data = [
     ("free money win now!", "spam"),
     ("meeting tomorrow at 3pm", "not spam"),
     ("click here for prizes", "spam"),
-    # ... thousands more examples
+    # ... 数千个更多示例
 ]
 
-# Train model to learn patterns
+# 训练模型以学习模式
 model = train_spam_classifier(training_data)
 
-# Use learned patterns to classify new emails
+# 使用学到的模式对新的邮件进行分类
 result = model.predict("limited time offer click now")
-# Returns: "spam" (learned pattern, not hardcoded rule)
+# 返回："spam"（学到的模式，而非硬编码规则）
 ```
 
-**Advantages:**
-- Learns complex patterns humans can't easily articulate
-- Improves with more data
-- Adapts to new patterns when retrained
-- Handles nuance and context
+**优势：**
+- 学习人类难以明确表达的复杂模式
+- 随着更多数据而改进
+- 重新训练后适应新模式
+- 处理细微差别和上下文
 
-### Core ML Concept: Function Approximation
+### 核心 ML 概念：函数逼近
 
-At its core, ML is **function approximation**:
+从本质上讲，ML 是**函数逼近**：
 
-**Traditional programming:**
+**传统编程：**
 ```
-Rules (written by programmer) + Input → Output
-```
-
-**Machine learning:**
-```
-Examples (data) → Learn Function → Apply to New Input → Output
+规则（由程序员编写）+ 输入 → 输出
 ```
 
-**Concrete example - Image classification:**
-
+**机器学习：**
 ```
-Traditional: IF pixels match pattern X THEN cat
-ML: Here are 10,000 cat images and 10,000 dog images.
-    Figure out what makes them different.
-    Now tell me if this new image is a cat or dog.
+示例（数据）→ 学习函数 → 应用于新输入 → 输出
 ```
 
-### What ML Is Good For
+**具体示例 - 图像分类：**
 
-✅ **Pattern recognition** - Identifying cats in images, detecting fraud  
-✅ **Prediction** - Stock prices, equipment failure, customer churn  
-✅ **Classification** - Spam detection, sentiment analysis, disease diagnosis  
-✅ **Generation** - Text generation (GPT), image generation (DALL-E)  
-✅ **Complex decision-making** - Game playing (AlphaGo), robotics  
+```
+传统：IF 像素匹配模式 X THEN 猫
+ML：这里有一万张猫的图片和一万张狗的图片。
+    找出它们的区别。
+    现在告诉我这张新图片是猫还是狗。
+```
 
-### What ML Is NOT Good For
+### ML 擅长什么
 
-❌ **Exact calculations** - Use traditional programming (2 + 2 = 4)  
-❌ **Guaranteed correctness** - ML is probabilistic, not deterministic  
-❌ **Explaining decisions** - Many models are "black boxes"  
-❌ **Tasks without data** - ML needs examples to learn from  
-❌ **Simple rule-based logic** - Don't use ML when `if/else` suffices  
+✅ **模式识别** - 识别图像中的猫、检测欺诈
+✅ **预测** - 股票价格、设备故障、客户流失
+✅ **分类** - 垃圾邮件检测、情感分析、疾病诊断
+✅ **生成** - 文本生成（GPT）、图像生成（DALL-E）
+✅ **复杂决策** - 游戏（AlphaGo）、机器人技术
+
+### ML 不擅长什么
+
+❌ **精确计算** - 使用传统编程（2 + 2 = 4）
+❌ **保证正确性** - ML 是概率性的，而非确定性的
+❌ **解释决策** - 许多模型是"黑盒"
+❌ **没有数据的任务** - ML 需要示例来学习
+❌ **简单的基于规则的逻辑** - 当 `if/else` 足够时不要使用 ML
 
 ---
 
-## The ML Workflow
+## ML 工作流
 
-### Overview: Data to Deployed Model
+### 概述：从数据到部署模型
 
 ```
 ┌─────────────┐
-│ 1. Data     │  Collect and prepare training data
-│ Collection  │
+│ 1. 数据     │  收集和准备训练数据
+│ 收集        │
 └──────┬──────┘
        │
 ┌──────▼──────┐
-│ 2. Data     │  Clean, transform, split data
-│ Preparation │
+│ 2. 数据     │  清洗、转换、拆分数据
+│ 准备        │
 └──────┬──────┘
        │
 ┌──────▼──────┐
-│ 3. Training │  Learn patterns from data
-│             │  (This is what "ML" usually refers to)
+│ 3. 训练     │  从数据中学习模式
+│             │  （这就是通常所说的"ML"）
 └──────┬──────┘
        │
 ┌──────▼──────┐
-│ 4. Evaluation│ Test model performance
+│ 4. 评估     │  测试模型性能
 │             │
 └──────┬──────┘
        │
 ┌──────▼──────┐
-│ 5. Deployment│ Deploy model to production
-│             │  (THIS IS YOUR PRIMARY FOCUS)
+│ 5. 部署     │  将模型部署到生产环境
+│             │  （这是你的主要职责）
 └──────┬──────┘
        │
 ┌──────▼──────┐
-│ 6. Inference│  Make predictions on new data
-│             │  (THIS IS ALSO YOUR FOCUS)
+│ 6. 推理     │  对新数据进行预测
+│             │  （这也是你的职责）
 └──────┬──────┘
        │
 ┌──────▼──────┐
-│ 7. Monitoring│ Track performance, detect drift
-│             │  (THIS TOO)
+│ 7. 监控     │  跟踪性能、检测漂移
+│             │  （这个也是）
 └─────────────┘
 ```
 
-### Phase 1: Data Collection
+### 阶段 1：数据收集
 
-**What happens:**
-- Gather training examples
-- Label data (for supervised learning)
-- Store in databases or data lakes
+**发生什么：**
+- 收集训练示例
+- 标记数据（用于监督学习）
+- 存储在数据库或数据湖中
 
-**Example - Sentiment Analysis:**
+**示例 - 情感分析：**
 ```
-Tweet                           Label
+推文                            标签
 "I love this product!"          positive
 "Worst experience ever"         negative
 "It's okay, nothing special"    neutral
 ```
 
-**Infrastructure role:**
-- Provide storage for datasets
-- Build data pipelines
-- Ensure data access for training
+**基础设施角色：**
+- 为数据集提供存储
+- 构建数据管道
+- 确保训练数据可访问
 
-### Phase 2: Data Preparation
+### 阶段 2：数据准备
 
-**What happens:**
-- Clean data (remove duplicates, handle missing values)
-- Transform data (normalize, encode categorical variables)
-- Split into training/validation/test sets
+**发生什么：**
+- 清洗数据（删除重复项、处理缺失值）
+- 转换数据（归一化、编码分类变量）
+- 拆分为训练/验证/测试集
 
-**Example split:**
+**示例拆分：**
 ```
-Total dataset: 10,000 examples
-├── Training set:   7,000 (70%)  ← Model learns from this
-├── Validation set: 2,000 (20%)  ← Tune hyperparameters
-└── Test set:       1,000 (10%)  ← Final evaluation
+总数据集：10,000 个示例
+├── 训练集：   7,000（70%）  ← 模型从中学习
+├── 验证集： 2,000（20%）  ← 调整超参数
+└── 测试集：   1,000（10%）  ← 最终评估
 ```
 
-**Infrastructure role:**
-- Provide compute for data processing
-- Store processed datasets
-- Version control datasets
+**基础设施角色：**
+- 为数据处理提供计算资源
+- 存储处理后的数据集
+- 对数据集进行版本控制
 
-### Phase 3: Training (The "Learning" Part)
+### 阶段 3：训练（"学习"部分）
 
-**What happens:**
-- Model processes training data
-- Adjusts internal parameters to minimize errors
-- Iterates through data multiple times (epochs)
+**发生什么：**
+- 模型处理训练数据
+- 调整内部参数以最小化错误
+- 多次遍历数据（epochs）
 
-**Training process (simplified):**
+**训练过程（简化）：**
 ```
 for epoch in range(num_epochs):
     for batch in training_data:
-        # Make predictions
+        # 进行预测
         predictions = model(batch.inputs)
 
-        # Calculate error (loss)
+        # 计算误差（loss）
         loss = calculate_loss(predictions, batch.labels)
 
-        # Update model to reduce error
+        # 更新模型以减小误差
         model.update_parameters(loss)
 ```
 
-**Visual representation:**
+**可视化表示：**
 ```
 Epoch 1: Loss = 0.8  ████████░░
 Epoch 2: Loss = 0.6  ██████░░░░
 Epoch 3: Loss = 0.4  ████░░░░░░
 Epoch 4: Loss = 0.3  ███░░░░░░░
 ...
-Epoch 20: Loss = 0.1  █░░░░░░░░░ (Model is trained!)
+Epoch 20: Loss = 0.1  █░░░░░░░░░（模型训练完成！）
 ```
 
-**Infrastructure role (CRITICAL):**
-- Provide GPU/TPU compute for training
-- Manage training job scheduling
-- Store model checkpoints
-- Monitor resource utilization
-- Handle long-running jobs (hours to weeks!)
+**基础设施角色（关键）：**
+- 为训练提供 GPU/TPU 计算资源
+- 管理训练作业调度
+- 存储模型检查点
+- 监控资源利用率
+- 处理长时间运行的作业（数小时到数周！）
 
-### Phase 4: Evaluation
+### 阶段 4：评估
 
-**What happens:**
-- Test model on unseen data (test set)
-- Calculate metrics (accuracy, precision, recall, etc.)
-- Decide if model is good enough for production
+**发生什么：**
+- 在未见过的数据（测试集）上测试模型
+- 计算指标（准确率、精确率、召回率等）
+- 决定模型是否足够好用于生产
 
-**Example metrics:**
+**示例指标：**
 ```
-Test Set Results:
-├── Accuracy: 92%
-├── Precision: 90%
-├── Recall: 88%
-└── F1 Score: 89%
+测试集结果：
+├── 准确率（Accuracy）：92%
+├── 精确率（Precision）：90%
+├── 召回率（Recall）：88%
+└── F1 分数：89%
 ```
 
-**Infrastructure role:**
-- Provide compute for evaluation
-- Store evaluation results
-- Track model versions and metrics
+**基础设施角色：**
+- 为评估提供计算资源
+- 存储评估结果
+- 跟踪模型版本和指标
 
-### Phase 5: Deployment
+### 阶段 5：部署
 
-**What happens:**
-- Package trained model
-- Deploy to serving infrastructure
-- Expose API for predictions
-- Implement monitoring and logging
+**发生什么：**
+- 打包训练好的模型
+- 部署到服务基础设施
+- 暴露 API 用于预测
+- 实现监控和日志记录
 
-**Infrastructure role (YOUR PRIMARY JOB):**
-- Build model serving infrastructure
-- Implement CI/CD for models
-- Handle model versioning
-- Implement A/B testing
-- Ensure high availability and low latency
+**基础设施角色（你的主要工作）：**
+- 构建模型服务基础设施
+- 实现模型的 CI/CD
+- 处理模型版本管理
+- 实现 A/B 测试
+- 确保高可用性和低延迟
 
-### Phase 6: Inference (Prediction)
+### 阶段 6：推理（预测）
 
-**What happens:**
-- Receive new input
-- Run input through model
-- Return prediction
+**发生什么：**
+- 接收新输入
+- 通过模型运行输入
+- 返回预测
 
-**Example - Image classification:**
+**示例 - 图像分类：**
 ```python
-# New image arrives
+# 新图像到达
 new_image = load_image("cat_photo.jpg")
 
-# Run through deployed model
+# 通过已部署的模型运行
 prediction = model.predict(new_image)
-# Returns: {"class": "cat", "confidence": 0.95}
+# 返回：{"class": "cat", "confidence": 0.95}
 ```
 
-**Infrastructure role:**
-- Serve predictions with low latency
-- Handle concurrent requests
-- Batch requests for efficiency
-- Monitor prediction quality
+**基础设施角色：**
+- 以低延迟提供预测
+- 处理并发请求
+- 批量处理请求以提高效率
+- 监控预测质量
 
-### Phase 7: Monitoring and Retraining
+### 阶段 7：监控和重新训练
 
-**What happens:**
-- Monitor model performance in production
-- Detect data drift (input distribution changes)
-- Detect concept drift (relationships change)
-- Trigger retraining when needed
+**发生什么：**
+- 监控模型在生产环境中的性能
+- 检测数据漂移（输入分布变化）
+- 检测概念漂移（关系变化）
+- 在需要时触发重新训练
 
-**Example drift detection:**
+**示例漂移检测：**
 ```
-Week 1: Average prediction confidence: 0.92 ✓
-Week 2: Average prediction confidence: 0.90 ✓
-Week 3: Average prediction confidence: 0.85 ⚠️
-Week 4: Average prediction confidence: 0.75 ❌ (Retrain!)
+第 1 周：平均预测置信度：0.92 ✓
+第 2 周：平均预测置信度：0.90 ✓
+第 3 周：平均预测置信度：0.85 ⚠️
+第 4 周：平均预测置信度：0.75 ❌（重新训练！）
 ```
 
-**Infrastructure role:**
-- Implement monitoring dashboards
-- Log predictions and features
-- Automate retraining pipelines
-- Manage model versioning
+**基础设施角色：**
+- 实现监控仪表板
+- 记录预测和特征
+- 自动化重新训练管道
+- 管理模型版本
 
 ---
 
-## Types of Machine Learning
+## 机器学习类型
 
-### Supervised Learning
+### 监督学习
 
-**Definition:** Learning from labeled examples (input + correct output)
+**定义：** 从带标签的示例中学习（输入 + 正确输出）
 
-**Analogy:** Learning with a teacher who provides answers
+**类比：** 跟着提供答案的老师学习
 
-**Example:**
+**示例：**
 ```
-Training data:
-Image of cat   → Label: "cat"
-Image of dog   → Label: "dog"
+训练数据：
+猫的图片   → 标签："cat"
+狗的图片   → 标签："dog"
 
-After training:
-New image      → Prediction: "cat" (no label needed!)
-```
-
-**Common tasks:**
-- Classification (output is a category)
-- Regression (output is a number)
-
-**Infrastructure considerations:**
-- Requires labeled training data (can be expensive to create)
-- Training can be compute-intensive
-- Inference is typically fast
-
-### Unsupervised Learning
-
-**Definition:** Finding patterns in data without labels
-
-**Analogy:** Learning by exploring on your own
-
-**Example - Clustering:**
-```
-Training data:
-Customer 1: Age=25, Income=$50k, Purchases=10
-Customer 2: Age=24, Income=$48k, Purchases=12
-Customer 3: Age=55, Income=$90k, Purchases=5
-Customer 4: Age=58, Income=$95k, Purchases=4
-
-Algorithm groups similar customers:
-Cluster 1: Young, moderate income, frequent buyers
-Cluster 2: Older, high income, infrequent buyers
+训练后：
+新图片      → 预测："cat"（无需标签！）
 ```
 
-**Common tasks:**
-- Clustering (group similar examples)
-- Dimensionality reduction (compress data)
-- Anomaly detection (find outliers)
+**常见任务：**
+- 分类（输出是类别）
+- 回归（输出是数字）
 
-**Infrastructure considerations:**
-- No labels needed (cheaper data)
-- Can process large amounts of data
-- May require more compute for training
+**基础设施注意事项：**
+- 需要带标签的训练数据（创建成本可能很高）
+- 训练可能需要大量计算
+- 推理通常很快
 
-### Reinforcement Learning
+### 无监督学习
 
-**Definition:** Learning through trial and error with rewards
+**定义：** 在没有标签的情况下从数据中发现模式
 
-**Analogy:** Training a dog with treats
+**类比：** 自己探索学习
 
-**Example - Game playing:**
+**示例 - 聚类：**
 ```
-Action: Move chess piece → Outcome: Lost the game → Reward: -1
-Action: Different move   → Outcome: Won the game  → Reward: +1
+训练数据：
+客户 1：年龄=25，收入=$50k，购买次数=10
+客户 2：年龄=24，收入=$48k，购买次数=12
+客户 3：年龄=55，收入=$90k，购买次数=5
+客户 4：年龄=58，收入=$95k，购买次数=4
 
-After many games: Learns to play chess well!
-```
-
-**Common tasks:**
-- Game playing (Chess, Go, video games)
-- Robotics (learn to walk, grasp objects)
-- Resource optimization (data center cooling)
-
-**Infrastructure considerations:**
-- Requires simulation environment (expensive)
-- Extremely compute-intensive training
-- Training can take days to months
-- Inference is typically fast
-
-### Semi-Supervised and Self-Supervised Learning
-
-**Semi-supervised:** Mix of labeled and unlabeled data
-
-**Self-supervised:** Create labels from data itself
-
-**Example - Self-supervised:**
-```
-Original sentence: "The cat sat on the mat"
-
-Training example:
-Input:  "The cat ___ on the mat"
-Output: "sat"
-
-Model learns language patterns without manual labeling!
+算法对相似客户进行分组：
+聚类 1：年轻、中等收入、频繁购买者
+聚类 2：年长、高收入、不频繁购买者
 ```
 
-**Infrastructure considerations:**
-- Reduces labeling cost
-- Can leverage large unlabeled datasets
-- Used by models like BERT, GPT
+**常见任务：**
+- 聚类（将相似的示例分组）
+- 降维（压缩数据）
+- 异常检测（发现异常值）
+
+**基础设施注意事项：**
+- 不需要标签（数据更便宜）
+- 可以处理大量数据
+- 训练可能需要更多计算资源
+
+### 强化学习
+
+**定义：** 通过试错和奖励进行学习
+
+**类比：** 用零食训练狗
+
+**示例 - 游戏：**
+```
+动作：移动棋子 → 结果：输掉游戏 → 奖励：-1
+动作：不同的走法 → 结果：赢得游戏 → 奖励：+1
+
+多次游戏后：学会下棋！
+```
+
+**常见任务：**
+- 游戏（国际象棋、围棋、电子游戏）
+- 机器人技术（学习走路、抓取物体）
+- 资源优化（数据中心冷却）
+
+**基础设施注意事项：**
+- 需要模拟环境（成本高昂）
+- 训练极其消耗计算资源
+- 训练可能需要数天到数月
+- 推理通常很快
+
+### 半监督和自监督学习
+
+**半监督学习：** 混合使用带标签和未标签的数据
+
+**自监督学习：** 从数据本身创建标签
+
+**示例 - 自监督：**
+```
+原始句子："The cat sat on the mat"
+
+训练示例：
+输入：  "The cat ___ on the mat"
+输出： "sat"
+
+模型学习语言模式，无需手动标记！
+```
+
+**基础设施注意事项：**
+- 降低标记成本
+- 可以利用大量未标记的数据集
+- 被 BERT、GPT 等模型使用
 
 ---
 
-## Common ML Tasks
+## 常见 ML 任务
 
-### Classification
+### 分类
 
-**What it does:** Assigns input to one of several categories
+**做什么：** 将输入分配到几个类别之一
 
-**Examples:**
-- Email: spam or not spam
-- Image: cat, dog, bird, etc.
-- Medical: disease diagnosis
-- Sentiment: positive, negative, neutral
+**示例：**
+- 邮件：垃圾邮件或非垃圾邮件
+- 图像：猫、狗、鸟等
+- 医疗：疾病诊断
+- 情感：正面、负面、中性
 
-**Output:** Class label (category)
+**输出：** 类别标签
 
-**Infrastructure needs:**
-- **Training:** Moderate to high compute (GPUs for complex tasks)
-- **Inference:** Fast (milliseconds)
-- **Model size:** Varies (MB to several GB)
+**基础设施需求：**
+- **训练：** 中等至高计算量（复杂任务需要 GPU）
+- **推理：** 快速（毫秒级）
+- **模型大小：** 不等（MB 到数 GB）
 
-### Regression
+### 回归
 
-**What it does:** Predicts a continuous numerical value
+**做什么：** 预测连续的数值
 
-**Examples:**
-- House price prediction
-- Temperature forecasting
-- Stock price prediction
-- Equipment failure time estimation
+**示例：**
+- 房价预测
+- 温度预测
+- 股票价格预测
+- 设备故障时间估计
 
-**Output:** Number (e.g., $325,000, 72.5°F, 14.3 days)
+**输出：** 数字（如 $325,000、72.5°F、14.3 天）
 
-**Infrastructure needs:**
-- **Training:** Moderate compute
-- **Inference:** Very fast (microseconds to milliseconds)
-- **Model size:** Typically small (MB)
+**基础设施需求：**
+- **训练：** 中等计算量
+- **推理：** 非常快（微秒到毫秒级）
+- **模型大小：** 通常较小（MB）
 
-### Object Detection
+### 目标检测
 
-**What it does:** Identifies and locates objects in images
+**做什么：** 识别并定位图像中的物体
 
-**Example:**
+**示例：**
 ```
-Input: Image of street scene
-Output: [
+输入：街景图像
+输出：[
   {object: "car", bbox: [100, 200, 300, 400], confidence: 0.95},
   {object: "person", bbox: [350, 180, 450, 350], confidence: 0.92},
   {object: "sign", bbox: [500, 100, 600, 200], confidence: 0.88}
 ]
 ```
 
-**Infrastructure needs:**
-- **Training:** High compute (GPUs required)
-- **Inference:** Moderate speed (need GPUs for real-time)
-- **Model size:** Large (hundreds of MB to GB)
+**基础设施需求：**
+- **训练：** 高计算量（需要 GPU）
+- **推理：** 中等速度（实时需要 GPU）
+- **模型大小：** 大（数百 MB 到 GB）
 
-### Natural Language Processing (NLP)
+### 自然语言处理（NLP）
 
-**What it does:** Understands and generates human language
+**做什么：** 理解和生成人类语言
 
-**Examples:**
-- Text classification (sentiment analysis)
-- Named entity recognition (extract names, dates, locations)
-- Machine translation
-- Text generation (ChatGPT, etc.)
+**示例：**
+- 文本分类（情感分析）
+- 命名实体识别（提取名称、日期、地点）
+- 机器翻译
+- 文本生成（ChatGPT 等）
 
-**Infrastructure needs:**
-- **Training:** Very high compute (large models need multiple GPUs)
-- **Inference:** Varies (simple NLP is fast, large language models are slow)
-- **Model size:** Varies widely (MB to hundreds of GB)
+**基础设施需求：**
+- **训练：** 非常高的计算量（大模型需要多个 GPU）
+- **推理：** 不等（简单的 NLP 很快，大语言模型较慢）
+- **模型大小：** 差异很大（MB 到数百 GB）
 
-### Recommendation Systems
+### 推荐系统
 
-**What it does:** Suggests items users might like
+**做什么：** 推荐用户可能喜欢的项目
 
-**Examples:**
-- Netflix movie recommendations
-- Amazon product suggestions
-- Spotify music playlists
-- YouTube video recommendations
+**示例：**
+- Netflix 电影推荐
+- Amazon 产品推荐
+- Spotify 音乐播放列表
+- YouTube 视频推荐
 
-**Infrastructure needs:**
-- **Training:** High compute and memory (large datasets)
-- **Inference:** Fast (must scale to millions of users)
-- **Model size:** Can be very large (GB to TB of embeddings)
+**基础设施需求：**
+- **训练：** 高计算量和内存（大数据集）
+- **推理：** 快速（必须扩展到数百万用户）
+- **模型大小：** 可能非常大（GB 到 TB 的 embeddings）
 
 ---
 
-## ML System Architecture
+## ML 系统架构
 
-### High-Level Architecture
+### 高层架构
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                      ML System Architecture                   │
+│                      ML 系统架构                              │
 └──────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────┐
-│ Data Storage        │
-│ - Raw data          │
-│ - Processed data    │
-│ - Feature store     │
+│ 数据存储            │
+│ - 原始数据          │
+│ - 处理后数据        │
+│ - 特征存储          │
 └──────────┬──────────┘
            │
 ┌──────────▼──────────┐
-│ Training Pipeline   │
-│ - Data processing   │
-│ - Model training    │
-│ - Evaluation        │
+│ 训练管道            │
+│ - 数据处理          │
+│ - 模型训练          │
+│ - 评估              │
 └──────────┬──────────┘
            │
 ┌──────────▼──────────┐
-│ Model Registry      │
-│ - Model artifacts   │
-│ - Metadata          │
-│ - Versioning        │
+│ 模型注册中心        │
+│ - 模型产物          │
+│ - 元数据            │
+│ - 版本管理          │
 └──────────┬──────────┘
            │
 ┌──────────▼──────────┐
-│ Serving Layer       │
-│ - Model loading     │
-│ - Preprocessing     │
-│ - Inference         │
-│ - Postprocessing    │
+│ 服务层              │
+│ - 模型加载          │
+│ - 预处理            │
+│ - 推理              │
+│ - 后处理            │
 └──────────┬──────────┘
            │
 ┌──────────▼──────────┐
-│ API Layer           │
+│ API 层              │
 │ - REST/gRPC         │
-│ - Auth              │
-│ - Rate limiting     │
+│ - 认证              │
+│ - 限流              │
 └──────────┬──────────┘
            │
 ┌──────────▼──────────┐
-│ Monitoring          │
-│ - Metrics           │
-│ - Logs              │
-│ - Alerting          │
+│ 监控                │
+│ - 指标              │
+│ - 日志              │
+│ - 告警              │
 └─────────────────────┘
 ```
 
-### Key Components
+### 关键组件
 
-#### 1. Data Storage
+#### 1. 数据存储
 ```
-Purpose: Store training data and features
-Infrastructure:
-- Object storage (S3, GCS, Azure Blob)
-- Data lakes (Delta Lake, Iceberg)
-- Feature stores (Feast, Tecton)
+用途：存储训练数据和特征
+基础设施：
+- 对象存储（S3, GCS, Azure Blob）
+- 数据湖（Delta Lake, Iceberg）
+- 特征存储（Feast, Tecton）
 
-Your role:
-- Provision storage
-- Implement data versioning
-- Ensure data access for training jobs
-```
-
-#### 2. Training Infrastructure
-```
-Purpose: Run training jobs
-Infrastructure:
-- GPU clusters (NVIDIA A100, H100)
-- Job schedulers (Kubernetes, Slurm)
-- Experiment tracking (MLflow, W&B)
-
-Your role:
-- Provision and manage GPU resources
-- Schedule training jobs
-- Implement resource quotas
-- Handle long-running jobs
+你的角色：
+- 配置存储
+- 实现数据版本控制
+- 确保训练作业的数据可访问性
 ```
 
-#### 3. Model Registry
+#### 2. 训练基础设施
 ```
-Purpose: Store and version trained models
-Infrastructure:
-- Model storage (S3, GCS)
-- Metadata database (PostgreSQL)
-- Model registry (MLflow, DVC)
+用途：运行训练作业
+基础设施：
+- GPU 集群（NVIDIA A100, H100）
+- 作业调度器（Kubernetes, Slurm）
+- 实验跟踪（MLflow, W&B）
 
-Your role:
-- Implement model versioning
-- Track model metadata
-- Manage model lifecycle
-```
-
-#### 4. Serving Infrastructure
-```
-Purpose: Serve predictions at scale
-Infrastructure:
-- Model servers (TorchServe, TensorFlow Serving)
-- Load balancers
-- Auto-scaling groups
-
-Your role:
-- Deploy models to production
-- Implement auto-scaling
-- Optimize latency and throughput
-- Handle model updates (blue/green, canary)
+你的角色：
+- 配置和管理 GPU 资源
+- 调度训练作业
+- 实现资源配额
+- 处理长时间运行的作业
 ```
 
-#### 5. Monitoring and Observability
+#### 3. 模型注册中心
 ```
-Purpose: Track model and system health
-Infrastructure:
-- Metrics (Prometheus, Datadog)
-- Logs (ELK, Splunk)
-- Tracing (Jaeger, Tempo)
+用途：存储和管理训练好的模型版本
+基础设施：
+- 模型存储（S3, GCS）
+- 元数据数据库（PostgreSQL）
+- 模型注册中心（MLflow, DVC）
 
-Your role:
-- Implement monitoring dashboards
-- Set up alerting
-- Log predictions for debugging
-- Track model performance metrics
+你的角色：
+- 实现模型版本控制
+- 跟踪模型元数据
+- 管理模型生命周期
+```
+
+#### 4. 服务基础设施
+```
+用途：大规模提供预测服务
+基础设施：
+- 模型服务器（TorchServe, TensorFlow Serving）
+- 负载均衡器
+- 自动扩展组
+
+你的角色：
+- 将模型部署到生产环境
+- 实现自动扩展
+- 优化延迟和吞吐量
+- 处理模型更新（蓝绿部署、金丝雀部署）
+```
+
+#### 5. 监控和可观测性
+```
+用途：跟踪模型和系统健康状态
+基础设施：
+- 指标（Prometheus, Datadog）
+- 日志（ELK, Splunk）
+- 追踪（Jaeger, Tempo）
+
+你的角色：
+- 实现监控仪表板
+- 设置告警
+- 记录预测用于调试
+- 跟踪模型性能指标
 ```
 
 ---
 
-## Infrastructure Implications
+## 基础设施影响
 
-### Training vs Inference: The Critical Distinction
+### 训练 vs 推理：关键区分
 
-**Training (happens occasionally):**
-- Processes entire dataset (millions of examples)
-- Runs for hours, days, or weeks
-- Requires massive compute (GPUs/TPUs)
-- High memory requirements
-- Can tolerate latency
-- Happens in batch mode
+**训练（偶尔发生）：**
+- 处理整个数据集（数百万个示例）
+- 运行数小时、数天或数周
+- 需要大量计算资源（GPU/TPU）
+- 高内存需求
+- 可以容忍延迟
+- 以批处理模式进行
 
-**Inference (happens constantly):**
-- Processes single inputs (or small batches)
-- Needs to return results in milliseconds
-- Can sometimes use CPUs
-- Lower memory requirements
-- Latency is critical
-- Happens in real-time
+**推理（持续发生）：**
+- 处理单个输入（或小批量）
+- 需要在毫秒内返回结果
+- 有时可以使用 CPU
+- 较低的内存需求
+- 延迟是关键
+- 实时进行
 
-**Infrastructure implications:**
+**基础设施影响：**
 ```
-Training:
-├── Infrastructure: High-end GPU clusters
-├── Scheduling: Batch job systems
-├── Cost model: Pay for reserved capacity
-└── Optimization: Throughput over latency
+训练：
+├── 基础设施：高端 GPU 集群
+├── 调度：批处理作业系统
+├── 成本模型：按预留容量付费
+└── 优化：优先吞吐量而非延迟
 
-Inference:
-├── Infrastructure: Optimized serving layer
-├── Scheduling: Real-time request handling
-├── Cost model: Pay per prediction
-└── Optimization: Latency over throughput
-```
-
-### Resource Requirements by Model Type
-
-#### Small Models (< 100MB)
-```
-Examples: Simple classifiers, regression models
-Training:
-- CPU often sufficient
-- Hours to train
-- GB-scale RAM
-
-Inference:
-- CPU is fine
-- Sub-millisecond latency
-- Can handle thousands of QPS per server
+推理：
+├── 基础设施：优化的服务层
+├── 调度：实时请求处理
+├── 成本模型：按预测付费
+└── 优化：优先延迟而非吞吐量
 ```
 
-#### Medium Models (100MB - 5GB)
+### 按模型类型的资源需求
+
+#### 小模型（< 100MB）
 ```
-Examples: ResNet, BERT base
-Training:
-- GPUs recommended
-- Hours to days
+示例：简单分类器、回归模型
+训练：
+- CPU 通常足够
+- 训练数小时
+- GB 级 RAM
+
+推理：
+- CPU 即可
+- 亚毫秒级延迟
+- 每台服务器可处理数千 QPS
+```
+
+#### 中等模型（100MB - 5GB）
+```
+示例：ResNet, BERT base
+训练：
+- 推荐 GPU
+- 数小时到数天
 - 10-100GB RAM
 
-Inference:
-- GPUs for real-time, CPUs for batch
-- 10-100ms latency
-- Hundreds of QPS per GPU
+推理：
+- 实时需要 GPU，批处理可用 CPU
+- 10-100ms 延迟
+- 每个 GPU 数百 QPS
 ```
 
-#### Large Models (5GB - 100GB)
+#### 大模型（5GB - 100GB）
 ```
-Examples: Large vision models, BERT large
-Training:
-- Multiple GPUs required
-- Days to weeks
+示例：大型视觉模型、BERT large
+训练：
+- 需要多个 GPU
+- 数天到数周
 - 100-500GB RAM
 
-Inference:
-- GPUs required
-- 100-1000ms latency
-- Tens of QPS per GPU
+推理：
+- 需要 GPU
+- 100-1000ms 延迟
+- 每个 GPU 数十 QPS
 ```
 
-#### Massive Models (> 100GB)
+#### 超大模型（> 100GB）
 ```
-Examples: GPT-3, GPT-4, large multimodal models
-Training:
-- Distributed across 100s-1000s of GPUs
-- Weeks to months
-- TB-scale RAM
+示例：GPT-3, GPT-4, 大型多模态模型
+训练：
+- 分布在数百到数千个 GPU 上
+- 数周到数月
+- TB 级 RAM
 
-Inference:
-- Multiple GPUs per prediction
-- 1-10+ seconds latency
-- Single-digit QPS per instance
+推理：
+- 每个预测需要多个 GPU
+- 1-10+ 秒延迟
+- 每个实例个位数 QPS
 ```
 
-### Cost Considerations
+### 成本考虑
 
-**Training costs:**
-- GPU hours: $1-$30+ per hour depending on GPU type
-- Storage: $0.02-$0.10 per GB/month
-- Data processing: CPU compute and I/O costs
+**训练成本：**
+- GPU 小时：$1-$30+ 每小时，取决于 GPU 类型
+- 存储：$0.02-$0.10 每 GB/月
+- 数据处理：CPU 计算和 I/O 成本
 
-**Inference costs:**
-- Per-request: $0.0001 - $0.01+ per prediction
-- GPU utilization: Keep GPUs busy to amortize cost
-- Auto-scaling: Balance cost and latency SLAs
+**推理成本：**
+- 每请求：$0.0001 - $0.01+ 每个预测
+- GPU 利用率：保持 GPU 忙碌以分摊成本
+- 自动扩展：平衡成本和延迟 SLA
 
-**Example cost calculation:**
+**示例成本计算：**
 ```
-Model: BERT-base for sentiment analysis
-Training (one-time):
-- 8 x A100 GPUs × 24 hours × $2.50/hr = $480
+模型：BERT-base 用于情感分析
+训练（一次性）：
+- 8 x A100 GPU × 24 小时 × $2.50/hr = $480
 
-Inference (monthly):
-- 10M predictions/day
-- 100ms per prediction
-- 2 GPU instances running 24/7
-- 2 × 720 hours × $1.50/hr = $2,160/month
+推理（每月）：
+- 每天 1000 万次预测
+- 每次预测 100ms
+- 2 个 GPU 实例 24/7 运行
+- 2 × 720 小时 × $1.50/hr = $2,160/月
 ```
 
 ---
 
-## Summary
+## 总结
 
-### Key Takeaways
+### 关键要点
 
-1. **ML learns patterns from data** rather than explicit programming
-2. **Training and inference are fundamentally different** - understand this distinction!
-3. **Different ML types** (supervised, unsupervised, RL) have different infrastructure needs
-4. **Common tasks** (classification, regression, NLP) have predictable resource requirements
-5. **ML systems are complex** - many components beyond just "the model"
-6. **Infrastructure is critical** - models are useless without good infrastructure
+1. **ML 从数据中学习模式**，而非显式编程
+2. **训练和推理有本质区别**——理解这一区别！
+3. **不同的 ML 类型**（监督、无监督、RL）有不同的基础设施需求
+4. **常见任务**（分类、回归、NLP）有可预测的资源需求
+5. **ML 系统很复杂**——远不止"模型"一个组件
+6. **基础设施至关重要**——没有好的基础设施，模型毫无用处
 
-### Infrastructure Engineer's Mental Model
+### 基础设施工程师的心智模型
 
-When you encounter an ML project, ask:
+当你遇到 ML 项目时，问自己：
 
-✅ **Is this training or inference?**
-✅ **What type of ML task is this?**
-✅ **What are the resource requirements?**
-✅ **What's the latency requirement?**
-✅ **How often does the model need to be retrained?**
-✅ **What's the expected query volume?**
-✅ **What framework is used? (PyTorch, TensorFlow, etc.)**
+✅ **这是训练还是推理？**
+✅ **这是什么类型的 ML 任务？**
+✅ **资源需求是什么？**
+✅ **延迟要求是什么？**
+✅ **模型需要多久重新训练一次？**
+✅ **预期的查询量是多少？**
+✅ **使用了什么框架？（PyTorch, TensorFlow 等）**
 
-### What You've Learned
+### 你学到了什么
 
-- ✅ What machine learning actually is (function approximation from data)
-- ✅ The full ML workflow from data to deployment
-- ✅ Training vs inference (critically important!)
-- ✅ Types of ML and their infrastructure implications
-- ✅ Common ML tasks and resource requirements
-- ✅ ML system architecture components
-- ✅ How to think about ML infrastructure
+- ✅ 机器学习究竟是什么（从数据中进行函数逼近）
+- ✅ 从数据到部署的完整 ML 工作流
+- ✅ 训练与推理（非常重要！）
+- ✅ ML 类型及其基础设施影响
+- ✅ 常见 ML 任务和资源需求
+- ✅ ML 系统架构组件
+- ✅ 如何思考 ML 基础设施
 
-### Next Steps
+### 下一步
 
-Now that you understand ML fundamentals, you'll dive into:
-- **Lecture 02:** PyTorch basics (loading models, running inference)
-- **Lecture 03:** TensorFlow basics (alternative framework)
-- **Lecture 04:** Model formats and deployment preparation
+现在你了解了 ML 基础，你将深入学习：
+- **讲座 02：** PyTorch 基础（加载模型、运行推理）
+- **讲座 03：** TensorFlow 基础（替代框架）
+- **讲座 04：** 模型格式和部署准备
 
 ---
 
-**Lecture Version**: 1.0
-**Last Updated**: October 2025
-**Word Count**: ~3,800 words
-**Estimated Reading Time**: 50-70 minutes
+**讲座版本**: 1.0
+**最后更新**: 2025 年 10 月
+**字数**: ~3,800 词
+**预计阅读时间**: 50-70 分钟
 
-**Ready for hands-on work?** Continue to `02-pytorch-basics.md`
+**准备好动手实践了吗？** 继续学习 `02-pytorch-basics.md`

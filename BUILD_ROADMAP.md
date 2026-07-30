@@ -1,323 +1,323 @@
-# Junior Engineer Learning Repository - Build Roadmap
+# Junior Engineer 学习资料库 - 构建路线图
 
-**Created:** October 18, 2025
-**Status:** IN PROGRESS
-**Target Completion:** Production Ready
-**Total Estimated Effort:** 317-408 hours
+**创建日期：** 2025 年 10 月 18 日
+**状态：** 进行中
+**目标完成：** 生产就绪
+**总预计工作量：** 317-408 小时
 
 ---
 
-## Current Status: Module Progress Tracker
+## 当前状态：模块进度追踪
 
-| Module | Lectures | Exercises | Quiz | Status | Completion % | Hours Remaining |
+| 模块 | 讲座 | 练习 | 测验 | 状态 | 完成度 | 剩余小时数 |
 |--------|----------|-----------|------|--------|--------------|-----------------|
-| **001 Python** | ✅ 3/3 (79KB) | ⚠️ 1/7 | ❌ 0/1 | 🟡 Good | 70% | 10-15 |
-| **002 Linux** | ✅ 5/5 (150KB) | ⚠️ 1/7 | ❌ 0/1 | 🟡 Good | 60% | 8-12 |
-| **003 Git** | ❌ 0/4 | ❌ 0/7 | ❌ 0/1 | 🔴 Empty | 0% | 30-40 |
-| **004 ML Basics** | ⚠️ 1/5 | ❌ 0/5 | ❌ 0/1 | 🔴 Minimal | 20% | 30-40 |
-| **005 Docker** | ❌ 0/5 | ❌ 0/7 | ❌ 0/1 | 🔴 Empty | 0% | 40-50 |
-| **006 Kubernetes** | ✅ 4/4 (155KB) | ✅ 3/3 (58KB) | ✅ 1/1 | 🟢 Complete | 100% | 0 |
-| **007 APIs** | ❌ 0/5 | ❌ 0/7 | ❌ 0/1 | 🔴 Empty | 0% | 40-50 |
-| **008 Databases** | ❌ 0/5 | ❌ 0/7 | ❌ 0/1 | 🔴 Empty | 0% | 40-50 |
-| **009 Monitoring** | ❌ 0/5 | ❌ 0/7 | ❌ 0/1 | 🔴 Empty | 0% | 40-50 |
-| **010 Cloud** | ❌ 0/6 | ❌ 0/7 | ❌ 0/1 | 🔴 Empty | 0% | 50-60 |
+| **001 Python** | ✅ 3/3（79KB） | ⚠️ 1/7 | ❌ 0/1 | 🟡 良好 | 70% | 10-15 |
+| **002 Linux** | ✅ 5/5（150KB） | ⚠️ 1/7 | ❌ 0/1 | 🟡 良好 | 60% | 8-12 |
+| **003 Git** | ❌ 0/4 | ❌ 0/7 | ❌ 0/1 | 🔴 空 | 0% | 30-40 |
+| **004 ML 基础** | ⚠️ 1/5 | ❌ 0/5 | ❌ 0/1 | 🔴 极少 | 20% | 30-40 |
+| **005 Docker** | ❌ 0/5 | ❌ 0/7 | ❌ 0/1 | 🔴 空 | 0% | 40-50 |
+| **006 Kubernetes** | ✅ 4/4（155KB） | ✅ 3/3（58KB） | ✅ 1/1 | 🟢 完成 | 100% | 0 |
+| **007 API** | ❌ 0/5 | ❌ 0/7 | ❌ 0/1 | 🔴 空 | 0% | 40-50 |
+| **008 数据库** | ❌ 0/5 | ❌ 0/7 | ❌ 0/1 | 🔴 空 | 0% | 40-50 |
+| **009 监控** | ❌ 0/5 | ❌ 0/7 | ❌ 0/1 | 🔴 空 | 0% | 40-50 |
+| **010 云平台** | ❌ 0/6 | ❌ 0/7 | ❌ 0/1 | 🔴 空 | 0% | 50-60 |
 
-**Overall Completion:** 25% (2.5 of 10 modules complete)
-**Remaining Effort:** ~288-367 hours
+**总体完成度：** 25%（10 个模块中完成 2.5 个）
+**剩余工作量：** 约 288-367 小时
 
 ---
 
-## Sprint Plan: Production-Ready in 8-10 Weeks
+## 冲刺计划：8-10 周内达到生产就绪
 
-### 🎯 Phase 1: CRITICAL FOUNDATION (Weeks 1-4, 88-112 hours)
+### 🎯 阶段 1：关键基础（第 1-4 周，88-112 小时）
 
-**Sprint 1 (Week 1): Complete Module 002 Linux + Module 001 Polish**
-- [ ] Module 002: Create 6 remaining exercises (12 hours)
+**冲刺 1（第 1 周）：完成模块 002 Linux + 模块 001 打磨**
+- [ ] 模块 002：创建 6 个剩余练习（12 小时）
   - exercise-02-permissions.md
   - exercise-03-processes.md
   - exercise-04-scripting.md
   - exercise-05-package-mgmt.md
   - exercise-06-logs.md
   - exercise-07-troubleshooting.md
-- [ ] Module 002: Create comprehensive quiz (3 hours)
-- [ ] Module 001: Add 6 remaining exercises (12 hours)
-- [ ] Module 001: Create comprehensive quiz (3 hours)
-- **Sprint Deliverable:** Modules 001-002 at 100%
+- [ ] 模块 002：创建综合测验（3 小时）
+- [ ] 模块 001：添加 6 个剩余练习（12 小时）
+- [ ] 模块 001：创建综合测验（3 小时）
+- **冲刺交付物：** 模块 001-002 达到 100%
 
-**Sprint 2 (Week 2): Complete Module 003 Git**
-- [ ] Create 4 comprehensive lectures (20 hours)
+**冲刺 2（第 2 周）：完成模块 003 Git**
+- [ ] 创建 4 个综合讲座（20 小时）
   - 01-git-fundamentals.md
   - 02-branching-merging.md
   - 03-collaboration.md
   - 04-advanced-git.md
-- [ ] Create 7 hands-on exercises (14 hours)
-- [ ] Create comprehensive quiz (3 hours)
-- **Sprint Deliverable:** Module 003 at 100%
+- [ ] 创建 7 个动手练习（14 小时）
+- [ ] 创建综合测验（3 小时）
+- **冲刺交付物：** 模块 003 达到 100%
 
-**Sprint 3 (Week 3): Complete Module 005 Docker**
-- [ ] Create 5 comprehensive lectures (25 hours)
+**冲刺 3（第 3 周）：完成模块 005 Docker**
+- [ ] 创建 5 个综合讲座（25 小时）
   - 01-docker-fundamentals.md
   - 02-dockerfiles.md
   - 03-docker-compose.md
   - 04-docker-networking.md
   - 05-best-practices.md
-- [ ] Create 7 hands-on exercises (14 hours)
-- [ ] Create comprehensive quiz (3 hours)
-- **Sprint Deliverable:** Module 005 at 100%
+- [ ] 创建 7 个动手练习（14 小时）
+- [ ] 创建综合测验（3 小时）
+- **冲刺交付物：** 模块 005 达到 100%
 
-**Sprint 4 (Week 4): Buffer & Review**
-- [ ] Review and polish Modules 001-003, 005
-- [ ] Test all exercises and validate accuracy
-- [ ] Update module READMEs with completion status
-- **Milestone:** Foundation complete (4 of 10 modules)
+**冲刺 4（第 4 周）：缓冲与审查**
+- [ ] 审查和打磨模块 001-003、005
+- [ ] 测试所有练习并验证准确性
+- [ ] 更新模块 README 的完成状态
+- **里程碑：** 基础完成（10 个模块中完成 4 个）
 
 ---
 
-### 🎯 Phase 2: APPLICATION SKILLS (Weeks 5-8, 120-150 hours)
+### 🎯 阶段 2：应用技能（第 5-8 周，120-150 小时）
 
-**Sprint 5 (Week 5): Complete Module 007 APIs**
-- [ ] Create 5 comprehensive lectures (25 hours)
+**冲刺 5（第 5 周）：完成模块 007 API**
+- [ ] 创建 5 个综合讲座（25 小时）
   - 01-api-fundamentals.md
   - 02-flask-fastapi.md
   - 03-authentication-security.md
   - 04-api-documentation.md
   - 05-testing-monitoring.md
-- [ ] Create 7 hands-on exercises (14 hours)
-- [ ] Create comprehensive quiz (3 hours)
-- **Sprint Deliverable:** Module 007 at 100%
+- [ ] 创建 7 个动手练习（14 小时）
+- [ ] 创建综合测验（3 小时）
+- **冲刺交付物：** 模块 007 达到 100%
 
-**Sprint 6 (Week 6): Complete Module 009 Monitoring**
-- [ ] Create 5 comprehensive lectures (25 hours)
+**冲刺 6（第 6 周）：完成模块 009 监控**
+- [ ] 创建 5 个综合讲座（25 小时）
   - 01-observability-fundamentals.md
   - 02-prometheus-grafana.md
   - 03-logging-best-practices.md
   - 04-elk-stack.md
   - 05-alerting-incident-response.md
-- [ ] Create 7 hands-on exercises (14 hours)
-- [ ] Create comprehensive quiz (3 hours)
-- **Sprint Deliverable:** Module 009 at 100%
+- [ ] 创建 7 个动手练习（14 小时）
+- [ ] 创建综合测验（3 小时）
+- **冲刺交付物：** 模块 009 达到 100%
 
-**Sprint 7 (Week 7): Complete Module 008 Databases**
-- [ ] Create 5 comprehensive lectures (25 hours)
+**冲刺 7（第 7 周）：完成模块 008 数据库**
+- [ ] 创建 5 个综合讲座（25 小时）
   - 01-sql-fundamentals.md
   - 02-postgresql.md
   - 03-nosql-databases.md
   - 04-optimization.md
   - 05-orm-frameworks.md
-- [ ] Create 7 hands-on exercises (14 hours)
-- [ ] Create comprehensive quiz (3 hours)
-- **Sprint Deliverable:** Module 008 at 100%
+- [ ] 创建 7 个动手练习（14 小时）
+- [ ] 创建综合测验（3 小时）
+- **冲刺交付物：** 模块 008 达到 100%
 
-**Sprint 8 (Week 8): Buffer & Review**
-- [ ] Review and polish Modules 007-009
-- [ ] Test all exercises
-- [ ] Update module READMEs
-- **Milestone:** 7 of 10 modules complete
+**冲刺 8（第 8 周）：缓冲与审查**
+- [ ] 审查和打磨模块 007-009
+- [ ] 测试所有练习
+- [ ] 更新模块 README
+- **里程碑：** 10 个模块中完成 7 个
 
 ---
 
-### 🎯 Phase 3: ADVANCED & POLISH (Weeks 9-10, 80-110 hours)
+### 🎯 阶段 3：高级与打磨（第 9-10 周，80-110 小时）
 
-**Sprint 9 (Week 9): Complete Module 010 Cloud + Module 004 Enhancement**
-- [ ] Module 010: Create 6 comprehensive lectures (30 hours)
+**冲刺 9（第 9 周）：完成模块 010 云平台 + 模块 004 增强**
+- [ ] 模块 010：创建 6 个综合讲座（30 小时）
   - 01-cloud-fundamentals.md
   - 02-aws-ml-infrastructure.md
   - 03-gcp-ml-infrastructure.md
   - 04-azure-ml-services.md
   - 05-cost-optimization.md
   - 06-multi-cloud.md
-- [ ] Module 010: Create 7 hands-on exercises (14 hours)
-- [ ] Module 010: Create comprehensive quiz (3 hours)
-- [ ] Module 004: Add 3 more lectures (15 hours)
-- [ ] Module 004: Create 5 exercises (10 hours)
-- [ ] Module 004: Create quiz (3 hours)
-- **Sprint Deliverable:** Modules 004 and 010 at 100%
+- [ ] 模块 010：创建 7 个动手练习（14 小时）
+- [ ] 模块 010：创建综合测验（3 小时）
+- [ ] 模块 004：添加 3 个更多讲座（15 小时）
+- [ ] 模块 004：创建 5 个练习（10 小时）
+- [ ] 模块 004：创建测验（3 小时）
+- **冲刺交付物：** 模块 004 和 010 达到 100%
 
-**Sprint 10 (Week 10): PROJECT DOCUMENTATION & FINAL POLISH**
-- [ ] Project 01: Complete documentation (architecture, deployment, API, troubleshooting) (10 hours)
-- [ ] Project 02: Complete documentation (12 hours)
-- [ ] Project 03: Complete documentation (12 hours)
-- [ ] Project 04: Complete documentation (12 hours)
-- [ ] Project 05: Complete documentation (15 hours)
-- [ ] Final QA: Test all modules, exercises, quizzes (10 hours)
-- [ ] Update main README with completion status (2 hours)
-- [ ] Generate comprehensive CHANGELOG (1 hour)
-- **Milestone:** 🎉 100% PRODUCTION READY
-
----
-
-## Daily Execution Template
-
-### Morning Session (4 hours)
-1. **Lecture Creation** (3 hours)
-   - Write 1 comprehensive lecture (3,000-5,000 words)
-   - Include code examples and best practices
-   - Add learning objectives and key takeaways
-
-2. **Exercise Creation** (1 hour)
-   - Create 1-2 hands-on exercises
-   - Include validation steps and solutions
-
-### Afternoon Session (4 hours)
-1. **Lecture Creation** (3 hours)
-   - Write 1 comprehensive lecture
-   - Review and polish previous content
-
-2. **Quiz/Documentation** (1 hour)
-   - Work on quizzes or project documentation
-   - Update tracking documents
-
-### Evening Session (Optional 2 hours)
-- Quality review and testing
-- Update roadmap and progress tracker
-- Plan next day's work
+**冲刺 10（第 10 周）：项目文档与最终打磨**
+- [ ] 项目 01：完成文档（架构、部署、API、故障排查）（10 小时）
+- [ ] 项目 02：完成文档（12 小时）
+- [ ] 项目 03：完成文档（12 小时）
+- [ ] 项目 04：完成文档（12 小时）
+- [ ] 项目 05：完成文档（15 小时）
+- [ ] 最终 QA：测试所有模块、练习、测验（10 小时）
+- [ ] 更新主 README 的完成状态（2 小时）
+- [ ] 生成综合 CHANGELOG（1 小时）
+- **里程碑：** 🎉 100% 生产就绪
 
 ---
 
-## Progress Tracking
+## 每日执行模板
 
-### Week 1 Progress
-- [x] **Oct 18:** Module 002 lectures complete (5 lectures, 150KB) ✅
-- [ ] **Oct 19:** Module 002 exercises 2-7 + quiz
-- [ ] **Oct 20:** Module 001 exercises + quiz
-- [ ] **Oct 21:** Module 003 lectures 1-2
-- [ ] **Oct 22:** Module 003 lectures 3-4 + exercises
+### 上午时段（4 小时）
+1. **创建讲座**（3 小时）
+   - 编写 1 个综合讲座（3,000-5,000 字）
+   - 包含代码示例和最佳实践
+   - 添加学习目标和关键要点
 
-### Week 2 Progress
-- [ ] Module 003 completion
-- [ ] Begin Module 005
+2. **创建练习**（1 小时）
+   - 创建 1-2 个动手练习
+   - 包含验证步骤和解答
 
-### Week 3-10 Progress
-- Track daily in this section
+### 下午时段（4 小时）
+1. **创建讲座**（3 小时）
+   - 编写 1 个综合讲座
+   - 审查和打磨之前的内容
 
----
+2. **测验/文档**（1 小时）
+   - 处理测验或项目文档
+   - 更新追踪文档
 
-## Quality Checklist (Per Module)
-
-Before marking a module as complete, verify:
-
-### Lectures ✓
-- [ ] All lectures 3,000-5,000 words
-- [ ] Code examples tested and accurate
-- [ ] Learning objectives clearly stated
-- [ ] Key takeaways summarized
-- [ ] Best practices section included
-- [ ] Quick reference card provided
-
-### Exercises ✓
-- [ ] All exercises 1,500-3,000 words
-- [ ] Clear objectives and prerequisites
-- [ ] Step-by-step instructions
-- [ ] Validation checkpoints
-- [ ] Stretch goals included
-- [ ] Time estimates realistic
-- [ ] Solutions provided (separate file if needed)
-
-### Quiz ✓
-- [ ] 20-30 questions total
-- [ ] Mix of question types
-- [ ] Detailed explanations for all answers
-- [ ] Difficulty mix (40% easy, 40% medium, 20% hard)
-- [ ] Covers all lecture topics
-- [ ] Practical scenario-based questions
-
-### Module README ✓
-- [ ] Overview and objectives clear
-- [ ] Prerequisites listed
-- [ ] Learning path defined
-- [ ] Time estimates accurate
-- [ ] Resources and references complete
+### 晚间时段（可选 2 小时）
+- 质量审查和测试
+- 更新路线图和进度追踪
+- 计划第二天的工作
 
 ---
 
-## Risk Management
+## 进度追踪
 
-### Identified Risks
+### 第 1 周进度
+- [x] **10 月 18 日：** 模块 002 讲座完成（5 个讲座，150KB）✅
+- [ ] **10 月 19 日：** 模块 002 练习 2-7 + 测验
+- [ ] **10 月 20 日：** 模块 001 练习 + 测验
+- [ ] **10 月 21 日：** 模块 003 讲座 1-2
+- [ ] **10 月 22 日：** 模块 003 讲座 3-4 + 练习
 
-| Risk | Probability | Impact | Mitigation |
+### 第 2 周进度
+- [ ] 模块 003 完成
+- [ ] 开始模块 005
+
+### 第 3-10 周进度
+- 在此部分每日跟踪
+
+---
+
+## 质量检查清单（每个模块）
+
+在标记模块为完成前，验证：
+
+### 讲座 ✓
+- [ ] 所有讲座 3,000-5,000 字
+- [ ] 代码示例经过测试且准确
+- [ ] 学习目标清晰陈述
+- [ ] 关键要点已总结
+- [ ] 包含最佳实践部分
+- [ ] 提供快速参考卡
+
+### 练习 ✓
+- [ ] 所有练习 1,500-3,000 字
+- [ ] 明确的目标和先修要求
+- [ ] 分步说明
+- [ ] 验证检查点
+- [ ] 包含扩展目标
+- [ ] 时间估算合理
+- [ ] 提供解答（如有需要，放在单独文件中）
+
+### 测验 ✓
+- [ ] 总计 20-30 题
+- [ ] 混合题型
+- [ ] 所有答案的详细解释
+- [ ] 难度混合（40% 简单、40% 中等、20% 困难）
+- [ ] 覆盖所有讲座主题
+- [ ] 基于场景的实用问题
+
+### 模块 README ✓
+- [ ] 概述和目标清晰
+- [ ] 列出先修要求
+- [ ] 学习路径已定义
+- [ ] 时间估算准确
+- [ ] 资源和参考资料完整
+
+---
+
+## 风险管理
+
+### 已识别风险
+
+| 风险 | 概率 | 影响 | 缓解措施 |
 |------|-------------|--------|------------|
-| Content quality inconsistency | Medium | High | Use Module 006 as template; peer review |
-| Technical inaccuracies | Medium | High | Test all commands; have SME review |
-| Timeline slippage | High | Medium | 20% buffer built into estimates |
-| Scope creep | Medium | Medium | Strict adherence to 4-5 lectures per module |
-| Burnout | Medium | High | Take breaks; flexible daily targets |
+| 内容质量不一致 | 中 | 高 | 以模块 006 为模板；同行审查 |
+| 技术不准确 | 中 | 高 | 测试所有命令；由专家审查 |
+| 时间线延误 | 高 | 中 | 估算中预留 20% 缓冲 |
+| 范围蔓延 | 中 | 中 | 严格遵守每个模块 4-5 个讲座 |
+| 过度疲劳 | 中 | 高 | 适当休息；灵活设定每日目标 |
 
-### Mitigation Strategies
+### 缓解策略
 
-1. **Quality Control:** Every module reviewed against Module 006 standard
-2. **Technical Accuracy:** All code examples tested before inclusion
-3. **Timeline Management:** Weekly reviews; adjust pace as needed
-4. **Scope Control:** No feature additions without removing equivalent work
-5. **Sustainability:** Flexible daily targets; celebrate milestones
-
----
-
-## Success Metrics
-
-### Minimum Viable Product (Week 8)
-- ✅ All 10 modules have ≥3 lectures
-- ✅ All 10 modules have ≥5 exercises
-- ✅ All 10 modules have ≥1 quiz
-- ✅ 7+ modules at 100% completion
-
-### Production Ready (Week 10)
-- ✅ All 10 modules at 100% completion
-- ✅ All 5 projects have complete documentation
-- ✅ All code tested and functional
-- ✅ Professional README and navigation
-- ✅ Ready for public launch
+1. **质量控制：** 每个模块对照模块 006 标准进行审查
+2. **技术准确性：** 所有代码示例在纳入前经过测试
+3. **时间线管理：** 每周审查；根据需要调整节奏
+4. **范围控制：** 不添加新功能，除非移除等量工作
+5. **可持续性：** 灵活的每日目标；庆祝里程碑
 
 ---
 
-## Team Communication
+## 成功指标
 
-### Daily Standup (Self-Report)
-- **Yesterday:** What was completed?
-- **Today:** What will be worked on?
-- **Blockers:** Any impediments?
+### 最小可行产品（第 8 周）
+- ✅ 所有 10 个模块都有 ≥3 个讲座
+- ✅ 所有 10 个模块都有 ≥5 个练习
+- ✅ 所有 10 个模块都有 ≥1 个测验
+- ✅ 7+ 个模块达到 100% 完成
 
-### Weekly Review
-- Progress against sprint goals
-- Quality assessment
-- Adjust next sprint if needed
-
-### Milestone Celebrations
-- Week 4: Foundation Complete 🎉
-- Week 8: Application Skills Complete 🎉
-- Week 10: Production Ready 🎉🎉🎉
+### 生产就绪（第 10 周）
+- ✅ 所有 10 个模块达到 100% 完成
+- ✅ 所有 5 个项目都有完整的文档
+- ✅ 所有代码经过测试且功能正常
+- ✅ 专业的 README 和导航
+- ✅ 随时可以公开发布
 
 ---
 
-## Next Actions (Immediate)
+## 团队沟通
 
-1. ✅ Complete this roadmap document
-2. 🔄 Continue Module 002 (6 exercises + quiz)
-3. 🔄 Polish Module 001 (6 exercises + quiz)
-4. ⏳ Start Module 003 Git lectures
-5. ⏳ Daily progress updates in this file
+### 每日站会（自主报告）
+- **昨日：** 完成了什么？
+- **今日：** 将做什么？
+- **阻碍：** 有任何障碍吗？
 
----
+### 每周回顾
+- 对照冲刺目标的进度
+- 质量评估
+- 如有需要，调整下个冲刺
 
-## Notes & Learnings
-
-### What's Working Well
-- Module 006 serves as excellent template
-- Clear structure accelerates content creation
-- AI infrastructure focus makes content relevant
-
-### Areas for Improvement
-- Consider creating exercise templates
-- Standardize quiz format across modules
-- Build reusable code examples library
-
-### Best Practices Discovered
-- Write lectures in morning when fresh
-- Test exercises in afternoon
-- Review and polish in evening
-- Batch similar tasks for efficiency
+### 里程碑庆祝
+- 第 4 周：基础完成 🎉
+- 第 8 周：应用技能完成 🎉
+- 第 10 周：生产就绪 🎉🎉🎉
 
 ---
 
-**Last Updated:** October 18, 2025 10:00 AM
-**Next Review:** October 19, 2025
-**Contact:** ai-infra-curriculum@joshua-ferguson.com
+## 下一步行动（立即执行）
+
+1. ✅ 完成本路线图文档
+2. 🔄 继续模块 002（6 个练习 + 测验）
+3. 🔄 打磨模块 001（6 个练习 + 测验）
+4. ⏳ 开始模块 003 Git 讲座
+5. ⏳ 每日在此文件中更新进度
+
+---
+
+## 备注与收获
+
+### 运行良好的方面
+- 模块 006 是优秀的模板
+- 清晰的结构加速内容创作
+- AI 基础设施的聚焦使内容相关
+
+### 需要改进的方面
+- 考虑创建练习模板
+- 标准化各模块的测验格式
+- 构建可重用的代码示例库
+
+### 发现的最佳实践
+- 在上午头脑清醒时编写讲座
+- 在下午测试练习
+- 在晚间审查和打磨
+- 同类任务批量处理以提高效率
+
+---
+
+**最后更新：** 2025 年 10 月 18 日 10:00 AM
+**下次审查：** 2025 年 10 月 19 日
+**联系：** ai-infra-curriculum@joshua-ferguson.com

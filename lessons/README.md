@@ -1,3 +1,3 @@
-# Lessons
+# 课程
 
-Each module directory should include a `README.md`, lecture notes, an `exercises/` directory, a quiz, and module resources.
+每个模块目录应包含一个 `README.md`、讲座笔记、一个 `exercises/` 目录、一个测验和模块资源。

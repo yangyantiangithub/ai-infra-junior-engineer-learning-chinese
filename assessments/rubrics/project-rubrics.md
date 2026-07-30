@@ -1,504 +1,504 @@
-# Project Assessment Rubrics
+# 项目评估评分标准
 
-## Overview
+## 概述
 
-This document provides detailed rubrics for assessing all five projects in the Junior AI Infrastructure Engineer curriculum. Each rubric breaks down evaluation criteria into four main categories:
+本文档提供了初级 AI 基础设施工程师课程中全部五个项目的详细评分标准。每个评分标准将评估标准分为四大类：
 
-1. **Functionality (40%)** - Does it work correctly?
-2. **Code Quality (25%)** - Is the code well-written and maintainable?
-3. **Documentation (20%)** - Is the project well-documented?
-4. **Best Practices (15%)** - Does it follow industry standards?
+1. **功能性 (40%)** - 功能是否正确？
+2. **代码质量 (25%)** - 代码编写得是否良好且可维护？
+3. **文档 (20%)** - 项目文档是否完善？
+4. **最佳实践 (15%)** - 是否遵循行业标准？
 
-### Scoring Scale (1-5 per criterion)
+### 评分等级（每个标准 1-5 分）
 
-- **5 - Exceptional**: Significantly exceeds requirements, demonstrates advanced understanding
-- **4 - Proficient**: Fully meets requirements with professional quality
-- **3 - Adequate**: Meets basic requirements, some improvements possible
-- **2 - Developing**: Partially meets requirements, significant gaps present
-- **1 - Insufficient**: Does not meet requirements, major issues present
+- **5 - 卓越**：显著超出要求，展示高级理解
+- **4 - 精通**：完全满足要求，具有专业质量
+- **3 - 合格**：满足基本要求，可以进一步改进
+- **2 - 发展中**：部分满足要求，存在明显差距
+- **1 - 不足**：未达到要求，存在重大问题
 
-### Minimum Passing Score: 75% (3.75/5.00 average)
-
----
-
-## Project 1: Containerized Model Server
-
-**Description**: Build a Flask/FastAPI application that serves a pre-trained ML model using Docker.
-
-### Functionality (40 points)
-
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **API Endpoints** | 10% | All endpoints work flawlessly with proper error handling | All endpoints work correctly | Basic endpoints functional, minor issues | Some endpoints missing or broken | Most endpoints non-functional |
-| **Model Loading** | 10% | Efficient loading with caching and error recovery | Model loads correctly every time | Model loads but inefficiently | Model loading unreliable | Model fails to load |
-| **Predictions** | 15% | Fast, accurate predictions with validation | Predictions work correctly | Predictions work but slow/unvalidated | Predictions unreliable | Predictions fail |
-| **Docker Container** | 5% | Optimized multi-stage build, runs perfectly | Container builds and runs correctly | Container works with warnings | Container has major issues | Container doesn't build/run |
-
-**Functionality Checklist**:
-- [ ] POST /predict endpoint returns valid predictions
-- [ ] GET /health endpoint returns service status
-- [ ] GET /model/info endpoint returns model metadata
-- [ ] Input validation with appropriate error messages
-- [ ] Container runs on standard Docker without modifications
-- [ ] Service handles concurrent requests correctly
-
-### Code Quality (25 points)
-
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **Code Organization** | 8% | Excellent structure, clear separation of concerns | Well-organized with logical structure | Basic organization present | Poor organization, mixed concerns | No clear organization |
-| **Error Handling** | 7% | Comprehensive try-catch with specific exceptions | Good error handling throughout | Basic error handling | Minimal error handling | No error handling |
-| **Code Style** | 5% | Perfect PEP 8 compliance, consistent style | Minor style issues only | Some style inconsistencies | Many style violations | No consistent style |
-| **Type Hints** | 5% | Complete type annotations | Most functions annotated | Some type hints present | Few type hints | No type hints |
-
-**Code Quality Checklist**:
-- [ ] Functions are single-purpose and well-named
-- [ ] No code duplication
-- [ ] Proper exception handling with informative messages
-- [ ] Follows PEP 8 style guidelines
-- [ ] Type hints for function parameters and returns
-- [ ] No hardcoded values (uses configuration)
-
-### Documentation (20 points)
-
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **README Quality** | 8% | Comprehensive, professional README with examples | Clear README with all essential info | Basic README covers minimum | Incomplete README | Minimal or no README |
-| **Code Comments** | 5% | Excellent inline comments, clear docstrings | Good comments for complex sections | Basic comments present | Sparse comments | No comments |
-| **API Documentation** | 7% | Complete API docs with examples and schemas | Good API docs covering all endpoints | Basic endpoint documentation | Minimal API docs | No API docs |
-
-**Documentation Checklist**:
-- [ ] README includes project description and purpose
-- [ ] Setup instructions are clear and complete
-- [ ] API endpoints documented with request/response examples
-- [ ] Docker build and run instructions provided
-- [ ] Troubleshooting section included
-- [ ] Dependencies listed with versions
-
-### Best Practices (15 points)
-
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **Docker Best Practices** | 5% | Optimized multi-stage, minimal layers | Efficient Dockerfile | Functional Dockerfile | Suboptimal Dockerfile | Poor Docker practices |
-| **Security** | 5% | No secrets in code, runs as non-root | Good security practices | Basic security considered | Security issues present | Major security flaws |
-| **Configuration** | 5% | Environment-based config, .env support | Good configuration management | Basic config file | Hardcoded values | No configuration |
-
-**Best Practices Checklist**:
-- [ ] .dockerignore file included
-- [ ] Small Docker image size (<500MB for this project)
-- [ ] Container runs as non-root user
-- [ ] Secrets managed via environment variables
-- [ ] .env.example file provided
-- [ ] requirements.txt with pinned versions
-
-### Bonus Points (up to +10%)
-- [ ] Health check with detailed status (+2%)
-- [ ] Request/response logging (+2%)
-- [ ] Unit tests with >80% coverage (+3%)
-- [ ] Docker Compose setup (+3%)
+### 最低及格分数：75%（3.75/5.00 平均分）
 
 ---
 
-## Project 2: Model Deployment with Monitoring
+## 项目 1：容器化模型服务
 
-**Description**: Extend Project 1 with comprehensive logging and basic monitoring using Prometheus.
+**描述**：使用 Flask/FastAPI 构建一个服务预训练 ML 模型的应用程序，并使用 Docker 容器化。
 
-### Functionality (40 points)
+### 功能性（40 分）
 
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **Logging System** | 10% | Structured logging with multiple levels, rotation | Good logging throughout application | Basic logging implemented | Minimal logging | No proper logging |
-| **Metrics Collection** | 15% | Comprehensive metrics with custom labels | All key metrics tracked | Basic metrics present | Few metrics tracked | No metrics |
-| **Prometheus Integration** | 10% | Perfect integration with custom metrics | Prometheus working well | Basic Prometheus setup | Prometheus partially working | Prometheus not working |
-| **Dashboard** | 5% | Professional Grafana dashboard with multiple panels | Good dashboard covering key metrics | Basic dashboard exists | Minimal visualization | No dashboard |
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **API 端点** | 10% | 所有端点完美运行，错误处理得当 | 所有端点正确工作 | 基本端点可用，存在小问题 | 部分端点缺失或异常 | 大多数端点无法使用 |
+| **模型加载** | 10% | 带缓存和错误恢复的高效加载 | 模型每次都正确加载 | 模型可加载但效率低 | 模型加载不可靠 | 模型加载失败 |
+| **预测** | 15% | 快速、准确的预测，带验证 | 预测正常工作 | 预测正常但速度慢/无验证 | 预测不可靠 | 预测失败 |
+| **Docker 容器** | 5% | 优化的多阶段构建，完美运行 | 容器构建并正确运行 | 容器运行但有警告 | 容器有重大问题 | 容器无法构建/运行 |
 
-**Functionality Checklist**:
-- [ ] Application logs to stdout with timestamps
-- [ ] Log levels (DEBUG, INFO, WARNING, ERROR) used appropriately
-- [ ] Metrics exposed at /metrics endpoint
-- [ ] Request count, latency, and error rate tracked
-- [ ] Prometheus successfully scrapes metrics
-- [ ] Grafana dashboard displays key metrics
+**功能性检查清单**：
+- [ ] POST /predict 端点返回有效的预测结果
+- [ ] GET /health 端点返回服务状态
+- [ ] GET /model/info 端点返回模型元数据
+- [ ] 输入验证并带有适当的错误消息
+- [ ] 容器在标准 Docker 上运行，无需修改
+- [ ] 服务正确处理并发请求
 
-### Code Quality (25 points)
+### 代码质量（25 分）
 
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **Logging Implementation** | 10% | Structured logging with context, proper formatters | Well-implemented logging | Basic logging setup | Poor logging implementation | No logging structure |
-| **Metrics Design** | 8% | Well-designed metrics following conventions | Good metric names and labels | Adequate metrics | Poorly designed metrics | No metric design |
-| **Code Maintainability** | 7% | Easy to understand and modify | Clear code structure | Understandable code | Confusing code | Unmaintainable code |
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **代码组织** | 8% | 优秀的结构，清晰的关注点分离 | 组织良好，逻辑清晰 | 有基本的组织 | 组织混乱，关注点混合 | 没有清晰的组织 |
+| **错误处理** | 7% | 全面的 try-catch，使用特定异常 | 全程良好的错误处理 | 基本的错误处理 | 最低限度的错误处理 | 没有错误处理 |
+| **代码风格** | 5% | 完美符合 PEP 8，风格一致 | 仅有少量风格问题 | 部分风格不一致 | 大量风格违规 | 没有一致的风格 |
+| **类型提示** | 5% | 完整的类型注解 | 大部分函数已注解 | 部分类型提示 | 少量类型提示 | 没有类型提示 |
 
-**Code Quality Checklist**:
-- [ ] Logger configured with proper formatting
-- [ ] Sensitive data not logged
-- [ ] Metric names follow Prometheus conventions (snake_case)
-- [ ] Appropriate metric types (Counter, Histogram, Gauge)
-- [ ] Code is DRY (Don't Repeat Yourself)
-- [ ] Configuration separated from code
+**代码质量检查清单**：
+- [ ] 函数功能单一且命名合理
+- [ ] 无代码重复
+- [ ] 带有信息性消息的适当异常处理
+- [ ] 遵循 PEP 8 风格指南
+- [ ] 函数参数和返回值有类型提示
+- [ ] 无硬编码值（使用配置）
 
-### Documentation (20 points)
+### 文档（20 分）
 
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **Setup Instructions** | 7% | Complete, tested setup guide | Clear setup instructions | Basic setup documented | Incomplete instructions | Missing instructions |
-| **Monitoring Guide** | 8% | Comprehensive monitoring documentation | Good monitoring docs | Basic monitoring info | Minimal monitoring docs | No monitoring docs |
-| **Troubleshooting** | 5% | Detailed troubleshooting with solutions | Common issues documented | Basic troubleshooting | Minimal troubleshooting | No troubleshooting |
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **README 质量** | 8% | 全面、专业的 README，带示例 | 清晰的 README，包含所有必要信息 | 基本 README 满足最低要求 | 不完整的 README | 最少或没有 README |
+| **代码注释** | 5% | 优秀的内联注释，清晰的 docstrings | 对复杂部分有良好注释 | 有基本注释 | 稀疏的注释 | 没有注释 |
+| **API 文档** | 7% | 完整的 API 文档，带示例和 schema | 良好的 API 文档，覆盖所有端点 | 基本的端点文档 | 最少的 API 文档 | 没有 API 文档 |
 
-**Documentation Checklist**:
-- [ ] Instructions for running with Docker Compose
-- [ ] How to access Prometheus UI
-- [ ] How to access Grafana dashboard
-- [ ] Explanation of key metrics
-- [ ] Example queries for Prometheus
-- [ ] Common issues and solutions
+**文档检查清单**：
+- [ ] README 包含项目描述和目的
+- [ ] 搭建说明清晰完整
+- [ ] API 端点包含请求/响应示例的文档
+- [ ] 提供 Docker 构建和运行说明
+- [ ] 包含故障排除部分
+- [ ] 列出依赖项及版本
 
-### Best Practices (15 points)
+### 最佳实践（15 分）
 
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **Observability** | 7% | Excellent observability design | Good observability practices | Basic observability | Poor observability | No observability |
-| **Configuration Management** | 4% | Environment-based, well-organized | Good configuration | Basic configuration | Poor configuration | Hardcoded values |
-| **Production Readiness** | 4% | Production-ready design | Mostly production-ready | Basic production considerations | Not production-ready | No production considerations |
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **Docker 最佳实践** | 5% | 优化的多阶段构建，最少的层 | 高效的 Dockerfile | 可用的 Dockerfile | 次优的 Dockerfile | 恶劣的 Docker 实践 |
+| **安全** | 5% | 代码中无 secrets，以非 root 运行 | 良好的安全实践 | 考虑了基本安全 | 存在安全问题 | 重大安全缺陷 |
+| **配置** | 5% | 基于环境的配置，支持 .env | 良好的配置管理 | 基本的配置文件 | 硬编码值 | 没有配置 |
 
-**Best Practices Checklist**:
-- [ ] Log levels configurable via environment variables
-- [ ] Metrics don't significantly impact performance
-- [ ] Monitoring data persisted (Prometheus data retention)
-- [ ] Grafana dashboard exported as JSON
-- [ ] Health checks included
-- [ ] Resource limits defined in Docker Compose
+**最佳实践检查清单**：
+- [ ] 包含 .dockerignore 文件
+- [ ] Docker 镜像小（本项目 <500MB）
+- [ ] 容器以非 root 用户运行
+- [ ] Secrets 通过环境变量管理
+- [ ] 提供了 .env.example 文件
+- [ ] 固定版本的 requirements.txt
 
-### Bonus Points (up to +10%)
-- [ ] Log aggregation (e.g., ELK stack) (+3%)
-- [ ] Alerting rules configured (+3%)
-- [ ] Performance benchmarks documented (+2%)
-- [ ] Integration tests for monitoring (+2%)
-
----
-
-## Project 3: Database-Backed ML Service
-
-**Description**: Add PostgreSQL database for storing predictions and model versioning.
-
-### Functionality (40 points)
-
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **Database Integration** | 15% | Robust DB integration with connection pooling | Database works reliably | Basic DB connection working | DB connection unstable | DB not working |
-| **CRUD Operations** | 10% | Complete CRUD with transactions | All CRUD operations work | Basic CRUD working | Some CRUD missing | CRUD not functional |
-| **Model Versioning** | 10% | Sophisticated versioning system | Good versioning implementation | Basic versioning present | Poor versioning | No versioning |
-| **Data Persistence** | 5% | Reliable persistence with migrations | Data persists correctly | Basic persistence works | Data persistence issues | Data not persisted |
-
-**Functionality Checklist**:
-- [ ] Database schema properly designed
-- [ ] Predictions stored with metadata (timestamp, model version, input)
-- [ ] Model versions tracked in database
-- [ ] Endpoint to retrieve prediction history
-- [ ] Database migrations implemented
-- [ ] Connection pool configured correctly
-
-### Code Quality (25 points)
-
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **Database Design** | 10% | Excellent schema design, normalized | Good database design | Adequate schema | Poor schema design | No proper schema |
-| **SQL/ORM Usage** | 8% | Efficient queries, proper ORM use | Good database operations | Basic SQL/ORM usage | Inefficient queries | Poor database code |
-| **Error Handling** | 7% | Robust DB error handling | Good error handling | Basic error handling | Minimal error handling | No DB error handling |
-
-**Code Quality Checklist**:
-- [ ] ORM (SQLAlchemy) used correctly
-- [ ] Database models well-defined
-- [ ] Indexes on frequently queried columns
-- [ ] No SQL injection vulnerabilities
-- [ ] Transactions used appropriately
-- [ ] Connection errors handled gracefully
-
-### Documentation (20 points)
-
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **Schema Documentation** | 7% | Complete schema docs with ERD | Good schema documentation | Basic schema documented | Minimal schema docs | No schema docs |
-| **API Documentation** | 8% | Comprehensive API docs with DB operations | Good API documentation | Basic API docs | Incomplete API docs | No API docs |
-| **Migration Guide** | 5% | Clear migration procedures | Migration steps documented | Basic migration info | Unclear migrations | No migration docs |
-
-**Documentation Checklist**:
-- [ ] Database schema diagram included
-- [ ] Table descriptions and relationships explained
-- [ ] API endpoints for database operations documented
-- [ ] Migration commands listed
-- [ ] Example queries provided
-- [ ] Backup and restore procedures
-
-### Best Practices (15 points)
-
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **Database Security** | 5% | Excellent security practices | Good security measures | Basic security | Security concerns | Major security issues |
-| **Data Management** | 5% | Sophisticated data lifecycle | Good data management | Basic data handling | Poor data management | No data management |
-| **Scalability** | 5% | Scalable design with indexes | Considers scalability | Basic scalability | Poor scalability | No scalability consideration |
-
-**Best Practices Checklist**:
-- [ ] Database credentials via environment variables
-- [ ] Connection pooling implemented
-- [ ] Prepared statements/ORM to prevent SQL injection
-- [ ] Database migrations version controlled
-- [ ] Proper indexing strategy
-- [ ] Data retention policy considered
-
-### Bonus Points (up to +10%)
-- [ ] Redis caching layer (+3%)
-- [ ] Database backup automation (+2%)
-- [ ] Query performance optimization (+2%)
-- [ ] Database seeding scripts (+2%)
-- [ ] Alembic migrations (+1%)
+### 加分项（最多 +10%）
+- [ ] 含详细状态信息的健康检查（+2%）
+- [ ] 请求/响应日志记录（+2%）
+- [ ] 覆盖率 >80% 的单元测试（+3%）
+- [ ] Docker Compose 搭建（+3%）
 
 ---
 
-## Project 4: Kubernetes Deployment
+## 项目 2：带监控的模型部署
 
-**Description**: Deploy the ML service to Kubernetes with scaling and load balancing.
+**描述**：扩展项目 1，增加全面的日志记录和基于 Prometheus 的基本监控。
 
-### Functionality (40 points)
+### 功能性（40 分）
 
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **K8s Deployment** | 15% | Perfect deployment with HPA | Deployment works reliably | Basic deployment functional | Deployment has issues | Deployment fails |
-| **Service Configuration** | 10% | Optimized service and ingress | Service configured correctly | Basic service setup | Service configuration issues | Service not working |
-| **Scaling** | 10% | Auto-scaling with proper metrics | Manual scaling works well | Basic scaling present | Scaling unreliable | No scaling |
-| **Health Checks** | 5% | Comprehensive liveness/readiness | Health checks configured | Basic health checks | Poor health checks | No health checks |
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **日志系统** | 10% | 结构化日志，多级别，轮转 | 应用程序中良好的日志记录 | 实现了基本日志 | 最少日志记录 | 没有合适的日志 |
+| **Metrics 收集** | 15% | 全面的 metrics，含自定义标签 | 所有关键 metrics 已追踪 | 有基本 metrics | 追踪的 metrics 很少 | 没有 metrics |
+| **Prometheus 集成** | 10% | 完美的集成，含自定义 metrics | Prometheus 运行良好 | 基本的 Prometheus 搭建 | Prometheus 部分运行 | Prometheus 不工作 |
+| **仪表板** | 5% | 专业的 Grafana 仪表板，多面板 | 良好的仪表板，覆盖关键 metrics | 存在基本仪表板 | 最少可视化 | 没有仪表板 |
 
-**Functionality Checklist**:
-- [ ] Deployment YAML creates pods successfully
-- [ ] Service exposes application correctly
-- [ ] ConfigMaps and Secrets used appropriately
-- [ ] Liveness and readiness probes configured
-- [ ] Horizontal Pod Autoscaler (HPA) configured
-- [ ] Application accessible via LoadBalancer/NodePort
+**功能性检查清单**：
+- [ ] 应用程序记录到 stdout 并带时间戳
+- [ ] 适当使用日志级别（DEBUG、INFO、WARNING、ERROR）
+- [ ] 在 /metrics 端点暴露 metrics
+- [ ] 追踪请求计数、延迟和错误率
+- [ ] Prometheus 成功抓取 metrics
+- [ ] Grafana 仪表板展示关键 metrics
 
-### Code Quality (25 points)
+### 代码质量（25 分）
 
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **YAML Quality** | 10% | Well-structured, templated YAML | Clean YAML files | Functional YAML | Messy YAML | Invalid YAML |
-| **Resource Management** | 8% | Optimal resource limits/requests | Good resource configuration | Basic resources set | Poor resource config | No resource limits |
-| **Configuration** | 7% | Excellent use of ConfigMaps/Secrets | Good configuration management | Basic configuration | Poor configuration | Hardcoded values |
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **日志实现** | 10% | 结构化日志，含上下文和正确格式化 | 实现良好的日志 | 基本的日志搭建 | 恶劣的日志实现 | 没有日志结构 |
+| **Metrics 设计** | 8% | 遵循惯例的优良 metrics 设计 | 良好的 metric 名称和标签 | 合格的 metrics | 设计差的 metrics | 没有 metric 设计 |
+| **代码可维护性** | 7% | 易于理解和修改 | 清晰的代码结构 | 可理解的代码 | 令人困惑的代码 | 不可维护的代码 |
 
-**Code Quality Checklist**:
-- [ ] YAML files properly formatted and valid
-- [ ] Resources (CPU, memory) appropriately configured
-- [ ] Labels and selectors used correctly
-- [ ] ConfigMaps for configuration
-- [ ] Secrets for sensitive data
-- [ ] No hardcoded values in YAML
+**代码质量检查清单**：
+- [ ] Logger 配置适当的格式
+- [ ] 敏感数据未记录在日志中
+- [ ] Metric 名称遵循 Prometheus 惯例（snake_case）
+- [ ] 适当的 metric 类型（Counter、Histogram、Gauge）
+- [ ] 代码符合 DRY 原则（不要重复自己）
+- [ ] 配置与代码分离
 
-### Documentation (20 points)
+### 文档（20 分）
 
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **Deployment Guide** | 10% | Comprehensive deployment docs | Clear deployment instructions | Basic deployment guide | Incomplete instructions | No deployment docs |
-| **Architecture Docs** | 5% | Detailed architecture diagrams | Good architecture explanation | Basic architecture info | Minimal architecture docs | No architecture docs |
-| **Operations Guide** | 5% | Complete ops manual | Good operational documentation | Basic operations info | Minimal ops docs | No operations docs |
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **搭建说明** | 7% | 完整、经过测试的搭建指南 | 清晰的搭建说明 | 基本的搭建文档 | 不完整的说明 | 缺少说明 |
+| **监控指南** | 8% | 全面的监控文档 | 良好的监控文档 | 基本的监控信息 | 最少的监控文档 | 没有监控文档 |
+| **故障排除** | 5% | 详细的故障排除，含解决方案 | 记录了常见问题 | 基本的故障排除 | 最少的故障排除 | 没有故障排除 |
 
-**Documentation Checklist**:
-- [ ] Prerequisites clearly listed (kubectl, cluster access)
-- [ ] Step-by-step deployment instructions
-- [ ] Architecture diagram showing K8s components
-- [ ] How to verify deployment
-- [ ] How to access logs
-- [ ] How to scale manually
+**文档检查清单**：
+- [ ] 使用 Docker Compose 运行的说明
+- [ ] 如何访问 Prometheus UI
+- [ ] 如何访问 Grafana 仪表板
+- [ ] 关键 metrics 的解释
+- [ ] Prometheus 的示例查询
+- [ ] 常见问题与解决方案
 
-### Best Practices (15 points)
+### 最佳实践（15 分）
 
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **K8s Best Practices** | 7% | Follows all K8s best practices | Most best practices followed | Some best practices | Few best practices | No best practices |
-| **Security** | 4% | Strong security posture | Good security measures | Basic security | Security concerns | Major security issues |
-| **Maintainability** | 4% | Highly maintainable setup | Maintainable configuration | Adequate maintainability | Hard to maintain | Unmaintainable |
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **可观测性** | 7% | 优秀的可观测性设计 | 良好的可观测性实践 | 基本的可观测性 | 恶劣的可观测性 | 没有可观测性 |
+| **配置管理** | 4% | 基于环境，组织良好 | 良好的配置 | 基本配置 | 恶劣配置 | 硬编码值 |
+| **生产就绪** | 4% | 生产就绪的设计 | 基本符合生产要求 | 基本的生产考量 | 不符合生产要求 | 没有生产考量 |
 
-**Best Practices Checklist**:
-- [ ] Namespaces used for organization
-- [ ] RBAC considered (if applicable)
-- [ ] Security contexts defined
-- [ ] Non-root container user
-- [ ] Image pull policy configured
-- [ ] Resource quotas considered
+**最佳实践检查清单**：
+- [ ] 日志级别可通过环境变量配置
+- [ ] Metrics 不会显著影响性能
+- [ ] 监控数据已持久化（Prometheus 数据保留）
+- [ ] Grafana 仪表板已导出为 JSON
+- [ ] 包含健康检查
+- [ ] Docker Compose 中定义了资源限制
 
-### Bonus Points (up to +10%)
-- [ ] Helm chart created (+5%)
-- [ ] Ingress controller configured (+3%)
-- [ ] Network policies defined (+2%)
-
----
-
-## Project 5: CI/CD Pipeline
-
-**Description**: Implement automated testing and deployment pipeline using GitHub Actions.
-
-### Functionality (40 points)
-
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **CI Pipeline** | 15% | Comprehensive CI with parallel jobs | CI runs all tests correctly | Basic CI working | CI partially working | CI not functional |
-| **CD Pipeline** | 15% | Automated deployment with rollback | CD deploys successfully | Basic CD working | CD unreliable | CD not working |
-| **Test Coverage** | 5% | >80% coverage, meaningful tests | Good test coverage (60-80%) | Adequate coverage (40-60%) | Low coverage (<40%) | No tests |
-| **Pipeline Efficiency** | 5% | Optimized, fast pipeline (<5 min) | Reasonably fast pipeline | Acceptable speed | Slow pipeline | Very slow or stalled |
-
-**Functionality Checklist**:
-- [ ] GitHub Actions workflow configured
-- [ ] Automated unit tests run on every push
-- [ ] Integration tests included
-- [ ] Linting and code quality checks
-- [ ] Docker image built and pushed to registry
-- [ ] Automatic deployment to staging/production
-
-### Code Quality (25 points)
-
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **Test Quality** | 12% | Excellent test coverage and quality | Good tests covering key paths | Basic tests present | Poor test quality | No meaningful tests |
-| **Workflow Design** | 8% | Well-designed, modular workflows | Good workflow structure | Basic workflow | Poor workflow design | Messy workflow |
-| **Code Organization** | 5% | Excellent separation of concerns | Well-organized code | Adequate organization | Poor organization | No organization |
-
-**Code Quality Checklist**:
-- [ ] Unit tests for all critical functions
-- [ ] Integration tests for API endpoints
-- [ ] Test fixtures and mocks used appropriately
-- [ ] Workflow jobs organized logically
-- [ ] Reusable workflow steps
-- [ ] Proper secret management in workflows
-
-### Documentation (20 points)
-
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **Pipeline Documentation** | 8% | Comprehensive pipeline docs | Good pipeline documentation | Basic pipeline info | Minimal docs | No pipeline docs |
-| **Testing Documentation** | 7% | Complete test documentation | Good test docs | Basic test info | Minimal test docs | No test docs |
-| **Deployment Guide** | 5% | Detailed deployment procedures | Good deployment docs | Basic deployment info | Incomplete docs | No deployment docs |
-
-**Documentation Checklist**:
-- [ ] README explains CI/CD pipeline
-- [ ] How to run tests locally
-- [ ] How to trigger deployments
-- [ ] Required secrets and environment variables
-- [ ] Troubleshooting failed pipeline runs
-- [ ] Branching and deployment strategy explained
-
-### Best Practices (15 points)
-
-| Criterion | Weight | 5 Points | 4 Points | 3 Points | 2 Points | 1 Point |
-|-----------|--------|----------|----------|----------|----------|---------|
-| **DevOps Practices** | 7% | Excellent DevOps implementation | Good DevOps practices | Basic DevOps | Poor DevOps practices | No DevOps practices |
-| **Security** | 4% | Secure pipeline with scanning | Good security measures | Basic security | Security concerns | Major security issues |
-| **Reliability** | 4% | Highly reliable pipeline | Reliable pipeline | Mostly reliable | Unreliable | Frequently fails |
-
-**Best Practices Checklist**:
-- [ ] Secrets stored in GitHub Secrets, not code
-- [ ] Branch protection rules configured
-- [ ] Pull request checks required
-- [ ] Separate staging and production environments
-- [ ] Rollback strategy implemented
-- [ ] Notifications on pipeline failures
-
-### Bonus Points (up to +10%)
-- [ ] Security scanning (SAST/DAST) (+3%)
-- [ ] Performance testing in pipeline (+3%)
-- [ ] Multi-environment deployment (+2%)
-- [ ] Blue-green or canary deployment (+2%)
+### 加分项（最多 +10%）
+- [ ] 日志聚合（如 ELK stack）（+3%）
+- [ ] 配置了告警规则（+3%）
+- [ ] 记录了性能基准测试（+2%）
+- [ ] 监控的集成测试（+2%）
 
 ---
 
-## General Submission Guidelines
+## 项目 3：数据库支持的 ML 服务
 
-### File Structure
+**描述**：添加 PostgreSQL 数据库用于存储预测结果和模型版本管理。
+
+### 功能性（40 分）
+
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **数据库集成** | 15% | 稳健的数据库集成，含连接池 | 数据库可靠运行 | 基本的数据库连接正常 | 数据库连接不稳定 | 数据库不工作 |
+| **CRUD 操作** | 10% | 完整的 CRUD 操作，含事务 | 所有 CRUD 操作正常 | 基本 CRUD 正常 | 部分 CRUD 缺失 | CRUD 无法使用 |
+| **模型版本管理** | 10% | 先进的版本管理系统 | 良好的版本管理实现 | 存在基本版本管理 | 恶劣的版本管理 | 没有版本管理 |
+| **数据持久化** | 5% | 可靠的持久化，含迁移 | 数据正确持久化 | 基本持久化正常 | 数据持久化问题 | 数据未持久化 |
+
+**功能性检查清单**：
+- [ ] 数据库 schema 设计合理
+- [ ] 预测结果存储并包含元数据（时间戳、模型版本、输入）
+- [ ] 数据库中追踪模型版本
+- [ ] 用于检索预测历史的端点
+- [ ] 实现了数据库迁移
+- [ ] 连接池正确配置
+
+### 代码质量（25 分）
+
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **数据库设计** | 10% | 优秀的 schema 设计，已规范化 | 良好的数据库设计 | 合格的 schema | 恶劣的 schema 设计 | 没有合适的 schema |
+| **SQL/ORM 使用** | 8% | 高效查询，正确使用 ORM | 良好的数据库操作 | 基本的 SQL/ORM 使用 | 低效查询 | 恶劣的数据库代码 |
+| **错误处理** | 7% | 稳健的数据库错误处理 | 良好的错误处理 | 基本的错误处理 | 最少错误处理 | 没有数据库错误处理 |
+
+**代码质量检查清单**：
+- [ ] 正确使用 ORM（SQLAlchemy）
+- [ ] 数据库模型定义良好
+- [ ] 对频繁查询的列建立了索引
+- [ ] 无 SQL 注入漏洞
+- [ ] 适当使用事务
+- [ ] 优雅处理连接错误
+
+### 文档（20 分）
+
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **Schema 文档** | 7% | 完整的 schema 文档，含 ERD | 良好的 schema 文档 | 记录了基本 schema | 最少的 schema 文档 | 没有 schema 文档 |
+| **API 文档** | 8% | 全面的 API 文档，含数据库操作 | 良好的 API 文档 | 基本的 API 文档 | 不完整的 API 文档 | 没有 API 文档 |
+| **迁移指南** | 5% | 清晰的迁移流程 | 记录了迁移步骤 | 基本的迁移信息 | 不清晰的迁移说明 | 没有迁移文档 |
+
+**文档检查清单**：
+- [ ] 包含数据库 schema 图
+- [ ] 解释了表描述和关系
+- [ ] 记录了数据库操作的 API 端点
+- [ ] 列出了迁移命令
+- [ ] 提供了示例查询
+- [ ] 备份和恢复流程
+
+### 最佳实践（15 分）
+
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **数据库安全** | 5% | 优秀的安全实践 | 良好的安全措施 | 基本安全 | 安全问题 | 重大安全问题 |
+| **数据管理** | 5% | 先进的数据生命周期管理 | 良好的数据管理 | 基本数据处理 | 恶劣的数据管理 | 没有数据管理 |
+| **可伸缩性** | 5% | 带索引的可伸缩设计 | 考虑了可伸缩性 | 基本的可伸缩性 | 恶劣的可伸缩性 | 没有考虑可伸缩性 |
+
+**最佳实践检查清单**：
+- [ ] 数据库凭据通过环境变量管理
+- [ ] 实现了连接池
+- [ ] 使用预处理语句/ORM 防止 SQL 注入
+- [ ] 数据库迁移受版本控制
+- [ ] 正确的索引策略
+- [ ] 考虑了数据保留策略
+
+### 加分项（最多 +10%）
+- [ ] Redis 缓存层（+3%）
+- [ ] 数据库备份自动化（+2%）
+- [ ] 查询性能优化（+2%）
+- [ ] 数据库种子脚本（+2%）
+- [ ] Alembic 迁移（+1%）
+
+---
+
+## 项目 4：Kubernetes 部署
+
+**描述**：将 ML 服务部署到 Kubernetes，实现伸缩和负载均衡。
+
+### 功能性（40 分）
+
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **K8s 部署** | 15% | 完美的部署，含 HPA | 部署可靠运行 | 基本部署可用 | 部署有问题 | 部署失败 |
+| **服务配置** | 10% | 优化的服务和 Ingress | 服务正确配置 | 基本的服务搭建 | 服务配置有问题 | 服务不工作 |
+| **伸缩** | 10% | 基于适当 metrics 的自动伸缩 | 手动伸缩良好 | 存在基本伸缩 | 伸缩不可靠 | 没有伸缩 |
+| **健康检查** | 5% | 全面的存活/就绪检查 | 健康检查已配置 | 基本的健康检查 | 恶劣的健康检查 | 没有健康检查 |
+
+**功能性检查清单**：
+- [ ] Deployment YAML 成功创建 pods
+- [ ] Service 正确暴露应用程序
+- [ ] ConfigMaps 和 Secrets 使用适当
+- [ ] 配置了存活和就绪探测
+- [ ] 配置了水平 Pod 自动伸缩器 (HPA)
+- [ ] 可通过 LoadBalancer/NodePort 访问应用程序
+
+### 代码质量（25 分）
+
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **YAML 质量** | 10% | 结构良好、模板化的 YAML | 整洁的 YAML 文件 | 可用的 YAML | 混乱的 YAML | 无效的 YAML |
+| **资源管理** | 8% | 最优的资源限制/请求 | 良好的资源配置 | 设置了基本资源 | 恶劣的资源配置 | 没有资源限制 |
+| **配置** | 7% | 出色地使用 ConfigMaps/Secrets | 良好的配置管理 | 基本配置 | 恶劣配置 | 硬编码值 |
+
+**代码质量检查清单**：
+- [ ] YAML 文件格式正确且有效
+- [ ] 资源（CPU、内存）配置适当
+- [ ] 正确使用标签和选择器
+- [ ] 使用 ConfigMaps 管理配置
+- [ ] 使用 Secrets 管理敏感数据
+- [ ] YAML 中没有硬编码值
+
+### 文档（20 分）
+
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **部署指南** | 10% | 全面的部署文档 | 清晰的部署说明 | 基本的部署指南 | 不完整的说明 | 没有部署文档 |
+| **架构文档** | 5% | 详细的架构图 | 良好的架构说明 | 基本架构信息 | 最少的架构文档 | 没有架构文档 |
+| **运维指南** | 5% | 完整的运维手册 | 良好的运维文档 | 基本运维信息 | 最少的运维文档 | 没有运维文档 |
+
+**文档检查清单**：
+- [ ] 清楚列出了先决条件（kubectl、集群访问）
+- [ ] 分步部署说明
+- [ ] 展示 K8s 组件的架构图
+- [ ] 如何验证部署
+- [ ] 如何查看日志
+- [ ] 如何手动伸缩
+
+### 最佳实践（15 分）
+
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **K8s 最佳实践** | 7% | 遵循所有 K8s 最佳实践 | 遵循大部分最佳实践 | 部分最佳实践 | 少量最佳实践 | 没有最佳实践 |
+| **安全** | 4% | 强安全态势 | 良好的安全措施 | 基本安全 | 安全问题 | 重大安全问题 |
+| **可维护性** | 4% | 高度可维护的搭建 | 可维护的配置 | 尚可的可维护性 | 难以维护 | 不可维护 |
+
+**最佳实践检查清单**：
+- [ ] 使用 Namespace 进行组织
+- [ ] 考虑了 RBAC（如适用）
+- [ ] 定义了安全上下文
+- [ ] 非 root 容器用户
+- [ ] 配置了镜像拉取策略
+- [ ] 考虑了资源配额
+
+### 加分项（最多 +10%）
+- [ ] 创建了 Helm chart（+5%）
+- [ ] 配置了 Ingress controller（+3%）
+- [ ] 定义了网络策略（+2%）
+
+---
+
+## 项目 5：CI/CD 流水线
+
+**描述**：使用 GitHub Actions 实现自动化测试和部署流水线。
+
+### 功能性（40 分）
+
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **CI 流水线** | 15% | 全面的 CI，含并行任务 | CI 正确运行所有测试 | 基本 CI 正常运行 | CI 部分运行 | CI 无法使用 |
+| **CD 流水线** | 15% | 带回滚的自动部署 | CD 成功部署 | 基本 CD 正常运行 | CD 不可靠 | CD 不工作 |
+| **测试覆盖率** | 5% | >80% 覆盖率，有意义的测试 | 良好的测试覆盖率 (60-80%) | 合格覆盖率 (40-60%) | 低覆盖率 (<40%) | 没有测试 |
+| **流水线效率** | 5% | 优化的快速流水线（<5 分钟） | 较快的流水线 | 可接受的速度 | 慢速流水线 | 非常慢或停滞 |
+
+**功能性检查清单**：
+- [ ] 配置了 GitHub Actions 工作流
+- [ ] 每次推送时自动运行单元测试
+- [ ] 包含集成测试
+- [ ] Lint 和代码质量检查
+- [ ] Docker 镜像构建并推送到 registry
+- [ ] 自动部署到 staging/production
+
+### 代码质量（25 分）
+
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **测试质量** | 12% | 优秀的测试覆盖率和质量 | 覆盖关键路径的良好测试 | 存在基本测试 | 恶劣的测试质量 | 没有有意义的测试 |
+| **工作流设计** | 8% | 设计良好、模块化的工作流 | 良好的工作流结构 | 基本工作流 | 恶劣的工作流设计 | 混乱的工作流 |
+| **代码组织** | 5% | 优秀的关注点分离 | 组织良好的代码 | 尚可的组织 | 恶劣的组织 | 没有组织 |
+
+**代码质量检查清单**：
+- [ ] 所有关键函数的单元测试
+- [ ] API 端点的集成测试
+- [ ] 适当使用测试 fixtures 和 mocks
+- [ ] 工作流任务逻辑化组织
+- [ ] 可重用的工作流步骤
+- [ ] 工作流中正确的 secret 管理
+
+### 文档（20 分）
+
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **流水线文档** | 8% | 全面的流水线文档 | 良好的流水线文档 | 基本流水线信息 | 最少文档 | 没有流水线文档 |
+| **测试文档** | 7% | 完整的测试文档 | 良好的测试文档 | 基本测试信息 | 最少测试文档 | 没有测试文档 |
+| **部署指南** | 5% | 详细的部署流程 | 良好的部署文档 | 基本部署信息 | 不完整的文档 | 没有部署文档 |
+
+**文档检查清单**：
+- [ ] README 解释了 CI/CD 流水线
+- [ ] 如何在本地运行测试
+- [ ] 如何触发部署
+- [ ] 所需的 secrets 和环境变量
+- [ ] 流水线运行失败的故障排除
+- [ ] 解释了分支和部署策略
+
+### 最佳实践（15 分）
+
+| 标准 | 权重 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|------|------|------|------|------|------|
+| **DevOps 实践** | 7% | 优秀的 DevOps 实现 | 良好的 DevOps 实践 | 基本 DevOps | 恶劣的 DevOps 实践 | 没有 DevOps 实践 |
+| **安全** | 4% | 带扫描的安全流水线 | 良好的安全措施 | 基本安全 | 安全问题 | 重大安全问题 |
+| **可靠性** | 4% | 高度可靠的流水线 | 可靠的流水线 | 多数时候可靠 | 不可靠 | 频繁失败 |
+
+**最佳实践检查清单**：
+- [ ] Secrets 存储在 GitHub Secrets 中，而非代码中
+- [ ] 配置了分支保护规则
+- [ ] 需要 pull request 检查
+- [ ] 独立的 staging 和 production 环境
+- [ ] 实现了回滚策略
+- [ ] 流水线失败时发送通知
+
+### 加分项（最多 +10%）
+- [ ] 安全扫描（SAST/DAST）（+3%）
+- [ ] 流水线中的性能测试（+3%）
+- [ ] 多环境部署（+2%）
+- [ ] 蓝绿或金丝雀部署（+2%）
+
+---
+
+## 通用提交指南
+
+### 文件结构
 ```
 project-{number}-{name}/
 ├── README.md
 ├── src/
-│   └── (your code)
+│   └── (你的代码)
 ├── tests/
-│   └── (your tests)
+│   └── (你的测试)
 ├── docs/
-│   └── (documentation)
+│   └── (文档)
 ├── .github/
-│   └── workflows/ (for Project 5)
-├── kubernetes/ (for Project 4)
+│   └── workflows/（项目 5 使用）
+├── kubernetes/（项目 4 使用）
 ├── docker-compose.yml
 ├── Dockerfile
 └── requirements.txt
 ```
 
-### Required Documentation
-All projects must include:
-- [ ] Comprehensive README with setup instructions
-- [ ] Architecture diagram or description
-- [ ] API documentation (if applicable)
-- [ ] How to run tests
-- [ ] Troubleshooting section
+### 所需文档
+所有项目必须包含：
+- [ ] 包含搭建说明的全面 README
+- [ ] 架构图或描述
+- [ ] API 文档（如适用）
+- [ ] 如何运行测试
+- [ ] 故障排除部分
 
-### Submission Checklist
-- [ ] All code runs without errors
-- [ ] Tests pass successfully
-- [ ] Documentation is complete
-- [ ] No secrets or credentials in code
-- [ ] .gitignore includes appropriate files
-- [ ] Requirements.txt has all dependencies
+### 提交检查清单
+- [ ] 所有代码无错误运行
+- [ ] 测试成功通过
+- [ ] 文档完整
+- [ ] 代码中没有 secrets 或凭据
+- [ ] .gitignore 包含适当的文件
+- [ ] Requirements.txt 包含所有依赖
 
-## Scoring Summary Template
+## 评分汇总模板
 
-Use this template to calculate your final score:
+使用此模板计算你的最终分数：
 
 ```
-Project: _______________
-Date: _______________
+项目：_______________
+日期：_______________
 
-Functionality:     ___ / 40 points
-Code Quality:      ___ / 25 points
-Documentation:     ___ / 20 points
-Best Practices:    ___ / 15 points
-Bonus Points:      ___ / 10 points (optional)
+功能性：     ___ / 40 分
+代码质量：   ___ / 25 分
+文档：       ___ / 20 分
+最佳实践：   ___ / 15 分
+加分项：     ___ / 10 分（可选）
 -----------------------------------
-Total Score:       ___ / 100 points
+总分：       ___ / 100 分
 
-Percentage:        ___%
-Letter Grade:      ___
+百分比：     ___%
+字母等级：   ___
 
-Pass/Fail:         ___ (75% minimum to pass)
+通过/未通过： ___（最低 75% 通过）
 
-Strengths:
--
--
--
-
-Areas for Improvement:
+优势：
 -
 -
 -
 
-Reviewer Notes:
+待改进领域：
+-
+-
+-
+
+评审者备注：
 
 
 ```
 
-## Self-Assessment Process
+## 自我评估流程
 
-1. **Complete the project** according to requirements
-2. **Review each rubric criterion** honestly
-3. **Score yourself** using the 1-5 scale
-4. **Calculate totals** for each category
-5. **Identify gaps** where score < 4
-6. **Make improvements** before final submission
-7. **Retest and reverify** all functionality
-8. **Document your work** thoroughly
+1. 按照要求**完成项目**
+2. 诚实地**评审每个评分标准**
+3. 使用 1-5 分等级**给自己打分**
+4. 计算每个类别的**总计**
+5. 找出分数 < 4 的**差距**
+6. 在最终提交前**进行改进**
+7. **重新测试并重新验证**所有功能
+8. 全面**记录你的工作**
 
-## Getting Feedback
+## 获取反馈
 
-For peer or mentor review:
-1. Share your GitHub repository
-2. Provide this rubric to reviewers
-3. Ask for specific feedback on low-scoring areas
-4. Incorporate feedback into improvements
-5. Resubmit if score < 75%
+寻求同伴或导师评审：
+1. 分享你的 GitHub 仓库
+2. 将本评分标准提供给评审者
+3. 请就低分领域给予具体反馈
+4. 将反馈纳入改进
+5. 如果分数 < 75%，重新提交
 
 ---
 
-**Remember**: These rubrics are designed to help you build production-quality projects. Aim for excellence, not just passing scores!
+**记住**：这些评分标准旨在帮助你构建生产质量的项目。追求卓越，而不仅仅是及格分数！

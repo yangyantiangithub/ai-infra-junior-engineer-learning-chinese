@@ -2,140 +2,140 @@
 
 ## Learning Objectives
 
-By the end of this lecture, you will be able to:
+通过本讲座，你将能够：
 
-- Understand what containers are and why they matter
-- Explain how containers differ from virtual machines
-- Understand Docker architecture and its components
-- Install Docker on your system
-- Run your first containers
-- Use basic Docker commands confidently
-- Understand the relationship between images and containers
+- 理解什么是 container 以及它们为何重要
+- 解释 container 与虚拟机的区别
+- 理解 Docker 架构及其组件
+- 在你的系统上安装 Docker
+- 运行你的第一个 container
+- 自信地使用基本 Docker 命令
+- 理解 image 和 container 之间的关系
 
-**Duration**: 90 minutes
-**Difficulty**: Beginner
+**Duration**: 90 分钟
+**Difficulty**: 初级
 **Prerequisites**: Module 002 (Linux Essentials)
 
 ---
 
 ## 1. Introduction to Containerization
 
-### What Are Containers?
+### 什么是 Container？
 
-**Containers** are lightweight, standalone packages that contain everything needed to run a piece of software: code, runtime, system tools, libraries, and settings.
+**Containers** 是轻量级、独立的软件包，包含运行软件所需的一切：代码、运行时、系统工具、库和设置。
 
-**Analogy**: Think of containers like shipping containers:
-- Standardized format
-- Portable across different systems
-- Isolated from other containers
-- Can be stacked and managed easily
+**Analogy**: 可以把 container 想象成海运集装箱：
+- 标准化格式
+- 可在不同系统间移植
+- 与其他 container 隔离
+- 可以堆叠且易于管理
 
 ```
-Traditional Deployment:
+传统部署:
 ┌─────────────────────────┐
-│   Physical Server       │
+│   物理服务器            │
 │  ┌──────────────────┐  │
-│  │  App A + Deps    │  │
-│  │  App B + Deps    │  │  ← Dependencies conflict!
-│  │  App C + Deps    │  │     Hard to manage!
+│  │  应用 A + 依赖   │  │
+│  │  应用 B + 依赖   │  │  ← 依赖冲突！
+│  │  应用 C + 依赖   │  │     难以管理！
 │  └──────────────────┘  │
 └─────────────────────────┘
 
-Container Deployment:
+Container 部署:
 ┌─────────────────────────┐
-│   Physical Server       │
+│   物理服务器            │
 │  ┌────┐ ┌────┐ ┌────┐  │
-│  │App │ │App │ │App │  │
-│  │ A  │ │ B  │ │ C  │  │  ← Isolated!
-│  │+Dep│ │+Dep│ │+Dep│  │     Portable!
+│  │应用│ │应用│ │应用│  │
+│  │ A  │ │ B  │ │ C  │  │  ← 隔离！
+│  │+依赖│ │+依赖│ │+依赖│  │     可移植！
 │  └────┘ └────┘ └────┘  │
 └─────────────────────────┘
 ```
 
-### Why Containers Matter
+### 为什么 Container 很重要
 
-**For Infrastructure Engineers:**
+**对于基础设施工程师：**
 
-1. **Consistency**: "Works on my machine" → "Works everywhere"
-2. **Portability**: Move between dev, test, and production seamlessly
-3. **Efficiency**: Faster startup than VMs, better resource utilization
-4. **Isolation**: Applications don't interfere with each other
-5. **Scalability**: Easy to replicate and scale horizontally
-6. **Version Control**: Images can be versioned like code
+1. **一致性**："在我机器上能运行" → "在任何地方都能运行"
+2. **可移植性**：在开发、测试和生产环境之间无缝移动
+3. **效率**：启动速度比 VM 快，资源利用率更高
+4. **隔离性**：应用之间不会相互干扰
+5. **可扩展性**：易于复制和水平扩展
+6. **版本控制**：Image 可以像代码一样进行版本管理
 
-**For AI/ML Infrastructure:**
+**对于 AI/ML 基础设施：**
 
-- Package models with exact dependencies
-- Consistent training environments
-- Easy model serving deployment
-- GPU resource management
-- Reproducible research environments
+- 使用精确的依赖关系打包模型
+- 一致的训练环境
+- 简单的模型 serving 部署
+- GPU 资源管理
+- 可重现的研究环境
 
 ---
 
 ## 2. Containers vs Virtual Machines
 
-### Architecture Comparison
+### 架构对比
 
 ```
-Virtual Machines:
+虚拟机:
 ┌─────────────────────────────────┐
-│        Physical Server          │
+│        物理服务器                │
 │  ┌──────────────────────────┐  │
-│  │      Hypervisor          │  │
+│  │     Hypervisor           │  │
 │  └──────────────────────────┘  │
 │  ┌────┐  ┌────┐  ┌────┐       │
 │  │VM1 │  │VM2 │  │VM3 │       │
-│  │OS  │  │OS  │  │OS  │       │  ← Each VM has full OS!
-│  │App │  │App │  │App │       │     Heavy!
+│  │OS  │  │OS  │  │OS  │       │  ← 每个 VM 都有完整 OS！
+│  │App │  │App │  │App │       │     重量级！
 │  └────┘  └────┘  └────┘       │
 └─────────────────────────────────┘
 
 Containers:
 ┌─────────────────────────────────┐
-│        Physical Server          │
+│        物理服务器                │
 │  ┌──────────────────────────┐  │
-│  │        Host OS           │  │
+│  │     主机 OS              │  │
 │  └──────────────────────────┘  │
 │  ┌──────────────────────────┐  │
-│  │    Container Runtime     │  │
+│  │   Container Runtime      │  │
 │  └──────────────────────────┘  │
 │  ┌────┐  ┌────┐  ┌────┐       │
-│  │C1  │  │C2  │  │C3  │       │  ← Share host OS kernel!
-│  │App │  │App │  │App │       │     Lightweight!
+│  │C1  │  │C2  │  │C3  │       │  ← 共享主机 OS 内核！
+│  │App │  │App │  │App │       │     轻量级！
 │  └────┘  └────┘  └────┘       │
 └─────────────────────────────────┘
 ```
 
 ### Comparison Table
 
-| Aspect | Virtual Machines | Containers |
+| 对比项 | 虚拟机 | Containers |
 |--------|------------------|------------|
-| **Startup Time** | Minutes | Seconds |
-| **Size** | GBs | MBs |
-| **Performance** | Slower (overhead) | Near-native |
-| **Isolation** | Complete (hardware-level) | Process-level |
-| **OS** | Each VM has full OS | Share host OS kernel |
-| **Portability** | Limited | Highly portable |
-| **Resource Usage** | Heavy | Lightweight |
-| **Use Case** | Strong isolation needs | Microservices, CI/CD |
+| **启动时间** | 分钟级 | 秒级 |
+| **大小** | GB 级别 | MB 级别 |
+| **性能** | 较慢（有开销） | 接近原生 |
+| **隔离性** | 完全（硬件级别） | 进程级别 |
+| **操作系统** | 每个 VM 有完整 OS | 共享主机 OS 内核 |
+| **可移植性** | 有限 | 高度可移植 |
+| **资源使用** | 重量级 | 轻量级 |
+| **使用场景** | 需要强隔离 | 微服务、CI/CD |
 
-### When to Use What?
+### 何时使用什么？
 
-**Use VMs when:**
-- Need different operating systems
-- Require complete isolation (security)
-- Running legacy applications
-- Need hardware-level features
+**使用 VM 的场景：**
+- 需要不同的操作系统
+- 要求完全隔离（安全）
+- 运行遗留应用
+- 需要硬件级别功能
 
-**Use Containers when:**
-- Building microservices
-- CI/CD pipelines
-- Development environments
-- Cloud-native applications
+**使用 Container 的场景：**
+- 构建微服务
+- CI/CD 流水线
+- 开发环境
+- 云原生应用
 - ML model serving
 
-**Best Practice**: Often use both! VMs for isolation, containers within VMs for efficiency.
+**Best Practice**: 通常两者一起使用！VM 提供隔离，VM 内部的 container 提供效率。
 
 ---
 
@@ -143,168 +143,168 @@ Containers:
 
 ### Overview
 
-Docker uses a **client-server architecture**:
+Docker 使用 **客户端-服务器架构**：
 
 ```
 ┌─────────────────────────────────────────────────┐
-│                Docker Client                    │
-│              (docker command)                   │
+│                Docker 客户端                      │
+│              (docker 命令)                        │
 └────────────────────┬────────────────────────────┘
                      │ REST API
                      ↓
 ┌─────────────────────────────────────────────────┐
-│              Docker Daemon                      │
-│               (dockerd)                         │
-│  ┌────────────────────────────────────────┐   │
-│  │     Container Management               │   │
-│  ├────────────────────────────────────────┤   │
-│  │     Image Management                   │   │
-│  ├────────────────────────────────────────┤   │
-│  │     Volume Management                  │   │
-│  ├────────────────────────────────────────┤   │
-│  │     Network Management                 │   │
-│  └────────────────────────────────────────┘   │
-│                     │                          │
-│                     ↓                          │
-│              containerd                        │
-│                     │                          │
-│                     ↓                          │
-│                  runc                          │
+│              Docker Daemon                       │
+│               (dockerd)                          │
+│  ┌────────────────────────────────────────┐    │
+│  │     Container 管理                      │    │
+│  ├────────────────────────────────────────┤    │
+│  │     Image 管理                          │    │
+│  ├────────────────────────────────────────┤    │
+│  │     Volume 管理                         │    │
+│  ├────────────────────────────────────────┤    │
+│  │     Network 管理                        │    │
+│  └────────────────────────────────────────┘    │
+│                     │                           │
+│                     ↓                           │
+│              containerd                         │
+│                     │                           │
+│                     ↓                           │
+│                  runc                           │
 └─────────────────────────────────────────────────┘
                      │
                      ↓
 ┌─────────────────────────────────────────────────┐
-│              Containers                         │
-│    [Container 1] [Container 2] [Container 3]   │
+│              Containers                          │
+│    [Container 1] [Container 2] [Container 3]    │
 └─────────────────────────────────────────────────┘
 ```
 
 ### Key Components
 
-**1. Docker Client (`docker` CLI)**
-- Command-line interface you use
-- Sends commands to Docker daemon
-- Examples: `docker run`, `docker build`, `docker ps`
+**1. Docker 客户端 (`docker` CLI)**
+- 你使用的命令行界面
+- 向 Docker daemon 发送命令
+- 示例：`docker run`、`docker build`、`docker ps`
 
 **2. Docker Daemon (`dockerd`)**
-- Background service managing containers
-- Listens for Docker API requests
-- Manages images, containers, networks, volumes
-- Can communicate with other daemons
+- 管理 container 的后台服务
+- 监听 Docker API 请求
+- 管理 image、container、网络、volume
+- 可以与其他 daemon 通信
 
 **3. containerd**
-- Industry-standard container runtime
-- Manages container lifecycle
-- Image transfer and storage
-- Started/stopped by Docker daemon
+- 行业标准的 container runtime
+- 管理 container 生命周期
+- 镜像传输和存储
+- 由 Docker daemon 启动/停止
 
 **4. runc**
-- Low-level container runtime
-- Actually creates and runs containers
-- OCI (Open Container Initiative) compliant
+- 底层 container runtime
+- 实际创建和运行 container
+- 符合 OCI（Open Container Initiative）标准
 
 **5. Docker Registry**
-- Stores Docker images
-- Docker Hub: public registry
-- Private registries for enterprise
+- 存储 Docker image
+- Docker Hub：公共 registry
+- 企业级私有 registry
 
-### How It All Works Together
+### 所有组件如何协同工作
 
 ```
 $ docker run nginx
 
-1. Client: Sends 'run nginx' to daemon
-2. Daemon: Checks if nginx image exists locally
-3. Daemon: If not, pulls from registry (Docker Hub)
-4. containerd: Unpacks image layers
-5. runc: Creates container from image
-6. Container: nginx starts running!
+1. 客户端：向 daemon 发送 'run nginx' 命令
+2. Daemon：检查 nginx image 是否本地存在
+3. Daemon：如果不存在，从 registry（Docker Hub）拉取
+4. containerd：解压 image layer
+5. runc：从 image 创建 container
+6. Container：nginx 开始运行！
 ```
 
 ---
 
 ## 4. Installing Docker
 
-### Installation on Linux (Ubuntu/Debian)
+### 在 Linux 上安装 (Ubuntu/Debian)
 
 ```bash
-# Update package index
+# 更新包索引
 sudo apt-get update
 
-# Install prerequisites
+# 安装先决条件
 sudo apt-get install \
     ca-certificates \
     curl \
     gnupg \
     lsb-release
 
-# Add Docker's official GPG key
+# 添加 Docker 官方 GPG 密钥
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
-# Set up repository
+# 设置仓库
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# Install Docker Engine
+# 安装 Docker Engine
 sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# Verify installation
+# 验证安装
 sudo docker run hello-world
 ```
 
-### Post-Installation: Run Docker without `sudo`
+### 安装后：无需 `sudo` 运行 Docker
 
 ```bash
-# Create docker group (usually exists)
+# 创建 docker 组（通常已存在）
 sudo groupadd docker
 
-# Add your user to docker group
+# 将你的用户添加到 docker 组
 sudo usermod -aG docker $USER
 
-# Apply group membership (or log out/in)
+# 应用组成员身份（或注销/重新登录）
 newgrp docker
 
-# Verify
-docker run hello-world  # No sudo needed!
+# 验证
+docker run hello-world  # 不需要 sudo 了！
 ```
 
-### Installation on Mac/Windows
+### 在 Mac/Windows 上安装
 
-**Docker Desktop** (recommended for development):
+**Docker Desktop**（推荐用于开发）：
 
-1. Download from https://www.docker.com/products/docker-desktop
-2. Run installer
-3. Start Docker Desktop
-4. Verify in terminal: `docker --version`
+1. 从 https://www.docker.com/products/docker-desktop 下载
+2. 运行安装程序
+3. 启动 Docker Desktop
+4. 在终端中验证：`docker --version`
 
-**What's Included:**
+**包含的内容：**
 - Docker Engine
 - Docker CLI
 - Docker Compose
-- Kubernetes (optional)
-- Dashboard UI
+- Kubernetes（可选）
+- 仪表盘 UI
 
-### Verification
+### 验证
 
 ```bash
-# Check version
+# 检查版本
 docker --version
-# Output: Docker version 24.0.6, build ed223bc
+# 输出：Docker version 24.0.6, build ed223bc
 
-# Check detailed info
+# 检查详细信息
 docker version
 
-# Check Docker system info
+# 检查 Docker 系统信息
 docker info
 
-# Run test container
+# 运行测试 container
 docker run hello-world
 ```
 
-**Expected Output from hello-world**:
+**hello-world 的预期输出**：
 ```
 Hello from Docker!
 This message shows that your installation appears to be working correctly.
@@ -322,10 +322,10 @@ To generate this message, Docker took the following steps:
 
 ## 5. Understanding Images and Containers
 
-### The Image-Container Relationship
+### Image-Container 关系
 
-**Image** = Blueprint (class in OOP)
-**Container** = Running instance (object in OOP)
+**Image** = 蓝图（OOP 中的类）
+**Container** = 运行实例（OOP 中的对象）
 
 ```
 Image (nginx:latest)
@@ -334,413 +334,413 @@ Image (nginx:latest)
       ├──→ Container 2 (web-server-2)
       └──→ Container 3 (web-server-3)
 
-One image, multiple containers!
+一个 image，多个 container！
 ```
 
-### What is a Docker Image?
+### Docker Image 是什么？
 
-**Image**: Read-only template with instructions for creating a container.
+**Image**：用于创建 container 的只读模板，包含指令。
 
 **Key Concepts:**
-- Made up of layers
-- Each layer represents a filesystem change
-- Layers are cached and reusable
-- Images are immutable
+- 由多个 layer 组成
+- 每个 layer 代表一个文件系统变更
+- Layer 被缓存并可重用
+- Image 是不可变的
 
 ```
-Image Layers (example):
+Image Layers (示例)：
 ┌─────────────────────┐
-│  App Code Layer     │  ← Top layer
+│  应用代码 Layer      │  ← 顶层
 ├─────────────────────┤
-│  pip install deps   │
+│  pip install 依赖    │
 ├─────────────────────┤
-│  Python 3.11        │
+│  Python 3.11         │
 ├─────────────────────┤
-│  Ubuntu Base        │  ← Bottom layer
+│  Ubuntu 基础         │  ← 底层
 └─────────────────────┘
 ```
 
-### What is a Container?
+### Container 是什么？
 
-**Container**: Runnable instance of an image.
+**Container**：image 的可运行实例。
 
 **Key Concepts:**
-- Has writable layer on top of image
-- Can be started, stopped, moved, deleted
-- Isolated from other containers
-- Can connect to networks, attach storage
+- 在 image 之上有可写 layer
+- 可以启动、停止、移动、删除
+- 与其他 container 隔离
+- 可以连接到网络、附加存储
 
 ```
-Container = Image + Writable Layer + Runtime Config
+Container = Image + 可写 Layer + 运行时配置
 
 ┌─────────────────────┐
-│  Writable Layer     │  ← Container's changes
+│  可写 Layer          │  ← Container 的变更
 ├─────────────────────┤
-│  Image Layers       │  ← Read-only
+│  Image Layers        │  ← 只读
 └─────────────────────┘
 ```
 
 ---
 
-## 6. Your First Containers
+## 6. 你的第一个 Container
 
-### Running a Simple Container
+### 运行简单 Container
 
 ```bash
-# Run nginx web server
+# 运行 nginx web 服务器
 docker run nginx
 
-# What happened:
-# 1. Downloaded nginx image (if not present)
-# 2. Created container from image
-# 3. Started nginx process
-# 4. Attached to container output (logs)
+# 发生了什么：
+# 1. 下载 nginx image（如果不存在）
+# 2. 从 image 创建 container
+# 3. 启动 nginx 进程
+# 4. 附加到 container 输出（日志）
 
-# Stop with Ctrl+C
+# 使用 Ctrl+C 停止
 ```
 
-### Running in Detached Mode
+### 以分离模式运行
 
 ```bash
-# Run in background (-d = detached)
+# 在后台运行（-d = detached）
 docker run -d nginx
 
-# Output: container ID
+# 输出：container ID
 # a1b2c3d4e5f6...
 
-# Container runs in background!
+# Container 在后台运行！
 ```
 
-### Naming Containers
+### 命名 Container
 
 ```bash
-# Give container a name
+# 给 container 一个名称
 docker run -d --name my-nginx nginx
 
-# Easier to reference by name than ID
+# 通过名称引用比通过 ID 更容易
 ```
 
 ### Port Mapping
 
 ```bash
-# Map container port to host port
+# 将 container 端口映射到主机端口
 docker run -d -p 8080:80 nginx
 
-# Format: -p host_port:container_port
-# Access nginx at http://localhost:8080
+# 格式：-p 主机端口:容器端口
+# 通过 http://localhost:8080 访问 nginx
 
-# Open browser and visit http://localhost:8080
-# You should see "Welcome to nginx!"
+# 打开浏览器访问 http://localhost:8080
+# 你应该看到 "Welcome to nginx!"
 ```
 
-### Interactive Containers
+### 交互式 Container
 
 ```bash
-# Run Ubuntu interactively
+# 以交互方式运行 Ubuntu
 docker run -it ubuntu bash
 
-# -i: Keep STDIN open (interactive)
-# -t: Allocate pseudo-TTY (terminal)
+# -i：保持 STDIN 打开（交互式）
+# -t：分配伪 TTY（终端）
 
-# You're now inside the container!
+# 你现在在 container 内部！
 root@a1b2c3d4e5f6:/# ls
 root@a1b2c3d4e5f6:/# whoami
 # root
 
-root@a1b2c3d4e5f6:/# exit  # Exit container
+root@a1b2c3d4e5f6:/# exit  # 退出 container
 ```
 
-### Environment Variables
+### 环境变量
 
 ```bash
-# Pass environment variables
+# 传递环境变量
 docker run -d -e MY_VAR=hello -e DB_HOST=localhost nginx
 
-# Multiple variables with multiple -e flags
+# 使用多个 -e 标志传递多个变量
 ```
 
 ---
 
-## 7. Basic Docker Commands
+## 7. 基本 Docker 命令
 
-### Managing Containers
+### 管理 Container
 
 ```bash
-# List running containers
+# 列出运行中的 container
 docker ps
 
-# List all containers (including stopped)
+# 列出所有 container（包括已停止的）
 docker ps -a
 
-# Stop a container
+# 停止 container
 docker stop my-nginx
 
-# Start a stopped container
+# 启动已停止的 container
 docker start my-nginx
 
-# Restart a container
+# 重启 container
 docker restart my-nginx
 
-# Remove a container
+# 删除 container
 docker rm my-nginx
 
-# Force remove running container
+# 强制删除运行中的 container
 docker rm -f my-nginx
 
-# Remove all stopped containers
+# 删除所有已停止的 container
 docker container prune
 ```
 
-### Viewing Container Details
+### 查看 Container 详情
 
 ```bash
-# View container logs
+# 查看 container 日志
 docker logs my-nginx
 
-# Follow logs (like tail -f)
+# 跟踪日志（类似 tail -f）
 docker logs -f my-nginx
 
-# Last 100 lines
+# 最近 100 行
 docker logs --tail 100 my-nginx
 
-# Inspect container
+# 检查 container
 docker inspect my-nginx
 
-# View container stats (CPU, memory)
+# 查看 container 统计（CPU、内存）
 docker stats my-nginx
 ```
 
-### Executing Commands in Containers
+### 在 Container 中执行命令
 
 ```bash
-# Execute command in running container
+# 在运行中的 container 内执行命令
 docker exec my-nginx ls /etc
 
-# Interactive shell
+# 交互式 shell
 docker exec -it my-nginx bash
 
-# Now you're inside the running container!
+# 现在你在运行中的 container 内部！
 ```
 
-### Managing Images
+### 管理 Image
 
 ```bash
-# List images
+# 列出 image
 docker images
 
-# Pull image from registry
+# 从 registry 拉取 image
 docker pull python:3.11
 
-# Remove image
+# 删除 image
 docker rmi nginx
 
-# Remove unused images
+# 删除未使用的 image
 docker image prune
 
-# View image history (layers)
+# 查看 image 历史（layers）
 docker history nginx
 ```
 
 ---
 
-## 8. Practical Examples
+## 8. 实际示例
 
-### Example 1: Simple Web Server
+### Example 1: 简单的 Web 服务器
 
 ```bash
-# Run nginx on port 8080
+# 在端口 8080 上运行 nginx
 docker run -d -p 8080:80 --name webserver nginx
 
-# Verify it's running
+# 验证它正在运行
 docker ps
 
-# Check logs
+# 检查日志
 docker logs webserver
 
-# Access in browser: http://localhost:8080
+# 在浏览器中访问：http://localhost:8080
 
-# Stop and remove
+# 停止并删除
 docker stop webserver
 docker rm webserver
 ```
 
-### Example 2: Python Application
+### Example 2: Python 应用
 
 ```bash
-# Run Python REPL
+# 运行 Python REPL
 docker run -it python:3.11 python
 
 >>> print("Hello from Docker!")
 >>> exit()
 
-# Run Python script
+# 运行 Python 脚本
 echo 'print("Hello from Docker!")' > hello.py
 docker run -v $(pwd):/app python:3.11 python /app/hello.py
 ```
 
-### Example 3: Database Container
+### Example 3: 数据库 Container
 
 ```bash
-# Run PostgreSQL
+# 运行 PostgreSQL
 docker run -d \
   --name postgres-db \
   -e POSTGRES_PASSWORD=mysecretpassword \
   -p 5432:5432 \
   postgres:15
 
-# Check it's running
+# 检查它是否在运行
 docker logs postgres-db
 
-# Connect with psql
+# 使用 psql 连接
 docker exec -it postgres-db psql -U postgres
 
-# Cleanup
+# 清理
 docker stop postgres-db
 docker rm postgres-db
 ```
 
-### Example 4: Development Environment
+### Example 4: 开发环境
 
 ```bash
-# Run Jupyter notebook
+# 运行 Jupyter notebook
 docker run -d \
   --name jupyter \
   -p 8888:8888 \
   -v $(pwd):/home/jovyan/work \
   jupyter/scipy-notebook
 
-# Get access token
+# 获取访问令牌
 docker logs jupyter | grep token
 
-# Access at http://localhost:8888 with token
+# 使用令牌访问 http://localhost:8888
 ```
 
 ---
 
-## 9. Common Issues and Troubleshooting
+## 9. 常见问题与排错
 
 ### Issue 1: "Cannot connect to Docker daemon"
 
 **Error**: `Cannot connect to the Docker daemon. Is the docker daemon running?`
 
-**Solutions**:
+**解决方案**：
 ```bash
-# Check if Docker is running
+# 检查 Docker 是否在运行
 sudo systemctl status docker
 
-# Start Docker
+# 启动 Docker
 sudo systemctl start docker
 
-# Check if user is in docker group
+# 检查用户是否在 docker 组中
 groups $USER
 
-# If not, add user to docker group (see section 4)
+# 如果不在，将用户添加到 docker 组（见第 4 节）
 ```
 
-### Issue 2: Port Already in Use
+### Issue 2: 端口已被占用
 
 **Error**: `Bind for 0.0.0.0:8080 failed: port is already allocated`
 
-**Solutions**:
+**解决方案**：
 ```bash
-# Find what's using the port
+# 查找哪个程序正在使用该端口
 sudo lsof -i :8080
 
-# Use different host port
+# 使用不同的主机端口
 docker run -p 8081:80 nginx
 
-# Or stop the conflicting service
+# 或者停止冲突的服务
 ```
 
-### Issue 3: Container Exits Immediately
+### Issue 3: Container 立即退出
 
-**Problem**: Container starts and stops right away
+**Problem**: Container 启动后立即停止
 
 **Diagnosis**:
 ```bash
-# Check exit code
+# 检查退出代码
 docker ps -a
 
-# View logs
+# 查看日志
 docker logs <container-name>
 
-# Run interactively to debug
+# 以交互方式运行以调试
 docker run -it <image> sh
 ```
 
-### Issue 4: Out of Disk Space
+### Issue 4: 磁盘空间不足
 
 **Error**: `no space left on device`
 
-**Solutions**:
+**解决方案**：
 ```bash
-# Check Docker disk usage
+# 检查 Docker 磁盘使用情况
 docker system df
 
-# Clean up unused resources
+# 清理未使用的资源
 docker system prune
 
-# Remove all unused containers, networks, images
+# 删除所有未使用的 container、网络、image
 docker system prune -a
 
-# Remove specific items
-docker container prune  # Remove stopped containers
-docker image prune      # Remove dangling images
-docker volume prune     # Remove unused volumes
+# 删除特定项目
+docker container prune  # 删除已停止的 container
+docker image prune      # 删除悬挂的 image
+docker volume prune     # 删除未使用的 volume
 ```
 
 ---
 
-## 10. Best Practices (Fundamentals)
+## 10. 最佳实践（基础）
 
-### 1. Always Name Your Containers
+### 1. 始终命名你的 Container
 
 ```bash
-# Bad
+# 不好
 docker run -d nginx
 
-# Good
+# 好
 docker run -d --name my-webserver nginx
 ```
 
-### 2. Use Specific Image Tags
+### 2. 使用特定的 Image Tag
 
 ```bash
-# Bad (uses 'latest', unpredictable)
+# 不好（使用 'latest'，不可预测）
 docker run nginx
 
-# Good (specific version)
+# 好（特定版本）
 docker run nginx:1.25.3
 ```
 
-### 3. Clean Up Regularly
+### 3. 定期清理
 
 ```bash
-# Remove stopped containers
+# 删除已停止的 container
 docker container prune
 
-# Remove unused images
+# 删除未使用的 image
 docker image prune
 
-# Full cleanup (be careful!)
+# 完整清理（小心！）
 docker system prune -a
 ```
 
-### 4. Check Logs for Debugging
+### 4. 通过日志进行调试
 
 ```bash
-# Always check logs first
+# 始终先检查日志
 docker logs <container-name>
 
-# For live troubleshooting
+# 实时排错
 docker logs -f <container-name>
 ```
 
-### 5. Use `docker exec` for Inspection
+### 5. 使用 `docker exec` 进行检查
 
 ```bash
-# Don't create new containers to debug
-# Use exec on running container
+# 不要创建新的 container 来调试
+# 在运行中的 container 上使用 exec
 docker exec -it <container-name> bash
 ```
 
@@ -748,16 +748,16 @@ docker exec -it <container-name> bash
 
 ## Key Takeaways
 
-✅ **Containers** are lightweight, isolated application packages
-✅ **Containers ≠ VMs**: Containers share host OS, much lighter
-✅ **Docker** is a platform for building and running containers
-✅ **Images** are blueprints, **containers** are running instances
-✅ **Docker uses client-server architecture** with daemon
-✅ **Basic workflow**: pull image → run container → manage lifecycle
-✅ **Port mapping** connects container to host network
-✅ **docker ps** shows running containers
-✅ **docker logs** shows container output
-✅ **docker exec** runs commands in running containers
+✅ **Containers** 是轻量级、隔离的应用包
+✅ **Containers ≠ VMs**：Container 共享主机 OS，轻量得多
+✅ **Docker** 是构建和运行 container 的平台
+✅ **Images** 是蓝图，**containers** 是运行实例
+✅ **Docker 使用客户端-服务器架构**，包含 daemon
+✅ **基本工作流**：拉取 image → 运行 container → 管理生命周期
+✅ **端口映射** 将 container 连接到主机网络
+✅ **docker ps** 显示运行中的 container
+✅ **docker logs** 显示 container 输出
+✅ **docker exec** 在运行中的 container 内执行命令
 
 ---
 
@@ -766,67 +766,67 @@ docker exec -it <container-name> bash
 ### Essential Commands
 
 ```bash
-# Run container
+# 运行 container
 docker run [OPTIONS] IMAGE [COMMAND]
 
-# List containers
+# 列出 container
 docker ps [-a]
 
-# Stop container
+# 停止 container
 docker stop CONTAINER
 
-# Remove container
+# 删除 container
 docker rm CONTAINER
 
-# View logs
+# 查看日志
 docker logs CONTAINER
 
-# Execute command
+# 执行命令
 docker exec [OPTIONS] CONTAINER COMMAND
 
-# List images
+# 列出 image
 docker images
 
-# Pull image
+# 拉取 image
 docker pull IMAGE[:TAG]
 
-# Remove image
+# 删除 image
 docker rmi IMAGE
 ```
 
 ### Common Options
 
 ```
--d         Detached mode (background)
--it        Interactive with terminal
--p         Port mapping (host:container)
--e         Environment variable
---name     Name the container
--v         Volume mount
---rm       Remove container when it exits
+-d         分离模式（后台）
+-it        交互式终端
+-p         端口映射（主机:容器）
+-e         环境变量
+--name     命名 container
+-v         Volume 挂载
+--rm       Container 退出时自动删除
 ```
 
 ---
 
-## What's Next?
+## 后续内容
 
-In the next lecture, we'll dive deeper into:
-- **Dockerfile basics**: Building your own images
-- **Image layers**: Understanding how images are constructed
-- **Building images**: Creating custom images for your applications
-- **Image optimization**: Making images smaller and faster
+在下一讲中，我们将深入探讨：
+- **Dockerfile 基础**：构建你自己的 image
+- **Image Layers**：理解 image 是如何构建的
+- **构建 Image**：为你的应用创建自定义 image
+- **Image 优化**：使 image 更小、更快
 
-**Practice Before Next Lecture**:
-1. Run at least 5 different containers
-2. Practice start/stop/remove
-3. Use `docker exec` to explore running containers
-4. Try port mapping with different applications
+**下一讲前练习**：
+1. 运行至少 5 个不同的 container
+2. 练习 start/stop/remove
+3. 使用 `docker exec` 探索运行中的 container
+4. 尝试不同应用的端口映射
 
-Continue to `lecture-notes/02-dockerfiles-basics.md`
+继续学习 `lecture-notes/02-dockerfiles-basics.md`
 
 ---
 
 **Lecture Version**: 1.0
 **Last Updated**: October 2025
-**Estimated Time**: 90 minutes
-**Difficulty**: Beginner
+**Estimated Time**: 90 分钟
+**Difficulty**: 初级

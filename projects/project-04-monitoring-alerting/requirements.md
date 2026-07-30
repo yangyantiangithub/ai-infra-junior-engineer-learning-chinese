@@ -1,747 +1,747 @@
-# Requirements: Monitoring & Alerting System
+# 需求：监控与告警系统
 
-**Project**: Monitoring & Alerting System
-**Level**: Junior AI Infrastructure Engineer
-**Version**: 1.0
-
----
-
-## Functional Requirements
-
-### FR-1: Metrics Collection & Storage
-
-#### FR-1.1: Deploy Prometheus for Metrics Collection
-
-**Description**: Set up Prometheus as the central metrics collection and storage system.
-
-**Requirements**:
-- Deploy Prometheus 2.47+ using Docker Compose
-- Configure persistent storage with 30-day retention
-- Set up service discovery for automatic target detection
-- Enable remote write for long-term storage (optional)
-- Configure high availability with multiple Prometheus instances (advanced)
-
-**Acceptance Criteria**:
-- [ ] Prometheus running and accessible at `http://localhost:9090`
-- [ ] Metrics stored with 30-day retention policy
-- [ ] No data gaps in time series
-- [ ] Query performance < 1 second for common queries
-- [ ] Storage usage within expected limits
-
-#### FR-1.2: Configure Service Discovery
-
-**Description**: Automatic discovery of monitoring targets without manual configuration.
-
-**Requirements**:
-- Kubernetes service discovery (if using K8s)
-- File-based service discovery (for static targets)
-- DNS-based service discovery
-- Automatic relabeling of discovered targets
-
-**Acceptance Criteria**:
-- [ ] New services automatically detected within 1 minute
-- [ ] Services removed when they go down
-- [ ] Correct labels applied to all targets
-- [ ] No orphaned scrape configs
-
-#### FR-1.3: Collect Infrastructure Metrics
-
-**Description**: Monitor system-level metrics for all infrastructure components.
-
-**Metrics to Collect**:
-- **CPU**: Usage per core, load average, steal time
-- **Memory**: Total, used, available, swap usage
-- **Disk**: Usage per mount point, I/O operations, throughput
-- **Network**: Bytes sent/received, packet errors, TCP connections
-
-**Acceptance Criteria**:
-- [ ] Node Exporter deployed on all nodes
-- [ ] All system metrics available in Prometheus
-- [ ] Metrics collected every 15 seconds
-- [ ] No missing data points
-
-#### FR-1.4: Collect Application Metrics
-
-**Description**: Track application-level performance and behavior metrics.
-
-**Metrics to Collect**:
-- **HTTP Requests**: Total requests by method, endpoint, status code
-- **Request Duration**: Histogram with quantiles (P50, P95, P99)
-- **Error Rate**: 4xx and 5xx errors per endpoint
-- **Active Connections**: Current number of active connections
-- **Request Size**: Histogram of request/response sizes
-
-**Acceptance Criteria**:
-- [ ] Application instrumented with `prometheus_client` library
-- [ ] `/metrics` endpoint exposed on all services
-- [ ] All HTTP requests tracked
-- [ ] Latency buckets configured appropriately
-
-#### FR-1.5: Collect ML Metrics
-
-**Description**: Monitor ML-specific metrics for model performance and health.
-
-**Metrics to Collect**:
-- **Predictions/sec**: Rate of predictions by model
-- **Inference Latency**: P50, P95, P99 inference duration
-- **Model Accuracy**: Current model accuracy (updated daily)
-- **Prediction Confidence**: Distribution of confidence scores
-- **Data Drift**: Drift score per feature
-- **Missing Features**: Count of requests with missing features
-
-**Acceptance Criteria**:
-- [ ] All ML metrics instrumented in prediction code
-- [ ] Metrics updated in real-time
-- [ ] Historical trends visible
-- [ ] Drift detection integrated
+**项目**：监控与告警系统
+**级别**：初级 AI 基础设施工程师
+**版本**：1.0
 
 ---
 
-### FR-2: Visualization & Dashboards
+## 功能需求
 
-#### FR-2.1: Deploy Grafana
+### FR-1：指标采集与存储
 
-**Description**: Set up Grafana for visualization and dashboard creation.
+#### FR-1.1：部署 Prometheus 用于指标采集
 
-**Requirements**:
-- Deploy Grafana 10.2+ using Docker Compose
-- Configure Prometheus as datasource
-- Set up authentication and RBAC
-- Enable dashboard provisioning
+**描述**：将 Prometheus 设置为中央指标采集和存储系统。
 
-**Acceptance Criteria**:
-- [ ] Grafana accessible at `http://localhost:3000`
-- [ ] Prometheus datasource configured and working
-- [ ] User authentication enabled
-- [ ] Dashboard auto-provisioning working
+**要求**：
+- 使用 Docker Compose 部署 Prometheus 2.47+
+- 配置持久化存储，保留 30 天
+- 设置服务发现以自动检测目标
+- 启用远程写入以实现长期存储（可选）
+- 配置多个 Prometheus 实例的高可用（高级）
 
-#### FR-2.2: Infrastructure Dashboard
+**验收标准**：
+- [ ] Prometheus 正在运行且可通过 `http://localhost:9090` 访问
+- [ ] 指标按 30 天保留策略存储
+- [ ] 时间序列中无数据缺口
+- [ ] 常见查询的性能 < 1 秒
+- [ ] 存储使用量在预期范围内
 
-**Description**: Create a dashboard for infrastructure monitoring.
+#### FR-1.2：配置服务发现
 
-**Required Panels**:
-- CPU usage per node (graph)
-- Memory usage per node (graph)
-- Disk usage (gauge)
-- Network traffic (graph)
-- System load (graph)
-- Container status (stat panel)
+**描述**：无需手动配置即可自动发现监控目标。
 
-**Acceptance Criteria**:
-- [ ] All panels display real-time data
-- [ ] Auto-refresh every 30 seconds
-- [ ] Drill-down capabilities
-- [ ] Time range selector working
-- [ ] Template variables for node selection
+**要求**：
+- Kubernetes 服务发现（如果使用 K8s）
+- 基于文件的服务发现（用于静态目标）
+- 基于 DNS 的服务发现
+- 自动重新标记已发现的目标
 
-#### FR-2.3: Application Dashboard
+**验收标准**：
+- [ ] 新服务在 1 分钟内自动被发现
+- [ ] 服务下线时被移除
+- [ ] 所有目标应用了正确的标签
+- [ ] 没有孤立的采集配置
 
-**Description**: Monitor application health and performance.
+#### FR-1.3：采集基础设施指标
 
-**Required Panels**:
-- Request rate (requests/second)
-- Error rate (%)
-- P95 latency (milliseconds)
-- Status code distribution (pie chart)
-- Endpoint performance comparison (table)
-- Active connections (gauge)
+**描述**：监控所有基础设施组件的系统级指标。
 
-**Acceptance Criteria**:
-- [ ] Real-time request metrics visible
-- [ ] Error rate calculation correct
-- [ ] Latency percentiles accurate
-- [ ] All endpoints tracked
+**采集的指标**：
+- **CPU**：每核心使用率、平均负载、窃取时间
+- **内存**：总量、已用、可用、交换空间使用率
+- **磁盘**：每个挂载点使用率、I/O 操作、吞吐量
+- **网络**：发送/接收字节数、数据包错误、TCP 连接数
 
-#### FR-2.4: ML Model Dashboard
+**验收标准**：
+- [ ] Node Exporter 部署在所有节点上
+- [ ] Prometheus 中所有系统指标可用
+- [ ] 每 15 秒采集一次指标
+- [ ] 无缺失数据点
 
-**Description**: Monitor ML model performance and health.
+#### FR-1.4：采集应用指标
 
-**Required Panels**:
-- Predictions per second (graph)
-- Inference latency percentiles (graph)
-- Model accuracy trend (graph)
-- Prediction confidence distribution (heatmap)
-- Data drift scores (graph)
-- Feature drift alerts (stat panel)
+**描述**：跟踪应用级别的性能和行为指标。
 
-**Acceptance Criteria**:
-- [ ] All ML metrics visualized
-- [ ] Drift detection visible
-- [ ] Accuracy trends clear
-- [ ] Confidence distribution heatmap working
+**采集的指标**：
+- **HTTP 请求**：按方法、端点、状态码统计的总请求数
+- **请求时长**：带分位数的直方图（P50、P95、P99）
+- **错误率**：每个端点的 4xx 和 5xx 错误
+- **活跃连接数**：当前活跃连接数
+- **请求大小**：请求/响应大小的直方图
 
-#### FR-2.5: Business Dashboard
+**验收标准**：
+- [ ] 应用使用 `prometheus_client` 库进行了仪表化
+- [ ] 所有服务暴露 `/metrics` 端点
+- [ ] 所有 HTTP 请求被跟踪
+- [ ] 延迟桶配置适当
 
-**Description**: High-level business and SLA metrics.
+#### FR-1.5：采集 ML 指标
 
-**Required Panels**:
-- Total requests (counter)
-- Success rate (gauge with thresholds)
-- SLA compliance (gauge)
-- Average response time (stat)
-- Requests by hour (bar chart)
-- Geographic distribution (worldmap - optional)
+**描述**：监控 ML 特定的模型性能和健康指标。
 
-**Acceptance Criteria**:
-- [ ] Business KPIs clearly displayed
-- [ ] SLA compliance visible
-- [ ] Non-technical stakeholders can understand
-- [ ] Daily/weekly/monthly views available
+**采集的指标**：
+- **每秒预测数**：按模型的预测速率
+- **推理延迟**：P50、P95、P99 推理时长
+- **模型准确率**：当前模型准确率（每日更新）
+- **预测置信度**：置信度分数的分布
+- **数据漂移**：每个特征的漂移分数
+- **缺失特征**：缺失特征的请求数
+
+**验收标准**：
+- [ ] 预测代码中已仪表化所有 ML 指标
+- [ ] 指标实时更新
+- [ ] 历史趋势可见
+- [ ] 漂移检测已集成
 
 ---
 
-### FR-3: Log Aggregation & Analysis
+### FR-2：可视化与仪表盘
 
-#### FR-3.1: Deploy ELK Stack
+#### FR-2.1：部署 Grafana
 
-**Description**: Set up Elasticsearch, Logstash, Kibana for log management.
+**描述**：设置 Grafana 用于可视化和仪表盘创建。
 
-**Requirements**:
-- Deploy Elasticsearch 8.11+ cluster
-- Configure Logstash for log processing
-- Deploy Kibana for log visualization
-- Set up Filebeat for log shipping
+**要求**：
+- 使用 Docker Compose 部署 Grafana 10.2+
+- 配置 Prometheus 作为数据源
+- 设置认证和 RBAC
+- 启用仪表盘自动配置
 
-**Acceptance Criteria**:
-- [ ] Elasticsearch accessible at `http://localhost:9200`
-- [ ] Kibana accessible at `http://localhost:5601`
-- [ ] Logstash processing logs
-- [ ] Filebeat shipping logs from all services
+**验收标准**：
+- [ ] 可通过 `http://localhost:3000` 访问 Grafana
+- [ ] Prometheus 数据源已配置并正常工作
+- [ ] 用户认证已启用
+- [ ] 仪表盘自动配置正常工作
 
-#### FR-3.2: Configure Log Shipping
+#### FR-2.2：基础设施仪表盘
 
-**Description**: Collect logs from all services and ship to Elasticsearch.
+**描述**：创建用于基础设施监控的仪表盘。
 
-**Requirements**:
-- Filebeat monitors application log files
-- Docker log driver integration
-- Kubernetes log collection (if applicable)
-- Multi-line log handling
+**必需面板**：
+- 每个节点的 CPU 使用率（图表）
+- 每个节点的内存使用率（图表）
+- 磁盘使用率（仪表盘）
+- 网络流量（图表）
+- 系统负载（图表）
+- 容器状态（统计面板）
 
-**Acceptance Criteria**:
-- [ ] All application logs in Elasticsearch
-- [ ] Log delivery latency < 30 seconds
-- [ ] No lost log lines
-- [ ] Multi-line exceptions captured correctly
+**验收标准**：
+- [ ] 所有面板显示实时数据
+- [ ] 每 30 秒自动刷新
+- [ ] 支持下钻查看
+- [ ] 时间范围选择器正常工作
+- [ ] 节点选择的模板变量
 
-#### FR-3.3: Implement Log Parsing
+#### FR-2.3：应用仪表盘
 
-**Description**: Parse and structure logs for searchability.
+**描述**：监控应用健康与性能。
 
-**Requirements**:
-- JSON log format for all applications
-- Grok patterns for legacy logs
-- Extract structured fields (timestamp, level, message, context)
-- Enrich logs with metadata (hostname, service, environment)
+**必需面板**：
+- 请求速率（请求/秒）
+- 错误率（%）
+- P95 延迟（毫秒）
+- 状态码分布（饼图）
+- 端点性能对比（表格）
+- 活跃连接数（仪表盘）
 
-**Acceptance Criteria**:
-- [ ] All logs in structured JSON format
-- [ ] Searchable fields extracted
-- [ ] Timestamps parsed correctly
-- [ ] No parsing errors
+**验收标准**：
+- [ ] 实时请求指标可见
+- [ ] 错误率计算正确
+- [ ] 延迟百分位数准确
+- [ ] 所有端点被跟踪
 
-#### FR-3.4: Create Kibana Dashboards
+#### FR-2.4：ML 模型仪表盘
 
-**Description**: Build log analysis dashboards in Kibana.
+**描述**：监控 ML 模型性能与健康。
 
-**Required Visualizations**:
-- Log volume over time
-- Log levels distribution
-- Top error messages
-- Slow requests (> 1s)
-- Failed requests analysis
+**必需面板**：
+- 每秒预测数（图表）
+- 推理延迟百分位数（图表）
+- 模型准确率趋势（图表）
+- 预测置信度分布（热力图）
+- 数据漂移分数（图表）
+- 特征漂移告警（统计面板）
 
-**Acceptance Criteria**:
-- [ ] Kibana dashboards created
-- [ ] Index patterns configured
-- [ ] Searches save and reusable
-- [ ] Filters working correctly
+**验收标准**：
+- [ ] 所有 ML 指标已可视化
+- [ ] 漂移检测可见
+- [ ] 准确率趋势清晰
+- [ ] 置信度分布热力图正常工作
 
-#### FR-3.5: Set Up Retention Policies
+#### FR-2.5：业务仪表盘
 
-**Description**: Configure log retention and rotation to manage storage.
+**描述**：高级业务和 SLA 指标。
 
-**Requirements**:
-- 90-day retention for all logs
-- Daily index rotation
-- Automatic deletion of old indices
-- Hot-warm-cold architecture (advanced)
+**必需面板**：
+- 总请求数（计数器）
+- 成功率（带阈值的仪表盘）
+- SLA 合规性（仪表盘）
+- 平均响应时间（统计）
+- 按小时统计的请求数（柱状图）
+- 地理分布（世界地图 - 可选）
 
-**Acceptance Criteria**:
-- [ ] Retention policy configured (90 days)
-- [ ] Indices rotated daily
-- [ ] Old indices deleted automatically
-- [ ] Storage usage stable
+**验收标准**：
+- [ ] 业务 KPI 清晰显示
+- [ ] SLA 合规性可见
+- [ ] 非技术人员可以理解
+- [ ] 支持日/周/月视图
 
 ---
 
-### FR-4: Alerting & Notifications
+### FR-3：日志聚合与分析
 
-#### FR-4.1: Configure Alertmanager
+#### FR-3.1：部署 ELK Stack
 
-**Description**: Set up Alertmanager for alert routing and notification.
+**描述**：设置 Elasticsearch、Logstash、Kibana 用于日志管理。
 
-**Requirements**:
-- Deploy Alertmanager 0.26+
-- Configure routing tree
-- Set up receivers (email, Slack, PagerDuty)
-- Implement inhibition rules
-- Configure grouping and throttling
+**要求**：
+- 部署 Elasticsearch 8.11+ 集群
+- 配置 Logstash 进行日志处理
+- 部署 Kibana 进行日志可视化
+- 设置 Filebeat 进行日志采集
 
-**Acceptance Criteria**:
-- [ ] Alertmanager running at `http://localhost:9093`
-- [ ] All routing rules working
-- [ ] Alerts grouped correctly
-- [ ] De-duplication working
+**验收标准**：
+- [ ] 可通过 `http://localhost:9200` 访问 Elasticsearch
+- [ ] 可通过 `http://localhost:5601` 访问 Kibana
+- [ ] Logstash 正在处理日志
+- [ ] Filebeat 正在从所有服务采集日志
 
-#### FR-4.2: Infrastructure Alert Rules
+#### FR-3.2：配置日志采集
 
-**Description**: Define alerts for infrastructure issues.
+**描述**：从所有服务收集日志并发送到 Elasticsearch。
 
-**Required Alerts**:
+**要求**：
+- Filebeat 监控应用日志文件
+- Docker 日志驱动集成
+- Kubernetes 日志收集（如适用）
+- 多行日志处理
 
-1. **High CPU Usage**
-   - **Condition**: CPU > 80% for 5 minutes
-   - **Severity**: Warning
-   - **Action**: Investigate load, consider scaling
+**验收标准**：
+- [ ] 所有应用日志在 Elasticsearch 中
+- [ ] 日志投递延迟 < 30 秒
+- [ ] 无丢失日志行
+- [ ] 多行异常正确捕获
 
-2. **High Memory Usage**
-   - **Condition**: Memory > 85% for 5 minutes
-   - **Severity**: Warning
-   - **Action**: Check for memory leaks, restart service
+#### FR-3.3：实现日志解析
 
-3. **Low Disk Space**
-   - **Condition**: Disk < 15% free
-   - **Severity**: Critical
-   - **Action**: Clean up logs, expand storage
+**描述**：解析和结构化日志以支持搜索。
 
-4. **Service Down**
-   - **Condition**: Target unreachable for 2 minutes
-   - **Severity**: Critical
-   - **Action**: Restart service, check logs
+**要求**：
+- 所有应用使用 JSON 日志格式
+- 为遗留日志使用 Grok 模式
+- 提取结构化字段（时间戳、级别、消息、上下文）
+- 用元数据丰富日志（主机名、服务、环境）
 
-**Acceptance Criteria**:
-- [ ] All alert rules configured in Prometheus
-- [ ] Alerts fire when thresholds exceeded
-- [ ] Alert annotations include runbook links
-- [ ] Severity levels set correctly
+**验收标准**：
+- [ ] 所有日志为结构化 JSON 格式
+- [ ] 可搜索字段已提取
+- [ ] 时间戳解析正确
+- [ ] 无解析错误
 
-#### FR-4.3: Application Alert Rules
+#### FR-3.4：创建 Kibana 仪表盘
 
-**Description**: Monitor application health and performance.
+**描述**：在 Kibana 中构建日志分析仪表盘。
 
-**Required Alerts**:
+**必需的可视化**：
+- 日志量随时间变化
+- 日志级别分布
+- 主要错误消息
+- 慢请求（> 1s）
+- 失败请求分析
 
-1. **High Error Rate**
-   - **Condition**: 5xx errors > 5% for 5 minutes
-   - **Severity**: Critical
-   - **Action**: Check logs, rollback if needed
+**验收标准**：
+- [ ] Kibana 仪表盘已创建
+- [ ] 索引模式已配置
+- [ ] 搜索可保存和复用
+- [ ] 过滤器正常工作
 
-2. **High Latency**
-   - **Condition**: P95 latency > 1 second for 5 minutes
-   - **Severity**: Warning
-   - **Action**: Profile application, optimize queries
+#### FR-3.5：设置保留策略
 
-3. **Low Throughput**
-   - **Condition**: Request rate < 1 req/s for 10 minutes
-   - **Severity**: Info
-   - **Action**: Check if expected, investigate traffic drop
+**描述**：配置日志保留和轮转以管理存储。
 
-4. **High Response Time**
-   - **Condition**: P99 latency > 5 seconds
-   - **Severity**: Warning
-   - **Action**: Identify slow endpoints, optimize
+**要求**：
+- 所有日志保留 90 天
+- 每日索引轮转
+- 自动删除旧索引
+- 热-温-冷架构（高级）
 
-**Acceptance Criteria**:
-- [ ] Application alerts configured
-- [ ] Thresholds tuned for actual workload
-- [ ] No false positives in testing
-- [ ] Alert descriptions clear
+**验收标准**：
+- [ ] 保留策略已配置（90 天）
+- [ ] 索引每日轮转
+- [ ] 旧索引自动删除
+- [ ] 存储使用量稳定
 
-#### FR-4.4: ML Model Alert Rules
+---
 
-**Description**: Detect ML-specific issues early.
+### FR-4：告警与通知
 
-**Required Alerts**:
+#### FR-4.1：配置 Alertmanager
 
-1. **Model Accuracy Drop**
-   - **Condition**: Accuracy < 85% for 10 minutes
-   - **Severity**: Critical
-   - **Action**: Check data quality, consider retraining
+**描述**：设置 Alertmanager 用于告警路由和通知。
 
-2. **Data Drift Detected**
-   - **Condition**: Drift score > 0.5 for 5 minutes
-   - **Severity**: Warning
-   - **Action**: Analyze distribution shift, retrain model
+**要求**：
+- 部署 Alertmanager 0.26+
+- 配置路由树
+- 设置接收器（邮件、Slack、PagerDuty）
+- 实现抑制规则
+- 配置分组和限流
 
-3. **High Inference Latency**
-   - **Condition**: P99 inference > 500ms for 5 minutes
-   - **Severity**: Warning
-   - **Action**: Optimize model, check GPU utilization
+**验收标准**：
+- [ ] Alertmanager 运行在 `http://localhost:9093`
+- [ ] 所有路由规则正常工作
+- [ ] 告警正确分组
+- [ ] 去重正常工作
 
-4. **Low Prediction Confidence**
-   - **Condition**: Average confidence < 70% for 10 minutes
-   - **Severity**: Warning
-   - **Action**: Investigate input data, check model version
+#### FR-4.2：基础设施告警规则
 
-**Acceptance Criteria**:
-- [ ] ML alerts firing correctly
-- [ ] Drift detection integrated
-- [ ] Performance thresholds appropriate
-- [ ] Runbook procedures documented
+**描述**：定义基础设施问题的告警。
 
-#### FR-4.5: Multi-Channel Notifications
+**必需的告警**：
 
-**Description**: Route alerts to appropriate notification channels.
+1. **CPU 使用率过高**
+   - **条件**：CPU > 80% 持续 5 分钟
+   - **严重级别**：警告
+   - **操作**：检查负载，考虑扩容
 
-**Channels**:
-- **Email**: Info and Warning alerts
-- **Slack**: Warning and Critical alerts
-- **PagerDuty**: Critical alerts only
-- **Webhook**: Integration with custom systems
+2. **内存使用率过高**
+   - **条件**：内存 > 85% 持续 5 分钟
+   - **严重级别**：警告
+   - **操作**：检查内存泄漏，重启服务
 
-**Routing Rules**:
+3. **磁盘空间不足**
+   - **条件**：磁盘可用空间 < 15%
+   - **严重级别**：严重
+   - **操作**：清理日志，扩展存储
+
+4. **服务宕机**
+   - **条件**：目标 2 分钟不可达
+   - **严重级别**：严重
+   - **操作**：重启服务，检查日志
+
+**验收标准**：
+- [ ] Prometheus 中已配置所有告警规则
+- [ ] 超出阈值时告警触发
+- [ ] 告警注释包含手册链接
+- [ ] 严重级别设置正确
+
+#### FR-4.3：应用告警规则
+
+**描述**：监控应用健康与性能。
+
+**必需的告警**：
+
+1. **错误率过高**
+   - **条件**：5xx 错误 > 5% 持续 5 分钟
+   - **严重级别**：严重
+   - **操作**：检查日志，必要时回滚
+
+2. **延迟过高**
+   - **条件**：P95 延迟 > 1 秒持续 5 分钟
+   - **严重级别**：警告
+   - **操作**：分析应用，优化查询
+
+3. **吞吐量过低**
+   - **条件**：请求速率 < 1 req/s 持续 10 分钟
+   - **严重级别**：信息
+   - **操作**：检查是否预期，调查流量下降原因
+
+4. **响应时间过长**
+   - **条件**：P99 延迟 > 5 秒
+   - **严重级别**：警告
+   - **操作**：识别慢端点，优化
+
+**验收标准**：
+- [ ] 应用告警已配置
+- [ ] 阈值已根据实际工作负载调整
+- [ ] 测试中无误报
+- [ ] 告警描述清晰
+
+#### FR-4.4：ML 模型告警规则
+
+**描述**：及早检测 ML 特定问题。
+
+**必需的告警**：
+
+1. **模型准确率下降**
+   - **条件**：准确率 < 85% 持续 10 分钟
+   - **严重级别**：严重
+   - **操作**：检查数据质量，考虑重新训练
+
+2. **检测到数据漂移**
+   - **条件**：漂移分数 > 0.5 持续 5 分钟
+   - **严重级别**：警告
+   - **操作**：分析分布偏移，重新训练模型
+
+3. **推理延迟过高**
+   - **条件**：P99 推理 > 500ms 持续 5 分钟
+   - **严重级别**：警告
+   - **操作**：优化模型，检查 GPU 利用率
+
+4. **预测置信度过低**
+   - **条件**：平均置信度 < 70% 持续 10 分钟
+   - **严重级别**：警告
+   - **操作**：调查输入数据，检查模型版本
+
+**验收标准**：
+- [ ] ML 告警正确触发
+- [ ] 漂移检测已集成
+- [ ] 性能阈值适当
+- [ ] 手册流程已文档化
+
+#### FR-4.5：多渠道通知
+
+**描述**：将告警路由到适当的通知渠道。
+
+**渠道**：
+- **邮件**：信息与警告级别的告警
+- **Slack**：警告与严重级别的告警
+- **PagerDuty**：仅严重级别的告警
+- **Webhook**：与自定义系统集成
+
+**路由规则**：
 ```
 Critical → PagerDuty + Slack
 Warning → Slack + Email
 Info → Email only
 ```
 
-**Acceptance Criteria**:
-- [ ] All notification channels configured
-- [ ] Routing based on severity working
-- [ ] Test alerts delivered successfully
-- [ ] No duplicate notifications
+**验收标准**：
+- [ ] 所有通知渠道已配置
+- [ ] 基于严重级别的路由正常工作
+- [ ] 测试告警成功投递
+- [ ] 无重复通知
 
-#### FR-4.6: Alert Suppression & De-duplication
+#### FR-4.6：告警抑制与去重
 
-**Description**: Prevent alert fatigue with intelligent grouping.
+**描述**：通过智能分组防止告警疲劳。
 
-**Requirements**:
-- Group related alerts (by service, instance)
-- Inhibit lower severity when higher severity fires
-- Throttle repeat alerts (max 1 per hour for same issue)
-- Silence alerts during maintenance windows
+**要求**：
+- 分组相关的告警（按服务、实例）
+- 较高级别告警触发时抑制较低级别
+- 限制重复告警（同一问题每小时最多 1 次）
+- 在维护窗口期内静默告警
 
-**Acceptance Criteria**:
-- [ ] Alert grouping configured
-- [ ] Inhibition rules working
-- [ ] Throttling prevents spam
-- [ ] Silence functionality tested
-
----
-
-### FR-5: ML-Specific Monitoring
-
-#### FR-5.1: Data Drift Detection
-
-**Description**: Detect distribution shifts in input data.
-
-**Methods**:
-- Kolmogorov-Smirnov test
-- Population Stability Index (PSI)
-- Statistical distance metrics
-
-**Requirements**:
-- Compare incoming data to training distribution
-- Calculate drift score per feature
-- Alert when drift exceeds threshold
-- Store historical drift scores
-
-**Acceptance Criteria**:
-- [ ] Drift detection running continuously
-- [ ] Drift scores calculated every 100 requests
-- [ ] Alerts fire when drift detected
-- [ ] Drift metrics exported to Prometheus
-
-#### FR-5.2: Model Performance Tracking
-
-**Description**: Monitor model accuracy and performance over time.
-
-**Metrics**:
-- Accuracy, Precision, Recall, F1 Score
-- Confusion matrix visualization
-- Per-class performance
-- Performance degradation alerts
-
-**Requirements**:
-- Collect ground truth labels (feedback loop)
-- Calculate metrics daily
-- Compare to baseline performance
-- Alert on significant degradation (>10%)
-
-**Acceptance Criteria**:
-- [ ] Performance metrics calculated
-- [ ] Trends visible in Grafana
-- [ ] Degradation alerts configured
-- [ ] Feedback mechanism implemented
-
-#### FR-5.3: Prediction Confidence Monitoring
-
-**Description**: Track distribution of model confidence scores.
-
-**Requirements**:
-- Histogram of confidence scores
-- Alert on low average confidence
-- Identify low-confidence predictions
-- Compare confidence to accuracy
-
-**Acceptance Criteria**:
-- [ ] Confidence histogram in Grafana
-- [ ] Low confidence alerts configured
-- [ ] Confidence trends tracked
-- [ ] Correlation with accuracy measured
-
-#### FR-5.4: Data Quality Monitoring
-
-**Description**: Detect data quality issues in incoming requests.
-
-**Checks**:
-- Missing features
-- Out-of-range values
-- Schema changes
-- Encoding errors
-
-**Requirements**:
-- Validate every prediction request
-- Track data quality metrics
-- Alert on quality degradation
-- Log problematic requests
-
-**Acceptance Criteria**:
-- [ ] Data validation implemented
-- [ ] Quality metrics tracked
-- [ ] Alerts for quality issues
-- [ ] Invalid requests logged
+**验收标准**：
+- [ ] 告警分组已配置
+- [ ] 抑制规则正常工作
+- [ ] 限流防止垃圾告警
+- [ ] 静默功能已测试
 
 ---
 
-## Non-Functional Requirements
+### FR-5：ML 特定监控
 
-### NFR-1: Performance
+#### FR-5.1：数据漂移检测
 
-**Requirements**:
-- Dashboard load time < 3 seconds
-- Metric query response time < 1 second
-- Log search results returned in < 5 seconds
-- Alert evaluation latency < 30 seconds
-- Support 100,000+ active time series
-- Handle 10,000 metrics/second ingestion rate
+**描述**：检测输入数据中的分布偏移。
 
-**Acceptance Criteria**:
-- [ ] Performance benchmarks met
-- [ ] Load testing completed
-- [ ] No degradation under load
-- [ ] Query optimization applied
+**方法**：
+- Kolmogorov-Smirnov 检验
+- 群体稳定性指数（PSI）
+- 统计距离度量
 
-### NFR-2: Reliability
+**要求**：
+- 将传入数据与训练分布进行比较
+- 计算每个特征的漂移分数
+- 漂移超出阈值时告警
+- 存储历史漂移分数
 
-**Requirements**:
-- Monitoring system uptime > 99.9%
-- No data loss during component failures
-- Automatic recovery from failures
-- Alerts always delivered (redundant paths)
-- Graceful degradation when components fail
+**验收标准**：
+- [ ] 漂移检测持续运行
+- [ ] 每 100 个请求计算一次漂移分数
+- [ ] 检测到漂移时触发告警
+- [ ] 漂移指标导出到 Prometheus
 
-**Acceptance Criteria**:
-- [ ] High availability tested
-- [ ] Failover mechanisms in place
-- [ ] Data replication configured
-- [ ] Recovery procedures documented
+#### FR-5.2：模型性能跟踪
 
-### NFR-3: Scalability
+**描述**：监控模型准确率和性能随时间的变化。
 
-**Requirements**:
-- Support 50+ monitored services
-- Handle 10,000+ metrics per second
-- Process 1GB+ logs per day
-- Scale to 1000+ alert rules
-- Horizontal scaling capability
+**指标**：
+- 准确率、精确率、召回率、F1 分数
+- 混淆矩阵可视化
+- 每个类别的性能
+- 性能退化告警
 
-**Acceptance Criteria**:
-- [ ] Scalability tested
-- [ ] Resource requirements documented
-- [ ] Scaling procedures defined
-- [ ] Performance under scale measured
+**要求**：
+- 收集真实标签（反馈循环）
+- 每日计算指标
+- 与基线性能比较
+- 显著退化时告警（>10%）
 
-### NFR-4: Security
+**验收标准**：
+- [ ] 性能指标已计算
+- [ ] Grafana 中趋势可见
+- [ ] 退化告警已配置
+- [ ] 反馈机制已实现
 
-**Requirements**:
-- Authentication for all UIs (Grafana, Kibana, Prometheus)
-- RBAC for different user roles
-- TLS encryption for data in transit
-- Audit logging for configuration changes
-- Secrets management for credentials
+#### FR-5.3：预测置信度监控
 
-**Acceptance Criteria**:
-- [ ] Authentication enabled
-- [ ] RBAC configured
-- [ ] TLS certificates installed
-- [ ] Audit logs enabled
-- [ ] No credentials in configs
+**描述**：跟踪模型置信度分数的分布。
 
-### NFR-5: Maintainability
+**要求**：
+- 置信度分数的直方图
+- 平均置信度过低时告警
+- 识别低置信度预测
+- 比较置信度与准确率
 
-**Requirements**:
-- Infrastructure as Code (docker-compose)
-- Version-controlled configurations
-- Automated backups
-- Clear documentation
-- Runbooks for common tasks
+**验收标准**：
+- [ ] Grafana 中置信度直方图可见
+- [ ] 低置信度告警已配置
+- [ ] 置信度趋势被跟踪
+- [ ] 与准确率的相关性已测量
 
-**Acceptance Criteria**:
-- [ ] All configs in version control
-- [ ] Backup/restore tested
-- [ ] Documentation complete
-- [ ] Runbooks written
+#### FR-5.4：数据质量监控
+
+**描述**：检测传入请求中的数据质量问题。
+
+**检查项**：
+- 缺失特征
+- 超出范围的值
+- 模式变更
+- 编码错误
+
+**要求**：
+- 验证每个预测请求
+- 跟踪数据质量指标
+- 质量退化时告警
+- 记录有问题的请求
+
+**验收标准**：
+- [ ] 数据验证已实现
+- [ ] 质量指标被跟踪
+- [ ] 质量问题告警
+- [ ] 无效请求已被记录
 
 ---
 
-## Service Level Indicators (SLIs)
+## 非功能需求
 
-### Application SLIs
+### NFR-1：性能
 
-| SLI | Definition | Target | Measurement |
+**要求**：
+- 仪表盘加载时间 < 3 秒
+- 指标查询响应时间 < 1 秒
+- 日志搜索结果返回时间 < 5 秒
+- 告警评估延迟 < 30 秒
+- 支持 100,000+ 活跃时间序列
+- 处理 10,000 个指标/秒的摄入速率
+
+**验收标准**：
+- [ ] 性能基准测试达标
+- [ ] 负载测试已完成
+- [ ] 负载下无性能退化
+- [ ] 查询优化已应用
+
+### NFR-2：可靠性
+
+**要求**：
+- 监控系统可用性 > 99.9%
+- 组件故障时无数据丢失
+- 从故障中自动恢复
+- 告警始终送达（冗余路径）
+- 组件故障时优雅降级
+
+**验收标准**：
+- [ ] 高可用性已测试
+- [ ] 故障切换机制已就位
+- [ ] 数据复制已配置
+- [ ] 恢复流程已文档化
+
+### NFR-3：可扩展性
+
+**要求**：
+- 支持 50+ 被监控服务
+- 处理 10,000+ 个指标/秒
+- 每天处理 1GB+ 日志
+- 扩展到 1000+ 条告警规则
+- 水平扩展能力
+
+**验收标准**：
+- [ ] 可扩展性已测试
+- [ ] 资源需求已文档化
+- [ ] 扩展流程已定义
+- [ ] 扩展后的性能已测量
+
+### NFR-4：安全性
+
+**要求**：
+- 所有 UI 的认证（Grafana、Kibana、Prometheus）
+- 不同用户角色的 RBAC
+- 传输中数据的 TLS 加密
+- 配置更改的审计日志
+- 凭据的机密管理
+
+**验收标准**：
+- [ ] 认证已启用
+- [ ] RBAC 已配置
+- [ ] TLS 证书已安装
+- [ ] 审计日志已启用
+- [ ] 配置中无明文的凭据
+
+### NFR-5：可维护性
+
+**要求**：
+- 基础设施即代码（docker-compose）
+- 版本控制的配置
+- 自动备份
+- 清晰的文档
+- 常见任务的手册
+
+**验收标准**：
+- [ ] 所有配置在版本控制中
+- [ ] 备份/恢复已测试
+- [ ] 文档完整
+- [ ] 手册已编写
+
+---
+
+## 服务级别指标（SLI）
+
+### 应用 SLI
+
+| SLI | 定义 | 目标 | 测量方式 |
 |-----|------------|--------|-------------|
-| **Availability** | % of successful requests | 99.9% | `(2xx+3xx requests) / total requests` |
-| **Latency** | P95 response time | < 200ms | `histogram_quantile(0.95, http_request_duration_seconds)` |
-| **Error Rate** | % of failed requests | < 1% | `5xx requests / total requests * 100` |
-| **Throughput** | Requests per second | > 100 | `rate(http_requests_total[5m])` |
+| **可用性** | 成功请求的百分比 | 99.9% | `(2xx+3xx 请求) / 总请求数` |
+| **延迟** | P95 响应时间 | < 200ms | `histogram_quantile(0.95, http_request_duration_seconds)` |
+| **错误率** | 失败请求的百分比 | < 1% | `5xx 请求 / 总请求数 * 100` |
+| **吞吐量** | 每秒请求数 | > 100 | `rate(http_requests_total[5m])` |
 
-### ML Model SLIs
+### ML 模型 SLI
 
-| SLI | Definition | Target | Measurement |
+| SLI | 定义 | 目标 | 测量方式 |
 |-----|------------|--------|-------------|
-| **Accuracy** | Model prediction accuracy | > 90% | `correct_predictions / total_predictions` |
-| **Inference Latency** | P95 inference time | < 100ms | `histogram_quantile(0.95, model_inference_duration_seconds)` |
-| **Prediction Throughput** | Predictions per second | > 50 | `rate(model_predictions_total[5m])` |
-| **Drift Score** | Data distribution drift | < 0.5 | `data_drift_score` (PSI or KS statistic) |
+| **准确率** | 模型预测准确率 | > 90% | `正确预测数 / 总预测数` |
+| **推理延迟** | P95 推理时间 | < 100ms | `histogram_quantile(0.95, model_inference_duration_seconds)` |
+| **预测吞吐量** | 每秒预测数 | > 50 | `rate(model_predictions_total[5m])` |
+| **漂移分数** | 数据分布漂移 | < 0.5 | `data_drift_score`（PSI 或 KS 统计量） |
 
-### Infrastructure SLIs
+### 基础设施 SLI
 
-| SLI | Definition | Target | Measurement |
+| SLI | 定义 | 目标 | 测量方式 |
 |-----|------------|--------|-------------|
-| **CPU Utilization** | Average CPU usage | < 70% | `100 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100` |
-| **Memory Utilization** | Average memory usage | < 80% | `(1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100` |
-| **Disk Utilization** | Disk usage | < 85% | `(node_filesystem_size_bytes - node_filesystem_avail_bytes) / node_filesystem_size_bytes * 100` |
+| **CPU 利用率** | 平均 CPU 使用率 | < 70% | `100 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100` |
+| **内存利用率** | 平均内存使用率 | < 80% | `(1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100` |
+| **磁盘利用率** | 磁盘使用率 | < 85% | `(node_filesystem_size_bytes - node_filesystem_avail_bytes) / node_filesystem_size_bytes * 100` |
 
 ---
 
-## Service Level Objectives (SLOs)
+## 服务级别目标（SLO）
 
-### Availability SLO
+### 可用性 SLO
 
-**Objective**: 99.9% uptime (monthly)
+**目标**：99.9% 可用性（月度）
 
-**Allows**:
-- 43.2 minutes of downtime per month
-- 8.64 hours of downtime per year
+**允许的**：
+- 每月 43.2 分钟停机时间
+- 每年 8.64 小时停机时间
 
-**Measurement Window**: 30 days rolling
+**测量窗口**：30 天滚动
 
-**Alert Threshold**: < 99.95% uptime in 7 days (early warning)
+**告警阈值**：7 天内可用性 < 99.95%（提前预警）
 
-### Latency SLO
+### 延迟 SLO
 
-**Objective**: 95% of requests complete in < 200ms
+**目标**：95% 的请求在 < 200ms 内完成
 
-**Measurement**: P95 latency over 5-minute windows
+**测量方式**：5 分钟窗口内的 P95 延迟
 
-**Alert Threshold**: P95 > 250ms for 10 minutes
+**告警阈值**：P95 > 250ms 持续 10 分钟
 
-### Error Rate SLO
+### 错误率 SLO
 
-**Objective**: < 1% error rate
+**目标**：错误率 < 1%
 
-**Measurement**: 5xx errors / total requests over 5 minutes
+**测量方式**：5 分钟内 5xx 错误 / 总请求数
 
-**Alert Threshold**: Error rate > 2% for 5 minutes
+**告警阈值**：错误率 > 2% 持续 5 分钟
 
-### Model Accuracy SLO
+### 模型准确率 SLO
 
-**Objective**: > 90% accuracy (daily)
+**目标**：准确率 > 90%（每日）
 
-**Measurement**: Accuracy calculated on ground truth labels
+**测量方式**：基于真实标签计算的准确率
 
-**Alert Threshold**: Accuracy < 85% for 1 hour
-
----
-
-## Success Criteria
-
-### Minimum Viable Product (MVP)
-
-- [ ] Prometheus collecting metrics from all services
-- [ ] Grafana with 4 dashboards (infrastructure, application, ML, business)
-- [ ] Alertmanager routing alerts to at least 2 channels
-- [ ] ELK Stack collecting and indexing logs
-- [ ] 12+ alert rules configured and tested
-- [ ] Data drift detection implemented
-- [ ] On-call runbook created
-- [ ] All components running in Docker Compose
-
-### Complete Implementation
-
-- [ ] All MVP criteria met
-- [ ] Service discovery working (Kubernetes or file-based)
-- [ ] Advanced visualizations (heatmaps, geo maps)
-- [ ] Alert inhibition and grouping configured
-- [ ] Model performance monitoring with feedback loop
-- [ ] Comprehensive documentation (setup, runbooks, troubleshooting)
-- [ ] Automated testing for alerts
-- [ ] Security hardening (TLS, RBAC, secrets management)
-
-### Excellent Implementation (Bonus)
-
-- [ ] Distributed tracing integrated (Jaeger or Tempo)
-- [ ] Custom Grafana plugins or dashboards
-- [ ] Automated remediation for common issues
-- [ ] Cost monitoring and optimization
-- [ ] Multi-environment support (dev, staging, prod)
-- [ ] Capacity planning dashboards
-- [ ] SLO tracking and error budget dashboards
+**告警阈值**：准确率 < 85% 持续 1 小时
 
 ---
 
-## Appendix: Metrics Reference
+## 成功标准
 
-### Standard Application Metrics
+### 最小可行产品（MVP）
+
+- [ ] Prometheus 从所有服务采集指标
+- [ ] Grafana 有 4 个仪表盘（基础设施、应用、ML、业务）
+- [ ] Alertmanager 将告警路由到至少 2 个渠道
+- [ ] ELK Stack 采集和索引日志
+- [ ] 12+ 条告警规则已配置和测试
+- [ ] 数据漂移检测已实现
+- [ ] 值班手册已创建
+- [ ] 所有组件在 Docker Compose 中运行
+
+### 完整实现
+
+- [ ] 满足所有 MVP 标准
+- [ ] 服务发现正常工作（Kubernetes 或基于文件）
+- [ ] 高级可视化（热力图、地理地图）
+- [ ] 告警抑制和分组已配置
+- [ ] 模型性能监控带反馈循环
+- [ ] 全面的文档（设置、手册、故障排除）
+- [ ] 告警的自动化测试
+- [ ] 安全加固（TLS、RBAC、机密管理）
+
+### 优秀实现（加分项）
+
+- [ ] 分布式链路追踪已集成（Jaeger 或 Tempo）
+- [ ] 自定义 Grafana 插件或仪表盘
+- [ ] 常见问题的自动化修复
+- [ ] 成本监控与优化
+- [ ] 多环境支持（开发、预发布、生产）
+- [ ] 容量规划仪表盘
+- [ ] SLO 跟踪和错误预算仪表盘
+
+---
+
+## 附录：指标参考
+
+### 标准应用指标
 
 ```python
-# Counter: Total HTTP requests
+# Counter（计数器）：HTTP 请求总数
 http_requests_total{method="GET", endpoint="/predict", status="200"}
 
-# Histogram: Request duration
+# Histogram（直方图）：请求时长
 http_request_duration_seconds_bucket{method="POST", endpoint="/predict", le="0.1"}
 
-# Gauge: Active connections
+# Gauge（仪表盘）：活跃连接数
 active_connections 42
 
-# Summary: Request size (deprecated, use Histogram)
+# Summary（摘要）：请求大小（已弃用，请使用 Histogram）
 http_request_size_bytes{quantile="0.95"}
 ```
 
-### ML-Specific Metrics
+### ML 特定指标
 
 ```python
-# Counter: Total predictions
+# Counter（计数器）：总预测数
 model_predictions_total{model="resnet50", prediction_class="cat"} 12345
 
-# Histogram: Inference duration
+# Histogram（直方图）：推理时长
 model_inference_duration_seconds_bucket{model="resnet50", le="0.1"} 9500
 
-# Gauge: Model accuracy
+# Gauge（仪表盘）：模型准确率
 model_accuracy{model="resnet50"} 0.92
 
-# Gauge: Data drift score
+# Gauge（仪表盘）：数据漂移分数
 data_drift_score{feature="age"} 0.23
 
-# Histogram: Prediction confidence
+# Histogram（直方图）：预测置信度
 model_prediction_confidence_bucket{model="resnet50", le="0.9"} 8500
 ```
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: October 2025
-**Status**: Approved
+**文档版本**：1.0
+**最后更新**：2025 年 10 月
+**状态**：已批准

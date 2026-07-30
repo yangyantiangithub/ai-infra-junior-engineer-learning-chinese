@@ -2,40 +2,40 @@
 
 ## Exercise Overview
 
-**Objective**: Master the art of creating custom Docker images using Dockerfiles, including optimization techniques and best practices for ML applications.
+**Objective**: 掌握使用 Dockerfile 创建自定义 Docker image 的艺术，包括针对 ML 应用的优化技术和 best practices。
 
-**Difficulty**: Beginner to Intermediate
-**Estimated Time**: 3-4 hours
+**Difficulty**: 初级到中级
+**Estimated Time**: 3-4 小时
 **Prerequisites**:
 - Exercise 01 (Container Operations)
 - Lecture 02 (Dockerfiles & Image Building)
 
 **What You'll Learn**:
-- Writing Dockerfiles from scratch
-- Multi-stage builds for optimization
-- Layer caching strategies
-- Building Python/ML applications
-- Image tagging and versioning
-- Pushing to Docker registries
-- Security best practices
-- Debugging build issues
+- 从头编写 Dockerfile
+- 多阶段构建优化
+- Layer 缓存策略
+- 构建 Python/ML 应用
+- Image 标记和版本管理
+- 推送到 Docker registry
+- 安全 best practices
+- 调试构建问题
 
 ---
 
-## Part 1: Your First Dockerfile
+## Part 1: 你的第一个 Dockerfile
 
-### Step 1.1: Simple Python Application
+### Step 1.1: 简单的 Python 应用
 
 ```bash
-# Create project directory
+# 创建项目目录
 mkdir -p ~/docker-exercises/python-app
 cd ~/docker-exercises/python-app
 
-# Create simple Python app
+# 创建简单的 Python 应用
 cat > app.py << 'EOF'
 #!/usr/bin/env python3
 """
-Simple Flask web application for Docker exercise
+用于 Docker 练习的简单 Flask web 应用
 """
 from flask import Flask, jsonify
 import os
@@ -59,85 +59,85 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
 EOF
 
-# Create requirements
+# 创建 requirements
 cat > requirements.txt << 'EOF'
 flask==3.0.0
 gunicorn==21.2.0
 EOF
 ```
 
-### Step 1.2: Write Your First Dockerfile
+### Step 1.2: 编写你的第一个 Dockerfile
 
 ```dockerfile
-# Create Dockerfile
+# 创建 Dockerfile
 cat > Dockerfile << 'EOF'
-# Use official Python runtime as base
+# 使用官方 Python 运行时作为基础
 FROM python:3.11
 
-# Set working directory
+# 设置工作目录
 WORKDIR /app
 
-# Copy requirements first (layer caching!)
+# 先复制 requirements（layer 缓存！）
 COPY requirements.txt .
 
-# Install dependencies
+# 安装依赖
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# 复制应用代码
 COPY app.py .
 
-# Expose port
+# 暴露端口
 EXPOSE 5000
 
-# Run application
+# 运行应用
 CMD ["python", "app.py"]
 EOF
 ```
 
-### Step 1.3: Build and Run
+### Step 1.3: 构建并运行
 
 ```bash
-# Build image
+# 构建 image
 docker build -t my-python-app:v1 .
 
-# What happened?
-# 1. Downloaded Python 3.11 base image
-# 2. Created working directory
-# 3. Installed dependencies
-# 4. Copied application code
-# 5. Tagged image as my-python-app:v1
+# 发生了什么？
+# 1. 下载 Python 3.11 基础 image
+# 2. 创建工作目录
+# 3. 安装依赖
+# 4. 复制应用代码
+# 5. 将 image 标记为 my-python-app:v1
 
-# Check image
+# 检查 image
 docker images | grep my-python-app
 
-# Run container
+# 运行 container
 docker run -d -p 5000:5000 --name pyapp my-python-app:v1
 
-# Test it
+# 测试
 curl http://localhost:5000
 curl http://localhost:5000/health
 
-# Check logs
+# 检查日志
 docker logs pyapp
 ```
 
 **Questions**:
-1. How large is your image? (`docker images my-python-app:v1`)
-2. What happens if you change `app.py` and rebuild?
-3. Which layers are cached?
+1. 你的 image 有多大？（`docker images my-python-app:v1`）
+2. 如果修改 `app.py` 并重新构建，会发生什么？
+3. 哪些 layer 被缓存了？
 
-✅ **Checkpoint**: You can build and run a custom Python application in Docker.
+✅ **Checkpoint**: 你可以在 Docker 中构建并运行自定义 Python 应用。
 
 ---
 
-## Part 2: Optimizing Images
+## Part 2: 优化 Image
 
-### Step 2.1: Use Smaller Base Image
+### Step 2.1: 使用更小的基础 Image
 
 ```dockerfile
-# Create optimized Dockerfile
+# 创建优化的 Dockerfile
 cat > Dockerfile.slim << 'EOF'
-# Use slim variant (much smaller!)
+# 使用 slim 变体（小得多！）
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -154,43 +154,43 @@ EOF
 ```
 
 ```bash
-# Build with slim base
+# 使用 slim 基础构建
 docker build -f Dockerfile.slim -t my-python-app:v2-slim .
 
-# Compare sizes
+# 比较大小
 docker images | grep my-python-app
 
-# Output should show significant size difference:
+# 输出应显示显著的大小差异：
 # my-python-app  v1       <timestamp>  1.02GB
 # my-python-app  v2-slim  <timestamp>  182MB
 ```
 
-### Step 2.2: Multi-Stage Build
+### Step 2.2: 多阶段构建
 
 ```dockerfile
-# Create multi-stage Dockerfile
+# 创建多阶段 Dockerfile
 cat > Dockerfile.multistage << 'EOF'
-# Stage 1: Builder
+# 阶段 1：构建
 FROM python:3.11 AS builder
 
 WORKDIR /app
 
-# Install dependencies to a local directory
+# 将依赖安装到本地目录
 COPY requirements.txt .
 RUN pip install --user --no-cache-dir -r requirements.txt
 
-# Stage 2: Runtime
+# 阶段 2：运行时
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy only the installed packages from builder
+# 仅从构建阶段复制已安装的包
 COPY --from=builder /root/.local /root/.local
 
-# Copy application
+# 复制应用
 COPY app.py .
 
-# Make sure scripts are in PATH
+# 确保脚本在 PATH 中
 ENV PATH=/root/.local/bin:$PATH
 
 EXPOSE 5000
@@ -200,33 +200,33 @@ EOF
 ```
 
 ```bash
-# Build multi-stage
+# 构建多阶段 image
 docker build -f Dockerfile.multistage -t my-python-app:v3-multi .
 
-# Compare all versions
+# 比较所有版本
 docker images | grep my-python-app
 
-# Run and verify it works
+# 运行并验证
 docker run -d -p 5001:5000 --name pyapp-multi my-python-app:v3-multi
 curl http://localhost:5001
 ```
 
-### Step 2.3: Layer Caching Optimization
+### Step 2.3: Layer 缓存优化
 
 ```dockerfile
-# Create cache-optimized Dockerfile
+# 创建缓存优化的 Dockerfile
 cat > Dockerfile.optimized << 'EOF'
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy and install dependencies FIRST
-# This layer will be cached unless requirements change
+# 首先复制并安装依赖
+# 除非 requirements 变更，否则此 layer 将被缓存
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy source code LAST
-# This changes frequently but won't invalidate dependency cache
+# 最后复制源代码
+# 这经常变化但不会使依赖缓存失效
 COPY app.py .
 
 EXPOSE 5000
@@ -236,37 +236,37 @@ EOF
 ```
 
 ```bash
-# First build
+# 首次构建
 time docker build -f Dockerfile.optimized -t my-python-app:v4 .
 
-# Make a change to app.py
+# 修改 app.py
 echo "# Comment added" >> app.py
 
-# Rebuild - notice how fast it is!
+# 重新构建 — 注意速度有多快！
 time docker build -f Dockerfile.optimized -t my-python-app:v4 .
 
-# Dependencies were cached!
+# 依赖被缓存了！
 ```
 
-**Challenge**: Modify `requirements.txt` and rebuild. What happens to build time?
+**Challenge**: 修改 `requirements.txt` 并重新构建。构建时间发生了什么变化？
 
-✅ **Checkpoint**: You can optimize images using slim bases and multi-stage builds.
+✅ **Checkpoint**: 你可以使用 slim 基础和多阶段构建优化 image。
 
 ---
 
-## Part 3: ML Application Image
+## Part 3: ML 应用 Image
 
-### Step 3.1: Simple Model Serving App
+### Step 3.1: 简单的 Model Serving 应用
 
 ```bash
-# Create ML app directory
+# 创建 ML app 目录
 mkdir -p ~/docker-exercises/ml-app
 cd ~/docker-exercises/ml-app
 
-# Create model serving application
+# 创建模型 serving 应用
 cat > serve.py << 'EOF'
 """
-Simple ML model serving with Flask
+使用 Flask 的简单 ML model serving
 """
 from flask import Flask, request, jsonify
 import torch
@@ -277,13 +277,13 @@ import io
 
 app = Flask(__name__)
 
-# Load model
+# 加载模型
 print("Loading model...")
 model = models.resnet18(pretrained=True)
 model.eval()
 print("Model loaded successfully!")
 
-# Image preprocessing
+# 图像预处理
 transform = transforms.Compose([
     transforms.Resize(256),
     transforms.CenterCrop(224),
@@ -307,7 +307,7 @@ def predict():
     img_bytes = file.read()
     img = Image.open(io.BytesIO(img_bytes))
 
-    # Preprocess and predict
+    # 预处理和预测
     img_tensor = transform(img).unsqueeze(0)
 
     with torch.no_grad():
@@ -328,7 +328,7 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
 EOF
 
-# Create requirements for ML app
+# 创建 ML 应用的 requirements
 cat > requirements.txt << 'EOF'
 flask==3.0.0
 torch==2.1.0
@@ -338,23 +338,23 @@ gunicorn==21.2.0
 EOF
 ```
 
-### Step 3.2: ML Application Dockerfile
+### Step 3.2: ML 应用的 Dockerfile
 
 ```dockerfile
 cat > Dockerfile << 'EOF'
-# Multi-stage build for ML application
+# ML 应用的多阶段构建
 FROM python:3.11 AS builder
 
 WORKDIR /app
 
-# Install dependencies
+# 安装依赖
 COPY requirements.txt .
 RUN pip install --user --no-cache-dir -r requirements.txt
 
-# Runtime stage
+# 运行时阶段
 FROM python:3.11-slim
 
-# Install system dependencies for PyTorch
+# 安装 PyTorch 的系统依赖
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libgomp1 \
@@ -362,58 +362,58 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-# Copy installed packages
+# 复制已安装的包
 COPY --from=builder /root/.local /root/.local
 
-# Copy application
+# 复制应用
 COPY serve.py .
 
-# Update PATH
+# 更新 PATH
 ENV PATH=/root/.local/bin:$PATH
 
 EXPOSE 8000
 
-# Use gunicorn for production
+# 使用 gunicorn 用于生产
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "120", "serve:app"]
 EOF
 ```
 
 ```bash
-# Build ML image (this will take a few minutes)
+# 构建 ML image（这将需要几分钟）
 docker build -t ml-serve:v1 .
 
-# Check size
+# 检查大小
 docker images ml-serve:v1
 
-# Run ML server
+# 运行 ML 服务器
 docker run -d -p 8000:8000 --name ml-server ml-serve:v1
 
-# Wait for model to load
+# 等待模型加载
 sleep 10
 
-# Check health
+# 检查健康状态
 curl http://localhost:8000/health
 
-# Test prediction (you'd need an image file)
+# 测试预测（你需要一个图像文件）
 # curl -X POST -F "file=@test_image.jpg" http://localhost:8000/predict
 ```
 
-### Step 3.3: Optimize ML Image Size
+### Step 3.3: 优化 ML Image 大小
 
 ```dockerfile
-# Create optimized ML Dockerfile
+# 创建优化的 ML Dockerfile
 cat > Dockerfile.optimized << 'EOF'
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# 安装系统依赖
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install CPU-only PyTorch (much smaller!)
+# 安装仅 CPU 版本的 PyTorch（小得多！）
 COPY requirements.txt .
 RUN pip install --no-cache-dir \
     flask==3.0.0 \
@@ -432,35 +432,35 @@ EOF
 ```
 
 ```bash
-# Build optimized version
+# 构建优化版本
 docker build -f Dockerfile.optimized -t ml-serve:v2-cpu .
 
-# Compare sizes
+# 比较大小
 docker images | grep ml-serve
 
-# The CPU version should be significantly smaller!
+# CPU 版本应该显著更小！
 ```
 
-✅ **Checkpoint**: You can containerize ML applications with optimized images.
+✅ **Checkpoint**: 你可以使用优化 image containerize ML 应用。
 
 ---
 
-## Part 4: Dockerfile Instructions Deep Dive
+## Part 4: Dockerfile 指令深入解析
 
-### Step 4.1: Understanding Layers
+### Step 4.1: 理解 Layers
 
 ```dockerfile
-# Create example with many layers
+# 创建包含多个 layer 的示例
 cat > Dockerfile.layers << 'EOF'
 FROM python:3.11-slim
 
-# Each RUN creates a new layer
+# 每个 RUN 创建一个新 layer
 RUN apt-get update
 RUN apt-get install -y curl
 RUN apt-get install -y wget
 RUN apt-get install -y vim
 
-# Better: Combine commands
+# 更好：合并命令
 # RUN apt-get update && \
 #     apt-get install -y curl wget vim && \
 #     rm -rf /var/lib/apt/lists/*
@@ -473,19 +473,19 @@ EOF
 ```
 
 ```bash
-# Build and inspect layers
+# 构建并检查 layers
 docker build -f Dockerfile.layers -t layer-demo .
 
-# See layer history
+# 查看 layer 历史
 docker history layer-demo
 
-# Notice each RUN command creates a layer
+# 注意每个 RUN 命令都创建一个 layer
 ```
 
 ### Step 4.2: COPY vs ADD
 
 ```bash
-# Create test files
+# 创建测试文件
 mkdir -p ~/docker-exercises/copy-test
 cd ~/docker-exercises/copy-test
 
@@ -499,10 +499,10 @@ FROM alpine:latest
 
 WORKDIR /app
 
-# COPY: Simple file copy
+# COPY：简单的文件复制
 COPY file.txt /app/
 
-# ADD: Can extract archives automatically
+# ADD：可以自动解压归档文件
 ADD archive.tar.gz /app/extracted/
 
 CMD ["sh"]
@@ -510,18 +510,18 @@ EOF
 ```
 
 ```bash
-# Build and check
+# 构建并检查
 docker build -f Dockerfile.copy -t copy-demo .
 
-# Run and explore
+# 运行并探索
 docker run --rm -it copy-demo sh
-# Inside container:
+# 在 container 内部：
 # ls -la /app
 # ls -la /app/extracted
 # exit
 ```
 
-**Best Practice**: Use `COPY` unless you specifically need `ADD`'s tar extraction.
+**Best Practice**: 除非你特别需要 `ADD` 的 tar 解压功能，否则使用 `COPY`。
 
 ### Step 4.3: ARG and ENV
 
@@ -529,11 +529,11 @@ docker run --rm -it copy-demo sh
 cat > Dockerfile.args << 'EOF'
 FROM python:3.11-slim
 
-# Build-time variable (only during build)
+# 构建时变量（仅在构建期间）
 ARG PYTHON_VERSION=3.11
 ARG APP_ENV=development
 
-# Runtime variable (available in container)
+# 运行时变量（在 container 中可用）
 ENV APP_ENV=${APP_ENV}
 ENV DEBUG=true
 
@@ -549,20 +549,20 @@ EOF
 ```
 
 ```bash
-# Build with default args
+# 使用默认参数构建
 docker build -f Dockerfile.args -t arg-demo:dev .
 
-# Build with custom args
+# 使用自定义参数构建
 docker build -f Dockerfile.args -t arg-demo:prod \
   --build-arg APP_ENV=production \
   --build-arg PYTHON_VERSION=3.11 .
 
-# Run and check env vars
+# 运行并检查环境变量
 docker run --rm arg-demo:dev python -c "import os; print(os.environ.get('APP_ENV'))"
 docker run --rm arg-demo:prod python -c "import os; print(os.environ.get('APP_ENV'))"
 ```
 
-### Step 4.4: USER Instruction (Security)
+### Step 4.4: USER 指令（安全）
 
 ```dockerfile
 cat > Dockerfile.user << 'EOF'
@@ -570,17 +570,17 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Create non-root user
+# 创建非 root 用户
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-# Install dependencies as root
+# 以 root 身份安装依赖
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app and set ownership
+# 复制应用并设置所有权
 COPY --chown=appuser:appuser app.py .
 
-# Switch to non-root user
+# 切换到非 root 用户
 USER appuser
 
 CMD ["python", "app.py"]
@@ -588,41 +588,41 @@ EOF
 ```
 
 ```bash
-# Build
+# 构建
 docker build -f Dockerfile.user -t secure-app .
 
-# Run and check user
+# 运行并检查用户
 docker run --rm secure-app whoami
-# Output: appuser (not root!)
+# 输出：appuser（不是 root！）
 
-# Verify security
+# 验证安全性
 docker run --rm secure-app id
-# Output shows non-root UID/GID
+# 输出显示非 root UID/GID
 ```
 
-✅ **Checkpoint**: You understand Dockerfile instructions and best practices.
+✅ **Checkpoint**: 你理解 Dockerfile 指令和 best practices。
 
 ---
 
-## Part 5: Build Context and .dockerignore
+## Part 5: Build Context 和 .dockerignore
 
-### Step 5.1: Understanding Build Context
+### Step 5.1: 理解 Build Context
 
 ```bash
-# Create project with many files
+# 创建包含多个文件的项目
 mkdir -p ~/docker-exercises/build-context
 cd ~/docker-exercises/build-context
 
-# Create some files
+# 创建一些文件
 echo "print('app')" > app.py
 echo "flask" > requirements.txt
 
-# Create large unnecessary files
+# 创建大型的不必要文件
 dd if=/dev/zero of=large_file.bin bs=1M count=100
 mkdir -p data
 dd if=/dev/zero of=data/dataset.bin bs=1M count=500
 
-# Simple Dockerfile
+# 简单的 Dockerfile
 cat > Dockerfile << 'EOF'
 FROM python:3.11-slim
 WORKDIR /app
@@ -632,105 +632,105 @@ COPY app.py .
 CMD ["python", "app.py"]
 EOF
 
-# Build - notice it sends ALL files to daemon
+# 构建 — 注意它会将所有文件发送到 daemon
 docker build -t context-demo .
-# Output: Sending build context to Docker daemon  614.4MB
+# 输出：Sending build context to Docker daemon  614.4MB
 ```
 
-### Step 5.2: Create .dockerignore
+### Step 5.2: 创建 .dockerignore
 
 ```bash
-# Create .dockerignore file
+# 创建 .dockerignore 文件
 cat > .dockerignore << 'EOF'
-# Ignore large data files
+# 忽略大型数据文件
 *.bin
 data/
 datasets/
 
-# Ignore git
+# 忽略 git
 .git/
 .gitignore
 
-# Ignore Python cache
+# 忽略 Python 缓存
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
 
-# Ignore virtual environments
+# 忽略虚拟环境
 venv/
 env/
 ENV/
 
-# Ignore IDE files
+# 忽略 IDE 文件
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Ignore OS files
+# 忽略操作系统文件
 .DS_Store
 Thumbs.db
 
-# Ignore documentation
+# 忽略文档
 docs/
 *.md
 !README.md
 
-# Ignore tests (if not needed in image)
+# 忽略测试（如果 image 中不需要）
 tests/
 *.test.py
 EOF
 
-# Rebuild
+# 重新构建
 docker build -t context-demo:v2 .
-# Output: Sending build context to Docker daemon  3.072kB
-# Much better!
+# 输出：Sending build context to Docker daemon  3.072kB
+# 好多了！
 ```
 
-**Challenge**: Create a Python project with tests, docs, and data. Write a `.dockerignore` that only includes production files.
+**Challenge**: 创建一个包含测试、文档和数据的 Python 项目。编写一个 `.dockerignore`，只包含生产文件。
 
-✅ **Checkpoint**: You can optimize build context with .dockerignore.
+✅ **Checkpoint**: 你可以使用 .dockerignore 优化 build context。
 
 ---
 
-## Part 6: Image Tagging and Versioning
+## Part 6: Image 标记和版本管理
 
-### Step 6.1: Tag Strategies
+### Step 6.1: 标记策略
 
 ```bash
-# Build with multiple tags
+# 使用多个标签构建
 docker build -t myapp:1.0.0 .
 docker build -t myapp:1.0 .
 docker build -t myapp:1 .
 docker build -t myapp:latest .
 
-# Or tag existing image
+# 或者标记现有 image
 docker tag myapp:1.0.0 myapp:latest
 docker tag myapp:1.0.0 myapp:stable
 
-# Semantic versioning
+# 语义版本控制
 docker build -t myapp:1.0.0-alpha .
 docker build -t myapp:1.0.0-beta .
 docker build -t myapp:1.0.0-rc1 .
 docker build -t myapp:1.0.0 .
 
-# Include git commit
+# 包含 git commit
 GIT_COMMIT=$(git rev-parse --short HEAD)
 docker build -t myapp:${GIT_COMMIT} .
 docker build -t myapp:dev-${GIT_COMMIT} .
 ```
 
-### Step 6.2: Best Practices for Tags
+### Step 6.2: 标签的最佳实践
 
 ```bash
-# Good tagging strategy for CI/CD
+# CI/CD 的良好标记策略
 VERSION="2.1.3"
 BUILD_DATE=$(date +%Y%m%d)
 GIT_SHA=$(git rev-parse --short HEAD)
 
-# Build with comprehensive tags
+# 使用全面的标签构建
 docker build \
   -t myapp:${VERSION} \
   -t myapp:${VERSION}-${BUILD_DATE} \
@@ -738,73 +738,73 @@ docker build \
   -t myapp:latest \
   .
 
-# List all tags
+# 列出所有标签
 docker images myapp
 ```
 
 **Tagging Best Practices**:
-1. **Always tag with specific version** (1.2.3)
-2. **Use semantic versioning** (MAJOR.MINOR.PATCH)
-3. **Tag latest** for most recent stable
-4. **Avoid using latest in production** (pin versions!)
-5. **Include build metadata** when needed
+1. **始终使用特定版本标签** (1.2.3)
+2. **使用语义版本控制** (MAJOR.MINOR.PATCH)
+3. **标记 latest** 用于最新稳定版
+4. **避免在生产中使用 latest**（固定版本！）
+5. **在需要时包含构建元数据**
 
-✅ **Checkpoint**: You can version and tag images properly.
+✅ **Checkpoint**: 你可以正确地版本管理和标记 image。
 
 ---
 
-## Part 7: Working with Registries
+## Part 7: 使用 Registry
 
 ### Step 7.1: Docker Hub
 
 ```bash
-# Login to Docker Hub
+# 登录 Docker Hub
 docker login
 
-# Tag for Docker Hub (username/image:tag)
+# 标记为 Docker Hub（用户名/image:tag）
 docker tag myapp:1.0.0 yourusername/myapp:1.0.0
 docker tag myapp:1.0.0 yourusername/myapp:latest
 
-# Push to Docker Hub
+# 推送到 Docker Hub
 docker push yourusername/myapp:1.0.0
 docker push yourusername/myapp:latest
 
-# Pull from Docker Hub
+# 从 Docker Hub 拉取
 docker pull yourusername/myapp:1.0.0
 
-# Logout
+# 登出
 docker logout
 ```
 
-### Step 7.2: Private Registry (Local)
+### Step 7.2: 私有 Registry（本地）
 
 ```bash
-# Run local registry
+# 运行本地 registry
 docker run -d -p 5000:5000 --name registry registry:2
 
-# Tag for local registry
+# 标记为本地 registry
 docker tag myapp:1.0.0 localhost:5000/myapp:1.0.0
 
-# Push to local registry
+# 推送到本地 registry
 docker push localhost:5000/myapp:1.0.0
 
-# Pull from local registry
+# 从本地 registry 拉取
 docker pull localhost:5000/myapp:1.0.0
 
-# List images in registry
+# 列出 registry 中的 image
 curl http://localhost:5000/v2/_catalog
 curl http://localhost:5000/v2/myapp/tags/list
 ```
 
-### Step 7.3: Registry Authentication
+### Step 7.3: Registry 认证
 
 ```bash
-# Create htpasswd file
+# 创建 htpasswd 文件
 docker run --rm \
   --entrypoint htpasswd \
   httpd:2 -Bbn testuser testpass > htpasswd
 
-# Run registry with authentication
+# 运行带认证的 registry
 docker run -d -p 5001:5000 \
   --name secure-registry \
   -v $(pwd)/htpasswd:/auth/htpasswd \
@@ -813,38 +813,38 @@ docker run -d -p 5001:5000 \
   -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd" \
   registry:2
 
-# Login to secure registry
+# 登录安全 registry
 docker login localhost:5001
 # Username: testuser
 # Password: testpass
 
-# Push to secure registry
+# 推送到安全 registry
 docker tag myapp:1.0.0 localhost:5001/myapp:1.0.0
 docker push localhost:5001/myapp:1.0.0
 ```
 
-✅ **Checkpoint**: You can work with Docker registries.
+✅ **Checkpoint**: 你可以使用 Docker registry。
 
 ---
 
-## Part 8: Debugging Build Issues
+## Part 8: 调试构建问题
 
-### Step 8.1: Common Build Errors
+### Step 8.1: 常见构建错误
 
 ```dockerfile
-# Create Dockerfile with issues
+# 创建有问题的 Dockerfile
 cat > Dockerfile.broken << 'EOF'
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Issue 1: File not found
+# 问题 1：文件未找到
 COPY nonexistent.txt .
 
-# Issue 2: Command fails
+# 问题 2：命令执行失败
 RUN pip install fake-package-that-doesnt-exist
 
-# Issue 3: Permission denied
+# 问题 3：权限被拒绝
 COPY app.py /root/protected/
 
 CMD ["python", "app.py"]
@@ -852,23 +852,23 @@ EOF
 ```
 
 ```bash
-# Try to build - will fail
+# 尝试构建 — 会失败
 docker build -f Dockerfile.broken -t broken-app .
 
-# Debug technique 1: Build up to working stage
-# Comment out failing lines and build incrementally
+# 调试技巧 1：构建到正常工作的阶段
+# 注释掉失败的行并递增构建
 
-# Debug technique 2: Check build context
+# 调试技巧 2：检查 build context
 ls -la
 
-# Debug technique 3: Use --no-cache
+# 调试技巧 3：使用 --no-cache
 docker build --no-cache -f Dockerfile.broken -t broken-app .
 ```
 
-### Step 8.2: Interactive Debugging
+### Step 8.2: 交互式调试
 
 ```bash
-# Build up to a certain point
+# 构建到某个点
 cat > Dockerfile.debug << 'EOF'
 FROM python:3.11-slim
 
@@ -877,17 +877,17 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-# Stop here for debugging
+# 在此处停止以进行调试
 CMD ["/bin/bash"]
 EOF
 
-# Build
+# 构建
 docker build -f Dockerfile.debug -t debug-app .
 
-# Run interactively
+# 以交互方式运行
 docker run --rm -it debug-app bash
 
-# Inside container, test commands:
+# 在 container 内部，测试命令：
 # pwd
 # ls -la
 # python --version
@@ -895,38 +895,38 @@ docker run --rm -it debug-app bash
 # exit
 ```
 
-### Step 8.3: Inspect Build Layers
+### Step 8.3: 检查构建 Layers
 
 ```bash
-# Build with verbose output
+# 使用详细输出构建
 docker build --progress=plain -t myapp .
 
-# Inspect specific layer
+# 检查特定 layer
 docker history myapp
 
-# Get detailed info
+# 获取详细信息
 docker inspect myapp
 
-# Find which layer added size
+# 找出哪个 layer 增加了大小
 docker history myapp --human --no-trunc
 ```
 
 **Debugging Checklist**:
-- [ ] Is the file in build context?
-- [ ] Check .dockerignore isn't excluding needed files
-- [ ] Verify base image exists and is accessible
-- [ ] Check network access for downloads
-- [ ] Review file permissions
-- [ ] Ensure correct syntax in Dockerfile
-- [ ] Use --no-cache to avoid stale layers
+- [ ] 文件在 build context 中吗？
+- [ ] 检查 .dockerignore 是否排除了需要的文件
+- [ ] 验证基础 image 存在且可访问
+- [ ] 检查下载的网络访问
+- [ ] 检查文件权限
+- [ ] 确保 Dockerfile 语法正确
+- [ ] 使用 --no-cache 避免过期 layer
 
-✅ **Checkpoint**: You can debug Dockerfile build issues.
+✅ **Checkpoint**: 你可以调试 Dockerfile 构建问题。
 
 ---
 
-## Part 9: Advanced Patterns
+## Part 9: 高级模式
 
-### Step 9.1: Health Checks in Dockerfile
+### Step 9.1: Dockerfile 中的健康检查
 
 ```dockerfile
 cat > Dockerfile.health << 'EOF'
@@ -941,7 +941,7 @@ COPY app.py .
 
 EXPOSE 5000
 
-# Add health check
+# 添加健康检查
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD python -c "import requests; requests.get('http://localhost:5000/health')" || exit 1
 
@@ -950,22 +950,22 @@ EOF
 ```
 
 ```bash
-# Build and run
+# 构建并运行
 docker build -f Dockerfile.health -t health-app .
 docker run -d -p 5000:5000 --name health-demo health-app
 
-# Check health status
-docker ps  # Shows health status
+# 检查健康状态
+docker ps  # 显示健康状态
 docker inspect health-demo | grep -A 10 Health
 ```
 
-### Step 9.2: Build Secrets
+### Step 9.2: 构建时密钥
 
 ```bash
-# Create secret file (API key, password, etc.)
+# 创建密钥文件（API key, 密码等）
 echo "super-secret-api-key" > api_key.txt
 
-# Dockerfile using build secrets
+# 使用构建时密钥的 Dockerfile
 cat > Dockerfile.secrets << 'EOF'
 # syntax=docker/dockerfile:1.4
 
@@ -973,11 +973,11 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Use secret during build (not stored in image!)
+# 在构建过程中使用密钥（不存储在 image 中！）
 RUN --mount=type=secret,id=api_key \
     API_KEY=$(cat /run/secrets/api_key) && \
     echo "Using API key: ${API_KEY:0:5}..." && \
-    # Use API key for build operations
+    # 使用 API key 进行构建操作
     echo "Build completed with secret"
 
 COPY app.py .
@@ -985,36 +985,36 @@ COPY app.py .
 CMD ["python", "app.py"]
 EOF
 
-# Build with secret
+# 使用密钥构建
 docker build --secret id=api_key,src=api_key.txt \
   -f Dockerfile.secrets -t secret-app .
 
-# Secret is NOT in the image!
+# 密钥不在 image 中！
 docker history secret-app
 ```
 
-### Step 9.3: Target Stage in Multi-Stage
+### Step 9.3: 多阶段构建中的目标阶段
 
 ```dockerfile
 cat > Dockerfile.targets << 'EOF'
-# Base stage
+# 基础阶段
 FROM python:3.11-slim AS base
 WORKDIR /app
 COPY requirements.txt .
 
-# Development stage
+# 开发阶段
 FROM base AS development
 RUN pip install -r requirements.txt
 RUN pip install pytest black flake8
 COPY . .
 CMD ["python", "app.py"]
 
-# Testing stage
+# 测试阶段
 FROM development AS testing
 RUN pytest tests/
 CMD ["pytest"]
 
-# Production stage
+# 生产阶段
 FROM base AS production
 RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py .
@@ -1023,105 +1023,105 @@ EOF
 ```
 
 ```bash
-# Build specific stage
+# 构建特定阶段
 docker build --target development -t myapp:dev -f Dockerfile.targets .
 docker build --target production -t myapp:prod -f Dockerfile.targets .
 docker build --target testing -t myapp:test -f Dockerfile.targets .
 
-# Each has different tools and configs!
+# 每个阶段有不同的工具和配置！
 docker run --rm myapp:dev python --version
 docker run --rm myapp:prod gunicorn --version
 ```
 
-✅ **Checkpoint**: You can use advanced Dockerfile patterns.
+✅ **Checkpoint**: 你可以使用高级 Dockerfile 模式。
 
 ---
 
-## Part 10: Production-Ready Dockerfile
+## Part 10: 生产就绪的 Dockerfile
 
-### Step 10.1: Complete Production Example
+### Step 10.1: 完整的生产示例
 
 ```dockerfile
 cat > Dockerfile.production << 'EOF'
 # syntax=docker/dockerfile:1.4
 
-# Build stage
+# 构建阶段
 FROM python:3.11 AS builder
 
 WORKDIR /app
 
-# Install build dependencies
+# 安装构建依赖
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# 安装 Python 依赖
 COPY requirements.txt .
 RUN pip install --user --no-cache-dir -r requirements.txt
 
-# Runtime stage
+# 运行时阶段
 FROM python:3.11-slim
 
-# Install runtime dependencies
+# 安装运行时依赖
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libgomp1 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
+# 创建非 root 用户
 RUN groupadd -r appuser && \
     useradd -r -g appuser -u 1000 appuser
 
 WORKDIR /app
 
-# Copy Python packages from builder
+# 从构建阶段复制 Python 包
 COPY --from=builder /root/.local /root/.local
 
-# Copy application with correct ownership
+# 以正确的所有权复制应用
 COPY --chown=appuser:appuser . .
 
-# Update PATH
+# 更新 PATH
 ENV PATH=/root/.local/bin:$PATH \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-# Switch to non-root user
+# 切换到非 root 用户
 USER appuser
 
 EXPOSE 8000
 
-# Health check
+# 健康检查
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-# Use production server
+# 使用生产服务器
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "--timeout", "120", "serve:app"]
 EOF
 ```
 
 **Production Checklist**:
-- [x] Multi-stage build
-- [x] Minimal base image (slim)
-- [x] Non-root user
-- [x] Health check
-- [x] Production server (gunicorn)
-- [x] Environment variables
-- [x] No cache in layers
-- [x] Proper signal handling
-- [x] Security best practices
+- [x] 多阶段构建
+- [x] 最小基础 image (slim)
+- [x] 非 root 用户
+- [x] 健康检查
+- [x] 生产服务器 (gunicorn)
+- [x] 环境变量
+- [x] Layer 中无缓存
+- [x] 正确的信号处理
+- [x] 安全 best practices
 
-✅ **Checkpoint**: You can create production-ready Dockerfiles.
+✅ **Checkpoint**: 你可以创建生产就绪的 Dockerfile。
 
 ---
 
-## Part 11: Practical Challenges
+## Part 11: 实际挑战
 
-### Challenge 1: Optimize a Bloated Image
+### Challenge 1: 优化臃肿的 Image
 
-You're given this Dockerfile:
+给你这个 Dockerfile：
 
 ```dockerfile
 FROM ubuntu:latest
@@ -1142,7 +1142,7 @@ RUN pip3 install numpy
 CMD ["python3", "app.py"]
 ```
 
-**Task**: Optimize this to be < 200MB
+**Task**: 优化到 < 200MB
 
 **Solution**:
 ```dockerfile
@@ -1150,12 +1150,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Combine RUN commands and clean up
+# 合并 RUN 命令并清理
 RUN apt-get update && \
     apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Use requirements.txt
+# 使用 requirements.txt
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -1164,12 +1164,12 @@ COPY app.py .
 CMD ["python", "app.py"]
 ```
 
-### Challenge 2: Multi-Service Application
+### Challenge 2: 多服务应用
 
-**Task**: Create a Dockerfile that can be used for:
-1. Web server (production)
-2. Worker process (background jobs)
-3. Database migration
+**Task**: 创建一个可用于以下场景的 Dockerfile：
+1. Web 服务器（生产）
+2. Worker 进程（后台任务）
+3. 数据库迁移
 
 **Solution**:
 ```dockerfile
@@ -1182,20 +1182,20 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Default: web server
+# 默认：web 服务器
 CMD ["gunicorn", "app:app"]
 
-# Override with:
+# 覆盖方式：
 # docker run myapp python worker.py
 # docker run myapp python migrate.py
 ```
 
-### Challenge 3: Build-Time Configuration
+### Challenge 3: 构建时配置
 
-**Task**: Create a Dockerfile that accepts:
-- Environment (dev/staging/prod)
-- Feature flags
-- Version number
+**Task**: 创建一个接受以下参数的 Dockerfile：
+- 环境 (dev/staging/prod)
+- 功能开关
+- 版本号
 
 **Solution**:
 ```dockerfile
@@ -1223,16 +1223,16 @@ CMD ["python", "app.py"]
 ```
 
 ```bash
-# Build for different environments
+# 为不同环境构建
 docker build --build-arg ENV=development --build-arg VERSION=1.2.3 -t myapp:dev .
 docker build --build-arg ENV=production --build-arg VERSION=1.2.3 -t myapp:prod .
 ```
 
 ---
 
-## Part 12: Testing Your Images
+## Part 12: 测试你的 Image
 
-### Step 12.1: Create Test Script
+### Step 12.1: 创建测试脚本
 
 ```bash
 cat > test_image.sh << 'EOF'
@@ -1242,7 +1242,7 @@ IMAGE=$1
 
 echo "Testing image: ${IMAGE}"
 
-# Test 1: Image exists
+# 测试 1：Image 存在
 echo "Test 1: Checking image exists..."
 docker images ${IMAGE} | grep -q ${IMAGE}
 if [ $? -eq 0 ]; then
@@ -1252,7 +1252,7 @@ else
     exit 1
 fi
 
-# Test 2: Container starts
+# 测试 2：Container 启动
 echo "Test 2: Checking container starts..."
 CONTAINER=$(docker run -d ${IMAGE})
 sleep 2
@@ -1265,7 +1265,7 @@ else
     exit 1
 fi
 
-# Test 3: Health check
+# 测试 3：健康检查
 echo "Test 3: Checking health endpoint..."
 PORT=$(docker port ${CONTAINER} | head -1 | cut -d: -f2)
 curl -f http://localhost:${PORT}/health
@@ -1275,7 +1275,7 @@ else
     echo "✗ Health check failed"
 fi
 
-# Cleanup
+# 清理
 docker rm -f ${CONTAINER}
 
 echo "All tests passed!"
@@ -1283,14 +1283,14 @@ EOF
 
 chmod +x test_image.sh
 
-# Run tests
+# 运行测试
 ./test_image.sh my-python-app:v1
 ```
 
-### Step 12.2: Automated Testing
+### Step 12.2: 自动化测试
 
 ```bash
-# Create test matrix
+# 创建测试矩阵
 cat > test_matrix.sh << 'EOF'
 #!/bin/bash
 
@@ -1319,7 +1319,7 @@ chmod +x test_matrix.sh
 ./test_matrix.sh
 ```
 
-✅ **Checkpoint**: You can test your Docker images.
+✅ **Checkpoint**: 你可以测试你的 Docker image。
 
 ---
 
@@ -1327,7 +1327,7 @@ chmod +x test_matrix.sh
 
 ### Validation Script
 
-Create a comprehensive validation:
+创建全面的验证：
 
 ```bash
 #!/bin/bash
@@ -1336,7 +1336,7 @@ Create a comprehensive validation:
 echo "Docker Image Building Exercise Validation"
 echo "==========================================="
 
-# Check all images were built
+# 检查所有 image 是否已构建
 REQUIRED_IMAGES=(
     "my-python-app:v1"
     "my-python-app:v2-slim"
@@ -1352,13 +1352,13 @@ for img in "${REQUIRED_IMAGES[@]}"; do
     fi
 done
 
-# Check image sizes
+# 检查 image 大小
 echo ""
 echo "Image Size Analysis:"
 echo "-------------------"
 docker images | grep "my-python-app\|ml-serve" | awk '{print $1":"$2" - "$7$8}'
 
-# Check for .dockerignore
+# 检查 .dockerignore
 if [ -f ".dockerignore" ]; then
     echo "✓ .dockerignore file exists"
 else
@@ -1371,48 +1371,48 @@ echo "Validation complete!"
 
 ### Reflection Questions
 
-1. **What's the difference between `COPY` and `ADD`?**
-   - Your answer:
+1. **`COPY` 和 `ADD` 有什么区别？**
+   - 你的答案：
 
-2. **Why use multi-stage builds?**
-   - Your answer:
+2. **为什么要使用多阶段构建？**
+   - 你的答案：
 
-3. **How do you minimize image size?**
-   - Your answer:
+3. **如何最小化 image 大小？**
+   - 你的答案：
 
-4. **When should you use `--no-cache-dir` with pip?**
-   - Your answer:
+4. **什么时候使用 `--no-cache-dir` 与 pip？**
+   - 你的答案：
 
-5. **Why is layer caching important?**
-   - Your answer:
+5. **为什么 layer 缓存很重要？**
+   - 你的答案：
 
-6. **What's the benefit of non-root users?**
-   - Your answer:
+6. **非 root 用户有什么好处？**
+   - 你的答案：
 
 ---
 
 ## Summary
 
 **What You Accomplished**:
-✅ Created custom Docker images from Dockerfiles
-✅ Optimized images with multi-stage builds
-✅ Containerized Python and ML applications
-✅ Mastered Dockerfile instructions
-✅ Implemented security best practices
-✅ Tagged and versioned images properly
-✅ Worked with Docker registries
-✅ Debugged build issues
-✅ Created production-ready Dockerfiles
+✅ 从 Dockerfile 创建了自定义 Docker image
+✅ 使用多阶段构建优化了 image
+✅ Containerized Python 和 ML 应用
+✅ 掌握了 Dockerfile 指令
+✅ 实现了安全 best practices
+✅ 正确标记和版本管理了 image
+✅ 使用了 Docker registry
+✅ 调试了构建问题
+✅ 创建了生产就绪的 Dockerfile
 
 **Key Concepts Mastered**:
-- **Dockerfile syntax** and best practices
-- **Layer caching** and build optimization
-- **Multi-stage builds** for smaller images
-- **Security practices** (non-root user, minimal base)
-- **Image tagging** and versioning strategies
-- **Registry operations** (push/pull)
-- **Build context** and .dockerignore
-- **Health checks** and production patterns
+- **Dockerfile 语法**和 best practices
+- **Layer 缓存**和构建优化
+- **多阶段构建**用于更小的 image
+- **安全实践**（非 root 用户、最小基础）
+- **Image 标记**和版本管理策略
+- **Registry 操作**（push/pull）
+- **Build context**和 .dockerignore
+- **健康检查**和生产模式
 
 **Image Size Comparison**:
 ```
@@ -1427,10 +1427,10 @@ Optimized ML (CPU): ~400 MB
 ## Next Steps
 
 **Practice More**:
-1. Build images for different application types
-2. Experiment with different base images
-3. Optimize existing projects
-4. Create reusable base images for your team
+1. 为不同类型的应用构建 image
+2. 尝试不同的基础 image
+3. 优化现有项目
+4. 为你的团队创建可重用的基础 image
 
 **Continue Learning**:
 - **Exercise 03**: Docker Compose Applications
@@ -1441,5 +1441,5 @@ Optimized ML (CPU): ~400 MB
 
 **Exercise Version**: 1.0
 **Last Updated**: October 2025
-**Estimated Time**: 3-4 hours
-**Difficulty**: Beginner to Intermediate
+**Estimated Time**: 3-4 小时
+**Difficulty**: 初级到中级

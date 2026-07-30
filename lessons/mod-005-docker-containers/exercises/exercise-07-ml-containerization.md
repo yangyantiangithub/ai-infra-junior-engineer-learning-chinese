@@ -2,36 +2,36 @@
 
 ## Exercise Overview
 
-**Objective**: Build a production-ready containerized machine learning application including model training, inference serving, monitoring, and complete CI/CD pipeline.
+**Objective**: 构建一个生产就绪的 containerized 机器学习应用，包括模型训练、推理 serving、监控以及完整的 CI/CD pipeline。
 
-**Difficulty**: Advanced
-**Estimated Time**: 5-6 hours
+**Difficulty**: 高级
+**Estimated Time**: 5-6 小时
 **Prerequisites**:
-- All previous Docker exercises (01-06)
-- All Docker lectures
+- 所有之前的 Docker 练习 (01-06)
+- 所有 Docker 讲座
 - Module 004 (ML Basics)
 
 **What You'll Learn**:
-- Containerizing ML training pipelines
-- Building ML inference APIs
-- GPU-enabled containers
-- Model versioning and management
-- ML-specific monitoring
-- Distributed training setup
-- Feature serving
-- Complete ML deployment pipeline
+- Containerizing ML 训练 pipeline
+- 构建 ML 推理 API
+- 启用 GPU 的 container
+- 模型版本管理和模型管理
+- ML 特定监控
+- 分布式训练设置
+- 特征 serving
+- 完整的 ML 部署 pipeline
 
 ---
 
-## Part 1: Simple ML Inference Service
+## Part 1: 简单的 ML 推理服务
 
-### Step 1.1: Basic Model Serving
+### Step 1.1: 基本 Model Serving
 
 ```bash
 mkdir -p ~/docker-exercises/ml-app
 cd ~/docker-exercises/ml-app
 
-# Create inference application
+# 创建推理应用
 cat > serve.py << 'EOF'
 from flask import Flask, request, jsonify
 import torch
@@ -41,19 +41,19 @@ from PIL import Image
 import io
 import logging
 
-# Configure logging
+# 配置日志
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Load model
+# 加载模型
 logger.info("Loading model...")
 model = models.resnet18(pretrained=True)
 model.eval()
 logger.info("Model loaded successfully")
 
-# Image preprocessing
+# 图像预处理
 transform = transforms.Compose([
     transforms.Resize(256),
     transforms.CenterCrop(224),
@@ -64,7 +64,7 @@ transform = transforms.Compose([
     )
 ])
 
-# Load ImageNet class labels
+# 加载 ImageNet 类别标签
 with open('imagenet_classes.txt') as f:
     labels = [line.strip() for line in f.readlines()]
 
@@ -82,20 +82,20 @@ def predict():
         return jsonify({'error': 'No file provided'}), 400
 
     try:
-        # Read and process image
+        # 读取并处理图像
         file = request.files['file']
         img_bytes = file.read()
         img = Image.open(io.BytesIO(img_bytes)).convert('RGB')
 
-        # Preprocess
+        # 预处理
         img_tensor = transform(img).unsqueeze(0)
 
-        # Inference
+        # 推理
         with torch.no_grad():
             outputs = model(img_tensor)
             probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
 
-        # Get top 5 predictions
+        # 获取前 5 个预测结果
         top5_prob, top5_catid = torch.topk(probabilities, 5)
 
         results = []
@@ -120,17 +120,17 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
 EOF
 
-# Create ImageNet labels (simplified)
+# 创建 ImageNet 标签（简化版）
 cat > imagenet_classes.txt << 'EOF'
 tench
 goldfish
 great white shark
 tiger shark
 hammerhead
-# ... (1000 classes total, truncated for brevity)
+# ... (共 1000 个类别，为简洁起见已截断)
 EOF
 
-# Create requirements
+# 创建 requirements
 cat > requirements.txt << 'EOF'
 torch==2.1.0
 torchvision==0.16.0
@@ -141,41 +141,41 @@ prometheus-client==0.19.0
 EOF
 ```
 
-### Step 1.2: Dockerfile for ML Inference
+### Step 1.2: ML 推理的 Dockerfile
 
 ```dockerfile
 cat > Dockerfile << 'EOF'
-# Multi-stage build for ML inference
+# ML 推理的多阶段构建
 FROM python:3.11 AS builder
 
 WORKDIR /app
 
-# Install dependencies
+# 安装依赖
 COPY requirements.txt .
 RUN pip install --user --no-cache-dir -r requirements.txt
 
-# Runtime stage
+# 运行时阶段
 FROM python:3.11-slim
 
-# Install runtime dependencies
+# 安装运行时依赖
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         libgomp1 \
         curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
+# 创建非 root 用户
 RUN groupadd -r mluser && useradd -r -g mluser -u 1000 mluser
 
 WORKDIR /app
 
-# Copy Python packages
+# 复制 Python 包
 COPY --from=builder /root/.local /home/mluser/.local
 
-# Copy application
+# 复制应用
 COPY --chown=mluser:mluser serve.py imagenet_classes.txt ./
 
-# Create directories for models and cache
+# 创建模型和缓存目录
 RUN mkdir -p /home/mluser/.cache/torch && \
     chown -R mluser:mluser /home/mluser/.cache
 
@@ -194,7 +194,7 @@ EOF
 ```
 
 ```bash
-# Build and run
+# 构建并运行
 docker build -t ml-inference:v1 .
 
 docker run -d \
@@ -202,31 +202,31 @@ docker run -d \
     -p 8000:8000 \
     ml-inference:v1
 
-# Test
-sleep 30  # Wait for model loading
+# 测试
+sleep 30  # 等待模型加载
 curl http://localhost:8000/health
 
-# Test with image (if you have one)
+# 用图像测试（如果有的话）
 # curl -X POST -F "file=@test_image.jpg" http://localhost:8000/predict
 
-# Cleanup
+# 清理
 docker rm -f ml-server
 ```
 
-✅ **Checkpoint**: You can containerize a basic ML inference service.
+✅ **Checkpoint**: 你可以 containerize 一个基本的 ML 推理服务。
 
 ---
 
-## Part 2: GPU-Enabled ML Container
+## Part 2: 启用 GPU 的 ML Container
 
-### Step 2.1: GPU-Enabled Dockerfile
+### Step 2.1: 启用 GPU 的 Dockerfile
 
 ```dockerfile
 cat > Dockerfile.gpu << 'EOF'
-# NVIDIA CUDA base image
+# NVIDIA CUDA 基础 image
 FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
 
-# Install Python
+# 安装 Python
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         python3.11 \
@@ -237,7 +237,7 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-# Install PyTorch with CUDA support
+# 安装带 CUDA 支持的 PyTorch
 COPY requirements-gpu.txt .
 RUN pip3 install --no-cache-dir \
     torch==2.1.0 \
@@ -246,10 +246,10 @@ RUN pip3 install --no-cache-dir \
 
 RUN pip3 install --no-cache-dir -r requirements-gpu.txt
 
-# Create non-root user
+# 创建非 root 用户
 RUN groupadd -r mluser && useradd -r -g mluser -u 1000 mluser
 
-# Copy application
+# 复制应用
 COPY --chown=mluser:mluser serve_gpu.py imagenet_classes.txt ./
 
 USER mluser
@@ -270,7 +270,7 @@ prometheus-client==0.19.0
 EOF
 ```
 
-### Step 2.2: GPU-Enabled Inference Script
+### Step 2.2: 启用 GPU 的推理脚本
 
 ```python
 cat > serve_gpu.py << 'EOF'
@@ -287,11 +287,11 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Check for GPU
+# 检查 GPU
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 logger.info(f"Using device: {device}")
 
-# Load model to GPU
+# 加载模型到 GPU
 logger.info("Loading model...")
 model = models.resnet50(pretrained=True).to(device)
 model.eval()
@@ -346,7 +346,7 @@ if __name__ == '__main__':
 EOF
 ```
 
-### Step 2.3: Docker Compose with GPU
+### Step 2.3: 使用 GPU 的 Docker Compose
 
 ```yaml
 cat > docker-compose-gpu.yml << 'EOF'
@@ -373,20 +373,20 @@ EOF
 ```
 
 ```bash
-# Build and run (requires nvidia-docker)
+# 构建并运行（需要 nvidia-docker）
 # docker compose -f docker-compose-gpu.yml up -d
 
-# Check GPU usage
+# 检查 GPU 使用
 # nvidia-smi
 ```
 
-✅ **Checkpoint**: You can create GPU-enabled ML containers.
+✅ **Checkpoint**: 你可以创建启用 GPU 的 ML container。
 
 ---
 
-## Part 3: Model Training Container
+## Part 3: 模型训练 Container
 
-### Step 3.1: Training Script
+### Step 3.1: 训练脚本
 
 ```python
 cat > train.py << 'EOF'
@@ -406,11 +406,11 @@ def train_model(
     batch_size=32,
     learning_rate=0.001
 ):
-    # Device configuration
+    # 设备配置
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
 
-    # Data transforms
+    # 数据变换
     transform = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
@@ -418,7 +418,7 @@ def train_model(
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
-    # Load dataset (example: ImageNet-style structure)
+    # 加载数据集（示例：ImageNet 风格结构）
     train_dataset = datasets.ImageFolder(
         os.path.join(data_dir, 'train'),
         transform=transform
@@ -430,17 +430,17 @@ def train_model(
         num_workers=4
     )
 
-    # Model
+    # 模型
     model = models.resnet18(pretrained=True)
     num_classes = len(train_dataset.classes)
     model.fc = nn.Linear(model.fc.in_features, num_classes)
     model = model.to(device)
 
-    # Loss and optimizer
+    # 损失和优化器
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-    # Training loop
+    # 训练循环
     metrics = {'epochs': [], 'loss': [], 'accuracy': []}
 
     for epoch in range(epochs):
@@ -452,16 +452,16 @@ def train_model(
         for i, (images, labels) in enumerate(train_loader):
             images, labels = images.to(device), labels.to(device)
 
-            # Forward pass
+            # 前向传播
             outputs = model(images)
             loss = criterion(outputs, labels)
 
-            # Backward pass
+            # 反向传播
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-            # Statistics
+            # 统计
             running_loss += loss.item()
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
@@ -471,7 +471,7 @@ def train_model(
                 print(f'Epoch [{epoch+1}/{epochs}], Step [{i+1}/{len(train_loader)}], '
                       f'Loss: {loss.item():.4f}')
 
-        # Epoch metrics
+        # 轮次指标
         epoch_loss = running_loss / len(train_loader)
         epoch_acc = 100 * correct / total
 
@@ -482,7 +482,7 @@ def train_model(
         print(f'Epoch [{epoch+1}/{epochs}] completed - '
               f'Loss: {epoch_loss:.4f}, Accuracy: {epoch_acc:.2f}%')
 
-    # Save model
+    # 保存模型
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     model_path = os.path.join(model_dir, f'model_{timestamp}.pth')
     torch.save({
@@ -494,7 +494,7 @@ def train_model(
 
     print(f'Model saved to {model_path}')
 
-    # Save metrics
+    # 保存指标
     metrics_path = os.path.join(model_dir, f'metrics_{timestamp}.json')
     with open(metrics_path, 'w') as f:
         json.dump(metrics, f, indent=2)
@@ -523,7 +523,7 @@ if __name__ == '__main__':
 EOF
 ```
 
-### Step 3.2: Training Dockerfile
+### Step 3.2: 训练 Dockerfile
 
 ```dockerfile
 cat > Dockerfile.train << 'EOF'
@@ -531,26 +531,26 @@ FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
 
 WORKDIR /workspace
 
-# Install additional dependencies
+# 安装额外依赖
 RUN pip install --no-cache-dir \
     tensorboard \
     mlflow \
     scikit-learn
 
-# Copy training script
+# 复制训练脚本
 COPY train.py .
 
-# Create directories
+# 创建目录
 RUN mkdir -p /data /models /logs
 
-# Set environment variables
+# 设置环境变量
 ENV PYTHONUNBUFFERED=1
 
 CMD ["python", "train.py"]
 EOF
 ```
 
-### Step 3.3: Training with Docker Compose
+### Step 3.3: 使用 Docker Compose 训练
 
 ```yaml
 cat > docker-compose-train.yml << 'EOF'
@@ -562,9 +562,9 @@ services:
       context: .
       dockerfile: Dockerfile.train
     volumes:
-      - ./data:/data:ro  # Training data (read-only)
-      - ./models:/models  # Model output
-      - ./logs:/logs  # Training logs
+      - ./data:/data:ro  # 训练数据（只读）
+      - ./models:/models  # 模型输出
+      - ./logs:/logs  # 训练日志
     deploy:
       resources:
         reservations:
@@ -596,20 +596,20 @@ volumes:
 EOF
 ```
 
-✅ **Checkpoint**: You can containerize ML training pipelines.
+✅ **Checkpoint**: 你可以 containerize ML 训练 pipeline。
 
 ---
 
-## Part 4: Complete ML Pipeline
+## Part 4: 完整的 ML Pipeline
 
-### Step 4.1: Full ML Stack
+### Step 4.1: 完整 ML 栈
 
 ```yaml
 cat > docker-compose-ml-stack.yml << 'EOF'
 version: '3.8'
 
 services:
-  # PostgreSQL for metadata
+  # 用于元数据的 PostgreSQL
   postgres:
     image: postgres:15
     environment:
@@ -624,7 +624,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # MinIO for artifact storage
+  # 用于 artifact 存储的 MinIO
   minio:
     image: minio/minio
     ports:
@@ -642,7 +642,7 @@ services:
       timeout: 20s
       retries: 3
 
-  # MLflow tracking server
+  # MLflow 追踪服务器
   mlflow:
     image: ghcr.io/mlflow/mlflow:latest
     ports:
@@ -662,7 +662,7 @@ services:
       minio:
         condition: service_healthy
 
-  # Redis for caching
+  # 用于缓存的 Redis
   redis:
     image: redis:7-alpine
     command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
@@ -672,7 +672,7 @@ services:
       timeout: 3s
       retries: 5
 
-  # Feature store
+  # 特征存储
   feast:
     image: feastdev/feature-server:latest
     ports:
@@ -681,7 +681,7 @@ services:
       - ./feature_repo:/feature_repo
     command: feast -c /feature_repo serve
 
-  # Model serving
+  # 模型 serving
   inference:
     build:
       context: .
@@ -702,7 +702,7 @@ services:
           cpus: '1.0'
           memory: 2G
 
-  # Prometheus for monitoring
+  # 用于监控的 Prometheus
   prometheus:
     image: prom/prometheus:latest
     ports:
@@ -711,7 +711,7 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
 
-  # Grafana for visualization
+  # 用于可视化的 Grafana
   grafana:
     image: grafana/grafana:latest
     ports:
@@ -729,7 +729,7 @@ volumes:
 EOF
 ```
 
-### Step 4.2: Model Registry Integration
+### Step 4.2: 模型注册中心集成
 
 ```python
 cat > model_registry.py << 'EOF'
@@ -743,27 +743,27 @@ class ModelRegistry:
         mlflow.set_tracking_uri(tracking_uri)
 
     def register_model(self, model, model_name, metrics=None):
-        """Register a trained model"""
+        """注册已训练的模型"""
         with mlflow.start_run():
-            # Log model
+            # 记录模型
             mlflow.pytorch.log_model(model, "model")
 
-            # Log metrics
+            # 记录指标
             if metrics:
                 for key, value in metrics.items():
                     mlflow.log_metric(key, value)
 
-            # Register model
+            # 注册模型
             model_uri = f"runs:/{mlflow.active_run().info.run_id}/model"
             mlflow.register_model(model_uri, model_name)
 
     def load_production_model(self, model_name):
-        """Load production model"""
+        """加载生产模型"""
         model_uri = f"models:/{model_name}/Production"
         return mlflow.pytorch.load_model(model_uri)
 
     def promote_model(self, model_name, version, stage='Production'):
-        """Promote model to production"""
+        """将模型提升到生产环境"""
         client = mlflow.tracking.MlflowClient()
         client.transition_model_version_stage(
             name=model_name,
@@ -773,13 +773,13 @@ class ModelRegistry:
 EOF
 ```
 
-✅ **Checkpoint**: You can build a complete ML pipeline with Docker.
+✅ **Checkpoint**: 你可以使用 Docker 构建完整的 ML pipeline。
 
 ---
 
-## Part 5: Distributed Training
+## Part 5: 分布式训练
 
-### Step 5.1: Distributed Training Script
+### Step 5.1: 分布式训练脚本
 
 ```python
 cat > train_distributed.py << 'EOF'
@@ -791,31 +791,31 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 import os
 
 def setup(rank, world_size):
-    """Initialize distributed training"""
+    """初始化分布式训练"""
     os.environ['MASTER_ADDR'] = os.environ.get('MASTER_ADDR', 'localhost')
     os.environ['MASTER_PORT'] = os.environ.get('MASTER_PORT', '12355')
 
-    # Initialize process group
+    # 初始化进程组
     dist.init_process_group("nccl", rank=rank, world_size=world_size)
 
 def cleanup():
-    """Cleanup distributed training"""
+    """清理分布式训练"""
     dist.destroy_process_group()
 
 def train(rank, world_size):
-    """Training function for each process"""
+    """每个进程的训练函数"""
     print(f"Running DDP on rank {rank}")
     setup(rank, world_size)
 
-    # Create model and move to GPU
+    # 创建模型并移动到 GPU
     model = nn.Linear(10, 10).to(rank)
     ddp_model = DDP(model, device_ids=[rank])
 
-    # Loss and optimizer
+    # 损失和优化器
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.SGD(ddp_model.parameters(), lr=0.001)
 
-    # Training loop
+    # 训练循环
     for epoch in range(10):
         optimizer.zero_grad()
         outputs = ddp_model(torch.randn(20, 10).to(rank))
@@ -838,7 +838,7 @@ if __name__ == '__main__':
 EOF
 ```
 
-### Step 5.2: Distributed Training Compose
+### Step 5.2: 分布式训练 Compose
 
 ```yaml
 cat > docker-compose-distributed.yml << 'EOF'
@@ -905,13 +905,13 @@ services:
 EOF
 ```
 
-✅ **Checkpoint**: You can set up distributed training with Docker.
+✅ **Checkpoint**: 你可以使用 Docker 设置分布式训练。
 
 ---
 
-## Part 6: Monitoring ML Services
+## Part 6: 监控 ML 服务
 
-### Step 6.1: Prometheus Metrics
+### Step 6.1: Prometheus 指标
 
 ```python
 cat > serve_with_metrics.py << 'EOF'
@@ -922,14 +922,14 @@ import time
 
 app = Flask(__name__)
 
-# Prometheus metrics
+# Prometheus 指标
 REQUEST_COUNT = Counter('ml_requests_total', 'Total requests', ['endpoint', 'status'])
 REQUEST_LATENCY = Histogram('ml_request_duration_seconds', 'Request latency')
 MODEL_LOAD_TIME = Gauge('ml_model_load_time_seconds', 'Model load time')
 GPU_MEMORY = Gauge('ml_gpu_memory_bytes', 'GPU memory usage')
 PREDICTIONS = Counter('ml_predictions_total', 'Total predictions', ['class'])
 
-# Load model and track load time
+# 加载模型并记录加载时间
 start_time = time.time()
 model = torch.hub.load('pytorch/vision', 'resnet18', pretrained=True)
 model.eval()
@@ -938,14 +938,14 @@ MODEL_LOAD_TIME.set(load_time)
 
 @app.route('/metrics')
 def metrics():
-    """Prometheus metrics endpoint"""
+    """Prometheus 指标端点"""
     return generate_latest()
 
 @app.route('/health')
 def health():
     REQUEST_COUNT.labels(endpoint='/health', status='success').inc()
 
-    # Update GPU metrics if available
+    # 如果可用，更新 GPU 指标
     if torch.cuda.is_available():
         GPU_MEMORY.set(torch.cuda.memory_allocated())
 
@@ -958,7 +958,7 @@ def health():
 @REQUEST_LATENCY.time()
 def predict():
     try:
-        # Prediction logic here
+        # 预测逻辑
         # ...
 
         REQUEST_COUNT.labels(endpoint='/predict', status='success').inc()
@@ -975,10 +975,10 @@ if __name__ == '__main__':
 EOF
 ```
 
-### Step 6.2: Custom ML Dashboards
+### Step 6.2: 自定义 ML 仪表板
 
 ```yaml
-# Grafana dashboard configuration
+# Grafana dashboard 配置
 cat > grafana-dashboard.json << 'EOF'
 {
   "dashboard": {
@@ -1022,11 +1022,11 @@ cat > grafana-dashboard.json << 'EOF'
 EOF
 ```
 
-✅ **Checkpoint**: You can monitor ML services with Prometheus and Grafana.
+✅ **Checkpoint**: 你可以使用 Prometheus 和 Grafana 监控 ML 服务。
 
 ---
 
-## Part 7: CI/CD for ML Applications
+## Part 7: ML 应用的 CI/CD
 
 ### Step 7.1: GitHub Actions ML Pipeline
 
@@ -1096,12 +1096,12 @@ jobs:
 
       - name: Deploy to production
         run: |
-          # Deployment commands here
+          # 部署命令
           echo "Deploying to production..."
 EOF
 ```
 
-### Step 7.2: Model Validation Pipeline
+### Step 7.2: 模型验证 Pipeline
 
 ```python
 cat > validate_model.py << 'EOF'
@@ -1110,23 +1110,23 @@ import json
 import sys
 
 def validate_model(model_path, validation_data_path):
-    """Validate model before deployment"""
+    """部署前验证模型"""
 
-    # Load model
+    # 加载模型
     model = torch.load(model_path)
     model.eval()
 
-    # Load validation data
-    # ... validation logic ...
+    # 加载验证数据
+    # ... 验证逻辑 ...
 
-    # Check metrics
+    # 检查指标
     metrics = {
-        'accuracy': 0.95,  # Replace with actual calculation
+        'accuracy': 0.95,  # 替换为实际计算值
         'latency_ms': 50,
         'size_mb': 45
     }
 
-    # Validation thresholds
+    # 验证阈值
     if metrics['accuracy'] < 0.90:
         print("FAIL: Accuracy below threshold")
         sys.exit(1)
@@ -1149,20 +1149,20 @@ if __name__ == '__main__':
 EOF
 ```
 
-✅ **Checkpoint**: You can implement CI/CD for ML applications.
+✅ **Checkpoint**: 你可以为 ML 应用实现 CI/CD。
 
 ---
 
-## Part 8: Production Deployment
+## Part 8: 生产部署
 
-### Step 8.1: Production-Ready ML Stack
+### Step 8.1: 生产就绪的 ML 栈
 
 ```yaml
 cat > docker-compose.production.yml << 'EOF'
 version: '3.8'
 
 services:
-  # Nginx load balancer
+  # Nginx 负载均衡器
   nginx:
     image: nginx:alpine
     ports:
@@ -1175,7 +1175,7 @@ services:
       - inference
     restart: always
 
-  # ML inference service (multiple replicas)
+  # ML 推理服务（多个副本）
   inference:
     build:
       context: .
@@ -1225,7 +1225,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # Redis cache
+  # Redis 缓存
   redis:
     image: redis:7-alpine
     command: redis-server --maxmemory 1gb --maxmemory-policy allkeys-lru
@@ -1233,7 +1233,7 @@ services:
       - redis-data:/data
     restart: always
 
-  # Monitoring
+  # 监控
   prometheus:
     image: prom/prometheus:latest
     ports:
@@ -1275,54 +1275,54 @@ secrets:
 EOF
 ```
 
-✅ **Checkpoint**: You have a production-ready ML deployment.
+✅ **Checkpoint**: 你有了一个生产就绪的 ML 部署。
 
 ---
 
 ## Summary
 
 **What You Accomplished**:
-✅ Built ML inference services
-✅ Created GPU-enabled containers
-✅ Containerized training pipelines
-✅ Implemented complete ML stack
-✅ Set up distributed training
-✅ Added ML-specific monitoring
-✅ Integrated CI/CD for ML
-✅ Deployed production ML systems
+✅ 构建了 ML 推理服务
+✅ 创建了启用 GPU 的 container
+✅ Containerized 训练 pipeline
+✅ 实现了完整的 ML 栈
+✅ 设置了分布式训练
+✅ 添加了 ML 特定监控
+✅ 集成了 ML 的 CI/CD
+✅ 部署了生产 ML 系统
 
 **Complete ML Infrastructure**:
-- Model training with GPU support
-- Inference serving with caching
-- Model registry (MLflow)
-- Feature store (Feast)
-- Monitoring (Prometheus/Grafana)
-- Distributed training
+- 带 GPU 支持的模型训练
+- 带缓存的推理 serving
+- 模型注册中心 (MLflow)
+- 特征存储 (Feast)
+- 监控 (Prometheus/Grafana)
+- 分布式训练
 - CI/CD pipeline
-- Production deployment
+- 生产部署
 
 **Best Practices Applied**:
-- Multi-stage builds for optimization
-- GPU resource management
-- Model versioning
-- Automated testing
-- Health checks
-- Security hardening
-- Horizontal scaling
-- Monitoring and logging
+- 多阶段构建优化
+- GPU 资源管理
+- 模型版本管理
+- 自动化测试
+- 健康检查
+- 安全加固
+- 水平扩展
+- 监控和日志记录
 
 ---
 
 ## Next Steps
 
 **Continue Learning**:
-- **Module 005 Quiz**: Test your complete Docker knowledge
-- **Module 006**: Kubernetes orchestration
-- **Module 007**: Production ML operations
+- **Module 005 Quiz**: 测试你的完整 Docker 知识
+- **Module 006**: Kubernetes 编排
+- **Module 007**: 生产 ML 运维
 
 ---
 
 **Exercise Version**: 1.0
 **Last Updated**: October 2025
-**Estimated Time**: 5-6 hours
-**Difficulty**: Advanced
+**Estimated Time**: 5-6 小时
+**Difficulty**: 高级

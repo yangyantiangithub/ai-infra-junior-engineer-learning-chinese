@@ -1,51 +1,51 @@
-# Exercise 06: Building a Production-Ready ML API
+# 练习 06：构建生产就绪的 ML API
 
-## Overview
+## 概述
 
-This comprehensive exercise guides you through building a complete production-ready ML API with FastAPI, implementing proper authentication, rate limiting, caching, monitoring, error handling, and deployment. You'll create an end-to-end inference API that follows industry best practices.
+本综合练习将指导你使用 FastAPI 构建一个完整的生产就绪 ML API，实现适当的认证、速率限制、缓存、监控、错误处理和部署。你将创建一个端到端的推理 API，遵循行业最佳实践。
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
-- Build a complete ML inference API with FastAPI
-- Implement JWT authentication and API key validation
-- Add rate limiting to prevent abuse
-- Implement caching for frequently requested predictions
-- Set up comprehensive monitoring and logging
-- Handle errors gracefully with proper status codes
-- Create API documentation with OpenAPI/Swagger
-- Deploy the API with proper CI/CD
-- Load test and optimize performance
+完成此练习后，你将：
+- 使用 FastAPI 构建完整的 ML 推理 API
+- 实现 JWT 认证和 API key 验证
+- 添加速率限制以防止滥用
+- 为频繁请求的预测实现缓存
+- 设置全面的监控和日志
+- 使用适当的状态码优雅地处理错误
+- 使用 OpenAPI/Swagger 创建 API 文档
+- 使用适当的 CI/CD 部署 API
+- 负载测试和优化性能
 
-## Prerequisites
+## 先决条件
 
-- Completed exercises 01-05 in this module
-- All API lectures (REST, FastAPI, Authentication, Advanced Patterns)
-- Python FastAPI knowledge
-- Basic understanding of ML inference
+- 已完成本模块的练习 01-05
+- 所有 API 讲座（REST、FastAPI、认证、高级模式）
+- Python FastAPI 知识
+- 对 ML 推理的基本理解
 
-## Time Required
+## 所需时间
 
-- Estimated: 150-180 minutes
-- Difficulty: Advanced
+- 预计：150-180 分钟
+- 难度：高级
 
 ---
 
-## Part 1: Project Setup
+## 第一部分：项目设置
 
-### Task 1.1: Create Project Structure
+### 任务 1.1：创建项目结构
 
 ```bash
 mkdir ml-inference-api
 cd ml-inference-api
 
-# Create directory structure
+# 创建目录结构
 mkdir -p app/{api,core,models,schemas,services}
 mkdir -p tests
 mkdir -p scripts
 mkdir -p deployment/{docker,kubernetes}
 
-# Create files
+# 创建文件
 touch app/__init__.py
 touch app/main.py
 touch app/api/__init__.py
@@ -59,9 +59,9 @@ touch Dockerfile
 touch docker-compose.yml
 ```
 
-### Task 1.2: Install Dependencies
+### 任务 1.2：安装依赖
 
-**requirements.txt:**
+**requirements.txt：**
 ```txt
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
@@ -81,32 +81,32 @@ pytest-asyncio==0.21.1
 ```
 
 ```bash
-# Create virtual environment
+# 创建虚拟环境
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # 在 Windows 上：venv\Scripts\activate
 
-# Install dependencies
+# 安装依赖
 pip install -r requirements.txt
 ```
 
 ---
 
-## Part 2: Configuration and Security
+## 第二部分：配置和安全
 
-### Task 2.1: Environment Configuration
+### 任务 2.1：环境配置
 
-**app/core/config.py:**
+**app/core/config.py：**
 ```python
 from pydantic_settings import BaseSettings
 from functools import lru_cache
 
 class Settings(BaseSettings):
-    # App settings
+    # 应用设置
     APP_NAME: str = "ML Inference API"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
 
-    # Security
+    # 安全
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
@@ -116,13 +116,13 @@ class Settings(BaseSettings):
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
-    CACHE_TTL: int = 3600  # 1 hour
+    CACHE_TTL: int = 3600  # 1 小时
 
-    # Rate limiting
+    # 速率限制
     RATE_LIMIT_PER_MINUTE: int = 60
     RATE_LIMIT_PER_HOUR: int = 1000
 
-    # Model
+    # 模型
     MODEL_PATH: str = "models/model.onnx"
 
     class Config:
@@ -133,7 +133,7 @@ def get_settings():
     return Settings()
 ```
 
-**.env.example:**
+**.env.example：**
 ```bash
 SECRET_KEY=your-secret-key-change-this-in-production
 REDIS_HOST=localhost
@@ -142,9 +142,9 @@ MODEL_PATH=models/model.onnx
 DEBUG=False
 ```
 
-### Task 2.2: Security Implementation
+### 任务 2.2：安全实现
 
-**app/core/security.py:**
+**app/core/security.py：**
 ```python
 from datetime import datetime, timedelta
 from typing import Optional
@@ -156,23 +156,23 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
-# Password hashing
+# 密码哈希
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# API Key authentication
+# API Key 认证
 api_key_header = APIKeyHeader(name=settings.API_KEY_HEADER, auto_error=False)
 
-# JWT Bearer authentication
+# JWT Bearer 认证
 security = HTTPBearer()
 
-# Valid API keys (in production, store in database)
+# 有效的 API key（生产环境中存储在数据库中）
 VALID_API_KEYS = {
     "dev-key-123": {"user": "developer", "tier": "premium"},
     "test-key-456": {"user": "tester", "tier": "free"}
 }
 
 def verify_api_key(api_key: str = Security(api_key_header)):
-    """Validate API key"""
+    """验证 API key"""
     if not api_key or api_key not in VALID_API_KEYS:
         raise HTTPException(
             status_code=403,
@@ -181,7 +181,7 @@ def verify_api_key(api_key: str = Security(api_key_header)):
     return VALID_API_KEYS[api_key]
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    """Create JWT access token"""
+    """创建 JWT 访问令牌"""
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -193,7 +193,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 def verify_token(credentials: HTTPAuthorizationCredentials = Security(security)):
-    """Verify JWT token"""
+    """验证 JWT 令牌"""
     try:
         payload = jwt.decode(
             credentials.credentials,
@@ -210,11 +210,11 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Security(security))
 
 ---
 
-## Part 3: Core Services
+## 第三部分：核心服务
 
-### Task 3.1: Inference Service
+### 任务 3.1：推理服务
 
-**app/services/inference.py:**
+**app/services/inference.py：**
 ```python
 import onnxruntime as ort
 import numpy as np
@@ -231,7 +231,7 @@ class InferenceService:
         self.model_loaded = False
 
     def load_model(self):
-        """Load ONNX model"""
+        """加载 ONNX 模型"""
         try:
             self.session = ort.InferenceSession(settings.MODEL_PATH)
             self.model_loaded = True
@@ -241,15 +241,15 @@ class InferenceService:
             raise
 
     def predict(self, features: List[float]) -> float:
-        """Run inference"""
+        """运行推理"""
         if not self.model_loaded:
             raise RuntimeError("Model not loaded")
 
         try:
-            # Prepare input
+            # 准备输入
             input_data = np.array([features], dtype=np.float32)
 
-            # Run inference
+            # 运行推理
             outputs = self.session.run(None, {"input": input_data})
             prediction = float(outputs[0][0])
 
@@ -259,13 +259,13 @@ class InferenceService:
             logger.error(f"Inference error: {e}")
             raise
 
-# Global inference service
+# 全局推理服务
 inference_service = InferenceService()
 ```
 
-### Task 3.2: Caching Service
+### 任务 3.2：缓存服务
 
-**app/services/cache.py:**
+**app/services/cache.py：**
 ```python
 import redis
 import json
@@ -285,23 +285,23 @@ class CacheService:
         )
 
     def _generate_key(self, features: list) -> str:
-        """Generate cache key from features"""
+        """从特征生成缓存键"""
         features_str = json.dumps(features, sort_keys=True)
         return f"prediction:{hashlib.md5(features_str.encode()).hexdigest()}"
 
     def get(self, features: list) -> Optional[float]:
-        """Get cached prediction"""
+        """获取缓存的预测"""
         key = self._generate_key(features)
         cached = self.redis_client.get(key)
         return float(cached) if cached else None
 
     def set(self, features: list, prediction: float):
-        """Cache prediction"""
+        """缓存预测"""
         key = self._generate_key(features)
         self.redis_client.setex(key, settings.CACHE_TTL, str(prediction))
 
     def clear(self):
-        """Clear all cached predictions"""
+        """清除所有缓存的预测"""
         keys = self.redis_client.keys("prediction:*")
         if keys:
             self.redis_client.delete(*keys)
@@ -311,11 +311,11 @@ cache_service = CacheService()
 
 ---
 
-## Part 4: API Schemas
+## 第四部分：API Schema
 
-### Task 4.1: Request/Response Models
+### 任务 4.1：请求/响应模型
 
-**app/schemas/request.py:**
+**app/schemas/request.py：**
 ```python
 from pydantic import BaseModel, Field
 from typing import List
@@ -342,7 +342,7 @@ class BatchPredictionRequest(BaseModel):
     )
 ```
 
-**app/schemas/response.py:**
+**app/schemas/response.py：**
 ```python
 from pydantic import BaseModel
 from typing import List, Optional
@@ -369,11 +369,11 @@ class ErrorResponse(BaseModel):
 
 ---
 
-## Part 5: API Endpoints
+## 第五部分：API Endpoint
 
-### Task 5.1: Main Application
+### 任务 5.1：主应用程序
 
-**app/main.py:**
+**app/main.py：**
 ```python
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -397,13 +397,13 @@ from app.schemas.response import (
     ErrorResponse
 )
 
-# Initialize settings
+# 初始化设置
 settings = get_settings()
 
-# Initialize rate limiter
+# 初始化速率限制器
 limiter = Limiter(key_func=get_remote_address)
 
-# Initialize FastAPI app
+# 初始化 FastAPI 应用
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
@@ -412,11 +412,11 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Add rate limiter to app
+# 添加速率限制器到应用
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# CORS middleware
+# CORS 中间件
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -425,14 +425,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Prometheus metrics
+# Prometheus 指标
 PREDICTION_COUNT = Counter('predictions_total', 'Total predictions')
 PREDICTION_LATENCY = Histogram('prediction_latency_seconds', 'Prediction latency')
 CACHE_HITS = Counter('cache_hits_total', 'Total cache hits')
 CACHE_MISSES = Counter('cache_misses_total', 'Total cache misses')
 ERROR_COUNT = Counter('errors_total', 'Total errors', ['error_type'])
 
-# Configure logging
+# 配置日志
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -441,14 +441,14 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("startup")
 async def startup_event():
-    """Load model on startup"""
+    """在启动时加载模型"""
     logger.info("Starting ML Inference API...")
     inference_service.load_model()
     logger.info("Model loaded successfully")
 
 @app.get("/", tags=["Root"])
 async def root():
-    """API root endpoint"""
+    """API 根 endpoint"""
     return {
         "service": settings.APP_NAME,
         "version": settings.APP_VERSION,
@@ -463,7 +463,7 @@ async def root():
 
 @app.get("/health", response_model=HealthResponse, tags=["Health"])
 async def health_check():
-    """Health check endpoint"""
+    """健康检查 endpoint"""
     return HealthResponse(
         status="healthy",
         model_loaded=inference_service.model_loaded,
@@ -478,11 +478,11 @@ async def health_check():
 )
 @limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
 async def predict(request: Request, pred_request: PredictionRequest):
-    """Make a prediction"""
+    """进行预测"""
     start_time = time.time()
 
     try:
-        # Check cache first
+        # 先检查缓存
         cached_result = cache_service.get(pred_request.features)
 
         if cached_result is not None:
@@ -495,14 +495,14 @@ async def predict(request: Request, pred_request: PredictionRequest):
                 cached=True
             )
 
-        # Cache miss - run inference
+        # 缓存未命中 - 运行推理
         CACHE_MISSES.inc()
         prediction = inference_service.predict(pred_request.features)
 
-        # Cache result
+        # 缓存结果
         cache_service.set(pred_request.features, prediction)
 
-        # Metrics
+        # 指标
         latency = (time.time() - start_time) * 1000
         PREDICTION_COUNT.inc()
         PREDICTION_LATENCY.observe(time.time() - start_time)
@@ -526,7 +526,7 @@ async def predict(request: Request, pred_request: PredictionRequest):
 )
 @limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
 async def batch_predict(request: Request, batch_request: BatchPredictionRequest):
-    """Make batch predictions"""
+    """进行批量预测"""
     start_time = time.time()
 
     try:
@@ -559,12 +559,12 @@ async def batch_predict(request: Request, batch_request: BatchPredictionRequest)
 
 @app.get("/metrics", tags=["Monitoring"])
 async def metrics():
-    """Prometheus metrics endpoint"""
+    """Prometheus 指标 endpoint"""
     return JSONResponse(content=generate_latest().decode(), media_type="text/plain")
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    """Global exception handler"""
+    """全局异常处理器"""
     ERROR_COUNT.labels(error_type="unhandled").inc()
     logger.error(f"Unhandled exception: {exc}")
     return JSONResponse(
@@ -579,11 +579,11 @@ if __name__ == "__main__":
 
 ---
 
-## Part 6: Testing
+## 第六部分：测试
 
-### Task 6.1: Unit Tests
+### 任务 6.1：单元测试
 
-**tests/test_api.py:**
+**tests/test_api.py：**
 ```python
 import pytest
 from fastapi.testclient import TestClient
@@ -632,42 +632,42 @@ def test_batch_predict():
     assert response.status_code == 200
     assert len(response.json()["predictions"]) == 2
 
-# Run tests
+# 运行测试
 # pytest tests/test_api.py -v
 ```
 
 ---
 
-## Part 7: Deployment
+## 第七部分：部署
 
-### Task 7.1: Docker Deployment
+### 任务 7.1：Docker 部署
 
-**Dockerfile:**
+**Dockerfile：**
 ```dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies
+# 安装依赖
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application
+# 复制应用程序
 COPY app/ ./app/
 COPY models/ ./models/
 
-# Expose port
+# 暴露端口
 EXPOSE 8000
 
-# Health check
+# 健康检查
 HEALTHCHECK --interval=30s --timeout=3s \
     CMD curl -f http://localhost:8000/health || exit 1
 
-# Run application
+# 运行应用程序
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-**docker-compose.yml:**
+**docker-compose.yml：**
 ```yaml
 version: '3.8'
 
@@ -700,54 +700,54 @@ services:
 
 ---
 
-## Deliverables
+## 交付物
 
-Submit the following:
+提交以下内容：
 
-1. **Complete API Code**:
-   - FastAPI application with all endpoints
-   - Authentication and authorization
-   - Rate limiting and caching
-   - Error handling
+1. **完整 API 代码**：
+   - 包含所有 endpoint 的 FastAPI 应用程序
+   - 认证和授权
+   - 速率限制和缓存
+   - 错误处理
 
-2. **Tests**:
-   - Unit tests for all endpoints
-   - Integration tests
-   - Performance tests
+2. **测试**：
+   - 所有 endpoint 的单元测试
+   - 集成测试
+   - 性能测试
 
-3. **Documentation**:
-   - API documentation (auto-generated with FastAPI)
-   - Deployment guide
-   - Usage examples
+3. **文档**：
+   - API 文档（使用 FastAPI 自动生成）
+   - 部署指南
+   - 使用示例
 
-4. **Evidence**:
-   - Screenshots of Swagger UI
-   - Load test results
-   - Prometheus metrics dashboard
-
----
-
-## Challenge Questions
-
-1. **Security**: How would you prevent API key leakage in logs?
-
-2. **Scaling**: How do you handle 100,000 requests/second?
-
-3. **Monitoring**: What alerts would you set up for production?
-
-4. **Versioning**: How do you deploy API v2 without breaking v1 clients?
-
-5. **Cost**: How do you optimize costs for an API with 1B requests/month?
+4. **证据**：
+   - Swagger UI 截图
+   - 负载测试结果
+   - Prometheus 指标仪表盘
 
 ---
 
-## Additional Resources
+## 挑战问题
 
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [API Security Best Practices](https://owasp.org/www-project-api-security/)
-- [Rate Limiting Patterns](https://cloud.google.com/architecture/rate-limiting-strategies)
-- [Prometheus Metrics](https://prometheus.io/docs/practices/naming/)
+1. **安全**：如何防止 API key 在日志中泄露？
+
+2. **扩展**：如何处理 100,000 请求/秒？
+
+3. **监控**：你会为生产环境设置哪些告警？
+
+4. **版本化**：如何在不破坏 v1 客户端的情况下部署 API v2？
+
+5. **成本**：如何优化月请求量 10 亿的 API 的成本？
 
 ---
 
-**Congratulations!** You've built a production-ready ML API with authentication, caching, monitoring, and proper error handling.
+## 附加资源
+
+- [FastAPI 文档](https://fastapi.tiangolo.com/)
+- [API 安全最佳实践](https://owasp.org/www-project-api-security/)
+- [速率限制模式](https://cloud.google.com/architecture/rate-limiting-strategies)
+- [Prometheus 指标](https://prometheus.io/docs/practices/naming/)
+
+---
+
+**恭喜！** 你已经构建了一个带有认证、缓存、监控和适当错误处理的生产就绪 ML API。

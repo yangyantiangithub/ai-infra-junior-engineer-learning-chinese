@@ -1,61 +1,61 @@
-# Lecture 03: Helm - Kubernetes Package Manager
+# Lecture 03: Helm - Kubernetes 包管理器
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Why Helm?](#why-helm)
-3. [Helm Architecture](#helm-architecture)
-4. [Installing Helm](#installing-helm)
-5. [Using Helm Charts](#using-helm-charts)
-6. [Creating Helm Charts](#creating-helm-charts)
-7. [Helm Templates](#helm-templates)
-8. [Values and Customization](#values-and-customization)
-9. [Chart Dependencies](#chart-dependencies)
-10. [Helm Best Practices](#helm-best-practices)
-11. [Helm for ML Applications](#helm-for-ml-applications)
-12. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [引言](#引言)
+2. [为什么用 Helm？](#为什么用-helm)
+3. [Helm 架构](#helm-架构)
+4. [安装 Helm](#安装-helm)
+5. [使用 Helm Chart](#使用-helm-chart)
+6. [创建 Helm Chart](#创建-helm-chart)
+7. [Helm 模板](#helm-模板)
+8. [Values 和自定义](#values-和自定义)
+9. [Chart 依赖](#chart-依赖)
+10. [Helm 最佳实践](#helm-最佳实践)
+11. [ML 应用的 Helm](#ml-应用的-helm)
+12. [总结和关键要点](#总结和关键要点)
 
-## Introduction
+## 引言
 
-Managing Kubernetes manifests can become complex quickly. As applications grow, you'll find yourself managing dozens or hundreds of YAML files with repetitive configuration. **Helm** solves this problem by providing package management for Kubernetes.
+管理 Kubernetes manifest 会很快变得复杂。随着应用增长，你将发现自己需要管理数十或数百个包含重复配置的 YAML 文件。**Helm** 通过为 Kubernetes 提供包管理来解决这个问题。
 
-Think of Helm as the "apt", "yum", or "npm" for Kubernetes - it lets you define, install, and upgrade even the most complex Kubernetes applications with a single command.
+将 Helm 视为 Kubernetes 的 "apt"、"yum" 或 "npm"——它让你能够用单个命令定义、安装和升级哪怕是最复杂的 Kubernetes 应用。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Understand what Helm is and why it's essential
-- Install and configure Helm
-- Use public Helm charts from repositories
-- Create custom Helm charts for your applications
-- Use templates and values for configuration
-- Manage chart dependencies
-- Apply Helm best practices
-- Deploy ML applications with Helm
+完成本讲座后，你将：
+- 理解 Helm 是什么以及为什么它至关重要
+- 安装和配置 Helm
+- 使用仓库中的公共 Helm chart
+- 为你的应用创建自定义 Helm chart
+- 使用模板和 values 进行配置
+- 管理 chart 依赖
+- 应用 Helm 最佳实践
+- 用 Helm 部署 ML 应用
 
-### Prerequisites
-- Lecture 02: Deploying Applications on Kubernetes
-- kubectl configured and working
-- Access to a Kubernetes cluster
-- Basic understanding of Go templates (helpful but not required)
+### 前置要求
+- Lecture 02：在 Kubernetes 上部署应用
+- kubectl 已配置并正常工作
+- 可访问 Kubernetes 集群
+- 基本理解 Go 模板（有帮助但不是必需的）
 
-## Why Helm?
+## 为什么用 Helm？
 
-### The Problem Without Helm
+### 没有 Helm 的问题
 
-Imagine deploying a web application with:
-- Frontend Deployment
-- Backend Deployment
-- Database StatefulSet
-- 3 Services
-- 2 ConfigMaps
-- 3 Secrets
+想象一下部署一个包含以下组件的 Web 应用：
+- 前端 Deployment
+- 后端 Deployment
+- 数据库 StatefulSet
+- 3 个 Service
+- 2 个 ConfigMap
+- 3 个 Secret
 - Ingress
-- ServiceAccounts
-- RBAC rules
+- ServiceAccount
+- RBAC 规则
 
-**Without Helm**:
+**没有 Helm**：
 ```bash
-# Deploy to development
+# 部署到开发环境
 kubectl apply -f frontend-deployment-dev.yaml
 kubectl apply -f backend-deployment-dev.yaml
 kubectl apply -f database-statefulset-dev.yaml
@@ -65,62 +65,62 @@ kubectl apply -f database-service.yaml
 kubectl apply -f configmap-dev.yaml
 kubectl apply -f secrets-dev.yaml
 kubectl apply -f ingress-dev.yaml
-# ... and so on
+# ... 等等
 
-# Deploy to production (different files!)
+# 部署到生产环境（不同的文件！）
 kubectl apply -f frontend-deployment-prod.yaml
 kubectl apply -f backend-deployment-prod.yaml
-# ... repeat for all resources with production config
+# ... 对所有资源重复，使用生产配置
 ```
 
-**Challenges**:
-1. Duplicate YAML files for each environment
-2. Manual management of configuration differences
-3. No versioning of deployments
-4. Difficult to rollback
-5. No dependency management
-6. Hard to share and reuse configurations
+**挑战**：
+1. 为每个环境重复 YAML 文件
+2. 手动管理配置差异
+3. 没有部署版本控制
+4. 难以回滚
+5. 没有依赖管理
+6. 难以共享和复用配置
 
-### The Solution With Helm
+### 使用 Helm 的解决方案
 
-**With Helm**:
+**使用 Helm**：
 ```bash
-# Deploy to development
+# 部署到开发环境
 helm install myapp ./mychart -f values-dev.yaml
 
-# Deploy to production
+# 部署到生产环境
 helm install myapp ./mychart -f values-prod.yaml
 
-# Upgrade
+# 升级
 helm upgrade myapp ./mychart
 
-# Rollback
+# 回滚
 helm rollback myapp
 
-# Uninstall
+# 卸载
 helm uninstall myapp
 ```
 
-**Benefits**:
-1. **Templating**: Single template, multiple environments
-2. **Packaging**: Bundle related resources together
-3. **Versioning**: Track deployment history
-4. **Rollback**: Easy rollback to previous versions
-5. **Dependencies**: Manage chart dependencies
-6. **Sharing**: Public and private chart repositories
-7. **Hooks**: Run jobs before/after install/upgrade
+**好处**：
+1. **模板化**：单个模板，多个环境
+2. **打包**：将相关资源捆绑在一起
+3. **版本控制**：跟踪部署历史
+4. **回滚**：轻松回滚到之前版本
+5. **依赖**：管理 chart 依赖
+6. **共享**：公共和私有 chart 仓库
+7. **Hooks**：在安装/升级之前/之后运行 job
 
-## Helm Architecture
+## Helm 架构
 
-### Helm Components
+### Helm 组件
 
 ```
 ┌─────────────────────────────────────────┐
-│          Helm Client (CLI)              │
-│   Commands: install, upgrade, rollback  │
+│          Helm 客户端 (CLI)              │
+│  命令: install, upgrade, rollback       │
 └────────────────┬────────────────────────┘
                  │
-                 │ Uses kubectl config
+                 │ 使用 kubectl 配置
                  │
                  ▼
 ┌─────────────────────────────────────────┐
@@ -129,43 +129,43 @@ helm uninstall myapp
                  │
                  ▼
 ┌─────────────────────────────────────────┐
-│         Kubernetes Resources            │
+│         Kubernetes 资源                 │
 │  (Deployments, Services, ConfigMaps)    │
 └─────────────────────────────────────────┘
 ```
 
-**Key Point**: Helm 3 is client-only (no Tiller server like Helm 2). It uses your kubectl configuration to connect directly to Kubernetes.
+**关键点**：Helm 3 仅客户端（没有像 Helm 2 那样的 Tiller 服务）。它使用你的 kubectl 配置直接连接到 Kubernetes。
 
-### Key Concepts
+### 关键概念
 
-**1. Chart**: A Helm package containing all resource definitions
+**1. Chart**：包含所有资源定义的 Helm 包
 ```
 mychart/
-├── Chart.yaml          # Chart metadata
-├── values.yaml         # Default values
-├── templates/          # Kubernetes manifests (templated)
+├── Chart.yaml          # Chart 元数据
+├── values.yaml         # 默认值
+├── templates/          # Kubernetes manifest（模板化）
 │   ├── deployment.yaml
 │   ├── service.yaml
 │   └── ingress.yaml
-└── charts/             # Dependent charts
+└── charts/             # 依赖的 chart
 ```
 
-**2. Release**: An instance of a chart deployed to Kubernetes
+**2. Release**：部署到 Kubernetes 的 chart 实例
 ```bash
-# Creates a release named "my-nginx"
+# 创建名为 "my-nginx" 的 release
 helm install my-nginx bitnami/nginx
 ```
 
-**3. Repository**: A collection of charts
+**3. Repository**：chart 的集合
 ```bash
-# Add repository
+# 添加仓库
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
-# Search repository
+# 搜索仓库
 helm search repo nginx
 ```
 
-**4. Values**: Configuration parameters for a chart
+**4. Values**：chart 的配置参数
 ```yaml
 # values.yaml
 replicaCount: 3
@@ -174,193 +174,193 @@ image:
   tag: "1.21"
 ```
 
-## Installing Helm
+## 安装 Helm
 
-### Installation Methods
+### 安装方法
 
-**macOS**:
+**macOS**：
 ```bash
 brew install helm
 ```
 
-**Linux**:
+**Linux**：
 ```bash
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ```
 
-**Windows (Chocolatey)**:
+**Windows (Chocolatey)**：
 ```bash
 choco install kubernetes-helm
 ```
 
-**From Binary**:
+**从二进制文件**：
 ```bash
-# Download from https://github.com/helm/helm/releases
+# 从 https://github.com/helm/helm/releases 下载
 wget https://get.helm.sh/helm-v3.12.0-linux-amd64.tar.gz
 tar -zxvf helm-v3.12.0-linux-amd64.tar.gz
 sudo mv linux-amd64/helm /usr/local/bin/helm
 ```
 
-### Verify Installation
+### 验证安装
 
 ```bash
-# Check version
+# 检查版本
 helm version
 
-# Should output:
+# 应输出：
 # version.BuildInfo{Version:"v3.12.0", ...}
 
-# Get help
+# 获取帮助
 helm help
 
-# List available commands
+# 列出可用命令
 helm --help
 ```
 
-### Configure Helm
+### 配置 Helm
 
 ```bash
-# Add stable repository
+# 添加 stable 仓库
 helm repo add stable https://charts.helm.sh/stable
 
-# Add Bitnami repository (widely used)
+# 添加 Bitnami 仓库（广泛使用）
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
-# Update repositories
+# 更新仓库
 helm repo update
 
-# List repositories
+# 列出仓库
 helm repo list
 
-# Search for charts
+# 搜索 chart
 helm search repo nginx
 helm search repo postgres
 ```
 
-## Using Helm Charts
+## 使用 Helm Chart
 
-### Finding Charts
+### 查找 Chart
 
-**Search Hub** (https://artifacthub.io):
+**Search Hub** (https://artifacthub.io)：
 ```bash
-# Search in Artifact Hub
+# 在 Artifact Hub 中搜索
 helm search hub prometheus
 
-# Search in added repositories
+# 在已添加的仓库中搜索
 helm search repo prometheus
 ```
 
-**Popular Chart Repositories**:
-- **Bitnami**: https://charts.bitnami.com/bitnami
-- **Prometheus Community**: https://prometheus-community.github.io/helm-charts
-- **Grafana**: https://grafana.github.io/helm-charts
-- **Elastic**: https://helm.elastic.co
-- **NGINX**: https://kubernetes.github.io/ingress-nginx
+**流行的 Chart 仓库**：
+- **Bitnami**：https://charts.bitnami.com/bitnami
+- **Prometheus Community**：https://prometheus-community.github.io/helm-charts
+- **Grafana**：https://grafana.github.io/helm-charts
+- **Elastic**：https://helm.elastic.co
+- **NGINX**：https://kubernetes.github.io/ingress-nginx
 
-### Installing a Chart
+### 安装 Chart
 
 ```bash
-# Install with default values
+# 使用默认值安装
 helm install my-nginx bitnami/nginx
 
-# Install with custom name
+# 使用自定义名称安装
 helm install my-web-server bitnami/nginx
 
-# Install in specific namespace
+# 在特定 namespace 中安装
 helm install my-nginx bitnami/nginx --namespace production --create-namespace
 
-# Install with custom values
+# 使用自定义值安装
 helm install my-nginx bitnami/nginx --set replicaCount=3
 
-# Install with values file
+# 使用 values 文件安装
 helm install my-nginx bitnami/nginx -f my-values.yaml
 
-# Dry run (see what would be installed)
+# Dry run（查看将要安装的内容）
 helm install my-nginx bitnami/nginx --dry-run --debug
 
-# Install specific version
+# 安装特定版本
 helm install my-nginx bitnami/nginx --version 13.2.0
 ```
 
-### Viewing Release Information
+### 查看 Release 信息
 
 ```bash
-# List releases
+# 列出 release
 helm list
 helm list --all-namespaces
 
-# Get release details
+# 获取 release 详情
 helm status my-nginx
 
-# Get release values
+# 获取 release values
 helm get values my-nginx
 
-# Get all values (including defaults)
+# 获取所有 values（包括默认值）
 helm get values my-nginx --all
 
-# Get manifest
+# 获取 manifest
 helm get manifest my-nginx
 
-# Get release history
+# 获取 release 历史
 helm history my-nginx
 ```
 
-### Upgrading Releases
+### 升级 Release
 
 ```bash
-# Upgrade with new values
+# 使用新值升级
 helm upgrade my-nginx bitnami/nginx --set replicaCount=5
 
-# Upgrade with values file
+# 使用 values 文件升级
 helm upgrade my-nginx bitnami/nginx -f new-values.yaml
 
-# Upgrade to specific version
+# 升级到特定版本
 helm upgrade my-nginx bitnami/nginx --version 13.2.1
 
-# Force recreation of resources
+# 强制重新创建资源
 helm upgrade my-nginx bitnami/nginx --force
 
-# Wait for upgrade to complete
+# 等待升级完成
 helm upgrade my-nginx bitnami/nginx --wait --timeout 5m
 ```
 
-### Rolling Back
+### 回滚
 
 ```bash
-# Rollback to previous version
+# 回滚到上一个版本
 helm rollback my-nginx
 
-# Rollback to specific revision
+# 回滚到特定修订版本
 helm rollback my-nginx 2
 
-# List history to see revisions
+# 列出历史以查看修订版本
 helm history my-nginx
 ```
 
-### Uninstalling Releases
+### 卸载 Release
 
 ```bash
-# Uninstall release
+# 卸载 release
 helm uninstall my-nginx
 
-# Uninstall but keep history
+# 卸载但保留历史
 helm uninstall my-nginx --keep-history
 
-# Can be rolled back if history kept
+# 如果保留了历史可以回滚
 helm rollback my-nginx
 ```
 
-### Example: Installing PostgreSQL
+### 示例：安装 PostgreSQL
 
 ```bash
-# Add Bitnami repo
+# 添加 Bitnami 仓库
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 
-# View chart values
+# 查看 chart values
 helm show values bitnami/postgresql > postgres-values.yaml
 
-# Create custom values
+# 创建自定义 values
 cat > my-postgres-values.yaml <<EOF
 auth:
   postgresPassword: "supersecret"
@@ -379,35 +379,35 @@ metrics:
   enabled: true
 EOF
 
-# Install PostgreSQL
+# 安装 PostgreSQL
 helm install postgres bitnami/postgresql -f my-postgres-values.yaml
 
-# Check status
+# 检查状态
 helm status postgres
 kubectl get pods
 
-# Get connection info
+# 获取连接信息
 export POSTGRES_PASSWORD=$(kubectl get secret postgres-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)
 kubectl run postgres-client --rm -it --image=postgres:14 -- psql -h postgres-postgresql -U postgres
 ```
 
-## Creating Helm Charts
+## 创建 Helm Chart
 
-### Chart Structure
+### Chart 结构
 
 ```bash
-# Create new chart
+# 创建新 chart
 helm create mychart
 
-# Directory structure
+# 目录结构
 mychart/
-├── .helmignore         # Files to ignore (like .gitignore)
-├── Chart.yaml          # Chart metadata
-├── values.yaml         # Default configuration values
-├── charts/             # Chart dependencies
-└── templates/          # Kubernetes manifests
-    ├── NOTES.txt       # Help text displayed after install
-    ├── _helpers.tpl    # Template helpers
+├── .helmignore         # 要忽略的文件（类似 .gitignore）
+├── Chart.yaml          # Chart 元数据
+├── values.yaml         # 默认配置值
+├── charts/             # Chart 依赖
+└── templates/          # Kubernetes manifest
+    ├── NOTES.txt       # 安装后显示的帮助文本
+    ├── _helpers.tpl    # 模板辅助函数
     ├── deployment.yaml
     ├── service.yaml
     ├── ingress.yaml
@@ -419,17 +419,17 @@ mychart/
 
 ### Chart.yaml
 
-The Chart.yaml file defines chart metadata:
+Chart.yaml 文件定义 chart 元数据：
 
 ```yaml
 apiVersion: v2
 name: mychart
 description: A Helm chart for my application
 type: application
-version: 0.1.0        # Chart version (SemVer)
-appVersion: "1.0.0"   # Application version
+version: 0.1.0        # Chart 版本 (SemVer)
+appVersion: "1.0.0"   # 应用版本
 
-# Optional fields
+# 可选字段
 keywords:
   - web
   - api
@@ -449,16 +449,16 @@ dependencies:
     condition: postgresql.enabled
 ```
 
-**Field Explanations**:
-- **apiVersion**: Chart API version (v2 for Helm 3)
-- **name**: Chart name
-- **version**: Chart version (incremented on chart changes)
-- **appVersion**: Version of the application being deployed
-- **type**: `application` or `library`
+**字段说明**：
+- **apiVersion**：Chart API 版本（Helm 3 为 v2）
+- **name**：Chart 名称
+- **version**：Chart 版本（chart 变更时递增）
+- **appVersion**：被部署应用的版本
+- **type**：`application` 或 `library`
 
 ### values.yaml
 
-Default configuration values:
+默认配置值：
 
 ```yaml
 # values.yaml
@@ -527,13 +527,13 @@ tolerations: []
 affinity: {}
 ```
 
-## Helm Templates
+## Helm 模板
 
-Templates are Kubernetes manifests with Go template syntax.
+模板是带有 Go 模板语法的 Kubernetes manifest。
 
-### Basic Templating
+### 基本模板
 
-**Template Syntax**:
+**模板语法**：
 ```yaml
 # templates/deployment.yaml
 apiVersion: apps/v1
@@ -562,37 +562,37 @@ spec:
           {{- toYaml .Values.resources | nindent 10 }}
 ```
 
-**Built-in Objects**:
-- **`.Release.Name`**: Release name
-- **`.Release.Namespace`**: Namespace
-- **`.Release.IsUpgrade`**: True if upgrade
-- **`.Release.IsInstall`**: True if install
-- **`.Chart.Name`**: Chart name from Chart.yaml
-- **`.Chart.Version`**: Chart version
-- **`.Chart.AppVersion`**: App version
-- **`.Values`**: Values from values.yaml and overrides
-- **`.Files`**: Access files in chart
-- **`.Capabilities`**: Info about Kubernetes cluster
+**内置对象**：
+- **`.Release.Name`**：Release 名称
+- **`.Release.Namespace`**：Namespace
+- **`.Release.IsUpgrade`**：如果是升级则为 true
+- **`.Release.IsInstall`**：如果是安装则为 true
+- **`.Chart.Name`**：来自 Chart.yaml 的 chart 名称
+- **`.Chart.Version`**：Chart 版本
+- **`.Chart.AppVersion`**：应用版本
+- **`.Values`**：来自 values.yaml 和覆盖配置的值
+- **`.Files`**：访问 chart 中的文件
+- **`.Capabilities`**：关于 Kubernetes 集群的信息
 
-### Template Functions
+### 模板函数
 
-**String Functions**:
+**字符串函数**：
 ```yaml
-# Quote
+# 引号
 value: {{ .Values.name | quote }}
 
-# Upper/Lower case
+# 大写/小写
 name: {{ .Values.name | upper }}
 name: {{ .Values.name | lower }}
 
-# Default value
+# 默认值
 replicas: {{ .Values.replicaCount | default 3 }}
 
-# Trim whitespace
+# 去除空白
 name: {{ .Values.name | trim }}
 ```
 
-**Logic Functions**:
+**逻辑函数**：
 ```yaml
 # If/else
 {{- if .Values.ingress.enabled }}
@@ -602,54 +602,54 @@ kind: Ingress
 {{- end }}
 
 {{- if .Values.postgresql.enabled }}
-# PostgreSQL configuration
+# PostgreSQL 配置
 {{- else }}
-# External database configuration
+# 外部数据库配置
 {{- end }}
 
-# With (set scope)
+# With（设置作用域）
 {{- with .Values.nodeSelector }}
 nodeSelector:
   {{- toYaml . | nindent 2 }}
 {{- end }}
 
-# Range (loop)
+# Range（循环）
 {{- range .Values.environments }}
 - name: {{ .name }}
   value: {{ .value }}
 {{- end }}
 ```
 
-**YAML Functions**:
+**YAML 函数**：
 ```yaml
-# toYaml: Convert to YAML
+# toYaml：转换为 YAML
 resources:
   {{- toYaml .Values.resources | nindent 2 }}
 
-# toJson: Convert to JSON
+# toJson：转换为 JSON
 config: {{ .Values.config | toJson }}
 
-# indent/nindent: Indent lines
+# indent/nindent：缩进行
 labels:
   {{- toYaml .Values.labels | nindent 4 }}
 ```
 
-### Template Helpers (_helpers.tpl)
+### 模板辅助函数 (_helpers.tpl)
 
-Reusable template snippets:
+可复用的模板片段：
 
 ```yaml
 # templates/_helpers.tpl
 
 {{/*
-Expand the name of the chart.
+展开 chart 的名称。
 */}}
 {{- define "mychart.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Create a default fully qualified app name.
+创建默认的完全限定应用名称。
 */}}
 {{- define "mychart.fullname" -}}
 {{- if .Values.fullnameOverride }}
@@ -665,7 +665,7 @@ Create a default fully qualified app name.
 {{- end }}
 
 {{/*
-Common labels
+通用标签
 */}}
 {{- define "mychart.labels" -}}
 helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
@@ -675,7 +675,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-Selector labels
+选择器标签
 */}}
 {{- define "mychart.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "mychart.name" . }}
@@ -683,7 +683,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 ```
 
-**Using Helpers**:
+**使用辅助函数**：
 ```yaml
 # templates/deployment.yaml
 apiVersion: apps/v1
@@ -702,9 +702,9 @@ spec:
         {{- include "mychart.selectorLabels" . | nindent 8 }}
 ```
 
-### Conditional Resources
+### 条件资源
 
-Only create resources when enabled:
+仅在启用时创建资源：
 
 ```yaml
 # templates/ingress.yaml
@@ -741,51 +741,51 @@ spec:
 
 ### NOTES.txt
 
-Provide instructions after installation:
+安装后提供说明：
 
 ```
 # templates/NOTES.txt
-Thank you for installing {{ .Chart.Name }}.
+感谢安装 {{ .Chart.Name }}。
 
-Your release is named {{ .Release.Name }}.
+您的 release 名为 {{ .Release.Name }}。
 
-To learn more about the release, try:
+要了解更多关于 release 的信息，请尝试：
 
   $ helm status {{ .Release.Name }}
   $ helm get all {{ .Release.Name }}
 
 {{- if .Values.ingress.enabled }}
-Application is available at:
+应用可通过以下地址访问：
 {{- range .Values.ingress.hosts }}
   http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}
 {{- end }}
 {{- else }}
-Get the application URL by running:
+获取应用 URL，请运行：
   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "mychart.name" . }}" -o jsonpath="{.items[0].metadata.name}")
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:80
-  echo "Visit http://127.0.0.1:8080"
+  echo "访问 http://127.0.0.1:8080"
 {{- end }}
 ```
 
-## Values and Customization
+## Values 和自定义
 
-### Multiple Values Files
+### 多个 Values 文件
 
 ```bash
-# Base values
+# 基础 values
 # values.yaml
 replicaCount: 2
 image:
   tag: "1.0.0"
 
-# Development overrides
+# 开发环境覆盖
 # values-dev.yaml
 replicaCount: 1
 resources:
   limits:
     memory: "256Mi"
 
-# Production overrides
+# 生产环境覆盖
 # values-prod.yaml
 replicaCount: 5
 resources:
@@ -794,21 +794,21 @@ resources:
 ingress:
   enabled: true
 
-# Install
+# 安装
 helm install myapp ./mychart -f values-dev.yaml
 helm install myapp ./mychart -f values-prod.yaml
 ```
 
-### Merging Values
+### Values 合并
 
-Values are merged in this order (last wins):
-1. Default values in values.yaml
-2. Values from `-f file1.yaml`
-3. Values from `-f file2.yaml` (if multiple -f)
-4. Values from `--set key=value`
+Values 按以下顺序合并（后者的优先级更高）：
+1. values.yaml 中的默认值
+2. 来自 `-f file1.yaml` 的值
+3. 来自 `-f file2.yaml` 的值（如果有多个 -f）
+4. 来自 `--set key=value` 的值
 
 ```bash
-# All these values are merged
+# 所有这些值都会被合并
 helm install myapp ./mychart \
   -f values.yaml \
   -f values-prod.yaml \
@@ -816,32 +816,32 @@ helm install myapp ./mychart \
   --set image.tag=1.2.3
 ```
 
-### Setting Values
+### 设置 Values
 
-**Command Line**:
+**命令行**：
 ```bash
-# Simple value
+# 简单值
 --set replicaCount=3
 
-# Nested value
+# 嵌套值
 --set image.tag=1.2.0
 
-# List
+# 列表
 --set environments[0].name=DEV,environments[0].value=development
 
-# Multiple values
+# 多个值
 --set key1=val1,key2=val2
 
-# String values
+# 字符串值
 --set name="My App"
 
-# null value
+# null 值
 --set serviceAccount.name=null
 ```
 
-### Values Schema Validation
+### Values Schema 验证
 
-Define schema to validate values:
+定义 schema 以验证 values：
 
 ```yaml
 # values.schema.json
@@ -872,11 +872,11 @@ Define schema to validate values:
 }
 ```
 
-Helm validates values against this schema during install/upgrade.
+Helm 在 install/upgrade 期间根据此 schema 验证 values。
 
-## Chart Dependencies
+## Chart 依赖
 
-### Defining Dependencies
+### 定义依赖
 
 ```yaml
 # Chart.yaml
@@ -896,27 +896,27 @@ dependencies:
       - cache
 ```
 
-### Managing Dependencies
+### 管理依赖
 
 ```bash
-# Download dependencies
+# 下载依赖
 helm dependency update ./mychart
 
-# This creates:
+# 这会创建：
 # mychart/charts/postgresql-11.x.x.tgz
 # mychart/charts/redis-17.x.x.tgz
 # mychart/Chart.lock
 
-# List dependencies
+# 列出依赖
 helm dependency list ./mychart
 
-# Build dependencies (from charts/)
+# 构建依赖（从 charts/）
 helm dependency build ./mychart
 ```
 
-### Configuring Dependencies
+### 配置依赖
 
-Configure dependency values in parent chart's values.yaml:
+在父 chart 的 values.yaml 中配置依赖值：
 
 ```yaml
 # values.yaml
@@ -939,13 +939,13 @@ redis:
       size: 8Gi
 ```
 
-### Conditional Dependencies
+### 条件依赖
 
 ```yaml
 # Chart.yaml
 dependencies:
   - name: postgresql
-    condition: postgresql.enabled    # Only install if true
+    condition: postgresql.enabled    # 仅在 true 时安装
 
   - name: redis
     tags:
@@ -954,40 +954,40 @@ dependencies:
 ```
 
 ```bash
-# Disable dependency
+# 禁用依赖
 helm install myapp ./mychart --set postgresql.enabled=false
 
-# Enable/disable by tags
+# 按标签启用/禁用
 helm install myapp ./mychart --set tags.cache=false
 ```
 
-## Helm Best Practices
+## Helm 最佳实践
 
-### Chart Structure
+### Chart 结构
 
-1. **Keep templates simple**: Complex logic belongs in application code
-2. **Use helpers**: Avoid repetition with _helpers.tpl
-3. **Document values**: Comment all values in values.yaml
-4. **Provide defaults**: Sensible defaults in values.yaml
-5. **Support customization**: Allow overriding important settings
+1. **保持模板简单**：复杂逻辑属于应用代码
+2. **使用辅助函数**：用 _helpers.tpl 避免重复
+3. **文档化 values**：在 values.yaml 中注释所有值
+4. **提供默认值**：在 values.yaml 中提供合理的默认值
+5. **支持自定义**：允许覆盖重要设置
 
-### Naming Conventions
+### 命名约定
 
 ```yaml
-# Good naming
+# 好的命名
 {{- define "mychart.fullname" -}}
 {{- printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
-# Use in resources
+# 在资源中使用
 name: {{ include "mychart.fullname" . }}-deployment
 name: {{ include "mychart.fullname" . }}-service
 name: {{ include "mychart.fullname" . }}-configmap
 ```
 
-### Labels
+### 标签
 
-Use standard labels:
+使用标准标签：
 
 ```yaml
 {{- define "mychart.labels" -}}
@@ -999,9 +999,9 @@ helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 {{- end }}
 ```
 
-### Resource Management
+### 资源管理
 
-Always allow resource customization:
+始终允许资源自定义：
 
 ```yaml
 # values.yaml
@@ -1013,12 +1013,12 @@ resources:
     cpu: 100m
     memory: 128Mi
 
-# template
+# 模板
 resources:
   {{- toYaml .Values.resources | nindent 10 }}
 ```
 
-### Security
+### 安全
 
 ```yaml
 # values.yaml
@@ -1034,54 +1034,54 @@ securityContext:
   readOnlyRootFilesystem: true
   allowPrivilegeEscalation: false
 
-# template
+# 模板
 securityContext:
   {{- toYaml .Values.securityContext | nindent 10 }}
 ```
 
-### Documentation
+### 文档
 
 ```yaml
-# values.yaml with comments
-# Number of replicas to deploy
+# 带注释的 values.yaml
+# 要部署的副本数量
 # @default -- 2
 replicaCount: 2
 
-# Image configuration
+# 镜像配置
 image:
-  # Image repository
+  # 镜像仓库
   # @default -- myapp
   repository: myapp
 
-  # Image pull policy
+  # 镜像拉取策略
   # @default -- IfNotPresent
   pullPolicy: IfNotPresent
 
-  # Image tag (defaults to Chart.AppVersion)
+  # 镜像标签（默认为 Chart.AppVersion）
   # @default -- Chart.AppVersion
   tag: ""
 ```
 
-### Testing Charts
+### 测试 Chart
 
 ```bash
-# Lint chart
+# 检查 chart
 helm lint ./mychart
 
-# Dry run install
+# Dry run 安装
 helm install myapp ./mychart --dry-run --debug
 
-# Template rendering (no API server needed)
+# 模板渲染（不需要 API server）
 helm template myapp ./mychart
 
-# Template with values
+# 带 values 的模板
 helm template myapp ./mychart -f values-prod.yaml
 
-# Test release
+# 测试 release
 helm test myapp
 ```
 
-### Chart Tests
+### Chart 测试
 
 ```yaml
 # templates/tests/test-connection.yaml
@@ -1101,13 +1101,13 @@ spec:
 ```
 
 ```bash
-# Run tests
+# 运行测试
 helm test myapp
 ```
 
-## Helm for ML Applications
+## ML 应用的 Helm
 
-### ML Model Serving Chart
+### ML 模型服务 Chart
 
 ```yaml
 # Chart.yaml
@@ -1266,10 +1266,10 @@ spec:
       {{- end }}
 ```
 
-### Deploying ML Application
+### 部署 ML 应用
 
 ```bash
-# Create values for production
+# 创建生产环境 values
 cat > ml-prod-values.yaml <<EOF
 replicaCount: 5
 
@@ -1315,86 +1315,86 @@ ingress:
           pathType: Prefix
 EOF
 
-# Install
+# 安装
 helm install ml-prod ./ml-model-server -f ml-prod-values.yaml
 
-# Upgrade
+# 升级
 helm upgrade ml-prod ./ml-model-server -f ml-prod-values.yaml
 
-# Monitor rollout
+# 监控 rollout
 kubectl rollout status deployment/ml-prod-ml-model-server
 ```
 
-## Summary and Key Takeaways
+## 总结和关键要点
 
-### Key Concepts
+### 关键概念
 
-- **Helm** is the package manager for Kubernetes
-- **Charts** package Kubernetes applications
-- **Releases** are chart instances deployed to clusters
-- **Repositories** distribute charts
-- **Values** customize chart behavior
-- **Templates** use Go templates for dynamic manifests
+- **Helm** 是 Kubernetes 的包管理器
+- **Chart** 打包 Kubernetes 应用
+- **Release** 是部署到集群的 chart 实例
+- **Repository** 分发 chart
+- **Values** 自定义 chart 行为
+- **Templates** 使用 Go 模板实现动态 manifest
 
-### Helm Commands
+### Helm 命令
 
 ```bash
-# Repository management
+# 仓库管理
 helm repo add/update/list/remove
 
-# Chart management
+# Chart 管理
 helm create/package/lint
 
-# Release management
+# Release 管理
 helm install/upgrade/rollback/uninstall
 
-# Information
+# 信息查询
 helm list/status/history/get
 
-# Testing
+# 测试
 helm test/lint/template
 ```
 
-### Chart Structure
+### Chart 结构
 
 ```
 mychart/
-├── Chart.yaml         # Metadata
-├── values.yaml        # Default values
-├── templates/         # Kubernetes manifests
-│   ├── _helpers.tpl   # Helper templates
-│   ├── NOTES.txt      # Usage instructions
-│   └── *.yaml         # Resource templates
-└── charts/            # Dependencies
+├── Chart.yaml         # 元数据
+├── values.yaml        # 默认值
+├── templates/         # Kubernetes manifest
+│   ├── _helpers.tpl   # 辅助模板
+│   ├── NOTES.txt      # 使用说明
+│   └── *.yaml         # 资源模板
+└── charts/            # 依赖
 ```
 
-### Best Practices
+### 最佳实践
 
-1. Use semantic versioning for charts
-2. Document all values with comments
-3. Provide sensible defaults
-4. Use helpers for reusable templates
-5. Apply standard labels
-6. Allow resource customization
-7. Test charts with `helm lint` and `helm test`
-8. Use dependencies for complex applications
-9. Secure secrets properly
-10. Version control your charts
+1. 对 chart 使用语义化版本控制
+2. 用注释文档化所有 values
+3. 提供合理的默认值
+4. 使用辅助函数实现可复用模板
+5. 应用标准标签
+6. 允许资源自定义
+7. 用 `helm lint` 和 `helm test` 测试 chart
+8. 对复杂应用使用依赖
+9. 正确保护 secret
+10. 将 chart 纳入版本控制
 
-### Next Steps
+### 后续步骤
 
-- **Lecture 04**: Kubernetes Operations
-- **Exercise 02**: Create a Helm chart for your application
-- Practice with public charts from Artifact Hub
-- Create charts for your ML models
+- **Lecture 04**：Kubernetes 运维
+- **Exercise 02**：为你的应用创建 Helm chart
+- 练习使用 Artifact Hub 上的公共 chart
+- 为你的 ML 模型创建 chart
 
-### Further Reading
+### 延伸阅读
 
-- Helm Documentation: https://helm.sh/docs/
-- Artifact Hub: https://artifacthub.io/
-- Chart Best Practices: https://helm.sh/docs/chart_best_practices/
-- Helm GitHub: https://github.com/helm/helm
+- Helm 文档：https://helm.sh/docs/
+- Artifact Hub：https://artifacthub.io/
+- Chart 最佳实践：https://helm.sh/docs/chart_best_practices/
+- Helm GitHub：https://github.com/helm/helm
 
 ---
 
-**Congratulations!** You now understand Helm and can package Kubernetes applications effectively. Practice creating charts to solidify your knowledge.
+**恭喜！** 你现在理解了 Helm，可以有效地打包 Kubernetes 应用。练习创建 chart 以巩固你的知识。

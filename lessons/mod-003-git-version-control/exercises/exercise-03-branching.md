@@ -1,127 +1,127 @@
-# Exercise 03: Branching for Feature Development
+# 练习 03：功能开发的分支
 
-## Overview
+## 概述
 
-**Difficulty**: Beginner to Intermediate
-**Estimated Time**: 75-90 minutes
-**Prerequisites**: Exercise 02 - Working with Commits and History, Lecture 02 - Branching and Merging
+**难度**：入门到中级
+**预计时间**：75-90 分钟
+**前置条件**：练习 02 - 处理 Commit 与历史，讲座 02 - 分支与合并
 
-In this exercise, you'll learn how to effectively use Git branches for parallel feature development in ML projects. You'll practice creating branches, switching contexts, managing multiple features simultaneously, and cleaning up old branches.
+在本练习中，你将学习如何在 ML 项目中有效使用 Git 分支进行并行功能开发。你将练习创建分支、切换上下文、同时管理多个功能以及清理旧分支。
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
+完成本练习后，你将：
 
-- Create and switch between feature branches
-- Understand branch naming conventions
-- Work on multiple features in parallel
-- Use branches to isolate experimental work
-- View and compare branches
-- Delete merged and unmerged branches
-- Apply branching strategies for ML projects
-- Navigate between branches without losing work
-- Use `git switch` and `git checkout` effectively
+- 创建和切换功能分支
+- 理解分支命名约定
+- 同时处理多个功能
+- 使用分支隔离实验性工作
+- 查看和比较分支
+- 删除已合并和未合并的分支
+- 对 ML 项目应用分支策略
+- 在不丢失工作的情况下在分支间导航
+- 有效使用 `git switch` 和 `git checkout`
 
-## Scenario
+## 场景
 
-Your ML inference API is evolving. The team is working on multiple features simultaneously:
-- Adding batch inference support
-- Implementing model caching for faster predictions
-- Adding Prometheus metrics export
-- Experimenting with ONNX model support
+你的 ML 推理 API 正在演进。团队同时在开发多个功能：
+- 添加批量推理支持
+- 实现模型缓存以加快预测速度
+- 添加 Prometheus 指标导出
+- 实验 ONNX 模型支持
 
-Each feature needs to be developed in isolation to allow independent testing and deployment. You'll use Git branches to manage this parallel development.
+每个功能需要独立开发，以便进行独立的测试和部署。你将使用 Git 分支来管理这种并行开发。
 
-## Prerequisites
+## 前置条件
 
-Before starting, ensure you have:
+开始之前，确保你有：
 
 ```bash
-# Repository from previous exercises
+# 前面练习中的仓库
 cd ml-inference-api
 
-# Clean working directory
+# 干净的工作目录
 git status
-# Should show: "nothing to commit, working tree clean"
+# 应显示："nothing to commit, working tree clean"
 
-# If you need a clean repo, commit or stash changes
+# 如果你需要一个干净的仓库，提交或暂存更改
 git add .
 git commit -m "wip: save current work"
 ```
 
 ---
 
-## Part 1: Creating and Switching Branches
+## 第一部分：创建和切换分支
 
-### Task 1.1: Understanding Branches
+### 任务 1.1：理解分支
 
-View your current branch structure.
+查看你当前的分支结构。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# View current branch
+# 查看当前分支
 git branch
 
-# View all branches (including remote)
+# 查看所有分支（包括远程）
 git branch -a
 
-# View branches with last commit
+# 查看带有最新 commit 的分支
 git branch -v
 
-# See where HEAD is pointing
+# 查看 HEAD 指向哪里
 cat .git/HEAD
 
-# View commit that current branch points to
+# 查看当前分支指向的 commit
 git log --oneline -1
 ```
 
-**Expected Output:**
+**预期输出：**
 ```text
 * main
 ```
 
-The `*` indicates your current branch.
+`*` 表示你当前的分支。
 
 ---
 
-### Task 1.2: Create Your First Feature Branch
+### 任务 1.2：创建第一个功能分支
 
-Create a branch for batch inference support.
+为批量推理支持创建一个分支。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create branch for batch inference feature
+# 创建批量推理功能分支
 git branch feature/batch-inference
 
-# List branches
+# 列出分支
 git branch
 
-# Notice: you created the branch but didn't switch to it
-# HEAD is still on main
+# 注意：你创建了分支但没有切换
+# HEAD 仍在 main 上
 
-# Switch to the new branch
+# 切换到新分支
 git switch feature/batch-inference
 
-# Alternative (older syntax, still works):
+# 替代方案（更旧的语法，仍然有效）：
 # git checkout feature/batch-inference
 
-# Verify you're on the new branch
+# 验证你在新分支上
 git branch
 git status
 
-# Create and switch in one command (shortcut)
+# 一步创建并切换（快捷方式）
 git switch -c feature/model-caching
 
-# Alternative:
+# 替代方案：
 # git checkout -b feature/model-caching
 
-# View branches with commit info
+# 查看带有 commit 信息的分支
 git branch -v
 ```
 
-**Expected Output:**
+**预期输出：**
 ```text
 * feature/model-caching
   feature/batch-inference
@@ -130,70 +130,70 @@ git branch -v
 
 ---
 
-### Task 1.3: Branch Naming Conventions
+### 任务 1.3：分支命名约定
 
-Learn and apply common branch naming patterns.
+学习并应用常见的分支命名模式。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Switch back to main
+# 切换回 main
 git switch main
 
-# Create branches following conventions:
+# 按照约定创建分支：
 
-# Feature branches
+# 功能分支
 git branch feature/prometheus-metrics
 git branch feature/onnx-support
 
-# Bug fix branches
+# Bug 修复分支
 git branch fix/memory-leak-preprocessing
 git branch fix/timeout-handling
 
-# Hotfix branches (urgent production fixes)
+# 热修复分支（紧急生产修复）
 git branch hotfix/api-crash-on-large-images
 
-# Experimental branches
+# 实验分支
 git branch experiment/quantization
 git branch experiment/tensorrt
 
-# View all branches
+# 查看所有分支
 git branch
 
-# View in tree format
+# 以树形格式查看
 git log --oneline --graph --all --decorate
 ```
 
-**Branch Naming Conventions:**
+**分支命名约定：**
 
-| Prefix | Use Case | Example |
+| 前缀 | 使用场景 | 示例 |
 |--------|----------|---------|
-| `feature/` | New features | `feature/batch-inference` |
-| `fix/` | Bug fixes | `fix/memory-leak` |
-| `hotfix/` | Urgent production fixes | `hotfix/security-patch` |
-| `experiment/` | Experimental work | `experiment/new-model` |
-| `refactor/` | Code refactoring | `refactor/api-structure` |
-| `docs/` | Documentation | `docs/api-guide` |
-| `test/` | Testing improvements | `test/integration-tests` |
+| `feature/` | 新功能 | `feature/batch-inference` |
+| `fix/` | Bug 修复 | `fix/memory-leak` |
+| `hotfix/` | 紧急生产修复 | `hotfix/security-patch` |
+| `experiment/` | 实验性工作 | `experiment/new-model` |
+| `refactor/` | 代码重构 | `refactor/api-structure` |
+| `docs/` | 文档 | `docs/api-guide` |
+| `test/` | 测试改进 | `test/integration-tests` |
 
 ---
 
-## Part 2: Working on Feature Branches
+## 第二部分：在功能分支上工作
 
-### Task 2.1: Implement Batch Inference Feature
+### 任务 2.1：实现批量推理功能
 
-Develop the batch inference feature on its branch.
+在其分支上开发批量推理功能。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Switch to batch inference branch
+# 切换到批量推理分支
 git switch feature/batch-inference
 
-# Verify you're on the right branch
+# 验证你在正确的分支上
 git branch
 
-# Create batch inference module
+# 创建批量推理模块
 cat > src/api/batch.py << 'EOF'
 """
 Batch Inference Module
@@ -262,7 +262,7 @@ class BatchInferenceService:
         return results
 EOF
 
-# Commit the module
+# 提交模块
 git add src/api/batch.py
 git commit -m "feat(batch): add batch inference service
 
@@ -273,7 +273,7 @@ Implement BatchInferenceService for processing multiple images:
 
 This improves throughput for bulk classification tasks."
 
-# Add batch endpoint to API
+# 添加批量端点到 API
 cat > src/api/routes/batch.py << 'EOF'
 """
 Batch Inference Routes
@@ -329,7 +329,7 @@ async def batch_predict(files: List[UploadFile] = File(...)) -> JSONResponse:
         )
 EOF
 
-# Create directory and commit
+# 创建目录并提交
 mkdir -p src/api/routes
 git add src/api/routes/batch.py
 git commit -m "feat(batch): add batch prediction endpoint
@@ -344,7 +344,7 @@ Example usage:
   POST /batch/predict
   files: [image1.jpg, image2.jpg, ...]"
 
-# Add tests
+# 添加测试
 cat > tests/unit/test_batch.py << 'EOF'
 """Tests for batch inference."""
 
@@ -378,34 +378,34 @@ git commit -m "test(batch): add batch inference tests
 
 Add unit tests for batch service initialization and validation."
 
-# View your work on this branch
+# 查看你在这个分支上的工作
 git log --oneline
 ```
 
-**Checkpoint:**
-- How many commits are on this branch?
-- Are these commits on the `main` branch?
+**检查点：**
+- 这个分支上有多少个 commit？
+- 这些 commit 在 `main` 分支上吗？
 
 ---
 
-### Task 2.2: Implement Model Caching Feature
+### 任务 2.2：实现模型缓存功能
 
-Switch to another feature branch and develop in parallel.
+切换到另一个功能分支并并行开发。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Switch to model caching branch
+# 切换到模型缓存分支
 git switch feature/model-caching
 
-# Notice: the batch inference files are gone!
+# 注意：批量推理文件消失了！
 ls src/api/batch.py  # File not found
 
-# This is expected - you're on a different branch
-# View branch status
+# 这是预期的 - 你在不同的分支上
+# 查看分支状态
 git log --oneline -3
 
-# Now implement caching
+# 现在实现缓存
 cat > src/utils/cache.py << 'EOF'
 """
 Model Caching Module
@@ -545,7 +545,7 @@ Benefits:
 - Improves response time for duplicate requests
 - Configurable cache size (default 1000 entries)"
 
-# Update configuration
+# 更新配置
 cat >> configs/default.yaml << 'EOF'
 
 # Prediction Cache
@@ -558,35 +558,35 @@ EOF
 git add configs/default.yaml
 git commit -m "config: add cache configuration settings"
 
-# View this branch's history
+# 查看这个分支的历史
 git log --oneline
 ```
 
-**Checkpoint:**
-Run `git log --oneline --all --graph` to see both branches!
+**检查点：**
+运行 `git log --oneline --all --graph` 查看两个分支！
 
 ---
 
-### Task 2.3: Quick Bug Fix on Main
+### 任务 2.3：在 Main 上快速修复 Bug
 
-Practice switching branches for urgent fixes.
+练习为紧急修复切换分支。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# You're on feature/model-caching
-# Urgent bug reported on main!
+# 你在 feature/model-caching 上
+# 报告了 main 上的紧急 bug！
 
-# Switch back to main
+# 切换回 main
 git switch main
 
-# Verify your feature work is safely stored
-ls src/utils/cache.py  # File not found (it's on the other branch)
+# 验证你的功能工作安全存储
+ls src/utils/cache.py  # File not found (它在另一个分支上)
 
-# Create hotfix branch from main
+# 从 main 创建热修复分支
 git switch -c hotfix/fix-timeout
 
-# Fix the issue
+# 修复问题
 cat > src/api/middleware.py << 'EOF'
 """
 API Middleware
@@ -680,59 +680,59 @@ Prevents server resources from being tied up by slow clients.
 
 Returns 504 Gateway Timeout on timeout."
 
-# View all branches
+# 查看所有分支
 git branch -v
 ```
 
 ---
 
-## Part 3: Viewing and Comparing Branches
+## 第三部分：查看和比较分支
 
-### Task 3.1: Compare Branches
+### 任务 3.1：比较分支
 
-Learn to view differences between branches.
+学习查看分支间的差异。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# List all branches
+# 列出所有分支
 git branch -a
 
-# View commits on feature/batch-inference not in main
+# 查看 feature/batch-inference 上不在 main 中的 commit
 git log main..feature/batch-inference --oneline
 
-# View commits on feature/model-caching not in main
+# 查看 feature/model-caching 上不在 main 中的 commit
 git log main..feature/model-caching --oneline
 
-# View all commits on both feature branches
+# 查看两个功能分支上的所有 commit
 git log main..feature/batch-inference main..feature/model-caching --oneline
 
-# Compare files between branches
+# 比较分支之间的文件
 git diff main feature/batch-inference
 
-# Compare specific file
+# 比较特定文件
 git diff main feature/batch-inference -- src/api/
 
-# Show which files differ
+# 显示哪些文件不同
 git diff --name-only main feature/batch-inference
 
-# Graphical view of all branches
+# 所有分支的图形化视图
 git log --oneline --graph --all --decorate
 
-# More detailed graph
+# 更详细的图形
 git log --graph --all --decorate --pretty=format:"%h %an: %s"
 ```
 
-**Checkpoint Exercise:**
+**检查点练习：**
 
-Answer using Git commands:
+使用 Git 命令回答：
 
-1. How many commits are on `feature/batch-inference`?
-2. How many commits are on `feature/model-caching`?
-3. What files are different between `main` and `feature/batch-inference`?
+1. `feature/batch-inference` 上有多少个 commit？
+2. `feature/model-caching` 上有多少个 commit？
+3. `main` 和 `feature/batch-inference` 之间哪些文件不同？
 
 ```bash
-# Answers:
+# 答案：
 git rev-list --count main..feature/batch-inference
 git rev-list --count main..feature/model-caching
 git diff --name-only main feature/batch-inference
@@ -740,45 +740,45 @@ git diff --name-only main feature/batch-inference
 
 ---
 
-### Task 3.2: View Branch History
+### 任务 3.2：查看分支历史
 
-Visualize branch relationships.
+可视化分支关系。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Graphical history
+# 图形化历史
 git log --oneline --graph --all
 
-# With dates
+# 带有日期
 git log --graph --all --pretty=format:"%h %ad | %s%d [%an]" --date=short
 
-# Only show branches
+# 仅显示分支
 git log --oneline --graph --all --simplify-by-decoration
 
-# See where branches diverged
+# 查看分支分叉点
 git merge-base main feature/batch-inference
 git log --oneline $(git merge-base main feature/batch-inference)
 
-# Show commits on feature branch since branching
+# 显示从分支创建以来的 commit
 git log --oneline main..feature/batch-inference
 ```
 
 ---
 
-## Part 4: Managing Multiple Features
+## 第四部分：管理多个功能
 
-### Task 4.1: Switch Between Branches
+### 任务 4.1：在分支间切换
 
-Practice context switching.
+练习上下文切换。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Work on batch inference
+# 在批量推理上工作
 git switch feature/batch-inference
 
-# Make a change
+# 进行更改
 cat >> src/api/batch.py << 'EOF'
 
 
@@ -787,17 +787,17 @@ def validate_batch_size(num_files: int, max_size: int = 32) -> bool:
     return 0 < num_files <= max_size
 EOF
 
-# Check status
+# 检查状态
 git status
 
-# Save work (commit it)
+# 保存工作（提交它）
 git add src/api/batch.py
 git commit -m "feat(batch): add batch size validation helper"
 
-# Switch to caching feature
+# 切换到缓存功能
 git switch feature/model-caching
 
-# Make a change there
+# 在那里进行更改
 cat >> src/utils/cache.py << 'EOF'
 
 
@@ -810,29 +810,29 @@ EOF
 git add src/utils/cache.py
 git commit -m "feat(cache): add cache stats summary helper"
 
-# View where you are
+# 查看你在哪里
 git branch
 
-# View all branch tips
+# 查看所有分支的末端
 git branch -v
 ```
 
 ---
 
-### Task 4.2: Create Experiment Branch
+### 任务 4.2：创建实验分支
 
-Use branches for experimental work.
+使用分支进行实验性工作。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Switch to main
+# 切换到 main
 git switch main
 
-# Create experiment branch
+# 创建实验分支
 git switch -c experiment/onnx-runtime
 
-# Add experimental ONNX support
+# 添加实验性 ONNX 支持
 mkdir -p src/models/onnx
 cat > src/models/onnx/runtime.py << 'EOF'
 """
@@ -906,28 +906,28 @@ TODO:
 
 DO NOT MERGE until thoroughly tested!"
 
-# Mark as experimental in branch description
+# 在分支描述中标记为实验性
 git config branch.experiment/onnx-runtime.description "Experimental ONNX Runtime support - do not merge"
 ```
 
 ---
 
-## Part 5: Branch Cleanup
+## 第五部分：分支清理
 
-### Task 5.1: Delete Merged Branches
+### 任务 5.1：删除已合并的分支
 
-Learn to clean up completed branches.
+学习清理已完成的分支。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# First, let's simulate a merged branch
+# 首先，模拟一个已合并的分支
 git switch main
 
-# Create a small feature
+# 创建一个小功能
 git switch -c feature/update-readme
 
-# Make a change
+# 进行更改
 cat >> README.md << 'EOF'
 
 ## Recent Updates
@@ -940,181 +940,181 @@ EOF
 git add README.md
 git commit -m "docs: update README with recent features"
 
-# Merge it to main (we'll learn merging in detail in Exercise 04)
+# 将其合并到 main（我们将在练习 04 中详细学习合并）
 git switch main
 git merge feature/update-readme --no-edit
 
-# Now the feature branch is merged
+# 现在功能分支已合并
 git log --oneline -3
 
-# Try to delete the branch
+# 尝试删除分支
 git branch -d feature/update-readme
 
-# Success! The -d flag only deletes merged branches
+# 成功！-d 标志只删除已合并的分支
 
-# List remaining branches
+# 列出剩余分支
 git branch
 ```
 
-**Expected Output:**
+**预期输出：**
 ```text
 Deleted branch feature/update-readme (was abc123).
 ```
 
 ---
 
-### Task 5.2: Delete Unmerged Branches
+### 任务 5.2：删除未合并的分支
 
-Handle deletion of branches with unmerged work.
+处理带有未合并工作的分支的删除。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Try to delete an unmerged feature branch
+# 尝试删除一个未合并的功能分支
 git branch -d feature/batch-inference
 
-# Error! Branch has unmerged changes
+# 错误！分支有未合并的变更
 ```
 
-**Expected Output:**
+**预期输出：**
 ```text
 error: The branch 'feature/batch-inference' is not fully merged.
 If you are sure you want to delete it, run 'git branch -D feature/batch-inference'.
 ```
 
 ```bash
-# Git is protecting you from losing work!
+# Git 在保护你免于丢失工作！
 
-# If you really want to delete it (CAREFUL!)
-# git branch -D feature/batch-inference  # DON'T RUN THIS
+# 如果你真的想删除它（小心！）
+# git branch -D feature/batch-inference  # 不要运行这个
 
-# Instead, let's keep it
+# 相反，让我们保留它
 git branch
 
-# View unmerged branches
+# 查看未合并的分支
 git branch --no-merged
 
-# View merged branches
+# 查看已合并的分支
 git branch --merged
 ```
 
 ---
 
-### Task 5.3: Rename Branches
+### 任务 5.3：重命名分支
 
-Practice renaming branches.
+练习重命名分支。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create a poorly named branch
+# 创建一个命名不佳的分支
 git switch -c feature/new-stuff
 
-# Oops, that's a terrible name!
-# Rename it while on the branch
+# 哦，这是个糟糕的名字！
+# 在分支上重命名它
 git branch -m feature/prometheus-integration
 
-# Verify
+# 验证
 git branch
 
-# You can also rename from another branch
+# 你也可以从另一个分支重命名
 git switch main
 git branch -m feature/prometheus-integration feature/monitoring-prometheus
 
-# Verify
+# 验证
 git branch
 ```
 
 ---
 
-## Part 6: Advanced Branch Operations
+## 第六部分：高级分支操作
 
-### Task 6.1: Track Remote Branches
+### 任务 6.1：跟踪远程分支
 
-Simulate working with remote branches.
+模拟使用远程分支。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# See all branches including remote tracking
+# 查看包括远程跟踪的所有分支
 git branch -a
 
-# Currently you only have local branches
+# 目前你只有本地分支
 
-# Simulate what you'd see with remote:
+# 模拟你可能看到的远程分支：
 # * main
 #   feature/batch-inference
 #   feature/model-caching
 #   remotes/origin/main
 #   remotes/origin/feature/batch-inference
 
-# Set upstream for a branch
+# 为分支设置上游
 git switch feature/batch-inference
 
-# When you push, you'd set upstream:
+# 推送时，你会设置上游：
 # git push -u origin feature/batch-inference
 
-# Then you can see tracking info
+# 然后你可以看到跟踪信息
 git branch -vv
 ```
 
 ---
 
-### Task 6.2: Stash Changes When Switching
+### 任务 6.2：切换时 Stash 变更
 
-Handle uncommitted changes when switching branches.
+处理切换分支时未提交的变更。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Switch to a feature branch
+# 切换到一个功能分支
 git switch feature/model-caching
 
-# Make changes but don't commit
+# 进行更改但不提交
 echo "# TODO: Add cache warming" >> src/utils/cache.py
 
-# Check status
+# 检查状态
 git status
 
-# Try to switch branches
+# 尝试切换分支
 git switch main
 
-# Git might complain if changes conflict
+# 如果变更冲突，Git 可能会抱怨
 
-# Solution 1: Stash changes
+# 解决方案 1：Stash 变更
 git stash push -m "WIP: cache warming idea"
 
-# Now switch
+# 现在切换
 git switch main
 
-# Later, go back and restore
+# 稍后，返回并恢复
 git switch feature/model-caching
 git stash list
 git stash pop
 
-# Solution 2: Commit the work
+# 解决方案 2：提交工作
 git add src/utils/cache.py
 git commit -m "wip: exploring cache warming"
 ```
 
 ---
 
-## Part 7: Practical Workflow
+## 第七部分：实用工作流
 
-### Task 7.1: Complete Feature Development Workflow
+### 任务 7.1：完整功能开发工作流
 
-Practice a full feature development cycle.
+练习完整的功能开发周期。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# 1. Start from main
+# 1. 从 main 开始
 git switch main
 
-# 2. Create feature branch
+# 2. 创建功能分支
 git switch -c feature/health-check-enhancements
 
-# 3. Develop feature
+# 3. 开发功能
 cat > src/api/health.py << 'EOF'
 """
 Enhanced Health Check
@@ -1168,7 +1168,7 @@ Add three health endpoints:
 
 Compatible with Kubernetes health checks."
 
-# 4. Add tests
+# 4. 添加测试
 cat > tests/unit/test_health.py << 'EOF'
 """Tests for health check endpoints."""
 
@@ -1196,7 +1196,7 @@ EOF
 git add tests/unit/test_health.py
 git commit -m "test(health): add health endpoint tests"
 
-# 5. Update docs
+# 5. 更新文档
 cat >> docs/api.md << 'EOF'
 
 ## Health Check Endpoints
@@ -1214,193 +1214,8 @@ EOF
 git add docs/api.md
 git commit -m "docs: document health check endpoints"
 
-# 6. View your work
+# 6. 查看你的工作
 git log --oneline
 
-# Ready for code review / merge!
+# 准备代码审查 / 合并！
 ```
-
----
-
-## Validation
-
-### Validate Your Branch Work
-
-Check your branch structure.
-
-**Instructions:**
-
-```bash
-# List all branches
-git branch -a
-
-# Should have at least:
-# - main
-# - feature/batch-inference
-# - feature/model-caching
-# - feature/health-check-enhancements
-# - experiment/onnx-runtime
-# - hotfix/fix-timeout
-
-# View branch graph
-git log --oneline --graph --all --decorate
-
-# Count commits per branch
-for branch in $(git branch | sed 's/^..//'); do
-    echo "Branch: $branch"
-    git log main..$branch --oneline | wc -l
-done
-
-# Check for uncommitted changes
-git status
-```
-
-**Quality Checklist:**
-
-- [ ] All features on separate branches
-- [ ] Branch names follow conventions
-- [ ] No uncommitted changes
-- [ ] Main branch is clean
-- [ ] Experimental work isolated
-
----
-
-## Challenge Tasks
-
-### Challenge 1: Branch Cleanup Script
-
-Create a script to clean up old branches:
-
-```bash
-# Create cleanup script
-cat > scripts/cleanup-branches.sh << 'EOF'
-#!/bin/bash
-# Clean up merged branches
-
-echo "Merged branches (safe to delete):"
-git branch --merged main | grep -v "main"
-
-echo ""
-echo "Delete these branches? (y/n)"
-read answer
-
-if [ "$answer" = "y" ]; then
-    git branch --merged main | grep -v "main" | xargs git branch -d
-    echo "Cleanup complete!"
-fi
-EOF
-
-chmod +x scripts/cleanup-branches.sh
-```
-
-### Challenge 2: Branch Status Report
-
-Create a branch status report:
-
-```bash
-git switch main
-
-cat > scripts/branch-report.sh << 'EOF'
-#!/bin/bash
-# Generate branch status report
-
-echo "=== Branch Status Report ==="
-echo ""
-echo "Current branch: $(git branch --show-current)"
-echo "Total branches: $(git branch | wc -l)"
-echo ""
-echo "Branches ahead of main:"
-for branch in $(git branch | sed 's/^..//'); do
-    if [ "$branch" != "main" ]; then
-        commits=$(git log main..$branch --oneline | wc -l)
-        if [ $commits -gt 0 ]; then
-            echo "  $branch: $commits commits"
-        fi
-    fi
-done
-EOF
-
-chmod +x scripts/branch-report.sh
-./scripts/branch-report.sh
-```
-
----
-
-## Troubleshooting
-
-**Issue**: "Cannot switch branch, uncommitted changes"
-```bash
-# Solution 1: Commit changes
-git add .
-git commit -m "wip: save work"
-
-# Solution 2: Stash changes
-git stash
-
-# Solution 3: Force switch (loses changes!)
-# git switch -f branch-name  # ⚠️ DANGEROUS
-```
-
-**Issue**: "Deleted wrong branch"
-```bash
-# If you just deleted it:
-git reflog
-git branch branch-name <commit-hash>
-```
-
-**Issue**: "Don't know which branch I'm on"
-```bash
-git branch  # Shows * on current
-git status  # Shows "On branch X"
-echo $(__git_ps1)  # If configured
-```
-
----
-
-## Reflection Questions
-
-1. **Why use feature branches instead of committing to main?**
-2. **When should you create a branch vs. committing to main?**
-3. **What's the purpose of experiment branches?**
-4. **How do branches help with code review?**
-5. **What's the difference between `-d` and `-D` when deleting branches?**
-6. **How do you handle switching branches with uncommitted work?**
-
----
-
-## Summary
-
-Congratulations! You've completed Exercise 03. You learned:
-
-- ✅ Creating and switching between branches
-- ✅ Branch naming conventions
-- ✅ Parallel feature development
-- ✅ Comparing and visualizing branches
-- ✅ Managing multiple features simultaneously
-- ✅ Deleting merged and unmerged branches
-- ✅ Handling uncommitted changes when switching
-- ✅ Complete feature development workflow
-
-### Key Commands
-
-```bash
-git branch                    # List branches
-git branch <name>             # Create branch
-git switch <name>             # Switch branch
-git switch -c <name>          # Create and switch
-git branch -d <name>          # Delete merged branch
-git branch -D <name>          # Force delete branch
-git branch -m <new-name>      # Rename branch
-git branch -v                 # List with commits
-git log --graph --all         # Visualize branches
-git diff branch1 branch2      # Compare branches
-git stash                     # Save uncommitted work
-```
-
-### Next Steps
-
-- Complete Exercise 04 to learn merging and conflict resolution
-- Practice branching in your projects
-- Review Lecture 02 on branching strategies
-
-**Excellent work!** You now know how to manage parallel development with Git branches.

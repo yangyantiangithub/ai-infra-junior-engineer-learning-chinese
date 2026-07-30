@@ -1,307 +1,307 @@
-# Module 006: Kubernetes Introduction
+# Module 006: Kubernetes 入门
 
-## Module Overview
+## 模块概述
 
-Welcome to Module 006, where you'll learn the fundamentals of Kubernetes (K8s), the industry-standard container orchestration platform. This module provides a comprehensive introduction to Kubernetes architecture, core concepts, and practical operations essential for AI infrastructure work.
+欢迎来到 Module 006，在这里你将学习 Kubernetes (K8s) 的基础知识，这是业界标准的容器编排平台。本模块全面介绍 Kubernetes 架构、核心概念和 AI 基础设施工作中必不可少的实践操作。
 
-Kubernetes has become the de facto standard for deploying, scaling, and managing containerized applications, including ML models and AI workloads. Understanding Kubernetes is critical for any AI infrastructure engineer, as it provides the foundation for building scalable, resilient ML systems.
+Kubernetes 已成为部署、扩展和管理容器化应用（包括 ML 模型和 AI 工作负载）的事实标准。理解 Kubernetes 对任何 AI 基础设施工程师都至关重要，因为它为构建可扩展、有弹性的 ML 系统奠定了基础。
 
-## What You'll Learn
+## 学习目标
 
-By the end of this module, you will be able to:
+完成本模块后，你将能够：
 
-- **Understand Kubernetes Architecture**: Master the core components of Kubernetes including the control plane, worker nodes, and how they interact
-- **Deploy Applications**: Create and manage Pods, Deployments, Services, and other Kubernetes resources
-- **Use Helm**: Package and deploy applications using Helm charts
-- **Operate Kubernetes Clusters**: Use kubectl effectively, debug issues, and monitor cluster health
-- **Apply K8s to ML Workloads**: Understand how Kubernetes supports AI/ML infrastructure needs
+- **理解 Kubernetes 架构**：掌握 Kubernetes 的核心组件，包括控制平面、工作节点及其交互方式
+- **部署应用**：创建和管理 Pod、Deployment、Service 等 Kubernetes 资源
+- **使用 Helm**：使用 Helm chart 打包和部署应用
+- **运维 Kubernetes 集群**：有效使用 kubectl、调试问题并监控集群健康状态
+- **将 K8s 应用于 ML 工作负载**：理解 Kubernetes 如何支持 AI/ML 基础设施需求
 
-## Prerequisites
+## 前置要求
 
-Before starting this module, you should have:
+在开始本模块之前，你应该具备：
 
-### Required Knowledge
-- **Module 003**: Docker Fundamentals (containerization concepts)
-- **Module 004**: Container Orchestration Basics
-- **Linux CLI**: Basic command-line proficiency
-- **YAML**: Understanding of YAML syntax and structure
-- **Networking**: Basic networking concepts (ports, DNS, load balancing)
+### 必需知识
+- **Module 003**：Docker 基础（容器化概念）
+- **Module 004**：容器编排基础
+- **Linux CLI**：基本的命令行能力
+- **YAML**：理解 YAML 语法和结构
+- **网络**：基础网络概念（端口、DNS、负载均衡）
 
-### Required Tools
-- Docker Desktop with Kubernetes enabled **OR** Minikube installed
-- kubectl CLI tool (version 1.25+)
-- Helm CLI (version 3.10+)
-- A code editor (VS Code recommended with Kubernetes extension)
-- At least 8GB RAM available for local cluster
+### 必需工具
+- 启用了 Kubernetes 的 Docker Desktop **或** 安装了 Minikube
+- kubectl CLI 工具 (1.25+ 版本)
+- Helm CLI (3.10+ 版本)
+- 代码编辑器（推荐 VS Code 配合 Kubernetes 扩展）
+- 至少 8GB 内存可用于本地集群
 
-### Recommended Setup
+### 推荐设置
 ```bash
-# Verify Docker
+# 验证 Docker
 docker --version
 
-# Verify Kubernetes cluster
+# 验证 Kubernetes 集群
 kubectl cluster-info
 
-# Verify Helm
+# 验证 Helm
 helm version
 
-# Check cluster nodes
+# 检查集群节点
 kubectl get nodes
 ```
 
-If you don't have a local Kubernetes cluster yet, see `resources/cluster-setup-guide.md` for detailed setup instructions.
+如果你还没有本地 Kubernetes 集群，请参阅 `resources/cluster-setup-guide.md` 获取详细安装说明。
 
-## Module Structure
+## 模块结构
 
-This module is organized into four main sections:
+本模块分为四个主要部分：
 
-### 1. Kubernetes Architecture (Lecture 01)
-**Duration**: 3-4 hours
+### 1. Kubernetes 架构（Lecture 01）
+**时长**: 3-4 小时
 
-- Control plane components (API Server, Scheduler, Controller Manager, etcd)
-- Worker node components (kubelet, kube-proxy, container runtime)
-- Kubernetes objects and API resources
-- Cluster networking model
-- How Kubernetes schedules and manages containers
+- 控制平面组件（API Server、Scheduler、Controller Manager、etcd）
+- 工作节点组件（kubelet、kube-proxy、container runtime）
+- Kubernetes 对象和 API 资源
+- 集群网络模型
+- Kubernetes 如何调度和管理容器
 
-### 2. Deploying Applications (Lecture 02)
-**Duration**: 4-5 hours
+### 2. 部署应用（Lecture 02）
+**时长**: 4-5 小时
 
-- Pods: The smallest deployable unit
-- Deployments: Managing application lifecycle
-- Services: Exposing applications
-- ConfigMaps and Secrets: Managing configuration
-- Persistent storage with Volumes and PersistentVolumeClaims
+- Pod：最小的可部署单元
+- Deployment：管理应用生命周期
+- Service：暴露应用
+- ConfigMap 和 Secret：管理配置
+- 使用 Volume 和 PersistentVolumeClaim 的持久化存储
 
-### 3. Helm Package Management (Lecture 03)
-**Duration**: 3-4 hours
+### 3. Helm 包管理（Lecture 03）
+**时长**: 3-4 小时
 
-- Introduction to Helm and package management
-- Helm charts structure and templating
-- Installing and managing releases
-- Creating custom Helm charts
-- Helm repositories and chart distribution
+- Helm 和包管理简介
+- Helm chart 结构和模板
+- 安装和管理 release
+- 创建自定义 Helm chart
+- Helm 仓库和 chart 分发
 
-### 4. Kubernetes Operations (Lecture 04)
-**Duration**: 3-4 hours
+### 4. Kubernetes 运维（Lecture 04）
+**时长**: 3-4 小时
 
-- kubectl command reference and shortcuts
-- Debugging Pods and Deployments
-- Viewing logs and executing commands in containers
-- Resource monitoring and metrics
-- Troubleshooting common issues
+- kubectl 命令参考和快捷键
+- 调试 Pod 和 Deployment
+- 查看日志和在容器中执行命令
+- 资源监控和指标
+- 常见问题排查
 
-## Learning Path
+## 学习路径
 
-### Week 1: Foundation
-**Days 1-2**: Kubernetes Architecture
-- Read lecture-notes/01-k8s-architecture.md
-- Watch recommended videos on K8s architecture
-- Set up local Kubernetes cluster
-- Explore cluster components with kubectl
+### 第一周：基础
+**第 1-2 天**: Kubernetes 架构
+- 阅读 lecture-notes/01-k8s-architecture.md
+- 观看推荐的 K8s 架构视频
+- 设置本地 Kubernetes 集群
+- 使用 kubectl 探索集群组件
 
-**Days 3-4**: Deploying Applications
-- Read lecture-notes/02-deploying-apps.md
-- Complete exercise-01-first-deployment.md
-- Practice creating Pods, Deployments, Services
-- Experiment with different service types
+**第 3-4 天**: 部署应用
+- 阅读 lecture-notes/02-deploying-apps.md
+- 完成 exercise-01-first-deployment.md
+- 练习创建 Pod、Deployment、Service
+- 实验不同的 Service 类型
 
-### Week 2: Advanced Topics
-**Days 5-6**: Helm Package Management
-- Read lecture-notes/03-helm.md
-- Complete exercise-02-helm-chart.md
-- Install applications from Helm Hub
-- Create your first Helm chart
+### 第二周：高级主题
+**第 5-6 天**: Helm 包管理
+- 阅读 lecture-notes/03-helm.md
+- 完成 exercise-02-helm-chart.md
+- 从 Helm Hub 安装应用
+- 创建你的第一个 Helm chart
 
-**Days 7**: Operations and Debugging
-- Read lecture-notes/04-k8s-operations.md
-- Complete exercise-03-debugging.md
-- Practice troubleshooting scenarios
-- Review kubectl command shortcuts
+**第 7 天**: 运维和调试
+- 阅读 lecture-notes/04-k8s-operations.md
+- 完成 exercise-03-debugging.md
+- 练习排障场景
+- 回顾 kubectl 命令快捷键
 
-### Week 3: Practice and Assessment
-**Days 8-9**: Hands-on Practice
-- Build a complete ML model serving application on K8s
-- Deploy with Helm
-- Implement monitoring and logging
-- Document your deployment
+### 第三周：练习和评估
+**第 8-9 天**: 动手实践
+- 在 K8s 上构建完整的 ML 模型服务应用
+- 使用 Helm 部署
+- 实现监控和日志
+- 记录你的部署
 
-**Day 10**: Assessment
-- Complete module-006-quiz.md
-- Self-assessment of learning objectives
-- Identify areas for further study
+**第 10 天**: 评估
+- 完成 module-006-quiz.md
+- 学习目标的自我评估
+- 确定进一步学习的领域
 
-## Hands-on Exercises
+## 动手练习
 
-This module includes three comprehensive exercises:
+本模块包含三个综合练习：
 
-### Exercise 01: First Deployment
-Deploy a simple web application to Kubernetes, expose it with a Service, and scale it up and down. This exercise reinforces core concepts of Pods, Deployments, and Services.
+### Exercise 01：首次部署
+将简单的 Web 应用部署到 Kubernetes，通过 Service 暴露它，并上下扩展。此练习强化 Pod、Deployment 和 Service 的核心概念。
 
-**Skills practiced**:
-- Writing Kubernetes manifests
-- Using kubectl to manage resources
-- Exposing applications
-- Scaling applications
+**练习的技能**：
+- 编写 Kubernetes manifest
+- 使用 kubectl 管理资源
+- 暴露应用
+- 扩展应用
 
-### Exercise 02: Helm Chart
-Create a Helm chart for a Python Flask application, parameterize the deployment, and install it with different configurations.
+### Exercise 02：Helm Chart
+为 Python Flask 应用创建 Helm chart，参数化部署，并使用不同的配置进行安装。
 
-**Skills practiced**:
-- Helm chart structure
-- Templating with Go templates
-- Values customization
-- Release management
+**练习的技能**：
+- Helm chart 结构
+- 使用 Go template 进行模板化
+- values 自定义
+- Release 管理
 
-### Exercise 03: Debugging
-Troubleshoot a broken Kubernetes deployment, identify issues using kubectl, fix configuration problems, and verify the application works.
+### Exercise 03：调试
+排查损坏的 Kubernetes 部署，使用 kubectl 识别问题，修复配置问题，验证应用正常工作。
 
-**Skills practiced**:
-- Debugging with kubectl
-- Reading logs and events
-- Identifying common issues
-- Fixing misconfigurations
+**练习的技能**：
+- 使用 kubectl 调试
+- 读取日志和事件
+- 识别常见问题
+- 修复错误配置
 
-## Assessment Criteria
+## 评估标准
 
-You should be able to demonstrate:
+你应该能够证明：
 
-1. **Conceptual Understanding** (25%)
-   - Explain Kubernetes architecture components
-   - Describe how Kubernetes schedules workloads
-   - Understand Kubernetes networking model
-   - Explain the relationship between Pods, Deployments, and Services
+1. **概念理解** (25%)
+   - 解释 Kubernetes 架构组件
+   - 描述 Kubernetes 如何调度工作负载
+   - 理解 Kubernetes 网络模型
+   - 解释 Pod、Deployment 和 Service 之间的关系
 
-2. **Practical Skills** (50%)
-   - Deploy applications using kubectl
-   - Write Kubernetes manifest files
-   - Create and customize Helm charts
-   - Use kubectl to inspect and debug resources
-   - Troubleshoot common Kubernetes issues
+2. **实践技能** (50%)
+   - 使用 kubectl 部署应用
+   - 编写 Kubernetes manifest 文件
+   - 创建和自定义 Helm chart
+   - 使用 kubectl 检查和调试资源
+   - 排查常见的 Kubernetes 问题
 
-3. **Best Practices** (25%)
-   - Apply resource limits and requests
-   - Use labels and selectors effectively
-   - Implement health checks (liveness/readiness probes)
-   - Manage configuration with ConfigMaps and Secrets
-   - Follow security best practices
+3. **最佳实践** (25%)
+   - 应用资源 limits 和 requests
+   - 有效使用 labels 和 selectors
+   - 实现健康检查（liveness/readiness probes）
+   - 使用 ConfigMap 和 Secret 管理配置
+   - 遵循安全最佳实践
 
-## Key Kubernetes Resources You'll Master
+## 你将掌握的关键 Kubernetes 资源
 
 ```yaml
-# Core workload resources
-- Pod                    # Single instance of running process
-- Deployment            # Declarative updates for Pods
-- ReplicaSet            # Maintains desired number of Pod replicas
-- StatefulSet           # For stateful applications
-- DaemonSet             # Runs on all/selected nodes
-- Job                   # Run-to-completion tasks
-- CronJob               # Scheduled jobs
+# 核心工作负载资源
+- Pod                    # 运行进程的单个实例
+- Deployment            # Pod 的声明式更新
+- ReplicaSet            # 维持 Pod 副本的期望数量
+- StatefulSet           # 用于有状态应用
+- DaemonSet             # 在所有/选定节点上运行
+- Job                   # 运行完成即结束的任务
+- CronJob               # 定时任务
 
-# Service and networking
-- Service               # Expose applications
-- Ingress               # HTTP/HTTPS routing
-- NetworkPolicy         # Network access control
+# 服务和网络
+- Service               # 暴露应用
+- Ingress               # HTTP/HTTPS 路由
+- NetworkPolicy         # 网络访问控制
 
-# Configuration and storage
-- ConfigMap             # Configuration data
-- Secret                # Sensitive data
-- PersistentVolume      # Cluster storage
-- PersistentVolumeClaim # Storage request
+# 配置和存储
+- ConfigMap             # 配置数据
+- Secret                # 敏感数据
+- PersistentVolume      # 集群存储
+- PersistentVolumeClaim # 存储请求
 
-# Cluster resources
-- Namespace             # Virtual clusters
-- Node                  # Worker machine
-- ServiceAccount        # Identity for processes
+# 集群资源
+- Namespace             # 虚拟集群
+- Node                  # 工作节点
+- ServiceAccount        # 进程的标识
 ```
 
-## Real-World AI/ML Use Cases
+## 真实世界的 AI/ML 用例
 
-Throughout this module, we'll connect Kubernetes concepts to AI infrastructure scenarios:
+在整个模块中，我们将 Kubernetes 概念与 AI 基础设施场景联系起来：
 
-- **Model Serving**: Deploy ML models as microservices with auto-scaling
-- **Training Jobs**: Run distributed training workloads with Jobs and GPU resources
-- **Data Processing**: Schedule ETL pipelines with CronJobs
-- **Feature Stores**: Deploy stateful feature storage with StatefulSets
-- **Experiment Tracking**: Run MLflow or similar tools on Kubernetes
-- **Jupyter Notebooks**: Provide on-demand notebook environments
+- **模型服务**：将 ML 模型部署为具有自动扩缩能力的微服务
+- **训练任务**：使用 Job 和 GPU 资源运行分布式训练工作负载
+- **数据处理**：使用 CronJob 调度 ETL 管道
+- **特征存储**：使用 StatefulSet 部署有状态特征存储
+- **实验跟踪**：在 Kubernetes 上运行 MLflow 或类似工具
+- **Jupyter Notebook**：提供按需 notebook 环境
 
-## Time Commitment
+## 时间投入
 
-- **Lecture Reading**: 10-12 hours
-- **Hands-on Exercises**: 8-10 hours
-- **Practice and Exploration**: 6-8 hours
-- **Assessment**: 2 hours
+- **讲义阅读**：10-12 小时
+- **动手练习**：8-10 小时
+- **练习和探索**：6-8 小时
+- **评估**：2 小时
 
-**Total**: Approximately 26-32 hours over 2-3 weeks
+**总计**：大约 26-32 小时，分布在 2-3 周内
 
-This is intensive material, so pace yourself and ensure you understand each concept before moving forward.
+这是密集的材料，所以请保持自己的节奏，确保在继续之前理解每个概念。
 
-## Success Indicators
+## 成功指标
 
-You've successfully completed this module when you can:
+当你能够做到以下几点时，即成功完成本模块：
 
-- [ ] Explain the role of each Kubernetes control plane component
-- [ ] Create and manage Pods using kubectl
-- [ ] Write Deployment manifests with proper resource limits
-- [ ] Expose applications using different Service types
-- [ ] Create and install Helm charts
-- [ ] Debug failing Pods and Deployments
-- [ ] Monitor cluster resources
-- [ ] Apply best practices for production deployments
-- [ ] Deploy a complete ML application to Kubernetes
+- [ ] 解释每个 Kubernetes 控制平面组件的作用
+- [ ] 使用 kubectl 创建和管理 Pod
+- [ ] 编写带有适当资源限制的 Deployment manifest
+- [ ] 使用不同的 Service 类型暴露应用
+- [ ] 创建和安装 Helm chart
+- [ ] 调试失败的 Pod 和 Deployment
+- [ ] 监控集群资源
+- [ ] 应用生产部署的最佳实践
+- [ ] 将完整的 ML 应用部署到 Kubernetes
 
-## Common Challenges and Tips
+## 常见挑战和技巧
 
-### Challenge 1: YAML Syntax Errors
-**Solution**: Use a YAML validator, enable editor syntax checking, and start with working examples.
+### 挑战 1: YAML 语法错误
+**解决方案**: 使用 YAML 验证器，启用编辑器语法检查，从工作示例开始。
 
-### Challenge 2: Resource Not Starting
-**Solution**: Always check `kubectl describe pod <name>` for events and `kubectl logs <pod>` for application logs.
+### 挑战 2: 资源无法启动
+**解决方案**: 始终检查 `kubectl describe pod <name>` 的事件和 `kubectl logs <pod>` 的应用日志。
 
-### Challenge 3: Networking Issues
-**Solution**: Understand Service types, verify selectors match Pod labels, check cluster networking is working.
+### 挑战 3: 网络问题
+**解决方案**: 理解 Service 类型，验证 selector 匹配 Pod labels，检查集群网络是否正常工作。
 
-### Challenge 4: Helm Template Errors
-**Solution**: Use `helm template` to render charts locally, validate YAML output, and test incrementally.
+### 挑战 4: Helm 模板错误
+**解决方案**: 使用 `helm template` 在本地渲染 chart，验证 YAML 输出，逐步测试。
 
-### Challenge 5: Cluster Resource Exhaustion
-**Solution**: Set resource requests/limits, monitor cluster capacity, clean up unused resources regularly.
+### 挑战 5: 集群资源耗尽
+**解决方案**: 设置资源 requests/limits，监控集群容量，定期清理未使用的资源。
 
-## Getting Help
+## 获取帮助
 
-If you get stuck:
+如果遇到困难：
 
-1. **Check the lecture notes**: Most common issues are addressed
-2. **Review the exercises**: Step-by-step guidance is provided
-3. **Consult official docs**: https://kubernetes.io/docs/
-4. **Use kubectl explain**: `kubectl explain deployment.spec` shows resource documentation
-5. **Debug systematically**: Follow the troubleshooting guide in lecture 04
-6. **Community resources**: Kubernetes Slack, Stack Overflow, Reddit r/kubernetes
+1. **检查讲义**：大多数常见问题都有解答
+2. **回顾练习**：提供了逐步指导
+3. **查阅官方文档**：https://kubernetes.io/docs/
+4. **使用 kubectl explain**：`kubectl explain deployment.spec` 显示资源文档
+5. **系统化调试**：按照 Lecture 04 中的排障指南操作
+6. **社区资源**：Kubernetes Slack、Stack Overflow、Reddit r/kubernetes
 
-## Next Steps
+## 后续步骤
 
-After completing this module:
+完成本模块后：
 
-- **Module 007**: Advanced Kubernetes - StatefulSets, custom resources, operators
-- **Module 008**: Kubernetes Monitoring - Prometheus, Grafana, logging
-- **Module 009**: CI/CD with Kubernetes - GitOps, ArgoCD, automated deployments
-- **Project 03**: Deploy a complete ML model serving system on Kubernetes
+- **Module 007**：高级 Kubernetes - StatefulSet、自定义资源、operator
+- **Module 008**：Kubernetes 监控 - Prometheus、Grafana、日志
+- **Module 009**：CI/CD 与 Kubernetes - GitOps、ArgoCD、自动化部署
+- **Project 03**：在 Kubernetes 上部署完整的 ML 模型服务系统
 
-## Additional Resources
+## 附加资源
 
-See `resources/recommended-reading.md` for:
-- Official Kubernetes documentation links
-- Tutorial videos and courses
-- Books and blog posts
-- Practice environments (Katacoda, Play with Kubernetes)
-- Community resources
+请参阅 `resources/recommended-reading.md` 获取：
+- 官方 Kubernetes 文档链接
+- 教程视频和课程
+- 书籍和博客文章
+- 练习环境（Katacoda、Play with Kubernetes）
+- 社区资源
 
-## Module Files
+## 模块文件
 
 ```
 mod-006-kubernetes-intro/
-├── README.md (this file)
+├── README.md (本文件)
 ├── lecture-notes/
 │   ├── 01-k8s-architecture.md
 │   ├── 02-deploying-apps.md
@@ -318,15 +318,15 @@ mod-006-kubernetes-intro/
     └── cluster-setup-guide.md
 ```
 
-## Changelog
+## 更新日志
 
-- **2025-10-18**: Initial module creation
-- Content aligned with Junior AI Infrastructure Engineer role requirements
-- Exercises designed for hands-on skill development
-- Assessment quiz covers all learning objectives
+- **2025-10-18**: 初始模块创建
+- 内容与初级 AI 基础设施工程师角色要求对齐
+- 练习设计用于动手技能发展
+- 评估测验覆盖所有学习目标
 
 ---
 
-**Ready to begin?** Start with `lecture-notes/01-k8s-architecture.md` to understand how Kubernetes works under the hood.
+**准备好开始了吗？** 从 `lecture-notes/01-k8s-architecture.md` 开始，了解 Kubernetes 如何在底层工作。
 
-**Questions or feedback?** Contact ai-infra-curriculum@joshua-ferguson.com
+**有问题或反馈？** 联系 ai-infra-curriculum@joshua-ferguson.com

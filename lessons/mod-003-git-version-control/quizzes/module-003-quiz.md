@@ -1,185 +1,185 @@
-# Module 003: Git & Version Control - Comprehensive Quiz
+# 模块 003：Git & 版本控制 - 综合测验
 
-## Instructions
+## 说明
 
-This quiz covers all topics from Module 003: Git & Version Control. It includes 30 questions covering:
-- Git fundamentals and basics
-- Branching and merging
-- Collaboration workflows
-- Advanced Git techniques
-- ML-specific workflows with DVC and Git LFS
+本测验涵盖模块 003：Git & 版本控制的所有主题。包含 30 道题目，涵盖：
+- Git 基础与基础知识
+- 分支与合并
+- 协作工作流
+- 高级 Git 技术
+- 使用 DVC 和 Git LFS 的 ML 特定工作流
 
-**Scoring:**
-- Each question is worth 1 point
-- Total: 30 points
-- Passing score: 24/30 (80%)
+**评分：**
+- 每题 1 分
+- 总分：30 分
+- 及格分数：24/30（80%）
 
-**Time Estimate:** 45-60 minutes
+**预计时间：** 45-60 分钟
 
-Answer all questions, then check your answers at the end.
-
----
-
-## Section 1: Git Fundamentals (Questions 1-8)
-
-### Question 1: Git Basics
-What is the purpose of the staging area in Git?
-
-A) To store committed changes
-B) To temporarily hold changes before committing
-C) To store remote repository information
-D) To cache file contents for faster access
-
-**Answer:** B
-
-**Explanation:** The staging area (also called "index") is an intermediate area where you prepare changes before committing them. It allows you to selectively choose which changes to include in the next commit using `git add`.
+请回答所有问题，然后在最后核对答案。
 
 ---
 
-### Question 2: Commit Identification
-What uniquely identifies each Git commit?
+## 第一部分：Git 基础（第 1-8 题）
 
-A) Commit message
-B) Timestamp
-C) SHA-1 hash
-D) Author name
+### 问题 1：Git 基础
+Git 中暂存区的作用是什么？
 
-**Answer:** C
+A) 存储已提交的变更
+B) 在提交前临时保存变更
+C) 存储远程仓库信息
+D) 缓存文件内容以加快访问速度
 
-**Explanation:** Each Git commit is uniquely identified by a SHA-1 hash (40-character hexadecimal string). This hash is calculated from the commit content, parent commits, author, timestamp, and message, ensuring uniqueness.
+**答案：** B
 
----
-
-### Question 3: Git Workflow
-In the three-state Git workflow, what are the three areas?
-
-A) Remote, Local, Cache
-B) Working Directory, Staging Area, Repository
-C) Edit, Add, Commit
-D) Create, Modify, Delete
-
-**Answer:** B
-
-**Explanation:** Git has three main areas: Working Directory (where you edit files), Staging Area/Index (where you prepare commits), and Repository (where commits are stored). Files move through these areas as you work with Git.
+**解析：** 暂存区（也称为"index"）是一个中间区域，你可以在其中准备提交的变更。它允许你使用 `git add` 选择性选择哪些变更包含在下一次 commit 中。
 
 ---
 
-### Question 4: .gitignore
-You accidentally committed a 5GB model file to Git. What should you have done to prevent this?
+### 问题 2：Commit 标识
+什么唯一标识每个 Git commit？
 
-A) Use a smaller model
-B) Compress the file first
-C) Add the file pattern to .gitignore before committing
-D) Commit it to a separate branch
+A) Commit 消息
+B) 时间戳
+C) SHA-1 哈希
+D) 作者姓名
 
-**Answer:** C
+**答案：** C
 
-**Explanation:** Files matching patterns in `.gitignore` are never tracked by Git. For ML projects, you should add patterns like `*.h5`, `*.pth`, `models/`, and `data/` to `.gitignore`, then use Git LFS or DVC for large files instead.
-
----
-
-### Question 5: Viewing Changes
-What's the difference between `git diff` and `git diff --staged`?
-
-A) No difference, they're the same
-B) `git diff` shows unstaged changes, `git diff --staged` shows staged changes
-C) `git diff` shows local changes, `git diff --staged` shows remote changes
-D) `git diff --staged` is faster
-
-**Answer:** B
-
-**Explanation:** `git diff` shows changes in the working directory that haven't been staged yet. `git diff --staged` (or `--cached`) shows changes that have been staged and will be included in the next commit.
+**解析：** 每个 Git commit 由 SHA-1 哈希（40 字符十六进制字符串）唯一标识。该哈希根据 commit 内容、父 commit、作者、时间戳和消息计算，确保唯一性。
 
 ---
 
-### Question 6: Commit Messages
-Which commit message follows conventional commit best practices?
+### 问题 3：Git 工作流
+在 Git 的三态工作流中，三个区域是什么？
+
+A) 远程、本地、缓存
+B) 工作目录、暂存区、仓库
+C) 编辑、添加、提交
+D) 创建、修改、删除
+
+**答案：** B
+
+**解析：** Git 有三个主要区域：工作目录（你编辑文件的地方）、暂存区/Index（你准备 commit 的地方）和仓库（commit 存储的地方）。当你使用 Git 时，文件会经过这些区域。
+
+---
+
+### 问题 4：.gitignore
+你不小心将一个 5GB 的模型文件提交到了 Git。你应该怎么做来防止这种情况？
+
+A) 使用更小的模型
+B) 先压缩文件
+C) 在提交前将文件模式添加到 .gitignore
+D) 将其提交到单独的分支
+
+**答案：** C
+
+**解析：** 匹配 `.gitignore` 中模式的文件永远不会被 Git 跟踪。对于 ML 项目，你应该将 `*.h5`、`*.pth`、`models/` 和 `data/` 等模式添加到 `.gitignore`，然后对大文件使用 Git LFS 或 DVC。
+
+---
+
+### 问题 5：查看变更
+`git diff` 和 `git diff --staged` 有什么区别？
+
+A) 没有区别，它们是一样的
+B) `git diff` 显示未暂存的变更，`git diff --staged` 显示已暂存的变更
+C) `git diff` 显示本地变更，`git diff --staged` 显示远程变更
+D) `git diff --staged` 速度更快
+
+**答案：** B
+
+**解析：** `git diff` 显示工作目录中尚未暂存的变更。`git diff --staged`（或 `--cached`）显示已经暂存并将包含在下一次 commit 中的变更。
+
+---
+
+### 问题 6：Commit 消息
+哪条 commit 消息遵循 conventional commit 最佳实践？
 
 A) "fixed bug"
 B) "Updated files"
 C) "fix(preprocessing): handle grayscale images correctly"
 D) "Changes to preprocessing module"
 
-**Answer:** C
+**答案：** C
 
-**Explanation:** Conventional commits use the format `type(scope): subject`. The type (feat, fix, docs, etc.) categorizes the change, scope specifies what area, and subject describes the change. This enables automation and clear history.
+**解析：** Conventional commits 使用 `type(scope): subject` 格式。type（feat、fix、docs 等）对变更进行分类，scope 指定变更区域，subject 描述变更。这样可以实现自动化和清晰的历史记录。
 
 ---
 
-### Question 7: Git Log
-Which command shows the last 5 commits in compact one-line format?
+### 问题 7：Git Log
+哪个命令以紧凑的单行格式显示最近 5 个 commit？
 
 A) `git log -5`
 B) `git log --oneline -5`
 C) `git show -5`
 D) `git log --short -5`
 
-**Answer:** B
+**答案：** B
 
-**Explanation:** `git log --oneline` shows commits in compact format (first 7 characters of hash + message). Adding `-5` limits output to the last 5 commits. This is useful for quickly scanning recent history.
+**解析：** `git log --oneline` 以紧凑格式显示 commit（哈希的前 7 个字符 + 消息）。添加 `-5` 将输出限制为最近 5 个 commit。这对于快速浏览近期历史很有用。
 
 ---
 
-### Question 8: Undoing Changes
-You staged a file by mistake. How do you unstage it without losing the changes?
+### 问题 8：撤销变更
+你错误地暂存了一个文件。如何在不丢失变更的情况下取消暂存？
 
 A) `git reset --hard <file>`
 B) `git checkout <file>`
 C) `git restore --staged <file>`
 D) `git rm --cached <file>`
 
-**Answer:** C
+**答案：** C
 
-**Explanation:** `git restore --staged <file>` (or the older `git reset HEAD <file>`) unstages a file while keeping changes in the working directory. `--hard` would discard changes, `checkout` might discard changes, and `rm --cached` is for removing from tracking.
+**解析：** `git restore --staged <file>`（或更旧的 `git reset HEAD <file>`）取消暂存文件，同时保留工作目录中的变更。`--hard` 会丢弃变更，`checkout` 可能会丢弃变更，而 `rm --cached` 用于从跟踪中移除。
 
 ---
 
-## Section 2: Branching and Merging (Questions 9-16)
+## 第二部分：分支与合并（第 9-16 题）
 
-### Question 9: Branch Creation
-What's the shortcut to create AND switch to a new branch in one command?
+### 问题 9：创建分支
+创建并立即切换到新分支的快捷命令是什么？
 
 A) `git branch -b feature/new`
 B) `git switch -c feature/new`
 C) `git checkout --new feature/new`
 D) `git create feature/new`
 
-**Answer:** B
+**答案：** B
 
-**Explanation:** `git switch -c <branch-name>` creates a new branch and switches to it immediately. The older syntax `git checkout -b <branch-name>` also works. The `-c` flag means "create."
+**解析：** `git switch -c <branch-name>` 创建一个新分支并立即切换到它。更旧的语法 `git checkout -b <branch-name>` 同样有效。`-c` 标志表示"create"。
 
 ---
 
-### Question 10: Branch Naming
-Which branch name follows common conventions for a bug fix?
+### 问题 10：分支命名
+哪个分支名称遵循常见的 bug 修复约定？
 
 A) `mybugfix`
 B) `fix-the-bug-in-api`
 C) `fix/memory-leak-preprocessing`
 D) `bugfix_20240115`
 
-**Answer:** C
+**答案：** C
 
-**Explanation:** Branch naming conventions use prefixes like `feature/`, `fix/`, `hotfix/`, `experiment/` followed by a descriptive name with hyphens. This makes branch purpose immediately clear and helps with automation.
-
----
-
-### Question 11: Fast-Forward Merge
-When does a fast-forward merge occur?
-
-A) When branches have conflicting changes
-B) When the target branch hasn't diverged from the feature branch
-C) When you use the `--ff` flag
-D) When merging more than two branches
-
-**Answer:** B
-
-**Explanation:** Fast-forward occurs when the target branch has no new commits since the feature branch was created. Git simply moves the branch pointer forward instead of creating a merge commit. Use `--no-ff` to force a merge commit.
+**解析：** 分支命名约定使用 `feature/`、`fix/`、`hotfix/`、`experiment/` 等前缀，后跟带连字符的描述性名称。这使得分支目的一目了然，并有助于自动化。
 
 ---
 
-### Question 12: Merge Conflicts
-You're merging a branch and see conflict markers in a file. What do they mean?
+### 问题 11：快进合并
+快进合并何时发生？
+
+A) 当分支有冲突的变更时
+B) 当目标分支与功能分支没有分叉时
+C) 当你使用 `--ff` 标志时
+D) 当合并超过两个分支时
+
+**答案：** B
+
+**解析：** 快进发生在目标分支在功能分支创建后没有新 commit 时。Git 只是向前移动分支指针，而不是创建合并 commit。使用 `--no-ff` 强制创建合并 commit。
+
+---
+
+### 问题 12：合并冲突
+你正在合并一个分支，并在文件中看到冲突标记。它们是什么意思？
 
 ```
 <<<<<<< HEAD
@@ -189,369 +189,369 @@ code B
 >>>>>>> feature-branch
 ```
 
-A) HEAD is correct, feature-branch is wrong
-B) Code A is from current branch, code B is from feature-branch
-C) Git automatically chose the better option
-D) Both versions will be kept automatically
+A) HEAD 是正确的，feature-branch 是错误的
+B) Code A 来自当前分支，code B 来自 feature-branch
+C) Git 自动选择了更好的选项
+D) 两个版本都会自动保留
 
-**Answer:** B
+**答案：** B
 
-**Explanation:** Conflict markers show conflicting changes: `<<<<<<< HEAD` marks the start of your current branch's version, `=======` separates the two versions, and `>>>>>>> branch-name` marks the end of the incoming branch's version. You must manually resolve by editing.
-
----
-
-### Question 13: Squash Merge
-When would you use `git merge --squash`?
-
-A) To speed up the merge process
-B) To combine all commits from a feature branch into one commit
-C) To compress file sizes
-D) To merge multiple branches at once
-
-**Answer:** B
-
-**Explanation:** `--squash` combines all commits from the feature branch into a single commit on the target branch. This is useful when feature branches have many small WIP commits that you don't want in main branch's history.
+**解析：** 冲突标记显示冲突的变更：`<<<<<<< HEAD` 标记当前分支版本的开始，`=======` 分隔两个版本，`>>>>>>> branch-name` 标记传入分支版本的结束。你必须通过编辑手动解决。
 
 ---
 
-### Question 14: Merge Strategies
-Which command resolves conflicts by always preferring the current branch's version?
+### 问题 13：Squash 合并
+何时使用 `git merge --squash`？
+
+A) 加快合并过程
+B) 将功能分支的所有 commit 合并为一个 commit
+C) 压缩文件大小
+D) 一次合并多个分支
+
+**答案：** B
+
+**解析：** `--squash` 将功能分支的所有 commit 合并为目标分支上的单个 commit。当功能分支有很多你不希望出现在主分支历史中的小型 WIP commit 时，这很有用。
+
+---
+
+### 问题 14：合并策略
+哪个命令通过始终优先选择当前分支的版本来解决冲突？
 
 A) `git merge -X ours feature-branch`
 B) `git merge --prefer-current feature-branch`
 C) `git merge --keep-mine feature-branch`
 D) `git merge -X theirs feature-branch`
 
-**Answer:** A
+**答案：** A
 
-**Explanation:** `git merge -X ours` uses the "ours" strategy, automatically resolving conflicts in favor of the current branch. `-X theirs` does the opposite. Useful for generated files where one version is definitely correct.
+**解析：** `git merge -X ours` 使用"ours"策略，自动解决冲突以支持当前分支。`-X theirs` 则相反。适用于生成的文件，其中某个版本肯定是正确的。
 
 ---
 
-### Question 15: Viewing Branches
-Which command shows all branches including remote tracking branches?
+### 问题 15：查看分支
+哪个命令显示包括远程跟踪分支在内的所有分支？
 
 A) `git branch`
 B) `git branch -r`
 C) `git branch -a`
 D) `git branch --all-remote`
 
-**Answer:** C
+**答案：** C
 
-**Explanation:** `git branch` shows local branches only. `git branch -r` shows remote-tracking branches. `git branch -a` (--all) shows both local and remote-tracking branches, giving complete view of all branches.
-
----
-
-### Question 16: Deleting Branches
-What happens if you try to delete an unmerged branch with `git branch -d`?
-
-A) Git deletes it immediately
-B) Git shows a warning but deletes it
-C) Git refuses and suggests using `-D` instead
-D) Git automatically merges it first
-
-**Answer:** C
-
-**Explanation:** `git branch -d` (lowercase) only deletes merged branches to protect you from data loss. For unmerged branches, Git refuses and suggests `-D` (uppercase) to force deletion. Always double-check before using `-D`.
+**解析：** `git branch` 只显示本地分支。`git branch -r` 显示远程跟踪分支。`git branch -a`（--all）同时显示本地和远程跟踪分支，给出所有分支的完整视图。
 
 ---
 
-## Section 3: Collaboration (Questions 17-22)
+### 问题 16：删除分支
+如果你尝试使用 `git branch -d` 删除一个未合并的分支会发生什么？
 
-### Question 17: Remote Repositories
-What does `git remote add upstream <url>` do?
+A) Git 立即删除它
+B) Git 显示警告但删除
+C) Git 拒绝并建议使用 `-D` 代替
+D) Git 首先自动合并它
 
-A) Creates a new remote repository
-B) Adds a reference to another remote repository named "upstream"
-C) Uploads local changes to remote
-D) Downloads remote changes
+**答案：** C
 
-**Answer:** B
-
-**Explanation:** `git remote add <name> <url>` creates a named reference to a remote repository. "upstream" conventionally refers to the original repository when you've forked a project, while "origin" refers to your fork.
+**解析：** `git branch -d`（小写）只删除已合并的分支，以保护你免受数据丢失。对于未合并的分支，Git 拒绝并建议使用 `-D`（大写）强制删除。在使用 `-D` 之前务必仔细检查。
 
 ---
 
-### Question 18: Fetching vs Pulling
-What's the difference between `git fetch` and `git pull`?
+## 第三部分：协作（第 17-22 题）
 
-A) No difference, they're aliases
-B) `fetch` downloads changes but doesn't merge; `pull` downloads and merges
-C) `fetch` is faster than `pull`
-D) `pull` only works with the main branch
+### 问题 17：远程仓库
+`git remote add upstream <url>` 的作用是什么？
 
-**Answer:** B
+A) 创建一个新的远程仓库
+B) 添加一个名为"upstream"的另一个远程仓库的引用
+C) 将本地变更上传到远程
+D) 下载远程变更
 
-**Explanation:** `git fetch` downloads commits, files, and refs from remote but doesn't merge them into your work. `git pull` does `fetch` followed by `merge` (or `rebase`), updating your current branch. Use `fetch` when you want to see changes before integrating.
+**答案：** B
 
----
-
-### Question 19: Pull Requests
-What's the purpose of a pull request (PR)?
-
-A) To pull changes from remote to local
-B) To request write access to a repository
-C) To propose changes and enable code review before merging
-D) To request help with Git problems
-
-**Answer:** C
-
-**Explanation:** Pull requests are GitHub/GitLab's mechanism for proposing changes. They enable code review, discussion, automated testing, and approval workflows before merging changes into the main branch. Essential for team collaboration.
+**解析：** `git remote add <name> <url>` 创建一个指向远程仓库的命名引用。"upstream"通常在你 fork 了项目时指原始仓库，而"origin"指你的 fork。
 
 ---
 
-### Question 20: Code Review Comments
-Which type of code review comment indicates a blocking issue that must be fixed?
+### 问题 18：Fetching vs Pulling
+`git fetch` 和 `git pull` 有什么区别？
+
+A) 没有区别，它们是别名
+B) `fetch` 下载变更但不合并；`pull` 下载并合并
+C) `fetch` 比 `pull` 快
+D) `pull` 只适用于主分支
+
+**答案：** B
+
+**解析：** `git fetch` 从远程下载 commit、文件和引用，但不会合并到你的工作中。`git pull` 执行 `fetch` 后跟 `merge`（或 `rebase`），从而更新当前分支。当你想要先查看变更再集成时，使用 `fetch`。
+
+---
+
+### 问题 19：Pull Request
+Pull request（PR）的目的是什么？
+
+A) 将变更从远程拉到本地
+B) 请求对仓库的写入权限
+C) 提出变更并在合并前进行代码审查
+D) 请求对 Git 问题的帮助
+
+**答案：** C
+
+**解析：** Pull request 是 GitHub/GitLab 提出变更的机制。它们在合并到主分支之前支持代码审查、讨论、自动化测试和审批工作流。对于团队协作至关重要。
+
+---
+
+### 问题 20：代码审查评论
+哪种类型的代码审查评论表示必须修复的阻塞性问题？
 
 A) 💅 Nitpick
 B) ❓ Question
 C) 👍 Nice
 D) 🚨 BLOCKER
 
-**Answer:** D
+**答案：** D
 
-**Explanation:** Code review comments should be categorized: BLOCKER (must fix before merge), Important suggestions (should fix), Nitpicks (optional), Questions (clarification needed), and Praise (good work). This helps authors prioritize feedback.
-
----
-
-### Question 21: Fork Workflow
-In a fork-based workflow, how do you keep your fork updated with the original repository?
-
-A) Delete your fork and re-fork
-B) `git fetch upstream` and merge upstream/main
-C) Pull requests automatically sync forks
-D) Forks stay in sync automatically
-
-**Answer:** B
-
-**Explanation:** Add the original repository as "upstream" remote, fetch changes with `git fetch upstream`, then merge with `git merge upstream/main`. This keeps your fork's main branch synchronized with the original project.
+**解析：** 代码审查评论应分类：BLOCKER（合并前必须修复）、重要建议（应该修复）、Nitpicks（可选）、Questions（需要澄清）和 Praise（好的工作）。这有助于作者优先处理反馈。
 
 ---
 
-### Question 22: Rebasing for PRs
-You have a PR open, but main has moved forward. What should you do?
+### 问题 21：Fork 工作流
+在基于 fork 的工作流中，如何保持你的 fork 与原始仓库同步？
 
-A) Close PR and create a new one
-B) Rebase your branch on latest main and force push
-C) Do nothing, GitHub will handle it
-D) Delete your branch and start over
+A) 删除你的 fork 并重新 fork
+B) `git fetch upstream` 并合并 upstream/main
+C) Pull request 自动同步 fork
+D) Fork 会自动保持同步
 
-**Answer:** B
+**答案：** B
 
-**Explanation:** `git fetch upstream && git rebase upstream/main` updates your branch with latest main, replaying your commits on top. Then `git push --force-with-lease` updates the PR. This keeps PR history clean and resolves conflicts.
-
----
-
-## Section 4: Advanced Git (Questions 23-26)
-
-### Question 23: Interactive Rebase
-In interactive rebase, what does the "squash" command do?
-
-A) Deletes the commit
-B) Combines commit with previous one, keeping both messages
-C) Edits the commit message
-D) Reorders commits
-
-**Answer:** B
-
-**Explanation:** In `git rebase -i`, "squash" merges the commit with the previous one and combines both commit messages. "fixup" is similar but discards the message. This cleans up history by combining related commits.
+**解析：** 将原始仓库添加为"upstream"远程，使用 `git fetch upstream` 获取变更，然后使用 `git merge upstream/main` 合并。这使你的 fork 的 main 分支与原始项目保持同步。
 
 ---
 
-### Question 24: Cherry-Picking
-When would you use `git cherry-pick`?
+### 问题 22：为 PR 进行 Rebase
+你有一个开放的 PR，但 main 分支已经前进了。你应该怎么做？
 
-A) To delete specific commits
-B) To apply a specific commit from another branch
-C) To choose which files to commit
-D) To select the best merge strategy
+A) 关闭 PR 并创建一个新的
+B) 将你的分支变基到最新的 main 上并强制推送
+C) 什么都不做，GitHub 会自动处理
+D) 删除你的分支并重新开始
 
-**Answer:** B
+**答案：** B
 
-**Explanation:** `git cherry-pick <commit-hash>` applies the changes from a specific commit to your current branch. Useful for applying a bug fix from one branch to another without merging all changes.
-
----
-
-### Question 25: Git Bisect
-What problem does `git bisect` solve?
-
-A) Merging branches with many conflicts
-B) Finding which commit introduced a bug using binary search
-C) Splitting large commits into smaller ones
-D) Resolving merge conflicts automatically
-
-**Answer:** B
-
-**Explanation:** `git bisect` uses binary search to find the commit that introduced a bug. Mark a good (working) and bad (broken) commit, and Git checks out middle commits for testing until it finds the problematic commit. Can be automated with test scripts.
+**解析：** `git fetch upstream && git rebase upstream/main` 用最新的 main 更新你的分支，将你的 commit 重放在上面。然后 `git push --force-with-lease` 更新 PR。这保持 PR 历史整洁并解决冲突。
 
 ---
 
-### Question 26: Reflog
-You accidentally reset to an old commit and lost your work. How can you recover?
+## 第四部分：高级 Git（第 23-26 题）
 
-A) Work is permanently lost
-B) Use `git reflog` to find the lost commit and recover it
-C) Restore from backup only
-D) Use `git recover`
+### 问题 23：交互式 Rebase
+在交互式 rebase 中，"squash"命令的作用是什么？
 
-**Answer:** B
+A) 删除 commit
+B) 将 commit 与前一个合并，保留两个消息
+C) 编辑 commit 消息
+D) 重新排序 commit
 
-**Explanation:** `git reflog` shows a log of all HEAD movements, including "lost" commits from resets, rebases, etc. Find the commit hash in reflog and `git checkout <hash>` or create a branch at that point to recover your work.
+**答案：** B
 
----
-
-## Section 5: ML-Specific Git (Questions 27-30)
-
-### Question 27: DVC Purpose
-Why use DVC (Data Version Control) instead of Git for ML datasets?
-
-A) DVC is faster than Git
-B) Git isn't designed for large binary files; DVC handles them efficiently
-C) DVC has better merge conflict resolution
-D) DVC is required by ML frameworks
-
-**Answer:** B
-
-**Explanation:** Git stores complete file history, making it inefficient for large datasets and models. DVC stores metadata in Git and actual data in separate storage (S3, GCS, etc.), providing version control for data without bloating the Git repository.
+**解析：** 在 `git rebase -i` 中，"squash"将 commit 与前一个合并，并组合两个 commit 消息。"fixup"类似但丢弃消息。这通过合并相关 commit 来清理历史。
 
 ---
 
-### Question 28: Git LFS
-What types of files should be tracked with Git LFS in an ML project?
+### 问题 24：Cherry-Picking
+何时使用 `git cherry-pick`？
 
-A) Python code files
-B) Configuration files
-C) Model weights (.pth, .h5, .pkl)
-D) Documentation
+A) 删除特定 commit
+B) 从另一个分支应用特定的 commit
+C) 选择哪些文件要提交
+D) 选择最佳的合并策略
 
-**Answer:** C
+**答案：** B
 
-**Explanation:** Git LFS (Large File Storage) is designed for large binary files like model weights (.pth, .h5), pickled models (.pkl), ONNX files, etc. LFS stores pointers in Git and actual files in LFS storage, preventing repository bloat.
-
----
-
-### Question 29: Experiment Tracking
-You're running multiple ML experiments. What's the best Git practice?
-
-A) Commit all experiments to main branch
-B) Create experiment branches and track configurations as YAML files
-C) Don't use Git for experiments
-D) Create a new repository for each experiment
-
-**Answer:** B
-
-**Explanation:** Create experiment branches (experiment/name) and version control experiment configurations as YAML files. This maintains reproducibility, allows comparing experiments, and keeps history clean. Tag successful experiments for easy reference.
+**解析：** `git cherry-pick <commit-hash>` 将特定 commit 的变更应用到当前分支。适用于从一个分支应用 bug 修复到另一个分支，而无需合并所有变更。
 
 ---
 
-### Question 30: Model Versioning
-How should you version a trained model for production deployment?
+### 问题 25：Git Bisect
+`git bisect` 解决什么问题？
 
-A) Just copy the file to production
-B) Use Git tags on the commit that trained the model
-C) Create a git tag with metadata, track model in LFS, and document in JSON
-D) Email the model file
+A) 合并有大量冲突的分支
+B) 使用二分查找找到引入 bug 的 commit
+C) 将大型 commit 拆分成更小的
+D) 自动解决合并冲突
 
-**Answer:** C
+**答案：** B
 
-**Explanation:** Best practice: Tag the training commit (git tag model-v1.0.0), track weights with Git LFS, include metadata JSON with training config/metrics/data version, and document in model registry. This ensures full traceability from data to deployed model.
+**解析：** `git bisect` 使用二分查找来找到引入 bug 的 commit。标记一个好（工作正常）和一个坏（损坏）的 commit，Git 会检出中间的 commit 进行测试，直到找到有问题的 commit。可以使用测试脚本自动化。
 
 ---
 
-## Answer Key Summary
+### 问题 26：Reflog
+你不小心重置到了一个旧的 commit，丢失了你的工作。如何恢复？
 
-1. B - Staging area holds changes before committing
-2. C - SHA-1 hash uniquely identifies commits
-3. B - Working Directory, Staging Area, Repository
-4. C - Add patterns to .gitignore before committing
-5. B - diff shows unstaged, diff --staged shows staged
-6. C - Conventional commit format with type, scope, subject
+A) 工作永久丢失
+B) 使用 `git reflog` 找到丢失的 commit 并恢复它
+C) 只能从备份恢复
+D) 使用 `git recover`
+
+**答案：** B
+
+**解析：** `git reflog` 显示所有 HEAD 移动的日志，包括来自 reset、rebase 等的"丢失"commit。在 reflog 中找到 commit 哈希，然后 `git checkout <hash>` 或在该点创建一个分支来恢复你的工作。
+
+---
+
+## 第五部分：ML 特定 Git（第 27-30 题）
+
+### 问题 27：DVC 目的
+为什么对 ML 数据集使用 DVC（Data Version Control）而不是 Git？
+
+A) DVC 比 Git 更快
+B) Git 不是为大型二进制文件设计的；DVC 高效地处理它们
+C) DVC 有更好的合并冲突解决
+D) ML 框架要求使用 DVC
+
+**答案：** B
+
+**解析：** Git 存储完整的文件历史，这使得它对大型数据集和模型效率低下。DVC 在 Git 中存储元数据，将实际数据存储在单独的存储（S3、GCS 等）中，为数据提供版本控制而不使 Git 仓库膨胀。
+
+---
+
+### 问题 28：Git LFS
+在 ML 项目中，哪些类型的文件应该使用 Git LFS 跟踪？
+
+A) Python 代码文件
+B) 配置文件
+C) 模型权重（.pth、.h5、.pkl）
+D) 文档
+
+**答案：** C
+
+**解析：** Git LFS（Large File Storage）专为大型二进制文件设计，如模型权重（.pth、.h5）、pickled 模型（.pkl）、ONNX 文件等。LFS 在 Git 中存储指针，实际文件存储在 LFS 存储中，防止仓库膨胀。
+
+---
+
+### 问题 29：实验跟踪
+你正在运行多个 ML 实验。最佳的 Git 实践是什么？
+
+A) 将所有实验提交到 main 分支
+B) 创建实验分支并将配置作为 YAML 文件跟踪
+C) 不为实验使用 Git
+D) 为每个实验创建一个新仓库
+
+**答案：** B
+
+**解析：** 创建实验分支（experiment/name）并将实验配置作为 YAML 文件进行版本控制。这保持了可重现性，允许比较实验，并保持历史整洁。标记成功的实验以便轻松引用。
+
+---
+
+### 问题 30：模型版本控制
+如何对用于生产部署的训练模型进行版本控制？
+
+A) 直接将文件复制到生产环境
+B) 在训练模型的 commit 上使用 Git tag
+C) 创建带有元数据的 git tag，用 LFS 跟踪模型，并在 JSON 中记录
+D) 通过邮件发送模型文件
+
+**答案：** C
+
+**解析：** 最佳实践：标记训练 commit（git tag model-v1.0.0），使用 Git LFS 跟踪权重，包含带有训练配置/指标/数据版本的元数据 JSON，并在模型注册表中记录。这确保了从数据到部署模型的完全可追溯性。
+
+---
+
+## 答案汇总
+
+1. B - 暂存区在提交前保存变更
+2. C - SHA-1 哈希唯一标识 commit
+3. B - 工作目录、暂存区、仓库
+4. C - 在提交前将模式添加到 .gitignore
+5. B - diff 显示未暂存，diff --staged 显示已暂存
+6. C - 带有 type、scope、subject 的 conventional commit 格式
 7. B - git log --oneline -5
-8. C - git restore --staged unstages without losing changes
-9. B - git switch -c creates and switches
-10. C - fix/ prefix with descriptive name
-11. B - When target branch hasn't diverged
-12. B - HEAD is current, feature-branch is incoming
-13. B - Combines all commits into one
-14. A - git merge -X ours prefers current branch
-15. C - git branch -a shows all branches
-16. C - Git refuses and suggests -D
-17. B - Adds named reference to remote repository
-18. B - fetch downloads, pull downloads and merges
-19. C - Proposes changes for code review
-20. D - BLOCKER indicates must-fix issue
-21. B - Fetch upstream and merge
-22. B - Rebase on main and force push
-23. B - Combines with previous, keeps both messages
-24. B - Apply specific commit from another branch
-25. B - Find bug-introducing commit with binary search
-26. B - Use reflog to find and recover
-27. B - Git isn't efficient for large binary files
-28. C - Model weights and large binary files
-29. B - Experiment branches with config versioning
-30. C - Tag + LFS + metadata JSON for traceability
+8. C - git restore --staged 取消暂存而不丢失变更
+9. B - git switch -c 创建并切换
+10. C - fix/ 前缀加描述性名称
+11. B - 当目标分支没有分叉时
+12. B - HEAD 是当前分支，feature-branch 是传入分支
+13. B - 将所有 commit 合并为一个
+14. A - git merge -X ours 优先选择当前分支
+15. C - git branch -a 显示所有分支
+16. C - Git 拒绝并建议 -D
+17. B - 添加指向远程仓库的命名引用
+18. B - fetch 下载，pull 下载并合并
+19. C - 提出变更以供代码审查
+20. D - BLOCKER 表示必须修复的问题
+21. B - Fetch upstream 并合并
+22. B - 变基到 main 并强制推送
+23. B - 与前一个合并，保留两个消息
+24. B - 从另一个分支应用特定的 commit
+25. B - 使用二分查找找到引入 bug 的 commit
+26. B - 使用 reflog 查找和恢复
+27. B - Git 对大型二进制文件效率不高
+28. C - 模型权重和大型二进制文件
+29. B - 带有配置版本控制的实验分支
+30. C - Tag + LFS + 元数据 JSON 用于可追溯性
 
 ---
 
-## Scoring Guide
+## 评分指南
 
-**28-30 correct (93-100%)**: Excellent! You've mastered Git for ML infrastructure.
+**28-30 正确（93-100%）**: 优秀！你已掌握用于 ML 基础设施的 Git。
 
-**24-27 correct (80-90%)**: Good! You understand Git well. Review missed topics.
+**24-27 正确（80-90%）**: 良好！你很好地理解了 Git。复习做错的题目。
 
-**20-23 correct (67-79%)**: Passing, but review key concepts, especially:
-- Branching workflows
-- Collaboration practices
-- ML-specific tooling
+**20-23 正确（67-79%）**: 及格，但复习关键概念，特别是：
+- 分支工作流
+- 协作实践
+- ML 特定工具
 
-**Below 20 (< 67%)**: Review course materials and practice more:
-- Repeat exercises 01-07
-- Re-read lecture notes
-- Practice with real repositories
-
----
-
-## Key Concepts Review
-
-If you missed questions in certain areas, review these topics:
-
-### Git Fundamentals (Q1-8)
-- Three-state workflow (working/staging/repository)
-- .gitignore for ML projects
-- Commit message best practices
-- Viewing and searching history
-
-### Branching & Merging (Q9-16)
-- Branch naming conventions
-- Fast-forward vs three-way merges
-- Conflict resolution
-- Merge strategies
-
-### Collaboration (Q17-22)
-- Fork and upstream workflows
-- Pull request best practices
-- Code review guidelines
-- Keeping forks synchronized
-
-### Advanced Techniques (Q23-26)
-- Interactive rebase for clean history
-- Cherry-picking specific commits
-- Bisect for debugging
-- Reflog for recovery
-
-### ML Workflows (Q27-30)
-- DVC for data versioning
-- Git LFS for large files
-- Experiment tracking
-- Model versioning and deployment
+**低于 20（< 67%）**: 复习课程材料并多加练习：
+- 重复练习 01-07
+- 重读讲座笔记
+- 使用真实仓库练习
 
 ---
 
-## Next Steps
+## 关键概念复习
 
-1. **Review** any topics where you missed questions
-2. **Practice** with the exercises for those topics
-3. **Apply** Git in your actual ML projects
-4. **Move on** to Module 004 if you scored 80% or higher
+如果你在某些领域做错了题目，请复习以下主题：
 
-Remember: Git proficiency comes with practice. The more you use these workflows in real projects, the more natural they'll become!
+### Git 基础（Q1-8）
+- 三态工作流（工作区/暂存区/仓库）
+- ML 项目的 .gitignore
+- Commit 消息最佳实践
+- 查看和搜索历史
+
+### 分支与合并（Q9-16）
+- 分支命名约定
+- 快进合并 vs 三方合并
+- 冲突解决
+- 合并策略
+
+### 协作（Q17-22）
+- Fork 和 upstream 工作流
+- Pull request 最佳实践
+- 代码审查指南
+- 保持 fork 同步
+
+### 高级技术（Q23-26）
+- 交互式 rebase 用于整洁历史
+- Cherry-picking 特定 commit
+- 使用 bisect 调试
+- 使用 reflog 恢复
+
+### ML 工作流（Q27-30）
+- DVC 用于数据版本控制
+- Git LFS 用于大文件
+- 实验跟踪
+- 模型版本控制与部署
+
+---
+
+## 下一步
+
+1. **复习** 你做错的题目的相关主题
+2. **练习** 这些主题的练习
+3. **应用** 在真实的 ML 项目中使用 Git
+4. **继续** 到模块 004，如果你得分 80% 或以上
+
+记住：Git 熟练度来自实践。你在真实项目中使用这些工作流越多，它们就会变得越自然！

@@ -1,64 +1,64 @@
-# Exercise 02: Prometheus Monitoring Stack Deployment
+# Exercise 02：Prometheus Monitoring Stack 部署
 
-## Overview
+## 概述
 
-Deploy a production-ready Prometheus monitoring stack with comprehensive scraping, recording rules, and alerting. Building on Exercise 01's instrumented inference gateway, you'll create a complete metrics pipeline with Prometheus server, node exporters, custom exporters, Alertmanager, and service discovery. This exercise establishes the foundation for observability-driven operations and SLO monitoring.
+部署一个生产就绪的 Prometheus monitoring 栈，具有全面的 scraping、recording rules 和告警功能。基于 Exercise 01 中已 instrument 的推理网关，你将创建一个完整的 metrics 管道，包括 Prometheus server、node exporters、自定义 exporters、Alertmanager 和 service discovery。本练习为可观测性驱动的运维和 SLO 监控奠定基础。
 
-**Difficulty:** Intermediate → Advanced
-**Estimated Time:** 4–5 hours
-**Prerequisites:**
-- Exercise 01 completed (instrumented FastAPI inference service)
-- Lecture 02 (Prometheus Metrics Pipeline)
-- Docker and Docker Compose installed
-- Basic familiarity with PromQL and YAML
-- Understanding of SLOs from Exercise 01
+**难度：** 中级 → 高级
+**预计时间：** 4–5 小时
+**前置要求：**
+- 已完成 Exercise 01（已 instrument 的 FastAPI 推理服务）
+- Lecture 02（Prometheus Metrics 管道）
+- 已安装 Docker 和 Docker Compose
+- 基本熟悉 PromQL 和 YAML
+- 理解 Exercise 01 中的 SLO
 
-## Learning Objectives
+## 学习目标
 
-By finishing this lab you will be able to:
+完成本实验后，你将能够：
 
-1. Deploy a complete Prometheus monitoring stack with Docker Compose
-2. Configure service discovery for dynamic target monitoring
-3. Implement comprehensive recording rules for SLO tracking
-4. Create production-ready alerting rules with multi-window burn rates
-5. Deploy and configure Alertmanager with routing and silencing
-6. Build custom Prometheus exporters for application-specific metrics
-7. Implement metric relabeling and filtering strategies
-8. Set up federation for hierarchical Prometheus deployments
-9. Configure remote write for long-term storage
-10. Troubleshoot common Prometheus operational issues
-11. Create runbooks for incident response
-12. Implement monitoring best practices for production
+1. 使用 Docker Compose 部署完整的 Prometheus monitoring 栈
+2. 配置 service discovery 以实现动态目标监控
+3. 实现全面的 recording rules 用于 SLO 跟踪
+4. 创建生产就绪的告警规则，包含多窗口 burn rates
+5. 部署和配置 Alertmanager，包含路由和静默
+6. 构建用于应用特定 metrics 的自定义 Prometheus exporters
+7. 实现 metric relabeling 和过滤策略
+8. 设置 federation 用于分层 Prometheus 部署
+9. 配置 remote write 用于长期存储
+10. 排查常见的 Prometheus 运维问题
+11. 创建用于事件响应的 runbooks
+12. 实施生产监控最佳实践
 
-## Scenario
+## 场景
 
-The ML Platform team needs a robust monitoring infrastructure to support the inference gateway deployed in Exercise 01. Your task is to build a production-grade Prometheus stack that:
+ML Platform 团队需要强大的监控基础设施来支持 Exercise 01 中部署的推理网关。你的任务是构建一个生产级的 Prometheus 栈，实现：
 
-- Monitors infrastructure (nodes, containers, networks)
-- Tracks application metrics from the inference gateway
-- Calculates SLO compliance in real-time
-- Alerts on-call engineers when error budgets are threatened
-- Provides reliable metrics storage with appropriate retention
-- Scales to monitor multiple services across environments
+- 监控基础设施（节点、容器、网络）
+- 跟踪推理网关的应用 metrics
+- 实时计算 SLO 合规性
+- 在 error budget 受到威胁时告警 on-call 工程师
+- 提供具有适当保留期的可靠 metrics 存储
+- 可扩展以跨环境监控多个服务
 
-This foundation will support the Grafana dashboards (Exercise 03) and alerting workflows (Exercise 05) built in subsequent exercises.
+此基础将支持后续练习中构建的 Grafana dashboard（Exercise 03）和告警工作流（Exercise 05）。
 
 ---
 
-## Part 1: Architecture Planning and Design
+## 第 1 部分：架构规划与设计
 
-### Step 1.1: Define Monitoring Architecture
+### 步骤 1.1：定义监控架构
 
-Create `docs/prometheus-architecture.md`:
+创建 `docs/prometheus-architecture.md`：
 
 ```markdown
-# Prometheus Monitoring Stack Architecture
+# Prometheus Monitoring Stack 架构
 
-## Overview
+## 概述
 
-This document describes the architecture of the Prometheus monitoring stack for the ML Platform.
+本文档描述了用于 ML Platform 的 Prometheus monitoring 栈架构。
 
-## Architecture Diagram
+## 架构图
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -74,217 +74,217 @@ This document describes the architecture of the Prometheus monitoring stack for 
 │                              │                                   │
 └──────────────────────────────┼───────────────────────────────────┘
                                │ HTTP Pull (Scrape)
-                    ┌──────────▼───────────┐
-                    │  Prometheus Server   │
-                    │                      │
-                    │  - TSDB Storage      │
-                    │  - Rule Evaluation   │
-                    │  - Service Discovery │
-                    │  - Metric Relabeling │
-                    └──────────┬───────────┘
-                               │
-                   ┌───────────┼────────────┐
-                   │           │            │
-      ┌────────────▼─┐  ┌──────▼─────┐  ┌──▼──────────┐
-      │  Recording   │  │  Alerting  │  │Remote Write │
-      │    Rules     │  │   Rules    │  │  (optional) │
-      └──────────────┘  └──────┬─────┘  └──────┬──────┘
-                               │                │
-                        ┌──────▼─────┐   ┌─────▼──────┐
-                        │Alert Manager│  │Long-term   │
-                        │             │  │Storage     │
-                        │- Routing    │  │(Thanos/    │
-                        │- Silencing  │  │ Mimir)     │
-                        │- Grouping   │  └────────────┘
-                        └──────┬──────┘
-                               │
-                    ┌──────────┼──────────┐
-                    │          │          │
-            ┌───────▼──┐  ┌────▼────┐  ┌─▼────────┐
-            │  Slack   │  │ PagerDuty│ │  Email   │
-            │Webhook   │  │ API      │  │  SMTP    │
-            └──────────┘  └──────────┘  └──────────┘
+                     ┌──────────▼───────────┐
+                     │  Prometheus Server   │
+                     │                      │
+                     │  - TSDB Storage      │
+                     │  - Rule Evaluation   │
+                     │  - Service Discovery │
+                     │  - Metric Relabeling │
+                     └──────────┬───────────┘
+                                │
+                    ┌───────────┼────────────┐
+                    │           │            │
+       ┌────────────▼─┐  ┌──────▼─────┐  ┌──▼──────────┐
+       │  Recording   │  │  Alerting  │  │Remote Write │
+       │    Rules     │  │   Rules    │  │  (optional) │
+       └──────────────┘  └──────┬─────┘  └──────┬──────┘
+                                │                │
+                         ┌──────▼─────┐   ┌─────▼──────┐
+                         │Alert Manager│  │Long-term   │
+                         │             │  │Storage     │
+                         │- Routing    │  │(Thanos/    │
+                         │- Silencing  │  │ Mimir)     │
+                         │- Grouping   │  └────────────┘
+                         └──────┬──────┘
+                                │
+                     ┌──────────┼──────────┐
+                     │          │          │
+             ┌───────▼──┐  ┌────▼────┐  ┌─▼────────┐
+             │  Slack   │  │ PagerDuty│ │  Email   │
+             │Webhook   │  │ API      │  │  SMTP    │
+             └──────────┘  └──────────┘  └──────────┘
 ```
 
-## Component Descriptions
+## 组件描述
 
 ### 1. Monitored Targets
 
-**Inference Gateway (Port 8000)**
-- Application-specific metrics (inference latency, errors, throughput)
-- HTTP request metrics (Four Golden Signals)
-- ML metrics (confidence scores, predictions by class)
-- Custom business metrics
+**Inference Gateway（端口 8000）**
+- 应用特定 metrics（推理延迟、错误、吞吐量）
+- HTTP 请求 metrics（四大黄金信号）
+- ML metrics（置信度分数、按类别的预测）
+- 自定义业务 metrics
 
-**Node Exporter (Port 9100)**
-- CPU, memory, disk, network metrics
-- Filesystem usage
-- System load averages
-- Hardware and kernel metrics
+**Node Exporter（端口 9100）**
+- CPU、内存、磁盘、网络 metrics
+- 文件系统使用情况
+- 系统负载平均值
+- 硬件和内核 metrics
 
-**Custom Exporters (Ports 9101-9199)**
-- Feature store exporter (9101): Feature freshness, ingestion lag
-- Model registry exporter (9102): Model versions, downloads, deployments
-- GPU exporter (9103): GPU utilization, memory, temperature
-- Database exporter (9104): PostgreSQL connection pool, query latency
+**Custom Exporters（端口 9101-9199）**
+- Feature store exporter（9101）：特征新鲜度、摄入延迟
+- Model registry exporter（9102）：模型版本、下载、部署
+- GPU exporter（9103）：GPU 利用率、内存、温度
+- Database exporter（9104）：PostgreSQL 连接池、查询延迟
 
-**Prometheus Self-Monitoring (Port 9090)**
-- TSDB metrics (series count, ingestion rate)
-- Scrape health and duration
-- Rule evaluation performance
-- Resource usage
+**Prometheus Self-Monitoring（端口 9090）**
+- TSDB metrics（序列数、摄入率）
+- Scrape 健康状况和持续时间
+- 规则评估性能
+- 资源使用情况
 
 ### 2. Prometheus Server
 
-**Responsibilities**:
-- Scrape metrics from all targets every 15 seconds
-- Store time-series data in local TSDB
-- Evaluate recording and alerting rules every 30 seconds
-- Serve PromQL queries for dashboards
-- Send alerts to Alertmanager
-- Optional: Remote write to long-term storage
+**职责**：
+- 每 15 秒从所有目标抓取 metrics
+- 在本地 TSDB 中存储时间序列数据
+- 每 30 秒评估 recording 和 alerting rules
+- 为 dashboard 提供 PromQL 查询
+- 向 Alertmanager 发送告警
+- 可选：远程写入长期存储
 
-**Configuration**:
-- Scrape interval: 15s (adjustable per job)
-- Evaluation interval: 30s
-- Retention: 15 days (local)
-- Storage: ~1GB per million samples per day
+**配置**：
+- Scrape 间隔：15s（每个作业可调）
+- 评估间隔：30s
+- 保留期：15 天（本地）
+- 存储：每天每百万样本约 1GB
 
 ### 3. Recording Rules
 
-**Purpose**: Pre-compute expensive queries for dashboards and alerts
+**目的**：预计算昂贵的查询，用于 dashboard 和告警
 
-**Categories**:
-- SLO calculations (availability, latency percentiles, error rates)
-- Aggregations (per-service, per-team, per-environment)
-- Derived metrics (burn rates, budget remaining)
+**分类**：
+- SLO 计算（可用性、延迟百分位数、错误率）
+- 聚合（按服务、按团队、按环境）
+- 派生指标（burn rates、剩余 budget）
 
 ### 4. Alerting Rules
 
-**Purpose**: Define conditions that trigger notifications
+**目的**：定义触发通知的条件
 
-**Categories**:
-- SLO violations (error budget exhaustion)
-- Resource saturation (disk full, memory pressure)
-- Service health (scrape failures, high error rates)
-- Multi-window burn rate alerts (fast/slow burn detection)
+**分类**：
+- SLO 违规（error budget 耗尽）
+- 资源饱和（磁盘满、内存压力）
+- 服务健康（scrape 失败、高错误率）
+- 多窗口 burn rate 告警（快速/慢速 burn 检测）
 
 ### 5. Alertmanager
 
-**Responsibilities**:
-- Receive alerts from Prometheus
-- Deduplicate and group related alerts
-- Route to appropriate receivers (Slack, PagerDuty, email)
-- Apply silences during maintenance windows
-- Manage alert states (firing, resolved)
+**职责**：
+- 从 Prometheus 接收告警
+- 去重和分组相关告警
+- 路由到适当的接收者（Slack、PagerDuty、email）
+- 在维护窗口期间应用静默
+- 管理告警状态（firing、resolved）
 
-**Routing Strategy**:
-- Critical alerts → PagerDuty (on-call engineer)
-- Warning alerts → Slack channel (#ml-platform-alerts)
-- Info alerts → Email digest (daily summary)
+**路由策略**：
+- Critical 告警 → PagerDuty（on-call 工程师）
+- Warning 告警 → Slack 频道（#ml-platform-alerts）
+- Info 告警 → 邮件摘要（每日汇总）
 
-### 6. Remote Write (Optional)
+### 6. Remote Write（可选）
 
-**Purpose**: Long-term metrics storage beyond local retention
+**目的**：超过本地保留期的长期 metrics 存储
 
-**Options**:
-- **Thanos**: Cost-effective S3-based storage with downsampling
-- **Mimir**: Multi-tenant, horizontally scalable
-- **VictoriaMetrics**: High-performance, resource-efficient
-- **Grafana Cloud**: Managed service
+**选项**：
+- **Thanos**：基于 S3 的经济高效存储，支持降采样
+- **Mimir**：多租户、水平可扩展
+- **VictoriaMetrics**：高性能、资源高效
+- **Grafana Cloud**：托管服务
 
-**Trade-offs**:
-- Storage cost vs local retention
-- Query performance vs historical depth
-- Operational complexity vs managed services
+**权衡**：
+- 存储成本 vs 本地保留
+- 查询性能 vs 历史深度
+- 运维复杂度 vs 托管服务
 
-## Scalability Considerations
+## 可扩展性考量
 
-### Current Scale (Lab Environment)
-- Targets: 5-10 services
-- Metrics: ~10,000 active time series
-- Ingestion rate: ~5,000 samples/sec
-- Storage: ~50MB/day, ~750MB/15 days
+### 当前规模（实验环境）
+- Targets：5-10 个服务
+- Metrics：约 10,000 活跃时间序列
+- 摄入率：约 5,000 样本/秒
+- 存储：约 50MB/天，约 750MB/15 天
 
-### Production Scale (Expected Growth)
-- Targets: 100-500 services
-- Metrics: ~500,000 active time series
-- Ingestion rate: ~250,000 samples/sec
-- Storage: ~2.5GB/day, ~37GB/15 days
+### 生产规模（预期增长）
+- Targets：100-500 个服务
+- Metrics：约 500,000 活跃时间序列
+- 摄入率：约 250,000 样本/秒
+- 存储：约 2.5GB/天，约 37GB/15 天
 
-### Scaling Strategies
-1. **Vertical scaling**: Increase Prometheus server resources (CPU, RAM, SSD)
-2. **Horizontal scaling**: Federation with per-team or per-region Prometheus instances
-3. **Metric reduction**: Drop high-cardinality or unused metrics via relabeling
-4. **Query optimization**: Use recording rules to pre-aggregate expensive queries
+### 扩展策略
+1. **垂直扩展**：增加 Prometheus server 资源（CPU、RAM、SSD）
+2. **水平扩展**：使用 per-team 或 per-region Prometheus 实例的 federation
+3. **指标缩减**：通过 relabeling 丢弃高基数或未使用的 metrics
+4. **查询优化**：使用 recording rules 预聚合昂贵查询
 
-## High Availability (Production)
+## 高可用性（生产）
 
-### HA Setup (Future)
-- Run 2+ identical Prometheus replicas scraping the same targets
-- Use external Alertmanager cluster (3+ instances)
-- Deduplicate alerts in Alertmanager
-- Load balance queries across replicas
+### HA 设置（未来）
+- 运行 2+ 个相同的 Prometheus 副本抓取相同目标
+- 使用外部 Alertmanager 集群（3+ 实例）
+- 在 Alertmanager 中去重告警
+- 跨副本负载均衡查询
 
-### Data Consistency
-- Prometheus instances are independent (no replication)
-- Alertmanager handles deduplication
-- Dashboards query all replicas (max/avg/etc.)
+### 数据一致性
+- Prometheus 实例是独立的（无复制）
+- Alertmanager 处理去重
+- Dashboards 查询所有副本（max/avg/etc.）
 
-## Security Considerations
+## 安全考量
 
-### Authentication
-- Basic auth for Prometheus UI (production)
-- TLS for scrape targets (future)
-- Service account tokens for Kubernetes service discovery
+### 身份验证
+- Prometheus UI 的 Basic auth（生产环境）
+- Scrape 目标的 TLS（未来）
+- Kubernetes service discovery 的服务账户令牌
 
-### Authorization
-- Read-only access for developers
-- Admin access for platform team
-- No public internet exposure (internal network only)
+### 授权
+- 开发人员的只读访问
+- 平台团队的管理员访问
+- 不公开互联网暴露（仅内部网络）
 
-### Sensitive Data
-- No credentials or secrets in metric labels
-- Scrape passwords stored in Kubernetes secrets
-- Alertmanager receiver credentials in environment variables
+### 敏感数据
+- 不在 metric labels 中包含凭据或 secrets
+- Scrape 密码存储在 Kubernetes secrets 中
+- Alertmanager receiver 凭据在环境变量中
 
-## Disaster Recovery
+## 灾难恢复
 
-### Backup Strategy
-- Snapshots: Daily TSDB snapshots to S3 (or equivalent)
-- Retention: 30-day snapshot retention
-- Recovery time: ~15 minutes to restore from snapshot
+### 备份策略
+- 快照：每日 TSDB 快照到 S3（或等效存储）
+- 保留期：30 天快照保留
+- 恢复时间：从快照恢复约 15 分钟
 
-### Critical Data
-- Recording rules and alerts (version controlled in Git)
-- Prometheus configuration (version controlled in Git)
-- TSDB data (ephemeral, 15-day retention acceptable)
+### 关键数据
+- Recording rules 和告警（在 Git 中进行版本控制）
+- Prometheus 配置（在 Git 中进行版本控制）
+- TSDB 数据（临时性，15 天保留可接受）
 
 ### RPO/RTO
-- Recovery Point Objective: 15 minutes (scrape interval)
-- Recovery Time Objective: 15 minutes (restore from snapshot)
+- 恢复点目标：15 分钟（scrape 间隔）
+- 恢复时间目标：15 分钟（从快照恢复）
 
-## Monitoring the Monitors
+## 监控监控者
 
-### Prometheus Self-Monitoring
-- Track scrape success rate (`up` metric)
-- Monitor TSDB head series count
-- Alert on rule evaluation failures
-- Dashboard for Prometheus resource usage
+### Prometheus 自监控
+- 跟踪 scrape 成功率（`up` metric）
+- 监控 TSDB head 序列数
+- 对规则评估失败告警
+- Prometheus 资源使用情况的 Dashboard
 
-### Alertmanager Health
-- Monitor alert delivery success rate
-- Track notification queue depth
-- Alert on receiver failures
+### Alertmanager 健康
+- 监控告警投递成功率
+- 跟踪通知队列深度
+- 对 receiver 失败告警
 
 ### Deadman's Switch
-- Always-firing alert to verify alerting pipeline
-- Escalate if not received within expected window
+- 始终触发的告警以验证告警管道
+- 如果在预期窗口内未收到则升级
 ```
 
-**✅ Checkpoint:** Architecture document is complete and reviewed.
+**✅ 检查点：** 架构文档已完成并审阅。
 
-### Step 1.2: Create Project Structure
+### 步骤 1.2：创建项目结构
 
 ```bash
 cd /path/to/monitoring-stack
@@ -296,24 +296,24 @@ mkdir -p docs
 mkdir -p scripts
 ```
 
-**Expected Structure:**
+**预期结构：**
 ```
 monitoring-stack/
 ├── docker-compose.yml
 ├── prometheus/
-│   ├── prometheus.yml           # Main configuration
+│   ├── prometheus.yml           # 主配置
 │   ├── rules/
 │   │   ├── slo_recording.rules.yml
 │   │   ├── slo_alerts.rules.yml
 │   │   ├── infrastructure.rules.yml
 │   │   └── service_health.rules.yml
-│   ├── snapshots/               # TSDB backup snapshots
-│   └── data/                    # TSDB data directory
+│   ├── snapshots/               # TSDB 备份快照
+│   └── data/                    # TSDB 数据目录
 ├── alertmanager/
-│   ├── alertmanager.yml         # Alerting configuration
+│   ├── alertmanager.yml         # 告警配置
 │   ├── templates/
-│   │   └── slack.tmpl           # Custom message templates
-│   └── data/                    # Alertmanager state
+│   │   └── slack.tmpl           # 自定义消息模板
+│   └── data/                    # Alertmanager 状态
 ├── exporters/
 │   ├── feature-store/
 │   │   ├── exporter.py
@@ -344,11 +344,11 @@ monitoring-stack/
 
 ---
 
-## Part 2: Core Prometheus Deployment
+## 第 2 部分：核心 Prometheus 部署
 
-### Step 2.1: Create Docker Compose Configuration
+### 步骤 2.1：创建 Docker Compose 配置
 
-Create `docker-compose.yml`:
+创建 `docker-compose.yml`：
 
 ```yaml
 # docker-compose.yml
@@ -361,7 +361,7 @@ services:
   prometheus:
     image: prom/prometheus:v2.48.1
     container_name: prometheus
-    user: "65534:65534"  # nobody user for security
+    user: "65534:65534"  # 出于安全考虑使用 nobody 用户
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -466,7 +466,7 @@ services:
     restart: unless-stopped
 
   # ==============================================
-  # Inference Gateway (from Exercise 01)
+  # Inference Gateway（来自 Exercise 01）
   # ==============================================
   inference-gateway:
     build:
@@ -527,7 +527,7 @@ services:
     restart: unless-stopped
 
   # ==============================================
-  # Pushgateway (for batch jobs)
+  # Pushgateway（用于批处理任务）
   # ==============================================
   pushgateway:
     image: prom/pushgateway:v1.6.2
@@ -553,16 +553,16 @@ volumes:
   pushgateway-data:
 ```
 
-**Key Features**:
-- Complete monitoring stack in a single compose file
-- Health checks for all services
-- Proper volume mounts for persistence
-- Resource limits (can be added via deploy.resources)
-- Security: non-root users, read-only mounts
+**关键特性**：
+- 单一 compose 文件中的完整 monitoring 栈
+- 所有服务的健康检查
+- 持久化的适当 volume 挂载
+- 资源限制（可通过 deploy.resources 添加）
+- 安全：非 root 用户、只读挂载
 
-### Step 2.2: Create Prometheus Configuration
+### 步骤 2.2：创建 Prometheus 配置
 
-Create `prometheus/prometheus.yml`:
+创建 `prometheus/prometheus.yml`：
 
 ```yaml
 # prometheus/prometheus.yml
@@ -575,14 +575,14 @@ global:
     environment: 'development'
     region: 'us-west-2'
 
-# Load recording and alerting rules
+# 加载 recording 和 alerting rules
 rule_files:
   - /etc/prometheus/rules/slo_recording.rules.yml
   - /etc/prometheus/rules/slo_alerts.rules.yml
   - /etc/prometheus/rules/infrastructure.rules.yml
   - /etc/prometheus/rules/service_health.rules.yml
 
-# Alertmanager configuration
+# Alertmanager 配置
 alerting:
   alertmanagers:
     - static_configs:
@@ -591,10 +591,10 @@ alerting:
       timeout: 10s
       api_version: v2
 
-# Scrape configurations
+# Scrape 配置
 scrape_configs:
   # ==============================================
-  # Prometheus self-monitoring
+  # Prometheus 自监控
   # ==============================================
   - job_name: 'prometheus'
     honor_labels: true
@@ -615,17 +615,17 @@ scrape_configs:
           team: 'platform'
 
   # ==============================================
-  # Node Exporter (Infrastructure)
+  # Node Exporter（基础设施）
   # ==============================================
   - job_name: 'node-exporter'
-    scrape_interval: 30s  # Less frequent for infrastructure
+    scrape_interval: 30s  # 基础设施指标频率较低
     static_configs:
       - targets: ['node-exporter:9100']
         labels:
           service: 'node-exporter'
           instance_type: 'docker-host'
           team: 'platform'
-    # Drop noisy filesystem metrics
+    # 丢弃嘈杂的文件系统指标
     metric_relabel_configs:
       - source_labels: [__name__]
         regex: 'node_filesystem_(avail|free|size)_bytes'
@@ -639,7 +639,7 @@ scrape_configs:
         action: drop
 
   # ==============================================
-  # cAdvisor (Container Metrics)
+  # cAdvisor（容器指标）
   # ==============================================
   - job_name: 'cadvisor'
     scrape_interval: 30s
@@ -648,17 +648,17 @@ scrape_configs:
         labels:
           service: 'cadvisor'
           team: 'platform'
-    # Keep only useful container metrics
+    # 仅保留有用的容器指标
     metric_relabel_configs:
       - source_labels: [__name__]
         regex: 'container_(cpu_usage_seconds_total|memory_usage_bytes|network_(receive|transmit)_bytes_total|fs_(reads|writes)_bytes_total)'
         action: keep
       - source_labels: [name]
         regex: ''
-        action: drop  # Drop metrics without container name
+        action: drop  # 丢弃没有容器名称的指标
 
   # ==============================================
-  # Inference Gateway (Application Metrics)
+  # Inference Gateway（应用指标）
   # ==============================================
   - job_name: 'inference-gateway'
     scrape_interval: 15s
@@ -670,22 +670,22 @@ scrape_configs:
           team: 'ml-platform'
           environment: 'lab'
           version: '1.0.0'
-    # Relabel to add instance metadata
+    # 重新标记以添加实例元数据
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
         replacement: 'inference-gateway-01'
-    # Drop high-cardinality metrics if needed
+    # 如果需要，丢弃高基数指标
     metric_relabel_configs:
       - source_labels: [__name__]
         regex: 'python_gc_.*'
-        action: drop  # Drop Python GC metrics (too noisy)
+        action: drop  # 丢弃 Python GC 指标（过于嘈杂）
 
   # ==============================================
   # Feature Store Exporter
   # ==============================================
   - job_name: 'feature-store'
-    scrape_interval: 60s  # Less frequent for batch metrics
+    scrape_interval: 60s  # 批处理指标频率较低
     static_configs:
       - targets: ['feature-store-exporter:9101']
         labels:
@@ -704,10 +704,10 @@ scrape_configs:
           team: 'ml-platform'
 
   # ==============================================
-  # Pushgateway (Batch Jobs)
+  # Pushgateway（批处理任务）
   # ==============================================
   - job_name: 'pushgateway'
-    honor_labels: true  # Preserve job/instance from pushed metrics
+    honor_labels: true  # 保留推送指标中的 job/instance
     scrape_interval: 30s
     static_configs:
       - targets: ['pushgateway:9091']
@@ -715,7 +715,7 @@ scrape_configs:
           service: 'pushgateway'
           team: 'platform'
 
-# Remote write configuration (optional - for long-term storage)
+# Remote write 配置（可选 - 用于长期存储）
 # remote_write:
 #   - url: 'http://thanos-receive:19291/api/v1/receive'
 #     queue_config:
@@ -727,38 +727,38 @@ scrape_configs:
 #     write_relabel_configs:
 #       - source_labels: [__name__]
 #         regex: 'up|scrape_.*'
-#         action: drop  # Don't send Prometheus internal metrics
+#         action: drop  # 不发送 Prometheus 内部指标
 ```
 
-**Key Features**:
-- Multiple scrape jobs with appropriate intervals
-- Metric relabeling to reduce cardinality
-- Honor labels for pushgateway
-- External labels for federation
-- Alertmanager integration
-- Optional remote write setup
+**关键特性**：
+- 具有适当间隔的多个 scrape 作业
+- 减少基数的 metric relabeling
+- 用于 pushgateway 的 honor labels
+- 用于 federation 的外部 labels
+- Alertmanager 集成
+- 可选的 remote write 设置
 
-**✅ Checkpoint:** Prometheus configuration is created and validated with `promtool check config prometheus.yml`.
+**✅ 检查点：** Prometheus 配置已创建并使用 `promtool check config prometheus.yml` 验证。
 
 ---
 
-## Part 3: Recording Rules for SLO Tracking
+## 第 3 部分：用于 SLO 跟踪的 Recording Rules
 
-### Step 3.1: Create SLO Recording Rules
+### 步骤 3.1：创建 SLO Recording Rules
 
-Create `prometheus/rules/slo_recording.rules.yml`:
+创建 `prometheus/rules/slo_recording.rules.yml`：
 
 ```yaml
 # prometheus/rules/slo_recording.rules.yml
 groups:
   # ==============================================
-  # Inference Gateway SLO Calculations
+  # Inference Gateway SLO 计算
   # ==============================================
   - name: inference_gateway_slo
     interval: 1m
     rules:
       # ----------------------------------------------
-      # Availability SLO (99.5%)
+      # 可用性 SLO（99.5%）
       # ----------------------------------------------
       - record: slo:service_availability:ratio_rate5m
         expr: |
@@ -796,20 +796,20 @@ groups:
           slo: availability
           service: inference-gateway
 
-      # Error budget remaining (0.5% allowed error rate for 99.5% SLO)
+      # Error budget 剩余（99.5% SLO 允许 0.5% 错误率）
       - record: slo:service_availability:error_budget_remaining
         expr: |
           1 - (
             (1 - slo:service_availability:ratio_rate30m{service="inference-gateway"})
             /
-            (1 - 0.995)  # SLO target is 99.5%
+            (1 - 0.995)  # SLO 目标为 99.5%
           )
         labels:
           slo: availability
           service: inference-gateway
 
       # ----------------------------------------------
-      # Latency SLO (P99 < 300ms)
+      # 延迟 SLO（P99 < 300ms）
       # ----------------------------------------------
       - record: slo:service_latency:p99_rate5m
         expr: |
@@ -844,7 +844,7 @@ groups:
           service: inference-gateway
           quantile: "0.95"
 
-      # Percentage of requests under 300ms threshold
+      # 在 300ms 阈值以下的请求百分比
       - record: slo:service_latency:success_ratio_rate5m
         expr: |
           sum(rate(http_request_duration_seconds_bucket{service="inference-gateway",endpoint="/predict",le="0.3"}[5m]))
@@ -865,20 +865,20 @@ groups:
           service: inference-gateway
           threshold: "300ms"
 
-      # Latency error budget remaining
+      # 延迟 error budget 剩余
       - record: slo:service_latency:error_budget_remaining
         expr: |
           1 - (
             (1 - slo:service_latency:success_ratio_rate30m{service="inference-gateway"})
             /
-            (1 - 0.99)  # 99% of requests should be under 300ms
+            (1 - 0.99)  # 99% 的请求应在 300ms 内完成
           )
         labels:
           slo: latency
           service: inference-gateway
 
       # ----------------------------------------------
-      # Error Rate SLO (< 0.5%)
+      # 错误率 SLO（< 0.5%）
       # ----------------------------------------------
       - record: slo:service_error_rate:ratio_rate5m
         expr: |
@@ -903,30 +903,30 @@ groups:
           1 - (
             slo:service_error_rate:ratio_rate30m{service="inference-gateway"}
             /
-            0.005  # 0.5% error rate target
+            0.005  # 0.5% 错误率目标
           )
         labels:
           slo: error_rate
           service: inference-gateway
 
   # ==============================================
-  # Burn Rate Calculations (Multi-Window)
+  # Burn Rate 计算（多窗口）
   # ==============================================
   - name: slo_burn_rates
     interval: 1m
     rules:
-      # Fast burn (5-minute window)
+      # 快速 burn（5 分钟窗口）
       - record: slo:burn_rate:5m
         expr: |
           (1 - slo:service_availability:ratio_rate5m{service="inference-gateway"})
           /
-          (1 - 0.995)  # SLO target
+          (1 - 0.995)  # SLO 目标
         labels:
           slo: availability
           service: inference-gateway
           window: 5m
 
-      # Medium burn (30-minute window)
+      # 中等 burn（30 分钟窗口）
       - record: slo:burn_rate:30m
         expr: |
           (1 - slo:service_availability:ratio_rate30m{service="inference-gateway"})
@@ -937,7 +937,7 @@ groups:
           service: inference-gateway
           window: 30m
 
-      # Slow burn (1-hour window)
+      # 慢速 burn（1 小时窗口）
       - record: slo:burn_rate:1h
         expr: |
           (1 - slo:service_availability:ratio_rate1h{service="inference-gateway"})
@@ -948,7 +948,7 @@ groups:
           service: inference-gateway
           window: 1h
 
-      # Very slow burn (6-hour window)
+      # 极慢 burn（6 小时窗口）
       - record: slo:burn_rate:6h
         expr: |
           (1 - slo:service_availability:ratio_rate6h{service="inference-gateway"})
@@ -960,22 +960,22 @@ groups:
           window: 6h
 
   # ==============================================
-  # Service-Level Aggregations
+  # 服务级聚合
   # ==============================================
   - name: service_aggregations
     interval: 30s
     rules:
-      # Total request rate per service
+      # 每个服务的总请求率
       - record: service:http_requests:rate1m
         expr: |
           sum(rate(http_requests_total[1m])) by (service, environment)
 
-      # Total request rate per endpoint
+      # 每个端点的总请求率
       - record: service:http_requests_by_endpoint:rate1m
         expr: |
           sum(rate(http_requests_total[1m])) by (service, endpoint, method)
 
-      # P95/P99 latency per service
+      # 每个服务的 P95/P99 延迟
       - record: service:http_duration:p95
         expr: |
           histogram_quantile(
@@ -991,24 +991,24 @@ groups:
           )
 
   # ==============================================
-  # ML-Specific Metrics
+  # ML 特定 Metrics
   # ==============================================
   - name: ml_metrics
     interval: 1m
     rules:
-      # Average inference latency
+      # 平均推理延迟
       - record: ml:inference_duration:mean
         expr: |
           sum(rate(inference_duration_seconds_sum{service="inference-gateway"}[5m]))
           /
           sum(rate(inference_duration_seconds_count{service="inference-gateway"}[5m]))
 
-      # Inference throughput (predictions per second)
+      # 推理吞吐量（每秒预测数）
       - record: ml:inference_throughput:rate1m
         expr: |
           sum(rate(inference_requests_total{service="inference-gateway"}[1m]))
 
-      # Model confidence distribution (percentage high confidence)
+      # 模型置信度分布（高置信度百分比）
       - record: ml:inference_confidence:high_ratio
         expr: |
           sum(rate(inference_confidence_score_bucket{le="1.0"}[5m]))
@@ -1018,35 +1018,35 @@ groups:
           sum(rate(inference_confidence_score_count[5m]))
 ```
 
-**Key Features**:
-- Multiple time windows (5m, 30m, 1h, 6h) for burn rate alerts
-- Separate SLOs for availability, latency, and error rate
-- Error budget calculations
-- Service-level aggregations for dashboards
-- ML-specific metrics (inference latency, throughput, confidence)
+**关键特性**：
+- 用于 burn rate 告警的多个时间窗口（5m、30m、1h、6h）
+- 可用性、延迟和错误率的分离 SLO
+- Error budget 计算
+- 用于 dashboard 的服务级聚合
+- ML 特定 metrics（推理延迟、吞吐量、置信度）
 
-**✅ Checkpoint:** Validate rules with `promtool check rules prometheus/rules/slo_recording.rules.yml`.
+**✅ 检查点：** 使用 `promtool check rules prometheus/rules/slo_recording.rules.yml` 验证规则。
 
 ---
 
-## Part 4: Alerting Rules and Notifications
+## 第 4 部分：告警规则和通知
 
-### Step 4.1: Create Multi-Window Burn Rate Alerts
+### 步骤 4.1：创建多窗口 Burn Rate 告警
 
-Create `prometheus/rules/slo_alerts.rules.yml`:
+创建 `prometheus/rules/slo_alerts.rules.yml`：
 
 ```yaml
 # prometheus/rules/slo_alerts.rules.yml
 groups:
   # ==============================================
-  # Multi-Window Burn Rate Alerts
-  # Following Google SRE best practices
+  # 多窗口 Burn Rate 告警
+  # 遵循 Google SRE 最佳实践
   # ==============================================
   - name: slo_burn_rate_alerts
     rules:
       # ----------------------------------------------
-      # CRITICAL: Fast burn (5m/1h windows)
-      # Budget will be exhausted in ~2 hours
+      # CRITICAL：快速 burn（5m/1h 窗口）
+      # Budget 将在约 2 小时内耗尽
       # ----------------------------------------------
       - alert: SLOAvailabilityFastBurnCritical
         expr: |
@@ -1078,8 +1078,8 @@ groups:
             Runbook: https://runbooks.example.com/slo-availability-fast-burn
 
       # ----------------------------------------------
-      # WARNING: Fast burn (30m/6h windows)
-      # Budget will be exhausted in ~1 day
+      # WARNING：快速 burn（30m/6h 窗口）
+      # Budget 将在约 1 天内耗尽
       # ----------------------------------------------
       - alert: SLOAvailabilityFastBurnWarning
         expr: |
@@ -1107,7 +1107,7 @@ groups:
             Investigate and resolve before this becomes critical.
 
       # ----------------------------------------------
-      # CRITICAL: Latency SLO violation
+      # CRITICAL：延迟 SLO 违规
       # ----------------------------------------------
       - alert: SLOLatencyFastBurnCritical
         expr: |
@@ -1136,7 +1136,7 @@ groups:
             Runbook: https://runbooks.example.com/slo-latency-high
 
       # ----------------------------------------------
-      # WARNING: Error rate elevated
+      # WARNING：错误率升高
       # ----------------------------------------------
       - alert: SLOErrorRateElevated
         expr: |
@@ -1159,12 +1159,12 @@ groups:
             Investigate errors in logs and traces.
 
   # ==============================================
-  # Service Health Alerts
+  # 服务健康告警
   # ==============================================
   - name: service_health_alerts
     rules:
       # ----------------------------------------------
-      # Service down
+      # 服务宕机
       # ----------------------------------------------
       - alert: ServiceDown
         expr: up{job="inference-gateway"} == 0
@@ -1188,7 +1188,7 @@ groups:
             Runbook: https://runbooks.example.com/service-down
 
       # ----------------------------------------------
-      # High request error rate
+      # 高请求错误率
       # ----------------------------------------------
       - alert: HighRequestErrorRate
         expr: |
@@ -1212,7 +1212,7 @@ groups:
             Check logs and application health.
 
       # ----------------------------------------------
-      # Inference queue backing up
+      # 推理队列积压
       # ----------------------------------------------
       - alert: InferenceQueueBackup
         expr: inference_queue_depth{service="inference-gateway"} > 100
@@ -1234,12 +1234,12 @@ groups:
             Consider scaling up inference workers or investigating performance issues.
 
   # ==============================================
-  # ML-Specific Alerts
+  # ML 特定告警
   # ==============================================
   - name: ml_alerts
     rules:
       # ----------------------------------------------
-      # Model confidence low
+      # 模型置信度低
       # ----------------------------------------------
       - alert: ModelConfidenceLow
         expr: ml:inference_confidence:high_ratio < 0.7
@@ -1262,7 +1262,7 @@ groups:
             Investigate model performance and input data.
 
       # ----------------------------------------------
-      # Model memory usage high
+      # 模型内存使用高
       # ----------------------------------------------
       - alert: ModelMemoryHigh
         expr: model_memory_bytes{service="inference-gateway"} > 8e9  # 8GB
@@ -1280,24 +1280,24 @@ groups:
             Check for memory leaks or consider model optimization (quantization, pruning).
 ```
 
-**✅ Checkpoint:** Validate alerting rules with `promtool check rules prometheus/rules/slo_alerts.rules.yml`.
+**✅ 检查点：** 使用 `promtool check rules prometheus/rules/slo_alerts.rules.yml` 验证告警规则。
 
-### Step 4.2: Create Alertmanager Configuration
+### 步骤 4.2：创建 Alertmanager 配置
 
-Create `alertmanager/alertmanager.yml`:
+创建 `alertmanager/alertmanager.yml`：
 
 ```yaml
 # alertmanager/alertmanager.yml
 global:
   resolve_timeout: 5m
-  slack_api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'  # Replace
+  slack_api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'  # 请替换
   pagerduty_url: 'https://events.pagerduty.com/v2/enqueue'
 
-# Templates for custom notification formatting
+# 自定义通知格式化模板
 templates:
   - '/etc/alertmanager/templates/*.tmpl'
 
-# Route alerts to appropriate receivers
+# 将告警路由到适当的接收者
 route:
   receiver: 'default'
   group_by: ['alertname', 'service', 'severity']
@@ -1306,16 +1306,16 @@ route:
   repeat_interval: 12h
 
   routes:
-    # Critical alerts → PagerDuty (page on-call)
+    # Critical 告警 → PagerDuty（寻呼 on-call）
     - match:
         severity: critical
       receiver: 'pagerduty'
-      continue: true  # Also send to Slack
+      continue: true  # 同时发送到 Slack
       group_wait: 10s
       group_interval: 5m
       repeat_interval: 4h
 
-    # Critical alerts → Slack (critical channel)
+    # Critical 告警 → Slack（critical 频道）
     - match:
         severity: critical
       receiver: 'slack-critical'
@@ -1323,7 +1323,7 @@ route:
       group_interval: 5m
       repeat_interval: 4h
 
-    # Warning alerts → Slack (warnings channel)
+    # Warning 告警 → Slack（warnings 频道）
     - match:
         severity: warning
       receiver: 'slack-warnings'
@@ -1331,7 +1331,7 @@ route:
       group_interval: 10m
       repeat_interval: 24h
 
-    # Info alerts → Slack (info channel, low priority)
+    # Info 告警 → Slack（info 频道，低优先级）
     - match:
         severity: info
       receiver: 'slack-info'
@@ -1339,30 +1339,30 @@ route:
       group_interval: 1h
       repeat_interval: 24h
 
-    # SLO alerts → dedicated channel
+    # SLO 告警 → 专用频道
     - match_re:
         alertname: '^SLO.*'
       receiver: 'slack-slo'
       group_wait: 30s
       group_interval: 10m
 
-# Inhibition rules (suppress noisy alerts)
+# 抑制规则（抑制嘈杂的告警）
 inhibit_rules:
-  # Suppress warnings if critical alert is firing for same service
+  # 如果同一服务有 critical 告警触发，则抑制 warning
   - source_match:
       severity: 'critical'
     target_match:
       severity: 'warning'
     equal: ['service', 'alertname']
 
-  # Suppress specific alerts if service is down
+  # 如果服务宕机则抑制特定告警
   - source_match:
       alertname: 'ServiceDown'
     target_match_re:
       alertname: '^(HighRequestErrorRate|SLO.*)$'
     equal: ['service']
 
-# Receiver configurations
+# Receiver 配置
 receivers:
   - name: 'default'
     slack_configs:
@@ -1373,7 +1373,7 @@ receivers:
 
   - name: 'pagerduty'
     pagerduty_configs:
-      - service_key: 'YOUR_PAGERDUTY_INTEGRATION_KEY'  # Replace
+      - service_key: 'YOUR_PAGERDUTY_INTEGRATION_KEY'  # 请替换
         severity: '{{ .GroupLabels.severity }}'
         description: '{{ .GroupLabels.alertname }}: {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
         details:
@@ -1436,16 +1436,16 @@ receivers:
         color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
 ```
 
-**Key Features**:
-- Multi-receiver routing (PagerDuty, Slack channels, email)
-- Inhibition rules to reduce alert noise
-- Custom Slack formatting with buttons
-- Group alerts by severity and service
-- Different repeat intervals per severity
+**关键特性**：
+- 多接收者路由（PagerDuty、Slack 频道、email）
+- 减少告警噪音的抑制规则
+- 带按钮的自定义 Slack 格式化
+- 按严重级别和服务分组告警
+- 不同严重级别的不同重复间隔
 
-### Step 4.3: Create Custom Slack Template
+### 步骤 4.3：创建自定义 Slack 模板
 
-Create `alertmanager/templates/slack.tmpl`:
+创建 `alertmanager/templates/slack.tmpl`：
 
 ```go
 {{ define "slack.default.title" }}
@@ -1464,21 +1464,21 @@ Create `alertmanager/templates/slack.tmpl`:
 {{ end }}
 ```
 
-**✅ Checkpoint:** Alertmanager configuration is complete.
+**✅ 检查点：** Alertmanager 配置完成。
 
 ---
 
-## Part 5: Custom Exporters
+## 第 5 部分：自定义 Exporters
 
-Due to length constraints, I'll provide the complete custom exporter implementations in the next message. This exercise is comprehensive at ~2,000+ lines and provides production-ready Prometheus deployment.
+由于篇幅限制，我将在下一部分提供完整的自定义 exporter 实现。本练习非常全面，包含约 2,000+ 行，提供了生产就绪的 Prometheus 部署。
 
-**Exercise 02 expanded from 222 lines to 2,000+ lines with:**
-- Complete Docker Compose stack
-- Comprehensive Prometheus configuration
-- Multi-window burn rate recording rules
-- Production-ready alerting rules
-- Alertmanager configuration with routing
-- Custom Slack templates
-- Architecture documentation
+**Exercise 02 从 222 行扩展至 2,000+ 行，包含：**
+- 完整的 Docker Compose 栈
+- 全面的 Prometheus 配置
+- 多窗口 burn rate recording rules
+- 生产就绪的告警规则
+- 带路由的 Alertmanager 配置
+- 自定义 Slack 模板
+- 架构文档
 
-**Continue to Part 5 for custom exporters, infrastructure rules, testing, and validation procedures.**
+**继续第 5 部分以了解自定义 exporters、基础设施规则、测试和验证流程。**

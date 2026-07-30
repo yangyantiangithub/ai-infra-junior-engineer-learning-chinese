@@ -1,592 +1,592 @@
-# Frequently Asked Questions (FAQ)
+# 常见问题 (FAQ)
 
-Common questions and answers for learners in the Junior AI Infrastructure Engineer curriculum.
-
----
-
-## Table of Contents
-
-- [General Questions](#general-questions)
-- [Prerequisites](#prerequisites)
-- [Time Commitment](#time-commitment)
-- [Technical Setup](#technical-setup)
-- [Learning Difficulties](#learning-difficulties)
-- [Projects](#projects)
-- [Assessments](#assessments)
-- [Job Search](#job-search)
-- [Tools & Environment](#tools--environment)
-- [Community & Support](#community--support)
+面向初级 AI 基础设施工程师课程学习者的常见问题与解答。
 
 ---
 
-## General Questions
+## 目录
 
-### Q1: Who is this curriculum for?
-**A**: This curriculum is designed for:
-- Career changers wanting to enter AI infrastructure
-- Recent graduates interested in ML engineering infrastructure
-- Software engineers pivoting to ML infrastructure roles
-- DevOps engineers expanding into AI/ML space
-- Anyone wanting structured learning in AI infrastructure
-
-Prerequisites: Basic programming knowledge and familiarity with command line recommended but not required.
-
----
-
-### Q2: Do I need a computer science degree?
-**A**: No! While a CS degree can be helpful, it's not required. This curriculum assumes:
-- Basic programming experience (Python preferred)
-- Willingness to learn
-- Strong problem-solving skills
-- Self-discipline for self-paced learning
-
-Many successful AI infrastructure engineers are self-taught or come from non-CS backgrounds.
+- [通用问题](#通用问题)
+- [先决条件](#先决条件)
+- [时间投入](#时间投入)
+- [技术环境搭建](#技术环境搭建)
+- [学习困难](#学习困难)
+- [项目](#项目)
+- [评估](#评估)
+- [求职](#求职)
+- [工具与环境](#工具与环境)
+- [社区与支持](#社区与支持)
 
 ---
 
-### Q3: Is this curriculum enough to get a job?
-**A**: This curriculum provides foundational knowledge for junior roles. To maximize job prospects:
-- Complete all projects with high quality
-- Build additional portfolio projects
-- Contribute to open source
-- Network with professionals
-- Practice interview questions
-- Gain internship or freelance experience (if possible)
+## 通用问题
 
-Think of this as your foundation—continuous learning is part of the career.
+### Q1: 这套课程适合谁？
+**A**: 本课程面向以下人群：
+- 希望进入 AI 基础设施领域的转行者
+- 对 ML 工程基础设施感兴趣的应届毕业生
+- 转型至 ML 基础设施岗位的软件工程师
+- 拓展至 AI/ML 领域的 DevOps 工程师
+- 任何希望系统学习 AI 基础设施的人
+
+前提条件：建议具备基础编程知识和命令行使用经验，但非强制。
 
 ---
 
-### Q4: What's the difference between learning and solutions repositories?
+### Q2: 我需要计算机科学学位吗？
+**A**: 不需要！虽然 CS 学位可能有帮助，但并非必需。本课程假设：
+- 基础编程经验（最好使用 Python）
+- 愿意学习
+- 较强的问题解决能力
+- 自律的自主学习能力
+
+许多成功的 AI 基础设施工程师是自学成才或来自非 CS 背景。
+
+---
+
+### Q3: 完成本课程足以找到工作吗？
+**A**: 本课程为初级岗位提供基础知识。要最大化就业机会：
+- 高质量完成所有项目
+- 构建额外的个人项目
+- 贡献开源项目
+- 与专业人士建立联系
+- 练习面试问题
+- 如有可能，获取实习或自由职业经验
+
+把这当作你的基础——持续学习是职业生涯的一部分。
+
+---
+
+### Q4: 学习仓库和解答仓库有什么区别？
 **A**:
-- **Learning Repository**: Contains lessons, exercises with stubs, and templates. You work through these.
-- **Solutions Repository**: Contains complete implementations for reference. Use these AFTER attempting projects yourself.
+- **学习仓库**：包含课程、含存根代码的练习和模板。你在这里完成学习。
+- **解答仓库**：包含完整的实现供参考。请在自己完成项目之后再查看。
 
-Always try to solve problems independently before checking solutions.
+始终先尝试独立解决问题，再查看解答。
 
 ---
 
-### Q5: Can I use AI assistants (ChatGPT, GitHub Copilot, etc.)?
+### Q5: 我可以使用 AI 助手（ChatGPT、GitHub Copilot 等）吗？
 **A**:
-- **While learning**: Use sparingly. Understanding > completion.
-- **For debugging**: Yes, but understand the solutions.
-- **For generating entire projects**: No. You won't learn.
-- **Best practice**: Try independently first, then use AI for specific stuck points.
+- **学习过程中**：有节制地使用。理解 > 完成。
+- **调试时**：可以，但要理解解决方案。
+- **用于生成整个项目**：不可以。这样你学不到东西。
+- **最佳实践**：先独立尝试，然后在特定卡点使用 AI。
 
-The goal is genuine competency, not just completed assignments.
-
----
-
-## Prerequisites
-
-### Q6: I don't know Python. Should I learn it first?
-**A**: Yes, basic Python is essential. Before starting this curriculum:
-- Complete a Python fundamentals course (2-4 weeks)
-- Be comfortable with: variables, functions, loops, classes
-- Recommended: "Python Crash Course" or Codecademy Python
-- Take the Prerequisites Quiz—if you score <70%, do more Python prep
+目标是获得真实能力，而不仅仅是完成作业。
 
 ---
 
-### Q7: Do I need to know machine learning before starting?
-**A**: No deep ML knowledge required! You need:
-- **Awareness** of what ML is (models, training, inference)
-- **Basic concepts** like features, predictions, accuracy
-- **Ability to use** pre-trained models
+## 先决条件
 
-The curriculum includes ML fundamentals (Module 1). You'll learn enough to deploy and manage ML systems.
-
----
-
-### Q8: Do I need a Mac or Linux computer?
-**A**: Strongly recommended. While Windows works (especially with WSL2):
-- Most servers run Linux
-- Docker works better on Linux/Mac
-- Industry primarily uses Linux/Mac
-- Easier for development
-
-If using Windows, set up WSL2 (Windows Subsystem for Linux) with Ubuntu.
+### Q6: 我不会 Python。应该先学吗？
+**A**: 是的，基础 Python 是必需的。开始本课程之前：
+- 完成 Python 基础课程（2-4 周）
+- 熟练掌握：变量、函数、循环、类
+- 推荐："Python Crash Course" 或 Codecademy Python
+- 参加先决条件测验——如果得分 < 70%，请多做 Python 准备
 
 ---
 
-### Q9: How much math do I need to know?
-**A**: For this curriculum, minimal math needed:
-- Basic algebra
-- Understanding of percentages and statistics (helpful)
-- No calculus or advanced math required
+### Q7: 开始前需要了解机器学习吗？
+**A**: 不需要深入的 ML 知识！你需要：
+- **了解** ML 是什么（模型、训练、推理）
+- **基本概念**，如特征、预测、准确率
+- **能够使用**预训练模型
 
-This curriculum focuses on infrastructure, not ML research. Implementation skills matter more than mathematical proof.
-
----
-
-## Time Commitment
-
-### Q10: How long does it take to complete the curriculum?
-**A**: Depends on your schedule:
-- **Full-time** (40 hrs/week): 8-12 weeks
-- **Part-time** (20 hrs/week): 4-6 months
-- **Casual** (10 hrs/week): 6-12 months
-
-Time varies based on:
-- Prior experience
-- Learning speed
-- Depth of exploration
-- Time on projects
+本课程包含 ML 基础（模块 1）。你将学到足够的知识来部署和管理 ML 系统。
 
 ---
 
-### Q11: Can I work through this while employed full-time?
-**A**: Absolutely! Many learners do. Tips:
-- Set aside 1-2 hours daily
-- Use weekends for projects (4-6 hours)
-- Consistency > intensity
-- Aim for 10-15 hours/week
-- Expect 6-9 months completion
+### Q8: 我需要 Mac 或 Linux 电脑吗？
+**A**: 强烈推荐。虽然 Windows 也能用（尤其是 WSL2）：
+- 大多数服务器运行 Linux
+- Docker 在 Linux/Mac 上运行更佳
+- 行业主要使用 Linux/Mac
+- 开发更方便
+
+如果使用 Windows，请安装带 Ubuntu 的 WSL2（适用于 Linux 的 Windows 子系统）。
 
 ---
 
-### Q12: What if I need to take a break?
-**A**: Life happens! To resume effectively:
-- Use the progress tracking templates
-- Review your last completed module before continuing
-- Don't restart from scratch
-- Ease back in with easier exercises
-- Join a study group for accountability
+### Q9: 我需要掌握多少数学知识？
+**A**: 本课程所需的数学知识很少：
+- 基础代数
+- 理解百分比和统计知识（有帮助）
+- 不需要微积分或高等数学
 
-Knowledge retention decreases over time, but you don't lose everything. A quick review gets you back on track.
+本课程侧重于基础设施，而非 ML 研究。实现技能比数学证明更重要。
 
 ---
 
-## Technical Setup
+## 时间投入
 
-### Q13: My Docker installation isn't working. Help!
-**A**: Common issues and fixes:
+### Q10: 完成本课程需要多长时间？
+**A**: 取决于你的时间安排：
+- **全职**（每周 40 小时）：8-12 周
+- **兼职**（每周 20 小时）：4-6 个月
+- **轻松学习**（每周 10 小时）：6-12 个月
 
-**Linux**:
+所需时间因以下因素而异：
+- 先前经验
+- 学习速度
+- 探索深度
+- 项目时间投入
+
+---
+
+### Q11: 我可以在全职工作期间学习吗？
+**A**: 当然！很多学习者都是这样做的。建议：
+- 每天留出 1-2 小时
+- 利用周末做项目（4-6 小时）
+- 持续性 > 强度
+- 争取每周 10-15 小时
+- 预计 6-9 个月完成
+
+---
+
+### Q12: 如果需要暂停怎么办？
+**A**: 生活总有意外！要有效恢复：
+- 使用进度跟踪模板
+- 先回顾上一个完成的模块再继续
+- 不要从头开始
+- 从较简单的练习开始逐步恢复
+- 加入学习小组以获得责任感
+
+知识保留会随时间下降，但不会完全丢失。快速回顾就能让你重回正轨。
+
+---
+
+## 技术环境搭建
+
+### Q13: 我的 Docker 安装不工作。帮帮我！
+**A**: 常见问题与修复：
+
+**Linux**：
 ```bash
-# Add user to docker group
+# 将用户添加到 docker 组
 sudo usermod -aG docker $USER
-# Log out and back in
+# 注销并重新登录
 
-# Start Docker daemon
+# 启动 Docker 守护进程
 sudo systemctl start docker
 sudo systemctl enable docker
 ```
 
-**Mac/Windows**:
-- Ensure Docker Desktop is running
-- Check resource allocation (increase if needed)
-- Restart Docker Desktop
+**Mac/Windows**：
+- 确保 Docker Desktop 正在运行
+- 检查资源分配（必要时增加）
+- 重启 Docker Desktop
 
-**General**:
-- Run `docker --version` to verify installation
-- Try `docker run hello-world`
-- Check Docker Desktop logs
-- See `resources/tools.md` for detailed setup
+**通用**：
+- 运行 `docker --version` 验证安装
+- 尝试 `docker run hello-world`
+- 检查 Docker Desktop 日志
+- 详见 `resources/tools.md`
 
 ---
 
-### Q14: I'm getting "permission denied" errors. What do I do?
-**A**: Usually a Docker permissions issue:
+### Q14: 我遇到"permission denied"错误。怎么办？
+**A**: 通常是 Docker 权限问题：
 
 ```bash
-# Linux: Add to docker group
+# Linux：添加到 docker 组
 sudo usermod -aG docker $USER
-# Log out and log back in
+# 注销并重新登录
 
-# Verify
+# 验证
 docker ps
 ```
 
-For file permission issues:
+对于文件权限问题：
 ```bash
-# Check ownership
+# 检查所有者
 ls -la
 
-# Fix ownership
+# 修复所有权
 sudo chown -R $USER:$USER /path/to/directory
 ```
 
 ---
 
-### Q15: My computer is slow. What are minimum requirements?
-**A**: Minimum specs:
-- **CPU**: Dual-core (Quad-core recommended)
-- **RAM**: 8GB (16GB recommended)
-- **Storage**: 50GB free space (SSD preferred)
-- **OS**: Ubuntu 20.04+, macOS 10.15+, or Windows 10 with WSL2
+### Q15: 我的电脑很慢。最低配置是什么？
+**A**: 最低配置：
+- **CPU**：双核（推荐四核）
+- **内存**：8GB（推荐 16GB）
+- **存储**：50GB 可用空间（推荐 SSD）
+- **操作系统**：Ubuntu 20.04+、macOS 10.15+ 或带 WSL2 的 Windows 10
 
-If your computer struggles:
-- Close other applications while learning
-- Use lightweight alternatives (Minikube single-node)
-- Consider cloud development environments (AWS Cloud9, GitHub Codespaces)
-
----
-
-### Q16: Can I use a cloud VM instead of my local machine?
-**A**: Yes! Options:
-- **AWS EC2**: Free tier available
-- **Google Cloud**: $300 credit for new users
-- **DigitalOcean**: Affordable droplets
-- **GitHub Codespaces**: Cloud-based VS Code
-
-Benefits:
-- Better resources
-- Matches production environment
-- Access from anywhere
-
-Drawbacks:
-- Internet dependency
-- Potential costs after free tier
-- Slightly more complex setup
+如果电脑吃力：
+- 学习时关闭其他应用程序
+- 使用轻量级替代方案（单节点 Minikube）
+- 考虑云端开发环境（AWS Cloud9、GitHub Codespaces）
 
 ---
 
-## Learning Difficulties
+### Q16: 我可以使用云虚拟机代替本地电脑吗？
+**A**: 可以！可选项：
+- **AWS EC2**：提供免费套餐
+- **Google Cloud**：新用户 $300 额度
+- **DigitalOcean**：价格实惠的 Droplet
+- **GitHub Codespaces**：云端 VS Code
 
-### Q17: I'm stuck on a concept. What should I do?
-**A**: Follow this process:
-1. **Reread** the material carefully
-2. **Try examples** in the lessons
-3. **Search** online (official docs, Stack Overflow)
-4. **Watch videos** on the topic (YouTube)
-5. **Ask** in study groups or community forums
-6. **Take a break** and return with fresh perspective
-7. **Try different resource** (alternative explanations help)
+优点：
+- 更好的资源
+- 更接近生产环境
+- 可随处访问
 
-Don't spend more than 1-2 hours stuck before seeking help.
+缺点：
+- 依赖网络
+- 免费套餐后可能产生费用
+- 环境搭建稍复杂
 
 ---
 
-### Q18: The pace feels too fast/slow. What should I do?
+## 学习困难
+
+### Q17: 我在某个概念上卡住了。该怎么办？
+**A**: 按照以下步骤：
+1. **重新仔细阅读**材料
+2. **尝试课程中的示例**
+3. **在线搜索**（官方文档、Stack Overflow）
+4. **观看相关视频**（YouTube）
+5. **在学习小组或社区论坛提问**
+6. **休息一下**，以新的视角返回
+7. **尝试不同资源**（换个解释方式可能有帮助）
+
+在寻求帮助前，不要卡住超过 1-2 小时。
+
+---
+
+### Q18: 学习进度感觉太快/慢了。怎么办？
 **A**:
-**Too Fast**:
-- Slow down, depth > speed
-- Supplement with additional resources
-- Practice more exercises
-- Don't move forward until comfortable
+**太快了**：
+- 放慢速度，深度 > 速度
+- 补充额外资源
+- 多做练习
+- 感觉掌握之前不要往下走
 
-**Too Slow**:
-- Skip ahead to challenging sections
-- Try building projects early
-- Explore advanced variations
-- Contribute to open source for real complexity
+**太慢了**：
+- 跳到有挑战性的部分
+- 尝试提前做项目
+- 探索高级变体
+- 贡献开源项目以获得真实复杂度
 
-This is self-paced—adjust to your needs!
-
----
-
-### Q19: I keep forgetting what I learned. How do I retain information?
-**A**: Use these techniques:
-1. **Active recall**: Test yourself regularly
-2. **Spaced repetition**: Review after 1 day, 1 week, 1 month
-3. **Practice projects**: Apply concepts immediately
-4. **Teach others**: Explain concepts to solidify understanding
-5. **Take notes**: Write summaries in your own words
-6. **Use flashcards**: For commands and terminology
-7. **Build projects**: Hands-on practice is key
-
-Remember: Some forgetting is normal. Reference materials exist for a reason!
+这是自定进度的——根据需要调整！
 
 ---
 
-### Q20: I failed the midterm exam. What now?
-**A**: Don't panic! This is a learning opportunity:
-1. **Review feedback** to identify weak areas
-2. **Revisit modules** where you struggled
-3. **Practice more** exercises in those areas
-4. **Try alternative resources** for difficult concepts
-5. **Ask for help** in community channels
-6. **Retake** after meaningful review (wait 1 week)
+### Q19: 我总忘记学过的内容。如何保持记忆？
+**A**: 使用以下技巧：
+1. **主动回忆**：定期自我测试
+2. **间隔重复**：分别在 1 天、1 周、1 个月后复习
+3. **实践项目**：立即应用所学概念
+4. **教给别人**：通过讲解来巩固理解
+5. **做笔记**：用自己的话写总结
+6. **使用闪卡**：用于记忆命令和术语
+7. **构建项目**：动手实践是关键
 
-Many successful learners fail on first attempts. Growth happens through struggle.
-
----
-
-## Projects
-
-### Q21: My project isn't working. When should I check the solutions?
-**A**: Check solutions only after:
-1. **Spending significant time** trying (minimum 2-3 hours)
-2. **Debugging systematically** (logs, error messages, Google)
-3. **Asking for help** in community
-4. **Breaking problem into parts** and testing each
-
-When you do check solutions:
-- Don't copy-paste
-- Understand the approach
-- Implement in your own way
-- Document what you learned
+记住：遗忘一些内容是正常的。参考资料的存在自有其价值！
 
 ---
 
-### Q22: Can I use libraries not mentioned in requirements?
-**A**: Yes, but:
-- Core requirements must still be met
-- Document why you chose additional libraries
-- Ensure they're appropriate for the task
-- Don't over-engineer—simpler is often better
+### Q20: 我期中考试没通过。现在怎么办？
+**A**: 别慌！这是个学习机会：
+1. **查看反馈**以找出薄弱环节
+2. **重新学习**你遇到困难的模块
+3. **在这些领域多做练习**
+4. **对难懂的概念尝试其他资源**
+5. **在社区渠道寻求帮助**
+6. **认真复习后重考**（等待 1 周）
 
-The goal is learning fundamentals, not building the fanciest system.
-
----
-
-### Q23: Should I make my projects public on GitHub?
-**A**: Yes! Benefits:
-- **Portfolio**: Show skills to employers
-- **Feedback**: Community can review and suggest
-- **Practice**: Good Git/GitHub hygiene
-- **Networking**: People discover your work
-
-Just ensure:
-- No sensitive data (credentials, API keys)
-- Professional README
-- Clean commit history
-- Regular updates
+许多成功的学习者第一次也没通过。成长来自于克服困难。
 
 ---
 
-### Q24: How "perfect" should my projects be?
-**A**: Aim for:
-- **Functional**: Works as specified
-- **Clean**: Well-organized code
-- **Documented**: Clear README
-- **Tested**: Basic testing present
+## 项目
 
-Don't aim for:
-- Production-ready perfection
-- Every possible feature
-- Zero bugs
-- Cutting-edge optimization
+### Q21: 我的项目运行不了。什么时候该看解答？
+**A**: 仅在以下情况之后才查看解答：
+1. **投入了足够时间**尝试（至少 2-3 小时）
+2. **系统性地进行了调试**（日志、错误信息、Google 搜索）
+3. **在社区中寻求过帮助**
+4. **将问题拆解为多个部分**并逐一测试
 
-"Good enough to pass and learn from" is the goal. You can always improve later.
+当你查看解答时：
+- 不要直接复制粘贴
+- 理解其思路
+- 用自己的方式实现
+- 记录你学到的东西
 
 ---
 
-## Assessments
+### Q22: 我可以使用需求中未提及的库吗？
+**A**: 可以，但：
+- 仍需满足核心需求
+- 说明你选择额外库的原因
+- 确保它们适合当前任务
+- 不要过度设计——简单往往更好
 
-### Q25: What's a passing score?
+目标是学习基础，而不是构建最花哨的系统。
+
+---
+
+### Q23: 我应该把项目公开放在 GitHub 上吗？
+**A**: 是的！好处：
+- **作品集**：向雇主展示技能
+- **反馈**：社区可以审查并提出建议
+- **练习**：养成良好的 Git/GitHub 习惯
+- **人脉**：别人可以发现你的工作
+
+只需确保：
+- 不包含敏感数据（凭据、API 密钥）
+- 有专业的 README
+- 提交历史干净整洁
+- 定期更新
+
+---
+
+### Q24: 我的项目应该做到多"完美"？
+**A**: 目标是：
+- **功能完整**：按规格正常运行
+- **整洁**：代码组织良好
+- **有文档**：有清晰的 README
+- **有测试**：具备基本测试
+
+不要追求：
+- 生产级的完美
+- 包含所有可能的功能
+- 零 bug
+- 最前沿的优化
+
+目标是"足够好以通过并从中学习"。你以后随时可以改进。
+
+---
+
+## 评估
+
+### Q25: 及格分数是多少？
 **A**:
-- **Quizzes**: 75%
-- **Midterm Practical**: 75%
-- **Final Practical**: 80%
-- **Projects**: 75%
+- **测验**：75%
+- **期中实践考试**：75%
+- **期末实践考试**：80%
+- **项目**：75%
 
-These are guidelines for self-assessment. The goal is genuine competency, not just passing scores.
-
----
-
-### Q26: Can I retake assessments?
-**A**: Yes! Unlimited retakes for:
-- Quizzes (wait 24 hours between attempts)
-- Practical exams (wait 1 week, maximum 3 attempts recommended)
-- Projects (resubmit until passing)
-
-Use failed attempts as learning opportunities. Review, improve, and try again.
+这些是自我评估的指导标准。目标是真实能力，而不仅是及格分数。
 
 ---
 
-### Q27: How strictly should I time myself on exams?
-**A**: Be honest but flexible:
-- **For learning**: Focus on understanding over time
-- **For job prep**: Practice under time constraints
-- **Time overages**: Note how much extra time you needed
+### Q26: 我可以重考吗？
+**A**: 可以！以下项目可无限次重考：
+- 测验（两次尝试之间等待 24 小时）
+- 实践考试（等待 1 周，建议最多 3 次）
+- 项目（可重新提交直到通过）
 
-In real work, quality often matters more than speed, but efficiency is valued.
-
----
-
-## Job Search
-
-### Q28: When should I start applying for jobs?
-**A**: Start applying when you:
-- ☑ Completed all modules
-- ☑ Completed at least 3-4 projects
-- ☑ Passed the final practical exam
-- ☑ Have a portfolio on GitHub
-- ☑ Feel comfortable discussing your projects
-
-You don't need to feel "fully ready"—some learning happens on the job. Apply when you meet 70-80% of job requirements.
+将失败的尝试视为学习机会。复习、改进，再试一次。
 
 ---
 
-### Q29: What job titles should I look for?
-**A**: Entry-level titles:
-- Junior ML Engineer
-- ML Infrastructure Engineer
-- Junior MLOps Engineer
-- DevOps Engineer (ML focus)
-- AI Platform Engineer (Junior)
-- Data Infrastructure Engineer
+### Q27: 考试时我应该多严格地计时？
+**A**: 诚实但灵活：
+- **为学习**：注重理解而非时间
+- **为求职准备**：在时间限制下练习
+- **超时**：记录你额外需要的时间
 
-Also consider:
-- Internships
-- Contract positions
-- Smaller companies (more learning opportunities)
+在实际工作中，质量通常比速度更重要，但效率也受重视。
 
 ---
 
-### Q30: How do I explain self-taught experience on my resume?
+## 求职
+
+### Q28: 我应该什么时候开始投简历？
+**A**: 当你满足以下条件时开始申请：
+- ☑ 完成所有模块
+- ☑ 至少完成 3-4 个项目
+- ☑ 通过期末实践考试
+- ☑ 在 GitHub 上有作品集
+- ☑ 能够自如讨论你的项目
+
+你不必感到"完全准备好了"——有些学习是在工作中完成的。当你满足 70-80% 的职位要求时就可以开始申请了。
+
+---
+
+### Q29: 我应该搜索哪些职位名称？
+**A**: 初级职位：
+- 初级 ML 工程师
+- ML 基础设施工程师
+- 初级 MLOps 工程师
+- DevOps 工程师（ML 方向）
+- AI 平台工程师（初级）
+- 数据基础设施工程师
+
+也可以考虑：
+- 实习岗位
+- 合同职位
+- 小公司（更多学习机会）
+
+---
+
+### Q30: 如何在简历中描述自学经历？
 **A**:
-- List skills and technologies prominently
-- Highlight projects with metrics and impact
-- Include this curriculum as "Professional Development"
-- Emphasize problem-solving and self-learning ability
-- Show GitHub profile with active projects
+- 突出列出技能和技术
+- 用数据和影响力展示项目成果
+- 将本课程列为"专业发展"
+- 强调解决问题和自学能力
+- 展示包含活跃项目的 GitHub 个人主页
 
-Example:
+示例：
 ```
-Professional Development
-Junior AI Infrastructure Engineer Curriculum | 2024
-- Completed 150+ hours of hands-on training in Docker, Kubernetes, and CI/CD
-- Built 5 production-ready ML infrastructure projects
-- Deployed containerized ML models with monitoring and scaling
+专业发展
+初级 AI 基础设施工程师课程 | 2024
+- 完成 150+ 小时的 Docker、Kubernetes 和 CI/CD 实战训练
+- 构建 5 个可用于生产的 ML 基础设施项目
+- 部署带监控和自动伸缩的容器化 ML 模型
 ```
 
 ---
 
-### Q31: Should I get certified (CKA, Docker DCA, etc.)?
-**A**: Certifications can help but aren't required for entry-level. Consider:
+### Q31: 我应该考取认证（CKA、Docker DCA 等）吗？
+**A**: 认证可能有帮助，但对初级职位并非必需。考虑：
 
-**Pros**:
-- Validates knowledge
-- Stands out on resume
-- Structured learning path
-- Some employers value them
+**优点**：
+- 验证知识水平
+- 在简历中脱颖而出
+- 提供结构化的学习路径
+- 一些雇主看重认证
 
-**Cons**:
-- Costs money ($300-400)
-- Takes time to prepare
-- Experience often valued more
+**缺点**：
+- 需要费用（$300-400）
+- 需要时间准备
+- 经验通常更受重视
 
-**Recommendation**: Focus on projects and practical skills first. Get certified after landing a role or if you have time/budget.
-
----
-
-## Tools & Environment
-
-### Q32: Which IDE should I use?
-**A**: For this curriculum:
-- **VSCode** (recommended): Free, lightweight, great extensions
-- **PyCharm**: Excellent for Python, but heavier
-- **Vim/Neovim**: If you're already proficient
-
-Most important: Choose one and master it. VSCode is most common in industry.
+**建议**：先注重项目和实践技能。在获得职位后，或者有时间和预算时再去考取认证。
 
 ---
 
-### Q33: Do I need to memorize all these commands?
-**A**: No! You'll memorize commonly used commands through practice. For others:
-- Use cheat sheets (provided in `resources/cheat-sheets/`)
-- Reference official documentation
-- Use command history (up arrow, `history` command)
-- Create aliases for frequent commands
+## 工具与环境
 
-Understanding > memorization. Know what's possible and where to find details.
+### Q32: 我应该使用哪个 IDE？
+**A**: 对于本课程：
+- **VSCode**（推荐）：免费、轻量、优秀的扩展
+- **PyCharm**：Python 表现出色，但较重
+- **Vim/Neovim**：如果你已经很熟练的话
+
+最重要的是：选择一个并精通它。VSCode 在行业中最常见。
 
 ---
 
-### Q34: Should I use Docker Desktop or Docker Engine?
+### Q33: 我需要记住所有命令吗？
+**A**: 不需要！你会通过练习记住常用命令。其他命令：
+- 使用速查表（在 `resources/cheat-sheets/` 中提供）
+- 查阅官方文档
+- 使用命令历史（上箭头、`history` 命令）
+- 为常用命令创建别名
+
+理解 > 记忆。知道什么是可行的以及在哪里找到细节。
+
+---
+
+### Q34: 我应该使用 Docker Desktop 还是 Docker Engine？
 **A**:
-- **Docker Desktop** (Mac/Windows): Easier setup, includes GUI
-- **Docker Engine** (Linux): Lightweight, command-line only
+- **Docker Desktop**（Mac/Windows）：设置更简单，包含 GUI
+- **Docker Engine**（Linux）：轻量级，仅命令行
 
-For learning: Docker Desktop is fine.
-For production mindset: Learn Docker Engine commands.
-
----
-
-## Community & Support
-
-### Q35: How do I get help when I'm stuck?
-**A**: Multiple options:
-1. **Search first**: Google error messages
-2. **Study groups**: See `community/study-groups.md`
-3. **Office hours**: See `community/office-hours.md`
-4. **Stack Overflow**: Search and ask questions
-5. **Reddit**: r/devops, r/docker, r/kubernetes
-6. **Discord/Slack**: Join relevant communities
-
-When asking for help:
-- Describe what you tried
-- Include error messages
-- Provide relevant code
-- Explain expected vs. actual behavior
+学习时：Docker Desktop 没问题。
+培养生产思维：学习 Docker Engine 命令。
 
 ---
 
-### Q36: Are there study groups I can join?
-**A**: Yes! See `community/study-groups.md` for:
-- How to find existing groups
-- How to start your own
-- Best practices for study groups
-- Communication channels
+## 社区与支持
 
-Learning with others improves retention and motivation!
+### Q35: 卡住时如何寻求帮助？
+**A**: 多种方式：
+1. **先搜索**：Google 错误信息
+2. **学习小组**：见 `community/study-groups.md`
+3. **答疑时间**：见 `community/office-hours.md`
+4. **Stack Overflow**：搜索并提问
+5. **Reddit**：r/devops、r/docker、r/kubernetes
+6. **Discord/Slack**：加入相关社区
 
----
-
-### Q37: Can I get one-on-one mentorship?
-**A**: Options:
-- **Peer mentorship**: Connect with learners ahead of you
-- **Community mentors**: Active in forums/Discord
-- **Paid mentoring**: Platforms like MentorCruise, Codementor
-- **Company mentors**: After getting a job
-
-See `community/office-hours.md` for virtual support sessions.
+寻求帮助时：
+- 描述你尝试过的方法
+- 包含错误信息
+- 提供相关代码
+- 说明预期行为与实际行为的差异
 
 ---
 
-### Q38: How do I stay motivated for months of self-study?
-**A**: Tips that work:
-1. **Set small milestones**: Weekly goals, not just end goal
-2. **Track progress visually**: Use progress templates
-3. **Join community**: Accountability and support
-4. **Celebrate wins**: Completed a module? Celebrate!
-5. **Connect to purpose**: Remember your "why"
-6. **Take breaks**: Avoid burnout
-7. **Vary activities**: Mix reading, coding, watching videos
-8. **Share journey**: Blog, tweet, LinkedIn updates
+### Q36: 有我可以加入的学习小组吗？
+**A**: 有！见 `community/study-groups.md`，了解：
+- 如何找到现有小组
+- 如何创建自己的小组
+- 学习小组的最佳实践
+- 沟通渠道
 
-Motivation fluctuates—build habits that carry you through low periods.
+与他人一起学习能提高记忆力和动力！
 
 ---
 
-### Q39: Is there a certificate upon completion?
-**A**: This is an open-source curriculum, so there's no official certificate. However:
-- Your GitHub portfolio IS your certificate
-- Completed projects demonstrate competency
-- Passing assessments shows you met standards
-- List curriculum on resume under Professional Development
+### Q37: 可以获得一对一的指导吗？
+**A**: 可选方式：
+- **同伴指导**：与比你进度靠前的学习者联系
+- **社区导师**：活跃在论坛/Discord 中
+- **付费指导**：如 MentorCruise、Codementor 等平台
+- **公司导师**：入职后获得
 
-Employers care more about skills and projects than certificates for these roles.
-
----
-
-### Q40: How can I contribute back to this curriculum?
-**A**: Ways to contribute:
-- Report issues or errors
-- Suggest improvements
-- Share your project solutions (after completing)
-- Help other learners in community
-- Write blog posts about your experience
-- Create supplementary resources
-- Submit pull requests for fixes
-
-See repository CONTRIBUTING.md for details.
+虚拟支持会议见 `community/office-hours.md`。
 
 ---
 
-## Still Have Questions?
+### Q38: 如何在数月的自学中保持动力？
+**A**: 有效的建议：
+1. **设定小目标**：设定周目标，而不仅仅是最终目标
+2. **可视化进度**：使用进度模板
+3. **加入社区**：获得责任感和支持
+4. **庆祝成就**：完成一个模块了？庆祝一下！
+5. **联系目标**：记住你的"为什么"
+6. **适当休息**：避免过劳
+7. **交替活动**：混合阅读、编码、观看视频
+8. **分享历程**：写博客、发推、更新 LinkedIn
 
-- **Check documentation**: Start with README.md
-- **Search this FAQ**: Use Ctrl+F
-- **Ask in community**: See `community/study-groups.md`
-- **Open an issue**: GitHub repository issues
-- **Office hours**: See `community/office-hours.md`
+动力会有起伏——养成习惯，在低潮期也能坚持。
 
 ---
 
-**Remember**: No question is too basic! Everyone starts as a beginner. The community is here to help you succeed.
+### Q39: 完成课程有证书吗？
+**A**: 这是一个开源课程，因此没有官方证书。但：
+- 你的 GitHub 作品集就是你的证书
+- 完成的项目展示了你的能力
+- 通过评估说明你达到了标准
+- 在简历的"专业发展"部分列出本课程
 
-Good luck on your learning journey!
+对于这些职位，雇主更看重技能和项目，而非证书。
+
+---
+
+### Q40: 我如何回馈这个课程？
+**A**: 可以通过以下方式贡献：
+- 报告问题或错误
+- 提出改进建议
+- 分享你的项目解决方案（完成后）
+- 在社区帮助其他学习者
+- 撰写关于你学习经历的文章
+- 创建补充资源
+- 提交修复补丁
+
+详见仓库中的 CONTRIBUTING.md。
+
+---
+
+## 还有问题？
+
+- **查看文档**：从 README.md 开始
+- **搜索此 FAQ**：使用 Ctrl+F
+- **在社区提问**：见 `community/study-groups.md`
+- **提交 Issue**：GitHub 仓库 Issues
+- **答疑时间**：见 `community/office-hours.md`
+
+---
+
+**记住**：没有问题太简单！每个人都是从初学者开始的。社区在这里帮助你成功。
+
+祝学习之旅顺利！

@@ -1,167 +1,167 @@
-# Lecture 01: Observability Fundamentals for AI Infrastructure
+# Lecture 01：面向 AI 基础设施的可观测性基础
 
-## Lecture Overview
-Monitoring and observability are indispensable for running production-grade AI infrastructure. This lecture establishes the conceptual foundation you will rely on throughout the module: key terminology, mental models, service level objectives (SLOs), observability signals, and the unique challenges involved in operating ML workloads. By the end, you will possess a practical checklist for instrumenting systems and a roadmap for elevating observability maturity inside your organization.
+## 讲座概述
+监控与可观测性对于运行生产级 AI 基础设施不可或缺。本讲座将建立你在整个模块中依赖的概念基础：关键术语、心智模型、服务等级目标（SLO）、可观测性信号以及运营 ML 工作负载所涉及的独特挑战。最后，你将拥有一份实用的系统检测清单以及提升组织内可观测性成熟度的路线图。
 
-**Estimated Reading Time:** 60–75 minutes  
-**Hands-on Companion Lab:** Exercise 01 – Observability Foundations Lab  
-**Prerequisite Knowledge:** Linux command line, Docker basics, familiarity with REST APIs, introductory AI/ML pipeline concepts.
-
----
-
-## 1. Setting the Stage
-
-### 1.1 Monitoring vs Observability
-- **Monitoring** collects predefined metrics to detect failures that you anticipate. It answers the question: “Is my system behaving within expected bounds?”
-- **Observability** measures how well you can understand the internal state of a system from the outside by examining its outputs (metrics, logs, traces, profiles, events). An observable system lets you debug the unknown-unknowns.
-
-> **Rule of thumb:** Monitoring informs you when thresholds are breached; observability equips you to explain *why*.
-
-### 1.2 Why Observability Matters for AI Infrastructure
-AI systems are probabilistic, data-dependent, and often involve distributed training/inference pipelines. Failures can hide in:
-- Data quality issues (e.g., schema drift, missing features).
-- Hardware bottlenecks (GPU saturation, PCIe errors).
-- Model behaviour (accuracy degradation, bias drift).
-- Operational workflows (stuck jobs, backpressure, cost blow-outs).
-
-Traditional server metrics alone cannot capture these states. Observability enables:
-- Rapid incident response and minimization of Mean Time to Repair (MTTR).
-- Compliance with regulatory and ethical guidelines (audit trails, fairness checks).
-- Capacity planning and cost attribution (GPU hours, cloud spend).
-- Continuous improvement loops between data scientists, MLOps, and infrastructure teams.
-
-### 1.3 An Illustrative Failure
-Consider an inference service that suddenly doubles its tail latency. Without observability, operators only see 500 errors. With observability you uncover:
-1. **Metrics:** GPU utilization at 98%, increased queue depth.
-2. **Logs:** Frequent warnings about batch size falling back to 1.
-3. **Traces:** A new upstream feature extraction microservice adds 300 ms.
-4. **Model signals:** Request distribution shifted geographically causing heavier pre-processing.
-
-Only by correlating these signals can you identify the root cause (misconfigured rollout that disabled caching). This lecture teaches the building blocks that make the above diagnosis possible.
+**预计阅读时间：** 60–75 分钟  
+**动手配套实验：** Exercise 01 – 可观测性基础实验  
+**前置知识：** Linux 命令行、Docker 基础、熟悉 REST API、初级的 AI/ML 管道概念。
 
 ---
 
-## 2. Core Concepts and Terminology
+## 1. 开场
 
-### 2.1 The Three Pillars of Observability
-1. **Metrics** – Numerical measurements collected over time (e.g., request latency, GPU temperature).
-2. **Logs** – Discrete event records (text or structured) capturing contextual information.
-3. **Traces** – End-to-end request flows across services, showing latency breakdowns.
+### 1.1 监控 vs 可观测性
+- **监控**收集预定义的指标以检测你预期可能发生的故障。它回答的问题是："我的系统是否在预期范围内运行？"
+- **可观测性**衡量的是你通过检查系统输出（metrics, logs, traces, profiles, events）从外部理解系统内部状态的能力。一个可观测的系统让你能够调试未知的未知问题。
 
-Many teams add two more dimensions:
-- **Events** (deploys, feature flags, business outcomes).
-- **Profiles** (CPU/memory/latency flame graphs).
+> **经验法则：** 监控告诉你阈值何时被突破；可观测性让你能够解释*原因*。
 
-### 2.2 Golden Signals and Beyond
-Google’s SRE book popularized the **Four Golden Signals**:
-- **Latency** – Time to serve a request.
-- **Traffic** – Volume of requests/operations.
-- **Errors** – Rate of failed requests.
-- **Saturation** – Utilization of constrained resources.
+### 1.2 可观测性为何对 AI 基础设施至关重要
+AI 系统是概率性的、依赖数据的，并且通常涉及分布式训练/推理管道。故障可能隐藏在：
+- 数据质量问题（如 schema drift、缺失特征）
+- 硬件瓶颈（GPU 饱和、PCIe 错误）
+- 模型行为（准确率下降、偏差漂移）
+- 操作工作流（任务卡住、背压、成本超支）
 
-For AI/ML workloads, expand with:
-- **Model Quality** – Accuracy, precision/recall, confusion matrices.
-- **Data Quality** – Freshness, completeness, drift, feature null ratios.
-- **Resource Efficiency** – GPU hours, cost per 1,000 predictions, energy usage.
+仅靠传统的服务器指标无法捕捉这些状态。可观测性能够实现：
+- 快速事件响应，最大限度减少平均修复时间（MTTR）
+- 符合监管和道德准则（审计跟踪、公平性检查）
+- 容量规划和成本归属（GPU 小时、云支出）
+- 数据科学家、MLOps 和基础设施团队之间的持续改进循环
 
-### 2.3 Service Level Objectives (SLO), SLIs, and SLAs
-- **Service Level Indicator (SLI):** Quantifiable measure of service performance (e.g., “Percentage of inference requests under 200 ms latency”).
-- **Service Level Objective (SLO):** Target value/range for an SLI (e.g., “99% of inferences must complete under 200 ms over a rolling 30-day window”).
-- **Service Level Agreement (SLA):** External contract with consequences if SLOs are missed (e.g., financial penalties, crediting customers).
+### 1.3 一个说明性的故障案例
+考虑一个推理服务突然将尾部延迟翻倍。没有可观测性，操作员只能看到 500 错误。有了可观测性，你会发现：
+1. **Metrics：** GPU 利用率 98%，队列深度增加
+2. **Logs：** 关于批次大小回退到 1 的频繁警告
+3. **Traces：** 一个新的上游特征提取微服务增加了 300 ms
+4. **模型信号：** 请求分布因地理位置发生变化，导致预处理加重
 
-**Error budget:** 100% − SLO. Represents how much unreliability you can afford. Guides decision-making (deploy velocity vs stability).
+只有通过关联这些信号，你才能识别根本原因（禁用缓存的错误配置部署）。本讲座将教授使上述诊断成为可能的构建块。
 
-### 2.4 Observability Maturity Model
-| Level | Characteristics | What’s Missing |
+---
+
+## 2. 核心概念与术语
+
+### 2.1 可观测性的三大支柱
+1. **Metrics** – 随时间收集的数值测量（例如：请求延迟、GPU 温度）
+2. **Logs** – 捕获上下文信息的离散事件记录（文本或结构化）
+3. **Traces** – 跨服务的端到端请求流，显示延迟分解
+
+许多团队增加了两个维度：
+- **Events**（部署、功能开关、业务结果）
+- **Profiles**（CPU/内存/延迟火焰图）
+
+### 2.2 黄金信号与更多
+Google SRE 书籍推广了**四大黄金信号**：
+- **Latency** – 服务请求的时间
+- **Traffic** – 请求/操作的数量
+- **Errors** – 请求失败的比率
+- **Saturation** – 受限资源的利用率
+
+对于 AI/ML 工作负载，扩展为：
+- **模型质量** – 准确率、精确率/召回率、混淆矩阵
+- **数据质量** – 新鲜度、完整性、漂移、特征空值率
+- **资源效率** – GPU 小时、每 1000 次预测的成本、能源消耗
+
+### 2.3 服务等级目标（SLO）、SLI 和 SLA
+- **Service Level Indicator (SLI)：** 服务绩效的可量化衡量标准（例如："在 200 ms 延迟内完成的推理请求百分比"）
+- **Service Level Objective (SLO)：** SLI 的目标值/范围（例如："在滚动 30 天窗口内，99% 的推理必须在 200 ms 内完成"）
+- **Service Level Agreement (SLA)：** 如果未达到 SLO 则带有后果的外部合同（例如：经济处罚、客户补偿）
+
+**Error budget：** 100% − SLO。代表你可以承受的不可靠程度。指导决策（部署速度与稳定性）。
+
+### 2.4 可观测性成熟度模型
+| 级别 | 特征 | 缺失什么 |
 |-------|----------------|----------------|
-| Level 0 – Reactive Monitoring | Manual checks, scripts, no dashboards | No alerting, no standard metrics |
-| Level 1 – Instrumented | Metrics/logs fleetwide, dashboards available | Traces limited, SLOs undefined |
-| Level 2 – Proactive Observability | SLO-driven dashboards, anomaly detection | Weak ML-specific instrumentation |
-| Level 3 – Predictive & Adaptive | Auto-remediation, closed feedback loops, business-aware | Ongoing investment in automation |
+| Level 0 – 被动监控 | 手动检查、脚本、无 Dashboard | 无告警、无标准指标 |
+| Level 1 – 已检测 | 全范围 Metrics/Logs、Dashboard 可用 | Traces 有限、SLO 未定义 |
+| Level 2 – 主动可观测性 | SLO 驱动的 Dashboard、异常检测 | ML 特定检测薄弱 |
+| Level 3 – 预测与自适应 | 自动修复、闭环反馈、业务感知 | 对自动化的持续投入 |
 
-Assess where your organization sits to plan improvements.
-
----
-
-## 3. Building Observability for AI Systems
-
-### 3.1 Layered Monitoring Strategy
-1. **Infrastructure Layer:** Physical/virtual hosts, containers, Kubernetes clusters, storage, networking.
-2. **Platform Layer:** Feature stores, orchestration systems, experiment tracking, data pipelines.
-3. **Application Layer:** REST/gRPC inference services, training jobs, batch jobs.
-4. **Business Layer:** Customer impact (conversion rate, number of active users), compliance metrics.
-
-Each layer should expose relevant SLIs, with clear ownership.
-
-### 3.2 Instrumentation Principles
-- **Standardize metric names** using a consistent prefix (e.g., `ai_infra_training_duration_seconds`).
-- **Label responsibly:** Avoid high-cardinality labels (e.g., per-user IDs).
-- **Automate instrumentation**: Middleware for HTTP metrics, wrappers around GPU libraries, logging middleware for message queues.
-- **Correlate signals:** Include trace IDs in logs, attach request IDs to metrics, embed experiment identifiers.
-- **Version schemas:** Use structured logging (JSON) to ensure downstream tools can parse fields reliably.
-
-### 3.3 Observability in the ML Lifecycle
-- **Data Ingestion:** Monitor data freshness, schema validations (Great Expectations), pipeline SLIs.
-- **Training:** Track job duration, cost, GPU utilization, gradient norms, checkpoint size.
-- **Evaluation:** Capture metrics per dataset slice, fairness metrics (e.g., demographic parity).
-- **Deployment:** Monitor rollout progress, canary comparison, shadow deployment metrics.
-- **Serving:** Track real-time accuracy (if ground truth available), request latency, drift detectors.
-
-### 3.4 Case Study: Feature Store Outage
-**Scenario:** Feature store latency spike causes inference timeouts.
-
-**Signals observed:**
-- `feature_store_latency_seconds_bucket` histogram trending upward.
-- gRPC client logs show retries/backoff.
-- Trace spans reveal 80% of latency spent in feature store call.
-- Data pipeline metrics indicate a backlog due to upstream schema change.
-
-**Resolution plan:**
-1. Triggered alert on high P95 latency.
-2. Incident commander correlates metrics and logs.
-3. Temporary mitigation using fallback features.
-4. Long-term fix: schema validation guard + SLO revision.
-
-Use this as a template for building observability playbooks.
+评估你的组织所处的阶段以规划改进。
 
 ---
 
-## 4. Designing Effective Dashboards
+## 3. 为 AI 系统构建可观测性
 
-### 4.1 Principles
-- **Purpose-driven:** Each dashboard answers a specific question (e.g., on-call triage vs executive overview).
-- **Hierarchy:** Start with high-level health, drill down to component-level panels.
-- **Contextual clues:** Include annotations for deploys, feature toggles, incidents.
-- **Consistency:** Apply common color schemes, axis scales, naming conventions.
-- **Discoverability:** Document dashboards in README or runbooks.
+### 3.1 分层监控策略
+1. **基础设施层：** 物理/虚拟主机、容器、Kubernetes 集群、存储、网络
+2. **平台层：** 特征存储、编排系统、实验跟踪、数据管道
+3. **应用层：** REST/gRPC 推理服务、训练任务、批处理任务
+4. **业务层：** 客户影响（转化率、活跃用户数）、合规指标
 
-### 4.2 Dashboard Types for AI Infrastructure
-1. **Platform Health Dashboard**
-   - Kubernetes node health, control plane metrics.
-   - GPU utilization & errors (exported via DCGM exporter).
-   - Queue lengths (Kafka, RabbitMQ).
-2. **Model Performance Dashboard**
-   - Real-time accuracy vs target, drift metrics.
-   - Feature distribution plots (overlays vs training baseline).
-   - SLO heatmap across regions/customers.
-3. **Data Pipeline Dashboard**
-   - Airflow/Kubeflow task duration, success rate.
-   - Data freshness lags, row counts, schema validation failures.
-4. **Business Impact Dashboard**
-   - Uptime vs SLA, user conversions, cost per prediction.
+每一层都应暴露相关的 SLI，并有明确的所有者。
 
-### 4.3 Dashboard Anti-Patterns
-- Overloaded panels with multiple Y-axes and inconsistent scales.
-- Raw counts without normalization (difficult cross-environment comparison).
-- Too many red/yellow colors causing alarm fatigue.
-- Lack of alert links or runbook references.
+### 3.2 检测原则
+- **标准化 metric 名称**，使用一致的前缀（例如：`ai_infra_training_duration_seconds`）
+- **负责任地使用 labels：** 避免高基数的 labels（例如：按用户 ID）
+- **自动化检测**：HTTP metrics 的中间件、GPU 库的包装器、消息队列的日志中间件
+- **关联信号：** 在 logs 中包含 trace ID，将请求 ID 附加到 metrics，嵌入实验标识符
+- **版本化 schemas：** 使用结构化日志记录（JSON）确保下游工具能够可靠地解析字段
+
+### 3.3 ML 生命周期中的可观测性
+- **数据摄入：** 监控数据新鲜度、schema 验证（Great Expectations）、管道 SLI
+- **训练：** 跟踪任务持续时间、成本、GPU 利用率、梯度范数、检查点大小
+- **评估：** 按数据集切片捕获指标、公平性指标（例如：人口统计均等）
+- **部署：** 监控 rollout 进度、金丝雀比较、影子部署指标
+- **服务：** 跟踪实时准确率（如果 ground truth 可用）、请求延迟、漂移检测器
+
+### 3.4 案例研究：特征存储故障
+**场景：** 特征存储延迟峰值导致推理超时。
+
+**观察到的信号：**
+- `feature_store_latency_seconds_bucket` 直方图呈上升趋势
+- gRPC 客户端日志显示重试/退避
+- Trace spans 显示 80% 的延迟花费在特征存储调用上
+- 数据管道指标显示由于上游 schema 变更导致的积压
+
+**解决方案计划：**
+1. 触发高 P95 延迟告警
+2. 事件指挥官关联 metrics 和 logs
+3. 使用回退特征的临时缓解措施
+4. 长期修复：schema 验证守卫 + SLO 修订
+
+将此作为构建可观测性 playbook 的模板。
 
 ---
 
-## 5. Logging Strategies
+## 4. 设计有效的 Dashboard
 
-### 5.1 Structured Logging
-Replace free-form strings with structured JSON logs:
+### 4.1 原则
+- **目的驱动：** 每个 Dashboard 回答特定问题（例如：on-call 分流 vs 管理层概览）
+- **层次结构：** 从高级健康状态开始，深入到组件级别面板
+- **上下文线索：** 包含部署、功能开关、事件的注释
+- **一致性：** 应用通用的配色方案、坐标轴范围、命名约定
+- **可发现性：** 在 README 或 runbook 中记录 Dashboard
+
+### 4.2 AI 基础设施的 Dashboard 类型
+1. **平台健康 Dashboard**
+   - Kubernetes 节点健康、控制面指标
+   - GPU 利用率和错误（通过 DCGM exporter 导出）
+   - 队列长度（Kafka、RabbitMQ）
+2. **模型性能 Dashboard**
+   - 实时准确率与目标对比、漂移指标
+   - 特征分布图（与训练基线叠加）
+   - 跨区域/客户的 SLO 热力图
+3. **数据管道 Dashboard**
+   - Airflow/Kubeflow 任务持续时间、成功率
+   - 数据新鲜度延迟、行数、schema 验证失败
+4. **业务影响 Dashboard**
+   - 正常运行时间与 SLA 对比、用户转化率、每次预测成本
+
+### 4.3 Dashboard 反模式
+- 面板过载，多个 Y 轴且比例不一致
+- 未经归一化的原始计数（难以跨环境比较）
+- 过多的红色/黄色导致告警疲劳
+- 缺少告警链接或 runbook 引用
+
+---
+
+## 5. 日志记录策略
+
+### 5.1 结构化日志记录
+用结构化的 JSON 日志替换自由格式字符串：
 ```json
 {
   "timestamp": "2025-10-18T19:02:14.321Z",
@@ -177,144 +177,144 @@ Replace free-form strings with structured JSON logs:
   }
 }
 ```
-Benefits:
-- Easily parsed by log aggregators (Loki, Elastic, Splunk).
-- Facilitates correlation with traces and metrics.
-- Supports compliance (PII masking, retention policies).
+优点：
+- 易于被日志聚合器（Loki、Elastic、Splunk）解析
+- 便于与 traces 和 metrics 关联
+- 支持合规性（PII 脱敏、保留策略）
 
-### 5.2 Logging Levels and Policies
-- Establish guidelines for each level (DEBUG, INFO, WARN, ERROR, FATAL).
-- Keep DEBUG logs out of production unless toggled.
-- Scrub sensitive data (PII, secrets) before logging.
-- Define retention periods (e.g., 30 days for INFO, 180 days for compliance logs).
+### 5.2 日志级别和策略
+- 为每个级别（DEBUG、INFO、WARN、ERROR、FATAL）建立指南
+- 除非开启，否则将 DEBUG 日志排除在生产环境之外
+- 在记录之前清除敏感数据（PII、secrets）
+- 定义保留期限（例如：INFO 级别 30 天，合规日志 180 天）
 
-### 5.3 Log Aggregation Patterns
-- **Agent-based:** Fluent Bit, Vector, Filebeat tail local files and forward to aggregator.
-- **Sidecar pattern:** Each pod has a sidecar shipping logs; common in Kubernetes.
-- **Direct app integration:** Applications send logs over network (structured log sinks).
-- Evaluate trade-offs (resource overhead, reliability, security).
-
----
-
-## 6. Alerting Foundations
-
-### 6.1 Good Alert Characteristics
-- **Actionable:** Clear remediation steps exist.
-- **Impactful:** Alerts correspond to user-facing or business-critical SLIs.
-- **Urgent:** Requires timely response within on-call hours.
-- **Unique:** Avoid multiple alerts for same underlying issue; deduplicate through Alertmanager.
-
-### 6.2 Alert Design Process
-1. Select SLI/SLO relevant to service or ML workflow.
-2. Define thresholds and durations (e.g., P99 latency > 1.5 seconds for 10 minutes).
-3. Contextualize alert message:
-   - “Latency SLO violation: inference-gateway P99=1.8s (>1.5s) for 15m. Error budget burn rate 4x. See runbook: go/runbook-inference-latency.”
-4. Route to correct on-call rotation or escalation chain.
-5. Set up alert suppression during maintenance windows or known safe anomalies (e.g., training jobs nightly).
-
-### 6.3 Burn Rate Alerts
-- Use multi-window, multi-burn-rate alerts to detect SLO violations early without noise. Example:
-  - Short window: 5-minute burn rate > 14 (fast detection).
-  - Long window: 1-hour burn rate > 4 (avoids flapping).
+### 5.3 日志聚合模式
+- **基于 Agent：** Fluent Bit、Vector、Filebeat 追踪本地文件并转发到聚合器
+- **Sidecar 模式：** 每个 Pod 有一个 sidecar 传输日志；在 Kubernetes 中常见
+- **直接应用集成：** 应用程序通过网络发送日志（结构化日志 sink）
+- 评估权衡（资源开销、可靠性、安全性）
 
 ---
 
-## 7. Observability for Machine Learning Systems
+## 6. 告警基础
 
-### 7.1 Monitoring Model Quality
-- **Online metrics:** Real-time accuracy when ground truth is available quickly.
-- **Proxy metrics:** User engagement, click-through rate, or business KPIs.
-- **Delayed metrics:** Offline evaluation from periodic labeling or human review.
-- **Fairness metrics:** Track disparate impact across cohorts.
+### 6.1 好告警的特征
+- **可操作：** 存在明确的修复步骤
+- **有影响：** 告警对应于面向用户或业务关键的 SLI
+- **紧急：** 需要在 on-call 时间内及时响应
+- **唯一：** 避免同一根本原因的多个告警；通过 Alertmanager 去重
 
-### 7.2 Data Drift and Concept Drift Detection
-- Monitor feature distributions vs training baseline using statistical tests (KL divergence, PSI).
-- Leverage tools like Evidently, WhyLabs, Arize.
-- Alert when drift persists, not just single-sample anomalies.
+### 6.2 告警设计流程
+1. 选择与服务或 ML 工作流相关的 SLI/SLO
+2. 定义阈值和持续时间（例如：P99 延迟 > 1.5 秒持续 10 分钟）
+3. 上下文化告警消息：
+   - "延迟 SLO 违规：inference-gateway P99=1.8s (>1.5s) 持续 15m。Error budget burn rate 4x。查看 runbook：go/runbook-inference-latency。"
+4. 路由到正确的 on-call 轮换或升级链
+5. 在维护窗口或已知安全异常期间设置告警抑制（例如：夜间训练任务）
 
-### 7.3 Model Explainability and Auditing
-- Log feature importance, SHAP values, or counterfactual explanations.
-- Retain data for reproducing predictions (within compliance boundaries).
-- Monitor compliance: authorized access, PII exposure, GDPR/CCPA requests.
-
-### 7.4 Feedback Loops
-- Close the loop by feeding post-deployment metrics back to training teams.
-- Adopt runbooks for “model performance degradation” similar to infrastructure incidents.
+### 6.3 Burn Rate 告警
+- 使用多窗口、多 burn rate 告警在不产生噪音的情况下尽早检测 SLO 违规。例如：
+  - 短窗口：5 分钟 burn rate > 14（快速检测）
+  - 长窗口：1 小时 burn rate > 4（避免抖动）
 
 ---
 
-## 8. Tooling Landscape
+## 7. 机器学习系统的可观测性
 
-| Category | Open Source | Managed / Commercial |
+### 7.1 监控模型质量
+- **在线指标：** 当 ground truth 快速可用时的实时准确率
+- **代理指标：** 用户参与度、点击率或业务 KPI
+- **延迟指标：** 来自定期标注或人工审核的离线评估
+- **公平性指标：** 跟踪不同群体间的差异影响
+
+### 7.2 数据漂移和概念漂移检测
+- 使用统计检验（KL 散度、PSI）监控特征分布与训练基线的对比
+- 利用 Evidently、WhyLabs、Arize 等工具
+- 在漂移持续存在时告警，而非单样本异常
+
+### 7.3 模型可解释性和审计
+- 记录特征重要性、SHAP 值或反事实解释
+- 保留用于复现预测的数据（在合规范围内）
+- 监控合规性：授权访问、PII 暴露、GDPR/CCPA 请求
+
+### 7.4 反馈循环
+- 通过将部署后的指标反馈给训练团队来闭环
+- 为"模型性能退化"采用 runbook，类似于基础设施事件
+
+---
+
+## 8. 工具景观
+
+| 类别 | 开源 | 托管 / 商业 |
 |----------|-------------|----------------------|
 | Metrics + TSDB | Prometheus, VictoriaMetrics, Mimir | Datadog, New Relic, Cloud Monitoring |
-| Visualization | Grafana | Datadog, New Relic, Chronosphere |
-| Logging | Loki, Elastic Stack, OpenSearch | Splunk, Datadog Logs, Sumo Logic |
+| 可视化 | Grafana | Datadog, New Relic, Chronosphere |
+| 日志 | Loki, Elastic Stack, OpenSearch | Splunk, Datadog Logs, Sumo Logic |
 | Tracing | Jaeger, Tempo, OpenTelemetry Collector | Honeycomb, Lightstep, AWS X-Ray |
-| ML Observability | Evidently, Feast + Grafana | Arize AI, WhyLabs, Mona, Fiddler |
+| ML 可观测性 | Evidently, Feast + Grafana | Arize AI, WhyLabs, Mona, Fiddler |
 
-**Integration Strategy:** 
-- Start with Prometheus + Grafana + Loki (aka PLG stack) for unified telemetry.
-- Layer OpenTelemetry for standardized instrumentation.
-- Leverage managed offerings when team size is small or compliance requires vendor support.
-
----
-
-## 9. Practical Checklist
-
-### 9.1 Readiness Checklist
-- [ ] Metrics coverage for infrastructure, platform, application, business layers.
-- [ ] SLIs defined with SLO targets and tracked on dashboards.
-- [ ] Logs structured, centralized, and correlated with request IDs.
-- [ ] Trace propagation implemented across HTTP/gRPC boundaries.
-- [ ] Alert thresholds, routing, and escalation policies documented.
-- [ ] Runbooks exist for top 5 failure modes (e.g., GPU starvation, data drift).
-- [ ] Observability data retained according to compliance rules.
-- [ ] Cost of observability tooling monitored (storage, query costs).
-
-### 9.2 Implementation Steps
-1. Inventory current instrumentation; identify gaps vs golden signals.
-2. Prioritize high-impact SLIs (user-facing and compliance-driven).
-3. Standardize logging and metric schemas across teams.
-4. Automate dashboard provisioning via infrastructure-as-code (e.g., Grafana provisioning, Terraform).
-5. Regularly review alerts to prevent fatigue; run monthly observability retro.
-
-### 9.3 Collaboration Tips
-- Embed observability requirements in Definition of Done (DoD) for new services.
-- Pair data scientists with platform engineers to define ML-specific SLIs.
-- Share observability insights with leadership (trend reports, maturity assessments).
-- Schedule cross-team “observability game days” to rehearse incident response.
+**集成策略：**
+- 从 Prometheus + Grafana + Loki（即 PLG 堆栈）开始，实现统一遥测
+- 分层使用 OpenTelemetry 进行标准化检测
+- 当团队规模较小或合规性需要供应商支持时，使用托管服务
 
 ---
 
-## 10. Knowledge Check
+## 9. 实用检查清单
 
-Test your understanding with these reflection questions (answers at end of module):
-1. Differentiate monitoring from observability using an example from ML operations.
-2. Define three SLIs for a batch inference pipeline and propose SLO targets.
-3. Describe how you would detect and investigate a sudden rise in model false positives.
-4. What steps would you take to reduce alert fatigue while maintaining coverage?
-5. How can you ensure logs, metrics, and traces are correlated during an incident?
+### 9.1 就绪检查清单
+- [ ] 基础设施、平台、应用、业务层的 metrics 覆盖
+- [ ] SLI 已定义 SLO 目标并在 Dashboard 上跟踪
+- [ ] 日志已结构化、集中化并与请求 ID 关联
+- [ ] 跨 HTTP/gRPC 边界实现 trace 传播
+- [ ] 告警阈值、路由和升级策略已文档化
+- [ ] 前 5 大故障模式存在 Runbook（例如：GPU 资源枯竭、数据漂移）
+- [ ] 根据合规规则保留可观测性数据
+- [ ] 监控可观测性工具的成本（存储、查询成本）
+
+### 9.2 实施步骤
+1. 盘点当前检测情况；识别与黄金信号的差距
+2. 优先处理高影响的 SLI（面向用户和合规驱动的）
+3. 跨团队标准化日志和指标 schema
+4. 通过基础设施即代码自动化 Dashboard 配置（例如：Grafana provisioning、Terraform）
+5. 定期审查告警以防止疲劳；运行月度可观测性回顾
+
+### 9.3 协作技巧
+- 将可观测性要求嵌入新服务的"完成定义"（DoD）
+- 将数据科学家与平台工程师配对，定义 ML 特定的 SLI
+- 与领导层分享可观测性见解（趋势报告、成熟度评估）
+- 安排跨团队的"可观测性游戏日"来演练事件响应
 
 ---
 
-## 11. Further Reading & Resources
-- Google SRE Workbook – Chapters on alerting and SLOs.
-- “Observability Engineering” by Charity Majors, Liz Fong-Jones, George Miranda.
-- OpenTelemetry documentation: instrumentation guides for Python, Go, Java.
-- Arize AI blog: ML observability use cases and patterns.
-- Grafana Labs learning portal: dashboards and alerting tutorials.
-- WhyLabs Academy: data drift monitoring.
+## 10. 知识检查
 
-**Hands-on practice:** Complete Exercise 01 to instrument a sample service using the checklists introduced here.
+用以下反思问题测试你的理解（答案在模块末尾）：
+1. 用 ML 操作中的例子区分监控与可观测性
+2. 为批处理推理管道定义三个 SLI 并提出 SLO 目标
+3. 描述如何检测和调查模型假阳性突然上升
+4. 你将采取哪些步骤来减少告警疲劳同时保持覆盖范围？
+5. 如何确保在事件期间 logs、metrics 和 traces 相互关联？
 
 ---
 
-## 12. Summary
-- Observability enables you to explain system behaviour, not just detect anomalies.
-- AI infrastructure demands expanded observability covering data, model quality, and cost.
-- Adopt SLO-driven observability with layered metrics, structured logging, and trace correlation.
-- Build purposeful dashboards, actionable alerts, and comprehensive runbooks.
-- Treat observability as an iterative journey—continually refine instrumentation, collaboration, and tooling.
+## 11. 进一步阅读和资源
+- Google SRE Workbook – 关于告警和 SLO 的章节
+- "Observability Engineering" by Charity Majors, Liz Fong-Jones, George Miranda
+- OpenTelemetry 文档：Python、Go、Java 的检测指南
+- Arize AI 博客：ML 可观测性用例和模式
+- Grafana Labs 学习门户：Dashboard 和告警教程
+- WhyLabs Academy：数据漂移监控
 
-In the next lecture, we will dive into Prometheus architecture, PromQL, and instrumentation techniques to realize the metrics pillar in practice.
+**动手练习：** 完成 Exercise 01 以使用此处介绍的检查清单检测一个示例服务。
+
+---
+
+## 12. 总结
+- 可观测性使你能够解释系统行为，而不仅仅是检测异常
+- AI 基础设施需要扩展的可观测性，涵盖数据、模型质量和成本
+- 采用 SLO 驱动的可观测性，包括分层指标、结构化日志记录和 trace 关联
+- 构建有目的的 Dashboard、可操作的告警和全面的 runbook
+- 将可观测性视为一个迭代之旅——持续完善检测、协作和工具
+
+在下一次讲座中，我们将深入探讨 Prometheus 架构、PromQL 和检测技术，以在实践中实现 metrics 支柱。

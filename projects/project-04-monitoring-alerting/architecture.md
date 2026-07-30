@@ -1,63 +1,62 @@
-# Architecture: Monitoring & Alerting System
+# 架构：监控与告警系统
 
-**Project**: Monitoring & Alerting System
-**Level**: Junior AI Infrastructure Engineer
-**Version**: 1.0
-
----
-
-## Table of Contents
-
-1. [System Overview](#system-overview)
-2. [Component Architecture](#component-architecture)
-3. [Data Flow](#data-flow)
-4. [Metrics Architecture](#metrics-architecture)
-5. [Logging Architecture](#logging-architecture)
-6. [Alerting Architecture](#alerting-architecture)
-7. [Technology Stack](#technology-stack)
-8. [Deployment Architecture](#deployment-architecture)
-9. [Security Architecture](#security-architecture)
-10. [Scalability Considerations](#scalability-considerations)
+**项目**：监控与告警系统
+**级别**：初级 AI 基础设施工程师
+**版本**：1.0
 
 ---
 
-## System Overview
+## 目录
 
-### Purpose
+1. [系统概述](#system-overview)
+2. [组件架构](#component-architecture)
+3. [数据流](#data-flow)
+4. [指标架构](#metrics-architecture)
+5. [日志架构](#logging-architecture)
+6. [告警架构](#alerting-architecture)
+7. [技术栈](#technology-stack)
+8. [部署架构](#deployment-architecture)
+9. [安全架构](#security-architecture)
+10. [可扩展性考虑](#scalability-considerations)
 
-The monitoring and alerting system provides comprehensive observability for ML infrastructure, enabling:
+---
 
-- **Real-time visibility** into system health and performance
-- **Proactive alerting** before issues impact users
-- **Root cause analysis** through metrics and logs correlation
-- **Performance optimization** based on historical trends
-- **Compliance** with SLAs and SLOs
+## 系统概述
 
-### Key Principles
+### 目的
 
-1. **The Four Golden Signals**: Monitor latency, traffic, errors, saturation
-2. **USE Method**: Utilization, Saturation, Errors for resources
-3. **RED Method**: Rate, Errors, Duration for services
-4. **Actionable Alerts**: Every alert requires human action
-5. **Symptom-Based Alerting**: Alert on user-visible symptoms, not internal metrics
+监控与告警系统为 ML 基础设施提供全面的可观测性，支持：
 
-### High-Level Architecture
+- **实时可见性**，了解系统健康与性能
+- **主动告警**，在问题影响用户之前发现
+- **根因分析**，通过指标和日志关联
+- **性能优化**，基于历史趋势
+- **合规性**，符合 SLA 和 SLO
+
+### 关键原则
+
+1. **四大黄金信号**：监控延迟、流量、错误、饱和度
+2. **USE 方法**：资源的利用率、饱和度、错误
+3. **RED 方法**：服务的速率、错误、时长
+4. **可操作的告警**：每个告警都需要人工干预
+5. **基于症状的告警**：针对用户可见的症状告警，而非内部指标
+
+### 高层架构
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Monitoring Ecosystem                         │
+│                      监控生态系统                                │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  ┌─────────────┐      ┌─────────────┐      ┌─────────────┐   │
-│  │   Metrics   │      │    Logs     │      │   Traces    │   │
-│  │ (Prometheus)│      │    (ELK)    │      │  (Future)   │   │
+│  │    指标     │      │    日志     │      │  链路追踪   │   │
+│  │ (Prometheus)│      │    (ELK)    │      │  (未来)     │   │
 │  └──────┬──────┘      └──────┬──────┘      └──────┬──────┘   │
 │         │                    │                     │          │
 │         └────────────────────┼─────────────────────┘          │
 │                              │                                │
 │                      ┌───────▼────────┐                       │
-│                      │  Visualization  │                       │
-│                      │    & Alerts     │                       │
+│                      │  可视化与告警   │                       │
 │                      └────────────────┘                       │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -65,18 +64,18 @@ The monitoring and alerting system provides comprehensive observability for ML i
 
 ---
 
-## Component Architecture
+## 组件架构
 
-### 1. Metrics Collection Layer
+### 1. 指标采集层
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│              Metrics Collection Architecture               │
+│                    指标采集架构                              │
 └────────────────────────────────────────────────────────────┘
 
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│  Application │     │ Infrastructure│     │  ML Models   │
-│              │     │   (Nodes)     │     │              │
+│    应用      │     │  基础设施    │     │   ML 模型    │
+│              │     │   （节点）    │     │              │
 └──────┬───────┘     └──────┬───────┘     └──────┬───────┘
        │                    │                     │
        │ /metrics           │ /metrics            │ /metrics
@@ -87,7 +86,7 @@ The monitoring and alerting system provides comprehensive observability for ML i
                 │    Prometheus        │
                 │                      │
                 │  ┌────────────────┐ │
-                │  │ Scrape Targets │ │
+                │  │  采集目标       │ │
                 │  ├────────────────┤ │
                 │  │ node-exporter  │ │
                 │  │ app:5000       │ │
@@ -95,12 +94,12 @@ The monitoring and alerting system provides comprehensive observability for ML i
                 │  └────────────────┘ │
                 │                      │
                 │  ┌────────────────┐ │
-                │  │ TSDB Storage   │ │
-                │  │ (30d retention)│ │
+                │  │ TSDB 存储      │ │
+                │  │（30天保留）    │ │
                 │  └────────────────┘ │
                 │                      │
                 │  ┌────────────────┐ │
-                │  │  Alert Rules   │ │
+                │  │  告警规则       │ │
                 │  └────────┬───────┘ │
                 └───────────┼──────────┘
                             │
@@ -109,114 +108,113 @@ The monitoring and alerting system provides comprehensive observability for ML i
                 └──────────────────────┘
 ```
 
-**Components**:
+**组件**：
 
-- **Prometheus Server**: Time-series database and scraper
-  - Pulls metrics from targets every 15 seconds
-  - Stores data locally with 30-day retention
-  - Evaluates alert rules every 30 seconds
+- **Prometheus Server**：时序数据库和采集器
+  - 每 15 秒从目标拉取指标
+  - 本地存储，保留 30 天
+  - 每 30 秒评估告警规则
 
-- **Exporters**: Expose metrics in Prometheus format
-  - `node_exporter`: System metrics (CPU, memory, disk)
-  - `blackbox_exporter`: Endpoint health checks (optional)
-  - Application built-in `/metrics` endpoint
+- **Exporter（导出器）**：以 Prometheus 格式暴露指标
+  - `node_exporter`：系统指标（CPU、内存、磁盘）
+  - `blackbox_exporter`：端点健康检查（可选）
+  - 应用内置 `/metrics` 端点
 
-- **Service Discovery**: Automatic target detection
-  - Kubernetes SD: Discovers pods/services in K8s
-  - File SD: Static configuration files
-  - DNS SD: Service discovery via DNS
+- **服务发现**：自动检测目标
+  - Kubernetes SD：发现 K8s 中的 Pod/服务
+  - File SD：静态配置文件
+  - DNS SD：通过 DNS 进行服务发现
 
-### 2. Logging Collection Layer
+### 2. 日志采集层
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│              Logging Collection Architecture               │
+│                    日志采集架构                              │
 └────────────────────────────────────────────────────────────┘
 
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│ Application  │     │ Application  │     │ Application  │
-│   Logs       │     │   Logs       │     │   Logs       │
-│ (JSON)       │     │ (JSON)       │     │ (JSON)       │
+│   应用日志   │     │   应用日志   │     │   应用日志   │
+│   (JSON)     │     │   (JSON)     │     │   (JSON)     │
 └──────┬───────┘     └──────┬───────┘     └──────┬───────┘
        │                    │                     │
-       │ Log Files          │ Docker Logs         │ Stdout
+       │ 日志文件           │ Docker 日志         │ Stdout
        │                    │                     │
        └────────────────────┼─────────────────────┘
                             │
                 ┌───────────▼──────────┐
                 │      Filebeat        │
-                │  (Log Shipper)       │
+                │   （日志采集器）      │
                 │                      │
-                │  - Monitor files     │
-                │  - Add metadata      │
-                │  - Buffer locally    │
+                │  - 监控文件           │
+                │  - 添加元数据         │
+                │  - 本地缓冲           │
                 └───────────┬──────────┘
                             │
                 ┌───────────▼──────────┐
                 │      Logstash        │
-                │  (Log Processor)     │
+                │   （日志处理器）      │
                 │                      │
                 │  ┌────────────────┐ │
-                │  │ Parse JSON     │ │
-                │  │ Filter fields  │ │
-                │  │ Enrich data    │ │
-                │  │ Transform      │ │
+                │  │ 解析 JSON     │ │
+                │  │ 过滤字段       │ │
+                │  │ 丰富数据       │ │
+                │  │ 转换格式       │ │
                 │  └────────────────┘ │
                 └───────────┬──────────┘
                             │
                 ┌───────────▼──────────┐
                 │   Elasticsearch      │
-                │  (Log Storage)       │
+                │   （日志存储）        │
                 │                      │
                 │  ┌────────────────┐ │
-                │  │ Daily Indices  │ │
+                │  │ 每日索引       │ │
                 │  │ logs-2025.10.18│ │
                 │  │ logs-2025.10.17│ │
                 │  └────────────────┘ │
                 │                      │
                 │  ┌────────────────┐ │
-                │  │ Index Patterns │ │
-                │  │ Full-text Index│ │
+                │  │ 索引模式       │ │
+                │  │ 全文索引       │ │
                 │  └────────────────┘ │
                 └───────────┬──────────┘
                             │
                 ┌───────────▼──────────┐
                 │       Kibana         │
-                │  (Log Visualization) │
+                │   （日志可视化）      │
                 └──────────────────────┘
 ```
 
-**Components**:
+**组件**：
 
-- **Filebeat**: Lightweight log shipper
-  - Monitors log files for changes
-  - Adds metadata (hostname, tags)
-  - Buffers during downstream failures
-  - Sends to Logstash or Elasticsearch
+- **Filebeat**：轻量级日志采集器
+  - 监控日志文件变化
+  - 添加元数据（主机名、标签）
+  - 下游故障时本地缓冲
+  - 发送到 Logstash 或 Elasticsearch
 
-- **Logstash**: Log processing pipeline
-  - Parses JSON logs
-  - Filters sensitive data
-  - Enriches with additional context
-  - Routes to Elasticsearch
+- **Logstash**：日志处理流水线
+  - 解析 JSON 日志
+  - 过滤敏感数据
+  - 丰富附加上下文
+  - 路由到 Elasticsearch
 
-- **Elasticsearch**: Distributed search and analytics
-  - Stores logs in daily indices
-  - Full-text search capability
-  - Aggregations for analysis
-  - 90-day retention with ILM
+- **Elasticsearch**：分布式搜索和分析
+  - 按每日索引存储日志
+  - 全文搜索能力
+  - 聚合分析
+  - 使用 ILM 保留 90 天
 
-- **Kibana**: Visualization and exploration
-  - Search and filter logs
-  - Build visualizations
-  - Create dashboards
-  - Saved searches
+- **Kibana**：可视化和探索
+  - 搜索和过滤日志
+  - 构建可视化
+  - 创建仪表盘
+  - 保存搜索
 
-### 3. Visualization Layer
+### 3. 可视化层
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│               Visualization Architecture                   │
+│                    可视化架构                               │
 └────────────────────────────────────────────────────────────┘
 
 ┌──────────────────────────────────────────────────────────┐
@@ -224,36 +222,34 @@ The monitoring and alerting system provides comprehensive observability for ML i
 ├──────────────────────────────────────────────────────────┤
 │                                                          │
 │  ┌────────────────────────────────────────────────┐    │
-│  │              Datasources                       │    │
+│  │              数据源                            │    │
 │  ├────────────────────────────────────────────────┤    │
-│  │  - Prometheus (metrics)                        │    │
-│  │  - Elasticsearch (logs, optional)              │    │
-│  │  - Loki (logs, alternative)                    │    │
+│  │  - Prometheus（指标）                         │    │
+│  │  - Elasticsearch（日志，可选）                 │    │
+│  │  - Loki（日志，备用方案）                      │    │
 │  └────────────────────────────────────────────────┘    │
 │                                                          │
 │  ┌────────────────────────────────────────────────┐    │
-│  │              Dashboards                        │    │
+│  │              仪表盘                            │    │
 │  ├────────────────────────────────────────────────┤    │
 │  │  ┌───────────────┐  ┌───────────────┐        │    │
-│  │  │Infrastructure │  │  Application  │        │    │
-│  │  │   Dashboard   │  │   Dashboard   │        │    │
+│  │  │ 基础设施仪表盘 │  │  应用仪表盘   │        │    │
 │  │  └───────────────┘  └───────────────┘        │    │
 │  │                                                │    │
 │  │  ┌───────────────┐  ┌───────────────┐        │    │
-│  │  │   ML Model    │  │   Business    │        │    │
-│  │  │   Dashboard   │  │   Dashboard   │        │    │
+│  │  │ ML 模型仪表盘  │  │  业务仪表盘   │        │    │
 │  │  └───────────────┘  └───────────────┘        │    │
 │  └────────────────────────────────────────────────┘    │
 │                                                          │
 │  ┌────────────────────────────────────────────────┐    │
-│  │              Panels                            │    │
+│  │              面板                              │    │
 │  ├────────────────────────────────────────────────┤    │
-│  │  - Graphs (time series)                        │    │
-│  │  - Gauges (current values)                     │    │
-│  │  - Stat panels (single values)                 │    │
-│  │  - Tables (structured data)                    │    │
-│  │  - Heatmaps (distributions)                    │    │
-│  │  - Bar charts (comparisons)                    │    │
+│  │  - 图表（时间序列）                            │    │
+│  │  - 仪表盘（当前值）                            │    │
+│  │  - 统计面板（单一值）                          │    │
+│  │  - 表格（结构化数据）                          │    │
+│  │  - 热力图（分布）                              │    │
+│  │  - 柱状图（对比）                              │    │
 │  └────────────────────────────────────────────────┘    │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
@@ -263,52 +259,52 @@ The monitoring and alerting system provides comprehensive observability for ML i
 ├──────────────────────────────────────────────────────────┤
 │                                                          │
 │  ┌────────────────────────────────────────────────┐    │
-│  │              Discover                          │    │
-│  │  - Search logs                                 │    │
-│  │  - Filter and explore                          │    │
+│  │            发现（Discover）                    │    │
+│  │  - 搜索日志                                    │    │
+│  │  - 过滤和探索                                  │    │
 │  └────────────────────────────────────────────────┘    │
 │                                                          │
 │  ┌────────────────────────────────────────────────┐    │
-│  │              Visualizations                    │    │
-│  │  - Log volume over time                        │    │
-│  │  - Error distribution                          │    │
-│  │  - Top error messages                          │    │
+│  │              可视化                            │    │
+│  │  - 日志量随时间变化                            │    │
+│  │  - 错误分布                                    │    │
+│  │  - 主要错误消息                                │    │
 │  └────────────────────────────────────────────────┘    │
 │                                                          │
 │  ┌────────────────────────────────────────────────┐    │
-│  │              Dashboards                        │    │
-│  │  - Application logs                            │    │
-│  │  - Error analysis                              │    │
+│  │              仪表盘                            │    │
+│  │  - 应用日志                                    │    │
+│  │  - 错误分析                                    │    │
 │  └────────────────────────────────────────────────┘    │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
-### 4. Alerting Layer
+### 4. 告警层
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│               Alerting Architecture                        │
+│                     告警架构                                │
 └────────────────────────────────────────────────────────────┘
 
 ┌──────────────────────────────────────────────────────────┐
 │                  Prometheus                              │
 │                                                          │
 │  ┌────────────────────────────────────────────────┐    │
-│  │           Alert Rules                          │    │
+│  │           告警规则                             │    │
 │  ├────────────────────────────────────────────────┤    │
-│  │  - infrastructure.yml (CPU, memory, disk)      │    │
-│  │  - application.yml (errors, latency)           │    │
-│  │  - ml_model.yml (accuracy, drift)              │    │
+│  │  - infrastructure.yml（CPU、内存、磁盘）       │    │
+│  │  - application.yml（错误、延迟）               │    │
+│  │  - ml_model.yml（准确率、漂移）                │    │
 │  └────────────────┬───────────────────────────────┘    │
-│                   │ Alerts                             │
+│                   │ 告警                               │
 └───────────────────┼────────────────────────────────────┘
                     │
         ┌───────────▼──────────┐
         │   Alertmanager       │
         │                      │
         │  ┌────────────────┐ │
-        │  │  Routing Tree  │ │
+        │  │  路由树        │ │
         │  ├────────────────┤ │
         │  │ severity:      │ │
         │  │ - critical     │ │
@@ -317,19 +313,19 @@ The monitoring and alerting system provides comprehensive observability for ML i
         │  └────────┬───────┘ │
         │           │          │
         │  ┌────────▼───────┐ │
-        │  │   Grouping     │ │
-        │  │   Throttling   │ │
-        │  │   Inhibition   │ │
+        │  │   分组         │ │
+        │  │   限流         │ │
+        │  │   抑制         │ │
         │  └────────┬───────┘ │
         │           │          │
         └───────────┼──────────┘
                     │
         ┌───────────▼──────────────────────────────┐
-        │          Receivers                       │
+        │           接收器                          │
         ├──────────────────────────────────────────┤
         │                                          │
         │  ┌──────┐  ┌──────┐  ┌──────┐  ┌────┐ │
-        │  │Email │  │Slack │  │PagerD│  │Web │ │
+        │  │邮件  │  │Slack │  │PagerD│  │Web │ │
         │  │      │  │      │  │uty   │  │hook│ │
         │  └──────┘  └──────┘  └──────┘  └────┘ │
         │                                          │
@@ -342,16 +338,16 @@ The monitoring and alerting system provides comprehensive observability for ML i
 
 ---
 
-## Data Flow
+## 数据流
 
-### Metrics Data Flow
+### 指标数据流
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Metrics Journey                          │
+│                    指标流转过程                              │
 └─────────────────────────────────────────────────────────────┘
 
-1. Application Instrumentation
+1. 应用仪表化
    ┌────────────────────────────────┐
    │ from prometheus_client import │
    │   Counter, Histogram           │
@@ -367,9 +363,9 @@ The monitoring and alerting system provides comprehensive observability for ML i
    │     ...                        │
    └────────────────────────────────┘
                 │
-                │ Expose on /metrics endpoint
+                │ 在 /metrics 端点暴露
                 ▼
-2. Prometheus Scrapes
+2. Prometheus 采集
    ┌────────────────────────────────┐
    │ GET http://app:5000/metrics    │
    │                                │
@@ -378,11 +374,11 @@ The monitoring and alerting system provides comprehensive observability for ML i
    │ http_requests_total 12345      │
    └────────────────────────────────┘
                 │
-                │ Every 15 seconds
+                │ 每 15 秒
                 ▼
-3. Store in TSDB
+3. 存储在 TSDB
    ┌────────────────────────────────┐
-   │ Time Series Database           │
+   │ 时序数据库                     │
    │                                │
    │ Timestamp | Metric     | Value │
    │ ──────────┼────────────┼───────│
@@ -391,9 +387,9 @@ The monitoring and alerting system provides comprehensive observability for ML i
    │ 10:00:30  | http_req.. | 112   │
    └────────────────────────────────┘
                 │
-                │ Query via PromQL
+                │ 通过 PromQL 查询
                 ▼
-4. Visualize in Grafana
+4. 在 Grafana 中可视化
    ┌────────────────────────────────┐
    │ rate(http_requests_total[5m])  │
    │                                │
@@ -406,14 +402,14 @@ The monitoring and alerting system provides comprehensive observability for ML i
    └────────────────────────────────┘
 ```
 
-### Logging Data Flow
+### 日志数据流
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     Logs Journey                            │
+│                    日志流转过程                              │
 └─────────────────────────────────────────────────────────────┘
 
-1. Application Logging
+1. 应用日志记录
    ┌────────────────────────────────┐
    │ import logging                 │
    │                                │
@@ -425,21 +421,21 @@ The monitoring and alerting system provides comprehensive observability for ML i
    │ })                             │
    └────────────────────────────────┘
                 │
-                │ Write to file
+                │ 写入文件
                 ▼
-2. Filebeat Collects
+2. Filebeat 收集
    ┌────────────────────────────────┐
    │ Monitor: /var/log/app/*.log    │
    │                                │
-   │ Add metadata:                  │
+   │ 添加元数据:                    │
    │ - hostname: server01           │
    │ - service: ml-api              │
    │ - environment: prod            │
    └────────────────────────────────┘
                 │
-                │ Ship to Logstash
+                │ 发送到 Logstash
                 ▼
-3. Logstash Processes
+3. Logstash 处理
    ┌────────────────────────────────┐
    │ input { beats { port => 5044 }}│
    │                                │
@@ -455,9 +451,9 @@ The monitoring and alerting system provides comprehensive observability for ML i
    │ }                              │
    └────────────────────────────────┘
                 │
-                │ Index in ES
+                │ 在 ES 中索引
                 ▼
-4. Store in Elasticsearch
+4. 存储在 Elasticsearch
    ┌────────────────────────────────┐
    │ Index: logs-2025.10            │
    │                                │
@@ -471,13 +467,13 @@ The monitoring and alerting system provides comprehensive observability for ML i
    │ }                              │
    └────────────────────────────────┘
                 │
-                │ Search in Kibana
+                │ 在 Kibana 中搜索
                 ▼
-5. Visualize in Kibana
+5. 在 Kibana 中可视化
    ┌────────────────────────────────┐
    │ level:ERROR AND duration:>1    │
    │                                │
-   │ Results: 3 errors found        │
+   │ 结果：找到 3 个错误            │
    │                                │
    │ [ERROR] Request timeout...     │
    │ [ERROR] Model load failed...   │
@@ -485,14 +481,14 @@ The monitoring and alerting system provides comprehensive observability for ML i
    └────────────────────────────────┘
 ```
 
-### Alert Data Flow
+### 告警数据流
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Alert Journey                            │
+│                    告警流转过程                              │
 └─────────────────────────────────────────────────────────────┘
 
-1. Alert Rule Definition
+1. 告警规则定义
    ┌────────────────────────────────┐
    │ - alert: HighErrorRate         │
    │   expr: rate(errors[5m]) > 0.05│
@@ -503,9 +499,9 @@ The monitoring and alerting system provides comprehensive observability for ML i
    │     summary: "High errors!"    │
    └────────────────────────────────┘
                 │
-                │ Evaluate every 30s
+                │ 每 30 秒评估
                 ▼
-2. Prometheus Evaluates
+2. Prometheus 评估
    ┌────────────────────────────────┐
    │ Query: rate(errors[5m])        │
    │ Result: 0.06 (6%)              │
@@ -514,24 +510,24 @@ The monitoring and alerting system provides comprehensive observability for ML i
    │ Duration: 5m → FIRE ALERT      │
    └────────────────────────────────┘
                 │
-                │ Send to Alertmanager
+                │ 发送到 Alertmanager
                 ▼
-3. Alertmanager Routes
+3. Alertmanager 路由
    ┌────────────────────────────────┐
    │ Alert: HighErrorRate           │
    │ Severity: critical             │
    │                                │
-   │ Routing rules:                 │
+   │ 路由规则:                      │
    │ - critical → PagerDuty         │
    │ - critical → Slack             │
    │                                │
-   │ Group: Wait 10s for similar    │
-   │ Throttle: Max 1/hour           │
+   │ 分组：等待 10 秒收集相似告警   │
+   │ 限流：每小时最多 1 次          │
    └────────────────────────────────┘
                 │
-                │ Notify receivers
+                │ 通知接收器
                 ▼
-4. Notifications Sent
+4. 发送通知
    ┌────────────────────────────────┐
    │ PagerDuty: Incident #12345     │
    │ ┌────────────────────────────┐ │
@@ -555,146 +551,146 @@ The monitoring and alerting system provides comprehensive observability for ML i
 
 ---
 
-## Metrics Architecture
+## 指标架构
 
-### Metric Types & Use Cases
+### 指标类型与用途
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                  Metric Type Selection                      │
+│                    指标类型选择                              │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│  Counter: Monotonically increasing                          │
+│  Counter（计数器）：单调递增                                 │
 │  ┌─────────────────────────────────────────┐               │
-│  │ Use for:                                 │               │
-│  │ - Total requests                         │               │
-│  │ - Total errors                           │               │
-│  │ - Total predictions                      │               │
+│  │ 用途：                                   │               │
+│  │ - 总请求数                               │               │
+│  │ - 总错误数                               │               │
+│  │ - 总预测数                               │               │
 │  │                                          │               │
-│  │ Query with: rate() or increase()         │               │
-│  │ Example: rate(http_requests_total[5m])   │               │
+│  │ 查询方式：rate() 或 increase()            │               │
+│  │ 示例：rate(http_requests_total[5m])      │               │
 │  └─────────────────────────────────────────┘               │
 │                                                             │
-│  Gauge: Can go up or down                                   │
+│  Gauge（仪表盘）：可升可降                                  │
 │  ┌─────────────────────────────────────────┐               │
-│  │ Use for:                                 │               │
-│  │ - CPU usage                              │               │
-│  │ - Memory usage                           │               │
-│  │ - Active connections                     │               │
-│  │ - Model accuracy                         │               │
+│  │ 用途：                                   │               │
+│  │ - CPU 使用率                             │               │
+│  │ - 内存使用率                             │               │
+│  │ - 活跃连接数                             │               │
+│  │ - 模型准确率                             │               │
 │  │                                          │               │
-│  │ Query directly or with avg()             │               │
-│  │ Example: node_memory_usage_bytes         │               │
+│  │ 查询方式：直接查询或 avg()                │               │
+│  │ 示例：node_memory_usage_bytes            │               │
 │  └─────────────────────────────────────────┘               │
 │                                                             │
-│  Histogram: Distribution of values                          │
+│  Histogram（直方图）：值的分布                              │
 │  ┌─────────────────────────────────────────┐               │
-│  │ Use for:                                 │               │
-│  │ - Request duration                       │               │
-│  │ - Response size                          │               │
-│  │ - Inference latency                      │               │
+│  │ 用途：                                   │               │
+│  │ - 请求时长                               │               │
+│  │ - 响应大小                               │               │
+│  │ - 推理延迟                               │               │
 │  │                                          │               │
-│  │ Query with: histogram_quantile()         │               │
-│  │ Example: histogram_quantile(0.95, ...)   │               │
+│  │ 查询方式：histogram_quantile()           │               │
+│  │ 示例：histogram_quantile(0.95, ...)      │               │
 │  └─────────────────────────────────────────┘               │
 │                                                             │
-│  Summary: Pre-calculated quantiles (deprecated)             │
+│  Summary（摘要）：预计算的分位数（已弃用）                    │
 │  ┌─────────────────────────────────────────┐               │
-│  │ Use: Avoid in new code                   │               │
-│  │ Prefer: Histogram for flexibility        │               │
+│  │ 使用：新代码中避免使用                   │               │
+│  │ 推荐：使用 Histogram 以获得灵活性        │               │
 │  └─────────────────────────────────────────┘               │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Metric Naming Convention
+### 指标命名规范
 
 ```
 <metric_name>{label1="value1", label2="value2"}
 
-Best Practices:
-- Use snake_case for metric names
-- Include unit in name (bytes, seconds, total)
-- Use labels for dimensions, not metric names
-- Keep cardinality low (< 10k unique label combinations)
+最佳实践：
+- 指标名称使用蛇形命名法（snake_case）
+- 在名称中包含单位（bytes、seconds、total）
+- 使用标签表示维度，而非指标名称
+- 保持基数较低（< 10k 唯一标签组合）
 
-Good Examples:
+好的示例：
 ✓ http_request_duration_seconds{method="GET", endpoint="/predict"}
 ✓ model_predictions_total{model="resnet50", class="cat"}
 ✓ node_memory_usage_bytes{instance="server01"}
 
-Bad Examples:
-✗ httpRequestDurationSeconds (camelCase)
-✗ requests (no unit, no context)
-✗ http_get_predict_latency (dimensions in name, not labels)
-✗ user_123_requests (high cardinality label)
+不好的示例：
+✗ httpRequestDurationSeconds（驼峰命名）
+✗ requests（没有单位，没有上下文）
+✗ http_get_predict_latency（维度在名称中而非标签中）
+✗ user_123_requests（高基数标签）
 ```
 
 ---
 
-## Logging Architecture
+## 日志架构
 
-### Log Levels
+### 日志级别
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Log Level Usage                          │
+│                    日志级别使用                              │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│  DEBUG: Detailed information for diagnosing problems        │
+│  DEBUG：用于诊断问题的详细信息                               │
 │  ┌─────────────────────────────────────────┐               │
-│  │ Example:                                 │               │
-│  │ "Loading model weights from disk"        │               │
-│  │ "Cache hit for key: abc123"              │               │
+│  │ 示例：                                   │               │
+│  │ "从磁盘加载模型权重"                      │               │
+│  │ "缓存命中，键值：abc123"                  │               │
 │  │                                          │               │
-│  │ Volume: High                             │               │
-│  │ Production: Usually disabled             │               │
+│  │ 数量：高                                 │               │
+│  │ 生产环境：通常禁用                       │               │
 │  └─────────────────────────────────────────┘               │
 │                                                             │
-│  INFO: General informational messages                       │
+│  INFO：一般信息性消息                                       │
 │  ┌─────────────────────────────────────────┐               │
-│  │ Example:                                 │               │
-│  │ "Prediction request received"            │               │
-│  │ "Model v1.2 loaded successfully"         │               │
+│  │ 示例：                                   │               │
+│  │ "收到预测请求"                            │               │
+│  │ "模型 v1.2 加载成功"                     │               │
 │  │                                          │               │
-│  │ Volume: Moderate                         │               │
-│  │ Production: Enabled                      │               │
+│  │ 数量：中等                               │               │
+│  │ 生产环境：启用                           │               │
 │  └─────────────────────────────────────────┘               │
 │                                                             │
-│  WARNING: Something unexpected, but handled                 │
+│  WARNING：意外情况但已处理                                  │
 │  ┌─────────────────────────────────────────┐               │
-│  │ Example:                                 │               │
-│  │ "Retry attempt 2/3 for API call"         │               │
-│  │ "Disk usage above 80%"                   │               │
+│  │ 示例：                                   │               │
+│  │ "API 调用第 2/3 次重试"                  │               │
+│  │ "磁盘使用率超过 80%"                     │               │
 │  │                                          │               │
-│  │ Volume: Low                              │               │
-│  │ Production: Review regularly             │               │
+│  │ 数量：低                                 │               │
+│  │ 生产环境：定期审查                       │               │
 │  └─────────────────────────────────────────┘               │
 │                                                             │
-│  ERROR: An error occurred, operation failed                 │
+│  ERROR：发生错误，操作失败                                   │
 │  ┌─────────────────────────────────────────┐               │
-│  │ Example:                                 │               │
-│  │ "Failed to load model: FileNotFound"     │               │
-│  │ "Database connection failed"             │               │
+│  │ 示例：                                   │               │
+│  │ "加载模型失败：文件未找到"               │               │
+│  │ "数据库连接失败"                          │               │
 │  │                                          │               │
-│  │ Volume: Very low (if higher, investigate)│               │
-│  │ Production: Alert on spike               │               │
+│  │ 数量：非常低（如升高需调查）             │               │
+│  │ 生产环境：峰值时告警                     │               │
 │  └─────────────────────────────────────────┘               │
 │                                                             │
-│  CRITICAL: System is unusable, immediate action required    │
+│  CRITICAL：系统不可用，需要立即处理                          │
 │  ┌─────────────────────────────────────────┐               │
-│  │ Example:                                 │               │
-│  │ "Out of memory, shutting down"           │               │
-│  │ "Unrecoverable error in main loop"       │               │
+│  │ 示例：                                   │               │
+│  │ "内存不足，正在关闭"                      │               │
+│  │ "主循环中发生不可恢复的错误"              │               │
 │  │                                          │               │
-│  │ Volume: Rare                             │               │
-│  │ Production: Page immediately             │               │
+│  │ 数量：极少                               │               │
+│  │ 生产环境：立即呼叫                       │               │
 │  └─────────────────────────────────────────┘               │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Structured Logging Format
+### 结构化日志格式
 
 ```json
 {
@@ -721,37 +717,37 @@ Bad Examples:
 
 ---
 
-## Technology Stack
+## 技术栈
 
-### Component Versions
+### 组件版本
 
-| Component | Version | Purpose | Resource Requirements |
+| 组件 | 版本 | 用途 | 资源需求 |
 |-----------|---------|---------|----------------------|
-| **Prometheus** | 2.47.2 | Metrics storage | 2 CPU, 4GB RAM, 50GB disk |
-| **Alertmanager** | 0.26.0 | Alert routing | 1 CPU, 1GB RAM, 1GB disk |
-| **Grafana** | 10.2.2 | Visualization | 1 CPU, 2GB RAM, 5GB disk |
-| **Elasticsearch** | 8.11.1 | Log storage | 2 CPU, 4GB RAM, 100GB disk |
-| **Logstash** | 8.11.1 | Log processing | 2 CPU, 2GB RAM, 1GB disk |
-| **Kibana** | 8.11.1 | Log visualization | 1 CPU, 2GB RAM, 1GB disk |
-| **Filebeat** | 8.11.1 | Log shipping | 0.5 CPU, 512MB RAM |
-| **Node Exporter** | 1.6.1 | System metrics | 0.1 CPU, 64MB RAM |
+| **Prometheus** | 2.47.2 | 指标存储 | 2 CPU, 4GB RAM, 50GB 磁盘 |
+| **Alertmanager** | 0.26.0 | 告警路由 | 1 CPU, 1GB RAM, 1GB 磁盘 |
+| **Grafana** | 10.2.2 | 可视化 | 1 CPU, 2GB RAM, 5GB 磁盘 |
+| **Elasticsearch** | 8.11.1 | 日志存储 | 2 CPU, 4GB RAM, 100GB 磁盘 |
+| **Logstash** | 8.11.1 | 日志处理 | 2 CPU, 2GB RAM, 1GB 磁盘 |
+| **Kibana** | 8.11.1 | 日志可视化 | 1 CPU, 2GB RAM, 1GB 磁盘 |
+| **Filebeat** | 8.11.1 | 日志采集 | 0.5 CPU, 512MB RAM |
+| **Node Exporter** | 1.6.1 | 系统指标 | 0.1 CPU, 64MB RAM |
 
-### Total Resource Requirements (Minimum)
+### 总资源需求（最低）
 
-- **CPU**: 10 cores
-- **Memory**: 16GB RAM
-- **Disk**: 200GB SSD
-- **Network**: 1 Gbps
+- **CPU**：10 核
+- **内存**：16GB RAM
+- **磁盘**：200GB SSD
+- **网络**：1 Gbps
 
 ---
 
-## Deployment Architecture
+## 部署架构
 
-### Docker Compose Deployment
+### Docker Compose 部署
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│              Docker Compose Stack                           │
+│                  Docker Compose 栈                          │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
@@ -769,9 +765,9 @@ Bad Examples:
 │  │  (agent)    │  │   :9100     │                         │
 │  └─────────────┘  └─────────────┘                         │
 │                                                             │
-│                   Docker Network: monitoring                │
+│                   Docker 网络：monitoring                    │
 │                                                             │
-│  Volumes:                                                   │
+│  数据卷：                                                   │
 │  - prometheus_data                                          │
 │  - grafana_data                                             │
 │  - elasticsearch_data                                       │
@@ -780,145 +776,145 @@ Bad Examples:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Kubernetes Deployment (Future)
+### Kubernetes 部署（未来）
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│           Kubernetes Deployment (Advanced)                  │
+│              Kubernetes 部署（高级）                          │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│  Namespace: monitoring                                      │
+│  命名空间：monitoring                                       │
 │                                                             │
-│  StatefulSets:                                              │
-│  - prometheus (3 replicas, HA)                              │
-│  - elasticsearch (3 nodes)                                  │
+│  StatefulSets（有状态集）：                                  │
+│  - prometheus（3 副本，高可用）                              │
+│  - elasticsearch（3 节点）                                   │
 │                                                             │
-│  Deployments:                                               │
-│  - grafana (2 replicas)                                     │
-│  - alertmanager (3 replicas)                                │
-│  - logstash (2 replicas)                                    │
-│  - kibana (2 replicas)                                      │
+│  Deployments（部署）：                                      │
+│  - grafana（2 副本）                                        │
+│  - alertmanager（3 副本）                                   │
+│  - logstash（2 副本）                                       │
+│  - kibana（2 副本）                                         │
 │                                                             │
-│  DaemonSets:                                                │
-│  - node-exporter (on every node)                            │
-│  - filebeat (on every node)                                 │
+│  DaemonSets（守护进程集）：                                  │
+│  - node-exporter（每个节点）                                 │
+│  - filebeat（每个节点）                                      │
 │                                                             │
-│  Services:                                                  │
-│  - prometheus (ClusterIP)                                   │
-│  - grafana (LoadBalancer)                                   │
-│  - alertmanager (ClusterIP)                                 │
-│  - elasticsearch (ClusterIP)                                │
-│  - kibana (LoadBalancer)                                    │
+│  Services（服务）：                                         │
+│  - prometheus（ClusterIP）                                   │
+│  - grafana（LoadBalancer）                                   │
+│  - alertmanager（ClusterIP）                                 │
+│  - elasticsearch（ClusterIP）                                │
+│  - kibana（LoadBalancer）                                    │
 │                                                             │
-│  Persistent Volumes:                                        │
-│  - prometheus-pv (50GB × 3)                                 │
-│  - elasticsearch-pv (100GB × 3)                             │
-│  - grafana-pv (10GB)                                        │
+│  持久化卷：                                                  │
+│  - prometheus-pv（50GB × 3）                                 │
+│  - elasticsearch-pv（100GB × 3）                             │
+│  - grafana-pv（10GB）                                        │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Security Architecture
+## 安全架构
 
-### Authentication & Authorization
+### 认证与授权
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                Security Architecture                        │
+│                     安全架构                                 │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│  Grafana:                                                   │
+│  Grafana：                                                  │
 │  ┌─────────────────────────────────────────┐               │
-│  │ - Username/password authentication       │               │
-│  │ - OAuth2/SAML integration (optional)     │               │
-│  │ - RBAC:                                  │               │
-│  │   - Admin: Full access                   │               │
-│  │   - Editor: Create/edit dashboards       │               │
-│  │   - Viewer: Read-only                    │               │
+│  │ - 用户名/密码认证                        │               │
+│  │ - OAuth2/SAML 集成（可选）               │               │
+│  │ - RBAC：                                  │               │
+│  │   - Admin（管理员）：完全访问权限         │               │
+│  │   - Editor（编辑者）：创建/编辑仪表盘     │               │
+│  │   - Viewer（查看者）：只读               │               │
 │  └─────────────────────────────────────────┘               │
 │                                                             │
-│  Prometheus:                                                │
+│  Prometheus：                                               │
 │  ┌─────────────────────────────────────────┐               │
-│  │ - Basic auth (reverse proxy)             │               │
-│  │ - TLS encryption                         │               │
-│  │ - No built-in auth (use nginx/Traefik)   │               │
+│  │ - 基本认证（反向代理）                    │               │
+│  │ - TLS 加密                               │               │
+│  │ - 无内置认证（使用 nginx/Traefik）       │               │
 │  └─────────────────────────────────────────┘               │
 │                                                             │
-│  Elasticsearch/Kibana:                                      │
+│  Elasticsearch/Kibana：                                     │
 │  ┌─────────────────────────────────────────┐               │
-│  │ - X-Pack security (username/password)    │               │
-│  │ - API keys                               │               │
-│  │ - RBAC with roles                        │               │
-│  │ - TLS encryption                         │               │
+│  │ - X-Pack 安全（用户名/密码）             │               │
+│  │ - API 密钥                               │               │
+│  │ - 基于角色的 RBAC                        │               │
+│  │ - TLS 加密                               │               │
 │  └─────────────────────────────────────────┘               │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Network Security
+### 网络安全
 
-- All components in private Docker network
-- Expose only necessary ports (Grafana 3000, Kibana 5601)
-- Use TLS for all external connections
-- Firewall rules restrict access to monitoring UIs
-- VPN access for remote monitoring
-
----
-
-## Scalability Considerations
-
-### Prometheus Scaling
-
-1. **Vertical Scaling**: Increase memory and CPU
-2. **Federation**: Hierarchical Prometheus instances
-3. **Remote Write**: Long-term storage in Thanos/Cortex
-4. **Sharding**: Split scrape targets across instances
-
-### Elasticsearch Scaling
-
-1. **Add Nodes**: Scale horizontally to 3, 5, 7 nodes
-2. **Hot-Warm-Cold Architecture**: Tier storage by age
-3. **Index Lifecycle Management (ILM)**: Auto-manage indices
-4. **Shard Tuning**: Optimize shard size (20-50GB per shard)
-
-### Grafana Scaling
-
-1. **Database Backend**: Use PostgreSQL instead of SQLite
-2. **Caching**: Enable query caching
-3. **Load Balancing**: Multiple Grafana instances
-4. **CDN**: Serve static assets from CDN
+- 所有组件在私有 Docker 网络中
+- 仅暴露必要的端口（Grafana 3000、Kibana 5601）
+- 所有外部连接使用 TLS
+- 防火墙规则限制对监控 UI 的访问
+- 通过 VPN 进行远程监控
 
 ---
 
-## Future Enhancements
+## 可扩展性考虑
 
-### Distributed Tracing
+### Prometheus 扩展
+
+1. **垂直扩展**：增加内存和 CPU
+2. **联邦**：分层 Prometheus 实例
+3. **远程写入**：长期存储到 Thanos/Cortex
+4. **分片**：将采集目标分散到多个实例
+
+### Elasticsearch 扩展
+
+1. **添加节点**：水平扩展到 3、5、7 个节点
+2. **热-温-冷架构**：按年龄分层存储
+3. **索引生命周期管理（ILM）**：自动管理索引
+4. **分片调优**：优化分片大小（每分片 20-50GB）
+
+### Grafana 扩展
+
+1. **数据库后端**：使用 PostgreSQL 替代 SQLite
+2. **缓存**：启用查询缓存
+3. **负载均衡**：多个 Grafana 实例
+4. **CDN**：从 CDN 提供静态资源
+
+---
+
+## 未来增强
+
+### 分布式链路追踪
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│              Future: Distributed Tracing                    │
+│              未来：分布式链路追踪                            │
 └─────────────────────────────────────────────────────────────┘
 
 Application → OpenTelemetry → Tempo/Jaeger → Grafana
 
-Benefits:
-- End-to-end request tracing
-- Identify bottlenecks across services
-- Visualize service dependencies
-- Root cause analysis for latency issues
+优势：
+- 端到端请求追踪
+- 识别跨服务的瓶颈
+- 可视化服务依赖关系
+- 延迟问题的根因分析
 ```
 
-### AIOps Integration
+### AIOps 集成
 
-- Anomaly detection with ML models
-- Automated root cause analysis
-- Predictive alerting
-- Auto-remediation for common issues
+- 使用 ML 模型进行异常检测
+- 自动化根因分析
+- 预测性告警
+- 常见问题的自动修复
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: October 2025
-**Author**: AI Infrastructure Curriculum Team
+**文档版本**：1.0
+**最后更新**：2025 年 10 月
+**作者**：AI 基础设施课程团队

@@ -1,75 +1,75 @@
-# Exercise 05: Collaboration and Pull Requests
+# 练习 05：协作与 Pull Request
 
-## Overview
+## 概述
 
-**Difficulty**: Intermediate
-**Estimated Time**: 90-120 minutes
-**Prerequisites**: Exercise 04 - Merging and Conflicts, Lecture 03 - Collaboration
+**难度**：中级
+**预计时间**：90-120 分钟
+**前置条件**：练习 04 - 合并与冲突，讲座 03 - 协作
 
-In this exercise, you'll learn collaborative Git workflows including forking repositories, creating pull requests, conducting code reviews, and working with remote repositories. You'll practice the complete GitHub collaboration workflow used in professional ML engineering teams.
+在本练习中，你将学习协作式 Git 工作流，包括 fork 仓库、创建 pull request、进行代码审查和使用远程仓库。你将练习专业 ML 工程团队中使用的完整 GitHub 协作工作流。
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
+完成本练习后，你将：
 
-- Fork and clone repositories
-- Work with remote repositories
-- Create and manage pull requests
-- Conduct effective code reviews
-- Understand PR best practices
-- Handle review feedback
-- Use GitHub CLI for efficiency
-- Collaborate on ML projects
-- Manage upstream synchronization
+- Fork 和 clone 仓库
+- 使用远程仓库
+- 创建和管理 pull request
+- 进行有效的代码审查
+- 理解 PR 最佳实践
+- 处理审查反馈
+- 使用 GitHub CLI 提高效率
+- 在 ML 项目上协作
+- 管理上游同步
 
-## Scenario
+## 场景
 
-You're joining an ML infrastructure team that uses GitHub for collaboration. You'll contribute to the team's inference API project by forking the repository, implementing features, creating pull requests, and participating in code review.
+你将加入一个使用 GitHub 进行协作的 ML 基础设施团队。你将通过 fork 仓库、实现功能、创建 pull request 和参与代码审查来为团队的推理 API 项目做贡献。
 
-## Prerequisites
+## 前置条件
 
 ```bash
-# Ensure you have GitHub CLI installed
+# 确保你已安装 GitHub CLI
 gh --version
 
-# If not installed:
-# Mac: brew install gh
-# Linux: Download from https://cli.github.com/
-# Windows: Download from https://cli.github.com/
+# 如果未安装：
+# Mac：brew install gh
+# Linux：从 https://cli.github.com/ 下载
+# Windows：从 https://cli.github.com/ 下载
 
-# Authenticate with GitHub
+# 使用 GitHub 进行身份验证
 gh auth login
 
-# Follow prompts to authenticate
+# 按照提示进行身份验证
 ```
 
 ---
 
-## Part 1: Forking and Cloning
+## 第一部分：Fork 和 Clone
 
-### Task 1.1: Fork a Repository
+### 任务 1.1：Fork 一个仓库
 
-**Instructions:**
+**说明：**
 
-For this exercise, we'll simulate the fork workflow locally. In a real scenario:
+对于本练习，我们将在本地模拟 fork 工作流。在实际场景中：
 
 ```bash
-# On GitHub website:
-# 1. Navigate to repository
-# 2. Click "Fork" button
-# 3. Fork to your account
+# 在 GitHub 网站上：
+# 1. 导航到仓库
+# 2. 点击"Fork"按钮
+# 3. Fork 到你的账号
 
-# Using GitHub CLI:
+# 使用 GitHub CLI：
 # gh repo fork <owner>/<repo> --clone
 
-# For this exercise, create a simulated "upstream" repo
+# 对于本练习，创建一个模拟的"upstream"仓库
 cd /tmp
 mkdir ml-inference-api-upstream
 cd ml-inference-api-upstream
 git init
 git config init.defaultBranch main
 
-# Create basic project
+# 创建基本项目
 cat > README.md << 'EOF'
 # ML Inference API (Team Repository)
 
@@ -86,20 +86,20 @@ EOF
 git add README.md
 git commit -m "Initial commit"
 
-# Tag as v1.0.0
+# 标记为 v1.0.0
 git tag -a v1.0.0 -m "Initial release"
 
-# Now "fork" it (simulate by cloning)
+# 现在"fork"它（通过克隆模拟）
 cd ~
 git clone /tmp/ml-inference-api-upstream ml-inference-api-fork
 cd ml-inference-api-fork
 
-# Add upstream remote
+# 添加上游 remote
 git remote add upstream /tmp/ml-inference-api-upstream
 git remote -v
 ```
 
-**Output:**
+**输出：**
 ```
 origin  /tmp/ml-inference-api-upstream (fetch)
 origin  /tmp/ml-inference-api-upstream (push)
@@ -109,49 +109,49 @@ upstream        /tmp/ml-inference-api-upstream (push)
 
 ---
 
-### Task 1.2: Sync with Upstream
+### 任务 1.2：与上游同步
 
-Keep your fork updated.
+保持你的 fork 更新。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Fetch updates from upstream
+# 从上游获取更新
 git fetch upstream
 
-# View upstream branches
+# 查看上游分支
 git branch -r
 
-# Merge upstream changes into your main
+# 将上游变更合并到你的 main
 git switch main
 git merge upstream/main
 
-# Alternative: rebase instead of merge
+# 替代方案：使用 rebase 代替 merge
 # git rebase upstream/main
 
-# Push to your fork
+# 推送到你的 fork
 # git push origin main
 ```
 
 ---
 
-## Part 2: Creating Pull Requests
+## 第二部分：创建 Pull Request
 
-### Task 2.1: Create a Feature Branch for PR
+### 任务 2.1：为 PR 创建功能分支
 
-Implement a feature for pull request submission.
+实现一个用于提交 pull request 的功能。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Always branch from latest main
+# 始终从最新的 main 创建分支
 git switch main
 git pull upstream main
 
-# Create feature branch with descriptive name
+# 使用描述性名称创建功能分支
 git switch -c feature/add-model-metrics
 
-# Implement the feature
+# 实现功能
 mkdir -p src/monitoring
 cat > src/monitoring/model_metrics.py << 'EOF'
 """
@@ -230,7 +230,7 @@ class ModelMetrics:
 model_metrics = ModelMetrics()
 EOF
 
-# Add tests
+# 添加测试
 mkdir -p tests/monitoring
 cat > tests/monitoring/test_model_metrics.py << 'EOF'
 """Tests for model metrics."""
@@ -278,7 +278,7 @@ def test_get_summary():
     assert "mean_prediction" in summary
 EOF
 
-# Commit with good messages
+# 使用好的消息提交
 git add src/monitoring/model_metrics.py
 git commit -m "feat: add model performance metrics tracking
 
@@ -300,7 +300,7 @@ Add comprehensive tests for ModelMetrics:
 
 All tests passing with 100% coverage."
 
-# Update documentation
+# 更新文档
 cat >> README.md << 'EOF'
 
 ## Model Monitoring
@@ -321,23 +321,23 @@ EOF
 git add README.md
 git commit -m "docs: add model metrics usage to README"
 
-# View your commits
+# 查看你的 commit
 git log --oneline origin/main..HEAD
 ```
 
 ---
 
-### Task 2.2: Push and Create Pull Request
+### 任务 2.2：推送并创建 Pull Request
 
-Submit your feature for review.
+提交你的功能进行审查。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Push feature branch to your fork
+# 将功能分支推送到你的 fork
 # git push origin feature/add-model-metrics
 
-# Create PR using GitHub CLI
+# 使用 GitHub CLI 创建 PR
 # gh pr create --title "Add model performance metrics" \
 #              --body "## Summary
 #
@@ -358,13 +358,13 @@ Submit your feature for review.
 # Closes #123" \
 #              --base main
 
-# Or create PR on GitHub website:
-# 1. Go to your fork
-# 2. Click "Compare & pull request"
-# 3. Fill in title and description
-# 4. Click "Create pull request"
+# 或在 GitHub 网站上创建 PR：
+# 1. 转到你的 fork
+# 2. 点击"Compare & pull request"
+# 3. 填写标题和描述
+# 4. 点击"Create pull request"
 
-# For this exercise, simulate PR creation
+# 对于本练习，模拟 PR 创建
 cat > .git/PR_TEMPLATE.md << 'EOF'
 # Pull Request: Add Model Performance Metrics
 
@@ -414,22 +414,22 @@ echo "PR template created! This would be submitted to GitHub."
 
 ---
 
-## Part 3: Code Review Process
+## 第三部分：代码审查流程
 
-### Task 3.1: Review a Pull Request
+### 任务 3.1：审查 Pull Request
 
-Practice reviewing code.
+练习审查代码。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Simulate receiving a PR to review
+# 模拟收到一个需要审查的 PR
 
-# Create a branch simulating someone else's work
+# 创建一个模拟他人工作的分支
 git switch main
 git switch -c review/teammate-pr
 
-# Add some code with issues
+# 添加一些有问题的代码
 cat > src/utils/image_processing.py << 'EOF'
 """Image processing utilities."""
 
@@ -445,7 +445,7 @@ EOF
 git add src/utils/image_processing.py
 git commit -m "Add image processing utils"
 
-# Review checklist:
+# 审查清单：
 cat > review_checklist.md << 'EOF'
 # Code Review Checklist
 
@@ -493,7 +493,7 @@ cat > review_checklist.md << 'EOF'
 - [ ] Reproducibility maintained
 EOF
 
-# Review comments to leave:
+# 要留下的审查评论：
 cat > review_comments.md << 'EOF'
 # Review Comments for PR #123
 
@@ -574,14 +574,14 @@ echo "Review completed! Comments ready to submit."
 
 ---
 
-### Task 3.2: Address Review Feedback
+### 任务 3.2：回应审查反馈
 
-Respond to code review comments.
+回应代码审查评论。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Address the feedback
+# 回应反馈
 cat > src/utils/image_processing.py << 'EOF'
 """
 Image Processing Utilities
@@ -652,7 +652,7 @@ def normalize(
     return img / actual_max
 EOF
 
-# Add tests
+# 添加测试
 cat > tests/utils/test_image_processing.py << 'EOF'
 """Tests for image processing utilities."""
 
@@ -717,7 +717,7 @@ Changes:
 
 Addresses review comments from @reviewer"
 
-# Leave a comment
+# 留下评论
 cat > review_response.md << 'EOF'
 # Response to Review Comments
 
@@ -752,14 +752,14 @@ echo "Feedback addressed! Ready for re-review."
 
 ---
 
-## Part 4: Collaboration Best Practices
+## 第四部分：协作最佳实践
 
-### Task 4.1: Write Good PR Descriptions
+### 任务 4.1：编写好的 PR 描述
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Template for excellent PR descriptions
+# 优秀 PR 描述的模板
 cat > .github/PULL_REQUEST_TEMPLATE.md << 'EOF'
 ## Description
 <!-- Provide a brief description of the changes -->
@@ -841,11 +841,11 @@ git commit -m "chore: add comprehensive PR template"
 
 ---
 
-### Task 4.2: Effective Code Review Comments
+### 任务 4.2：有效的代码审查评论
 
-**Instructions:**
+**说明：**
 
-Create a guide for code reviews:
+创建代码审查指南：
 
 ```bash
 cat > docs/CODE_REVIEW_GUIDE.md << 'EOF'
@@ -954,97 +954,97 @@ git commit -m "docs: add code review guidelines"
 
 ---
 
-## Part 5: Advanced Collaboration
+## 第五部分：高级协作
 
-### Task 5.1: Handle Multiple Contributors
+### 任务 5.1：处理多个贡献者
 
-Manage conflicts with concurrent PRs.
+管理并发 PR 的冲突。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Scenario: Another developer merged their PR while you were working
+# 场景：在你工作时，另一个开发者合并了他们的 PR
 
-# Update your main
+# 更新你的 main
 git switch main
 git fetch upstream
 git merge upstream/main
 
-# Rebase your feature branch
+# 变基你的功能分支
 git switch feature/add-model-metrics
 git rebase main
 
-# If conflicts occur, resolve them
+# 如果出现冲突，解决它们
 # git rebase --continue
 
-# Force push (since history changed)
+# 强制推送（因为历史已更改）
 # git push --force-with-lease origin feature/add-model-metrics
 ```
 
 ---
 
-### Task 5.2: Split Large PRs
+### 任务 5.2：拆分大型 PR
 
-Break down a large feature into smaller PRs.
+将大功能分解为较小的 PR。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Instead of one large PR, create a series:
+# 不是一个大型 PR，而是创建一系列：
 
-# PR 1: Foundation
+# PR 1：基础
 git switch -c feature/metrics-foundation
 # Add base metrics class
 git commit -m "feat: add base metrics infrastructure"
 
-# PR 2: Accuracy tracking (depends on PR 1)
+# PR 2：准确率跟踪（依赖于 PR 1）
 git switch -c feature/metrics-accuracy
 # Add accuracy calculations
 git commit -m "feat: add accuracy tracking to metrics"
 
-# PR 3: Dashboard integration (depends on PR 2)
+# PR 3：仪表板集成（依赖于 PR 2）
 git switch -c feature/metrics-dashboard
 # Add dashboard
 git commit -m "feat: integrate metrics with dashboard"
 
-# Each PR is smaller, easier to review, and can be merged independently
+# 每个 PR 更小、更容易审查，并且可以独立合并
 ```
 
 ---
 
-## Validation
+## 验证
 
-### Verify Your Workflow
+### 验证你的工作流
 
 ```bash
-# Check all remotes configured
+# 检查所有配置的 remote
 git remote -v
 
-# View all branches
+# 查看所有分支
 git branch -a
 
-# Check for pending changes
+# 检查待处理的变更
 git status
 
-# View recent PR-related commits
+# 查看近期与 PR 相关的 commit
 git log --oneline -10
 ```
 
 ---
 
-## Challenge Tasks
+## 挑战任务
 
-### Challenge 1: Set Up Branch Protection
+### 挑战 1：设置分支保护
 
-Configure branch protection rules (on GitHub):
-- Require PR reviews
-- Require status checks to pass
-- Enforce linear history
-- Require signed commits
+配置分支保护规则（在 GitHub 上）：
+- 要求 PR 审查
+- 要求状态检查通过
+- 强制线性历史
+- 要求签名提交
 
-### Challenge 2: Automate PR Checks
+### 挑战 2：自动化 PR 检查
 
-Create GitHub Actions workflow for PR validation:
+创建用于 PR 验证的 GitHub Actions 工作流：
 
 ```yaml
 # .github/workflows/pr-checks.yml
@@ -1067,9 +1067,9 @@ jobs:
 
 ---
 
-## Troubleshooting
+## 故障排除
 
-**Issue**: "PR has conflicts"
+**问题**："PR 有冲突"
 ```bash
 git fetch upstream
 git rebase upstream/main
@@ -1078,51 +1078,51 @@ git rebase --continue
 git push --force-with-lease
 ```
 
-**Issue**: "Accidentally pushed to main"
+**问题**："意外推送到 main"
 ```bash
-# Revert on GitHub
-# Or contact maintainer to remove commit
+# 在 GitHub 上还原
+# 或联系维护者移除 commit
 ```
 
 ---
 
-## Reflection Questions
+## 反思问题
 
-1. **Why fork instead of branching directly?**
-2. **What makes a good PR description?**
-3. **How do you provide constructive code review feedback?**
-4. **When should you split a PR into smaller PRs?**
-5. **How do you handle disagreements in code review?**
+1. **为什么 fork 而不是直接分支？**
+2. **什么构成了好的 PR 描述？**
+3. **如何提供建设性的代码审查反馈？**
+4. **何时应该将 PR 拆分为更小的 PR？**
+5. **如何处理代码审查中的分歧？**
 
 ---
 
-## Summary
+## 总结
 
-Congratulations! You've mastered Git collaboration:
+恭喜！你已经掌握了 Git 协作：
 
-- ✅ Forking and cloning repositories
-- ✅ Creating professional pull requests
-- ✅ Conducting effective code reviews
-- ✅ Addressing review feedback
-- ✅ Collaboration best practices
-- ✅ Managing concurrent development
-- ✅ PR templates and guidelines
+- ✅ Fork 和 clone 仓库
+- ✅ 创建专业的 pull request
+- ✅ 进行有效的代码审查
+- ✅ 回应审查反馈
+- ✅ 协作最佳实践
+- ✅ 管理并发开发
+- ✅ PR 模板和指南
 
-### Key Commands
+### 学会的关键命令
 
 ```bash
-git remote add upstream <url>  # Add upstream remote
-git fetch upstream             # Fetch upstream changes
-git rebase upstream/main       # Rebase on upstream
-gh pr create                   # Create PR (GitHub CLI)
-gh pr checkout <number>        # Checkout PR locally
-gh pr review                   # Review PR
-git push --force-with-lease    # Safe force push
+git remote add upstream <url>  # 添加上游 remote
+git fetch upstream             # 获取上游变更
+git rebase upstream/main       # 变基到上游
+gh pr create                   # 创建 PR（GitHub CLI）
+gh pr checkout <number>        # 在本地检出 PR
+gh pr review                   # 审查 PR
+git push --force-with-lease    # 安全强制推送
 ```
 
-### Next Steps
+### 下一步
 
-- Exercise 06: ML-specific Git workflows
-- Practice collaboration in team projects
+- 练习 06：ML 特定 Git 工作流
+- 在团队项目中练习协作
 
-**Excellent work!** You're ready for professional team collaboration.
+**出色的工作！** 你已经为专业团队协作做好了准备。

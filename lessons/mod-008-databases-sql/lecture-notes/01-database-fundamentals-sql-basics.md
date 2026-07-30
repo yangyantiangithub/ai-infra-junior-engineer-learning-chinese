@@ -1,133 +1,133 @@
-# Lecture 01: Database Fundamentals & SQL Basics
+# Lecture 01: 数据库基础与 SQL 入门
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [What is a Database?](#what-is-a-database)
-3. [Types of Databases](#types-of-databases)
-4. [Relational Database Concepts](#relational-database-concepts)
-5. [Introduction to SQL](#introduction-to-sql)
-6. [Setting Up Your Database Environment](#setting-up-your-database-environment)
-7. [Creating Databases and Tables](#creating-databases-and-tables)
-8. [Basic SQL Queries (SELECT)](#basic-sql-queries-select)
-9. [Filtering Data (WHERE)](#filtering-data-where)
-10. [Sorting and Limiting Results](#sorting-and-limiting-results)
-11. [Inserting Data](#inserting-data)
-12. [Updating Data](#updating-data)
-13. [Deleting Data](#deleting-data)
-14. [Databases in ML Infrastructure](#databases-in-ml-infrastructure)
-15. [Best Practices](#best-practices)
-16. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [引言](#introduction)
+2. [什么是数据库？](#what-is-a-database)
+3. [数据库类型](#types-of-databases)
+4. [关系型数据库概念](#relational-database-concepts)
+5. [SQL 简介](#introduction-to-sql)
+6. [设置数据库环境](#setting-up-your-database-environment)
+7. [创建数据库和表](#creating-databases-and-tables)
+8. [基本 SQL 查询（SELECT）](#basic-sql-queries-select)
+9. [数据过滤（WHERE）](#filtering-data-where)
+10. [排序与限制结果](#sorting-and-limiting-results)
+11. [插入数据](#inserting-data)
+12. [更新数据](#updating-data)
+13. [删除数据](#deleting-data)
+14. [ML 基础设施中的数据库](#databases-in-ml-infrastructure)
+15. [最佳实践](#best-practices)
+16. [总结与关键要点](#summary-and-key-takeaways)
 
-## Introduction
+## 引言
 
-Databases are the backbone of modern applications, storing and managing the data that powers everything from web applications to machine learning systems. For AI/ML infrastructure, databases play a critical role in storing training data, model metadata, experiment results, and production metrics.
+数据库是现代应用程序的基石，存储和管理着驱动从 Web 应用到机器学习系统一切的数据。对于 AI/ML 基础设施，数据库在存储训练数据、模型元数据、实验结果和生产指标方面发挥着关键作用。
 
-This lecture introduces you to database fundamentals and SQL (Structured Query Language), the standard language for interacting with relational databases.
+本讲座将向你介绍数据库基础和 SQL（结构化查询语言），这是与关系型数据库交互的标准语言。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Understand what databases are and why they're essential
-- Distinguish between different types of databases
-- Comprehend relational database concepts (tables, rows, columns, keys)
-- Write basic SQL queries to retrieve data
-- Filter, sort, and limit query results
-- Insert, update, and delete data
-- Apply database concepts to ML infrastructure scenarios
-- Follow SQL best practices
+在本讲座结束时，你将：
+- 理解什么是数据库及其重要性
+- 区分不同类型的数据库
+- 理解关系型数据库概念（表、行、列、键）
+- 编写基本 SQL 查询以检索数据
+- 过滤、排序和限制查询结果
+- 插入、更新和删除数据
+- 将数据库概念应用于 ML 基础设施场景
+- 遵循 SQL 最佳实践
 
-### Prerequisites
-- Basic programming knowledge (Python recommended)
-- Command-line proficiency
-- Understanding of data structures (arrays, dictionaries)
+### 前置条件
+- 基本编程知识（推荐 Python）
+- 命令行熟练度
+- 理解数据结构（数组、字典）
 
-### Estimated Time
-4-5 hours (including hands-on practice)
+### 预计时间
+4-5 小时（包括动手练习）
 
-## What is a Database?
+## 什么是数据库？
 
-### Definition
+### 定义
 
-A **database** is an organized collection of structured data stored electronically. Databases are designed to:
-- Store large amounts of data efficiently
-- Retrieve data quickly
-- Maintain data integrity and consistency
-- Support concurrent access by multiple users
-- Provide data security and backup capabilities
+**数据库**是以电子方式存储的结构化数据的有机集合。数据库旨在：
+- 高效存储大量数据
+- 快速检索数据
+- 维护数据完整性和一致性
+- 支持多个用户并发访问
+- 提供数据安全和备份能力
 
-### Why Use Databases?
+### 为什么使用数据库？
 
-**Without databases:**
+**没有数据库时：**
 ```python
-# Storing data in files (problematic!)
+# 将数据存储在文件中（问题重重！）
 import json
 
-# Save data
+# 保存数据
 with open('models.json', 'w') as f:
     json.dump({"model1": {...}, "model2": {...}}, f)
 
-# Problems:
-# - No concurrent access control
-# - Difficult to query efficiently
-# - No data integrity guarantees
-# - Hard to scale
-# - No transaction support
+# 问题：
+# - 无并发访问控制
+# - 难以高效查询
+# - 无数据完整性保证
+# - 难以扩展
+# - 无事务支持
 ```
 
-**With databases:**
+**使用数据库时：**
 ```sql
--- Efficient, scalable, concurrent access
+-- 高效、可扩展、并发访问
 SELECT * FROM models WHERE accuracy > 0.9;
--- Instant results from millions of records!
+-- 从数百万条记录中瞬间获取结果！
 ```
 
-### Key Advantages of Databases
+### 数据库的主要优势
 
-1. **Data Integrity**: Enforce rules and constraints
-2. **Concurrency**: Multiple users can access simultaneously
-3. **Scalability**: Handle growing data volumes
-4. **Performance**: Optimized for fast queries
-5. **Security**: Access control and authentication
-6. **ACID Properties**: Atomicity, Consistency, Isolation, Durability
-7. **Backup & Recovery**: Data protection mechanisms
+1. **数据完整性**：强制执行规则和约束
+2. **并发性**：多个用户可以同时访问
+3. **可扩展性**：处理不断增长的数据量
+4. **性能**：针对快速查询进行了优化
+5. **安全性**：访问控制和身份验证
+6. **ACID 属性**：原子性、一致性、隔离性、持久性
+7. **备份与恢复**：数据保护机制
 
-## Types of Databases
+## 数据库类型
 
-### 1. Relational Databases (SQL)
+### 1. 关系型数据库（SQL）
 
-Store data in structured tables with predefined schemas.
+将数据存储在具有预定义 schema 的结构化表中。
 
-**Examples:**
-- PostgreSQL (open-source, powerful)
-- MySQL/MariaDB (popular, web-friendly)
-- SQLite (lightweight, file-based)
-- Oracle (enterprise)
-- Microsoft SQL Server (enterprise)
+**示例：**
+- PostgreSQL（开源、强大）
+- MySQL/MariaDB（流行、适合 Web）
+- SQLite（轻量级、基于文件）
+- Oracle（企业级）
+- Microsoft SQL Server（企业级）
 
-**Characteristics:**
-- Structured data with schemas
-- ACID transactions
-- SQL query language
-- Relationships via foreign keys
-- Strong consistency
+**特点：**
+- 带 schema 的结构化数据
+- ACID 事务
+- SQL 查询语言
+- 通过外键建立关系
+- 强一致性
 
-**Use Cases:**
-- Financial systems
-- E-commerce
-- User management
-- ML experiment tracking
-- Model metadata storage
+**使用场景：**
+- 金融系统
+- 电子商务
+- 用户管理
+- ML 实验跟踪
+- 模型元数据存储
 
-### 2. NoSQL Databases
+### 2. NoSQL 数据库
 
-Store data in flexible, non-tabular formats.
+以灵活的非表格格式存储数据。
 
-**Types:**
+**类型：**
 
-**a) Document Databases**
-- MongoDB, CouchDB
-- Store JSON-like documents
-- Flexible schema
+**a) 文档数据库**
+- MongoDB、CouchDB
+- 存储类似 JSON 的文档
+- 灵活的 schema
 
 ```json
 {
@@ -140,66 +140,66 @@ Store data in flexible, non-tabular formats.
 }
 ```
 
-**b) Key-Value Stores**
-- Redis, DynamoDB
-- Simple key-value pairs
-- Extremely fast
+**b) 键值存储**
+- Redis、DynamoDB
+- 简单的键值对
+- 极快
 
 ```
 model:bert-v1 → {"accuracy": 0.92}
 ```
 
-**c) Column-Family Stores**
-- Cassandra, HBase
-- Optimized for large-scale data
+**c) 列族存储**
+- Cassandra、HBase
+- 针对大规模数据优化
 
-**d) Graph Databases**
-- Neo4j, Amazon Neptune
-- Store relationships and connections
+**d) 图数据库**
+- Neo4j、Amazon Neptune
+- 存储关系和连接
 
-**Use Cases:**
-- Caching (Redis)
-- Real-time analytics
-- Unstructured data
-- Horizontal scaling
-- Feature stores in ML
+**使用场景：**
+- 缓存（Redis）
+- 实时分析
+- 非结构化数据
+- 水平扩展
+- ML 中的特征存储
 
-### 3. Comparison: SQL vs NoSQL
+### 3. 对比：SQL vs NoSQL
 
-| Aspect | SQL (Relational) | NoSQL |
+| 方面 | SQL（关系型） | NoSQL |
 |--------|------------------|-------|
-| Schema | Fixed, predefined | Flexible, dynamic |
-| Scalability | Vertical (scale up) | Horizontal (scale out) |
-| Transactions | ACID guarantees | Eventual consistency |
-| Queries | Powerful SQL | Varies by type |
-| Data Structure | Tables, rows, columns | Documents, key-value, etc. |
-| Best For | Structured data, complex queries | Unstructured data, high volume |
-| ML Use Cases | Metadata, experiments | Features, embeddings, logs |
+| Schema | 固定、预定义 | 灵活、动态 |
+| 可扩展性 | 垂直（纵向扩展） | 水平（横向扩展） |
+| 事务 | ACID 保证 | 最终一致性 |
+| 查询 | 强大的 SQL | 因类型而异 |
+| 数据结构 | 表、行、列 | 文档、键值等 |
+| 最适合 | 结构化数据、复杂查询 | 非结构化数据、高容量 |
+| ML 使用场景 | 元数据、实验 | 特征、嵌入、日志 |
 
-### When to Use Each?
+### 何时使用哪种？
 
-**Use SQL when:**
-- Data has a clear structure
-- Need complex queries and joins
-- ACID transactions are critical
-- Data integrity is paramount
-- Examples: Model registry, experiment tracking
+**使用 SQL 的情况：**
+- 数据具有清晰的结构
+- 需要复杂查询和连接
+- ACID 事务至关重要
+- 数据完整性是首要任务
+- 示例：模型注册、实验跟踪
 
-**Use NoSQL when:**
-- Schema changes frequently
-- Need massive horizontal scaling
-- Handling unstructured data
-- Speed over consistency
-- Examples: Feature caching, log storage, embeddings
+**使用 NoSQL 的情况：**
+- Schema 频繁变化
+- 需要大规模水平扩展
+- 处理非结构化数据
+- 速度优先于一致性
+- 示例：特征缓存、日志存储、嵌入
 
-## Relational Database Concepts
+## 关系型数据库概念
 
-### Tables
+### 表
 
-Tables are the fundamental structure in relational databases. Think of them as spreadsheets.
+表是关系型数据库中的基本结构。可以将它们视为电子表格。
 
 ```
-models table:
+models 表：
 ┌────────┬─────────────┬───────────┬──────────┐
 │ id     │ name        │ framework │ accuracy │
 ├────────┼─────────────┼───────────┼──────────┤
@@ -209,17 +209,17 @@ models table:
 └────────┴─────────────┴───────────┴──────────┘
 ```
 
-**Components:**
-- **Table name**: `models`
-- **Columns**: `id`, `name`, `framework`, `accuracy`
-- **Rows**: Each row is a record (3 rows above)
+**组成部分：**
+- **表名**：`models`
+- **列**：`id`、`name`、`framework`、`accuracy`
+- **行**：每一行是一条记录（以上共 3 行）
 
-### Columns (Fields)
+### 列（字段）
 
-Columns define the attributes of the data.
+列定义数据的属性。
 
 ```sql
-Column Name | Data Type    | Constraints
+列名      | 数据类型     | 约束
 ------------|--------------|-------------
 id          | INTEGER      | PRIMARY KEY
 name        | VARCHAR(100) | NOT NULL
@@ -228,35 +228,35 @@ accuracy    | DECIMAL(5,4) | CHECK (accuracy >= 0 AND accuracy <= 1)
 created_at  | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP
 ```
 
-### Rows (Records)
+### 行（记录）
 
-Each row represents a single entity or record.
+每一行代表一个实体或记录。
 
 ```sql
--- One row (one model)
+-- 一行（一个模型）
 (1, 'BERT-base', 'PyTorch', 0.92, '2024-01-15 10:30:00')
 ```
 
-### Primary Keys
+### 主键
 
-A **primary key** uniquely identifies each row in a table.
+**主键**唯一标识表中的每一行。
 
 ```sql
 CREATE TABLE models (
-    id INTEGER PRIMARY KEY,  -- Unique identifier
+    id INTEGER PRIMARY KEY,  -- 唯一标识符
     name VARCHAR(100)
 );
 ```
 
-**Properties:**
-- Must be unique for each row
-- Cannot be NULL
-- Only one primary key per table
-- Often auto-incrementing
+**属性：**
+- 每一行必须唯一
+- 不能为 NULL
+- 每个表只有一个主键
+- 通常是自增的
 
-### Foreign Keys
+### 外键
 
-A **foreign key** creates a relationship between tables.
+**外键**在表之间建立关系。
 
 ```sql
 CREATE TABLE experiments (
@@ -267,152 +267,152 @@ CREATE TABLE experiments (
 );
 ```
 
-This links experiments to models:
+这将实验与模型关联起来：
 ```
-models table:           experiments table:
+models 表：              experiments 表：
 ┌────┬──────────┐      ┌──────────────┬──────────┬──────────┐
 │ id │ name     │      │ experiment_id│ model_id │ accuracy │
 ├────┼──────────┤      ├──────────────┼──────────┼──────────┤
 │ 1  │ BERT     │ ←────┤ 101          │ 1        │ 0.92     │
 │ 2  │ ResNet   │ ←────┤ 102          │ 2        │ 0.88     │
 └────┴──────────┘      │ 103          │ 1        │ 0.93     │
-                       └──────────────┴──────────┴──────────┘
+                        └──────────────┴──────────┴──────────┘
 ```
 
-### Data Types
+### 数据类型
 
-Common SQL data types:
+常见 SQL 数据类型：
 
-**Numeric:**
+**数值型：**
 ```sql
-INTEGER         -- Whole numbers: 1, 42, -10
-BIGINT          -- Large integers: 9223372036854775807
-DECIMAL(10,2)   -- Fixed precision: 123.45
-FLOAT           -- Floating point: 3.14159
+INTEGER         -- 整数：1、42、-10
+BIGINT          -- 大整数：9223372036854775807
+DECIMAL(10,2)   -- 固定精度：123.45
+FLOAT           -- 浮点数：3.14159
 ```
 
-**Text:**
+**文本型：**
 ```sql
-CHAR(10)        -- Fixed length: 'BERT      ' (padded)
-VARCHAR(100)    -- Variable length: 'BERT-base'
-TEXT            -- Unlimited text
+CHAR(10)        -- 固定长度：'BERT      '（填充）
+VARCHAR(100)    -- 可变长度：'BERT-base'
+TEXT            -- 无限制文本
 ```
 
-**Date/Time:**
+**日期/时间：**
 ```sql
-DATE            -- Date only: '2024-10-18'
-TIME            -- Time only: '14:30:00'
-TIMESTAMP       -- Date and time: '2024-10-18 14:30:00'
+DATE            -- 仅日期：'2024-10-18'
+TIME            -- 仅时间：'14:30:00'
+TIMESTAMP       -- 日期和时间：'2024-10-18 14:30:00'
 ```
 
-**Boolean:**
+**布尔型：**
 ```sql
-BOOLEAN         -- TRUE or FALSE
+BOOLEAN         -- TRUE 或 FALSE
 ```
 
-**Other:**
+**其他：**
 ```sql
-JSON            -- JSON data (PostgreSQL)
-ARRAY           -- Arrays (PostgreSQL)
-BLOB            -- Binary data (images, files)
+JSON            -- JSON 数据（PostgreSQL）
+ARRAY           -- 数组（PostgreSQL）
+BLOB            -- 二进制数据（图像、文件）
 ```
 
-## Introduction to SQL
+## SQL 简介
 
-### What is SQL?
+### 什么是 SQL？
 
-**SQL (Structured Query Language)** is the standard language for interacting with relational databases.
+**SQL（结构化查询语言）**是与关系型数据库交互的标准语言。
 
-**SQL Categories:**
+**SQL 分类：**
 
-1. **DDL (Data Definition Language)**: Define structure
-   - `CREATE`, `ALTER`, `DROP`
+1. **DDL（数据定义语言）**：定义结构
+   - `CREATE`、`ALTER`、`DROP`
 
-2. **DML (Data Manipulation Language)**: Manipulate data
-   - `SELECT`, `INSERT`, `UPDATE`, `DELETE`
+2. **DML（数据操作语言）**：操作数据
+   - `SELECT`、`INSERT`、`UPDATE`、`DELETE`
 
-3. **DCL (Data Control Language)**: Control access
-   - `GRANT`, `REVOKE`
+3. **DCL（数据控制语言）**：控制访问
+   - `GRANT`、`REVOKE`
 
-4. **TCL (Transaction Control Language)**: Manage transactions
-   - `COMMIT`, `ROLLBACK`
+4. **TCL（事务控制语言）**：管理事务
+   - `COMMIT`、`ROLLBACK`
 
-### SQL Syntax Conventions
+### SQL 语法约定
 
 ```sql
--- SQL keywords are typically UPPERCASE (convention)
+-- SQL 关键字通常大写（约定）
 SELECT * FROM models;
 
--- But lowercase works too
+-- 但小写也可以
 select * from models;
 
--- Statements end with semicolon
+-- 语句以分号结尾
 SELECT name FROM models;
 
--- Comments
--- Single line comment
-/* Multi-line
-   comment */
+-- 注释
+-- 单行注释
+/* 多行
+   注释 */
 ```
 
-**Best Practices:**
-- Use UPPERCASE for SQL keywords
-- Use lowercase for table/column names
-- Indent for readability
-- End statements with semicolons
+**最佳实践：**
+- SQL 关键字使用大写
+- 表/列名使用小写
+- 缩进以提高可读性
+- 语句以分号结尾
 
-## Setting Up Your Database Environment
+## 设置数据库环境
 
-### Option 1: SQLite (Recommended for Learning)
+### 选项 1：SQLite（推荐用于学习）
 
-SQLite is file-based and requires no server setup.
+SQLite 基于文件，无需服务器设置。
 
 ```bash
-# Install (usually pre-installed on Linux/Mac)
+# 安装（通常 Linux/Mac 已预装）
 sudo apt-get install sqlite3  # Ubuntu/Debian
 
-# Create database
+# 创建数据库
 sqlite3 ml_database.db
 
-# You'll see:
+# 你将看到：
 # SQLite version 3.x.x
 # sqlite>
 ```
 
-### Option 2: PostgreSQL (Production-Grade)
+### 选项 2：PostgreSQL（生产级）
 
 ```bash
-# Install PostgreSQL
+# 安装 PostgreSQL
 sudo apt-get install postgresql postgresql-contrib
 
-# Start service
+# 启动服务
 sudo systemctl start postgresql
 
-# Access PostgreSQL
+# 访问 PostgreSQL
 sudo -u postgres psql
 
-# Create database
+# 创建数据库
 CREATE DATABASE ml_database;
 
-# Connect to database
+# 连接到数据库
 \c ml_database
 ```
 
-### Option 3: Docker (Portable)
+### 选项 3：Docker（可移植）
 
 ```bash
-# Run PostgreSQL in Docker
+# 在 Docker 中运行 PostgreSQL
 docker run --name postgres-ml \
   -e POSTGRES_PASSWORD=mypassword \
   -e POSTGRES_DB=ml_database \
   -p 5432:5432 \
   -d postgres:14
 
-# Connect
+# 连接
 docker exec -it postgres-ml psql -U postgres -d ml_database
 ```
 
-### Python Database Connection
+### Python 数据库连接
 
 ```python
 # SQLite
@@ -420,7 +420,7 @@ import sqlite3
 conn = sqlite3.connect('ml_database.db')
 cursor = conn.cursor()
 
-# PostgreSQL (requires psycopg2)
+# PostgreSQL（需要 psycopg2）
 import psycopg2
 conn = psycopg2.connect(
     host="localhost",
@@ -431,20 +431,20 @@ conn = psycopg2.connect(
 cursor = conn.cursor()
 ```
 
-## Creating Databases and Tables
+## 创建数据库和表
 
-### Create Database
+### 创建数据库
 
 ```sql
 -- PostgreSQL/MySQL
 CREATE DATABASE ml_database;
 
--- Use database
+-- 使用数据库
 USE ml_database;  -- MySQL
 \c ml_database    -- PostgreSQL
 ```
 
-### Create Table
+### 创建表
 
 ```sql
 CREATE TABLE models (
@@ -459,17 +459,17 @@ CREATE TABLE models (
 );
 ```
 
-**Constraints:**
-- `PRIMARY KEY`: Unique identifier
-- `NOT NULL`: Value required
-- `DEFAULT`: Default value if not specified
-- `UNIQUE`: All values must be unique
-- `CHECK`: Custom validation
+**约束：**
+- `PRIMARY KEY`：唯一标识符
+- `NOT NULL`：值必填
+- `DEFAULT`：未指定时的默认值
+- `UNIQUE`：所有值必须唯一
+- `CHECK`：自定义验证
 
-### Example: ML Model Registry
+### 示例：ML 模型注册
 
 ```sql
--- Models table
+-- Models 表
 CREATE TABLE models (
     model_id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(100) NOT NULL UNIQUE,
@@ -489,7 +489,7 @@ CREATE TABLE models (
     CHECK (status IN ('training', 'ready', 'deployed', 'archived'))
 );
 
--- Experiments table
+-- Experiments 表
 CREATE TABLE experiments (
     experiment_id INTEGER PRIMARY KEY AUTOINCREMENT,
     model_id INTEGER NOT NULL,
@@ -505,7 +505,7 @@ CREATE TABLE experiments (
     FOREIGN KEY (model_id) REFERENCES models(model_id)
 );
 
--- Predictions table (for logging)
+-- Predictions 表（用于日志记录）
 CREATE TABLE predictions (
     prediction_id INTEGER PRIMARY KEY AUTOINCREMENT,
     model_id INTEGER NOT NULL,
@@ -519,7 +519,7 @@ CREATE TABLE predictions (
 );
 ```
 
-### View Table Structure
+### 查看表结构
 
 ```sql
 -- SQLite
@@ -531,20 +531,20 @@ CREATE TABLE predictions (
 -- MySQL
 DESCRIBE models;
 
--- Standard SQL
+-- 标准 SQL
 SHOW COLUMNS FROM models;
 ```
 
-## Basic SQL Queries (SELECT)
+## 基本 SQL 查询（SELECT）
 
-### Select All Columns
+### 选择所有列
 
 ```sql
--- Get all data from models table
+-- 从 models 表获取所有数据
 SELECT * FROM models;
 ```
 
-**Output:**
+**输出：**
 ```
 model_id | name      | framework | accuracy | created_at
 ---------|-----------|-----------|----------|-------------------
@@ -553,14 +553,14 @@ model_id | name      | framework | accuracy | created_at
 3        | GPT-2     | PyTorch   | 0.95     | 2024-10-18 12:00:00
 ```
 
-### Select Specific Columns
+### 选择特定列
 
 ```sql
--- Get only name and accuracy
+-- 只获取名称和准确率
 SELECT name, accuracy FROM models;
 ```
 
-**Output:**
+**输出：**
 ```
 name      | accuracy
 ----------|----------
@@ -569,10 +569,10 @@ ResNet-50 | 0.88
 GPT-2     | 0.95
 ```
 
-### Column Aliases
+### 列别名
 
 ```sql
--- Rename columns in output
+-- 在输出中重命名列
 SELECT
     name AS model_name,
     accuracy AS model_accuracy,
@@ -580,7 +580,7 @@ SELECT
 FROM models;
 ```
 
-**Output:**
+**输出：**
 ```
 model_name | model_accuracy | ml_framework
 -----------|----------------|-------------
@@ -588,10 +588,10 @@ BERT-base  | 0.92           | PyTorch
 ResNet-50  | 0.88           | TensorFlow
 ```
 
-### Expressions in SELECT
+### SELECT 中的表达式
 
 ```sql
--- Calculate accuracy percentage
+-- 计算准确率百分比
 SELECT
     name,
     accuracy,
@@ -599,7 +599,7 @@ SELECT
 FROM models;
 ```
 
-**Output:**
+**输出：**
 ```
 name      | accuracy | accuracy_percent
 ----------|----------|------------------
@@ -607,14 +607,14 @@ BERT-base | 0.92     | 92.0
 ResNet-50 | 0.88     | 88.0
 ```
 
-### DISTINCT Values
+### DISTINCT 值
 
 ```sql
--- Get unique frameworks
+-- 获取唯一的框架
 SELECT DISTINCT framework FROM models;
 ```
 
-**Output:**
+**输出：**
 ```
 framework
 -----------
@@ -622,168 +622,168 @@ PyTorch
 TensorFlow
 ```
 
-## Filtering Data (WHERE)
+## 数据过滤（WHERE）
 
-### Basic WHERE Clause
+### 基本 WHERE 子句
 
 ```sql
--- Get models with accuracy > 0.90
+-- 获取准确率 > 0.90 的模型
 SELECT * FROM models
 WHERE accuracy > 0.90;
 ```
 
-### Comparison Operators
+### 比较运算符
 
 ```sql
--- Equal to
+-- 等于
 SELECT * FROM models WHERE framework = 'PyTorch';
 
--- Not equal to
+-- 不等于
 SELECT * FROM models WHERE framework != 'TensorFlow';
-SELECT * FROM models WHERE framework <> 'TensorFlow';  -- Alternative
+SELECT * FROM models WHERE framework <> 'TensorFlow';  -- 另一种写法
 
--- Greater than
+-- 大于
 SELECT * FROM models WHERE accuracy > 0.90;
 
--- Greater than or equal to
+-- 大于或等于
 SELECT * FROM models WHERE accuracy >= 0.90;
 
--- Less than
+-- 小于
 SELECT * FROM models WHERE accuracy < 0.90;
 
--- Less than or equal to
+-- 小于或等于
 SELECT * FROM models WHERE accuracy <= 0.90;
 ```
 
-### Logical Operators
+### 逻辑运算符
 
-**AND:**
+**AND：**
 ```sql
--- Models that are PyTorch AND accuracy > 0.90
+-- 既是 PyTorch 且准确率 > 0.90 的模型
 SELECT * FROM models
 WHERE framework = 'PyTorch' AND accuracy > 0.90;
 ```
 
-**OR:**
+**OR：**
 ```sql
--- Models that are PyTorch OR TensorFlow
+-- 是 PyTorch 或 TensorFlow 的模型
 SELECT * FROM models
 WHERE framework = 'PyTorch' OR framework = 'TensorFlow';
 ```
 
-**NOT:**
+**NOT：**
 ```sql
--- Models that are NOT PyTorch
+-- 不是 PyTorch 的模型
 SELECT * FROM models
 WHERE NOT framework = 'PyTorch';
 ```
 
-**Combining:**
+**组合：**
 ```sql
--- Complex condition
+-- 复杂条件
 SELECT * FROM models
 WHERE (framework = 'PyTorch' OR framework = 'TensorFlow')
   AND accuracy > 0.85
   AND status = 'deployed';
 ```
 
-### IN Operator
+### IN 运算符
 
 ```sql
--- Models in specific frameworks
+-- 在特定框架中的模型
 SELECT * FROM models
 WHERE framework IN ('PyTorch', 'TensorFlow', 'JAX');
 
--- Equivalent to:
+-- 等价于：
 SELECT * FROM models
 WHERE framework = 'PyTorch'
    OR framework = 'TensorFlow'
    OR framework = 'JAX';
 ```
 
-### BETWEEN Operator
+### BETWEEN 运算符
 
 ```sql
--- Models with accuracy between 0.85 and 0.95
+-- 准确率在 0.85 到 0.95 之间的模型
 SELECT * FROM models
 WHERE accuracy BETWEEN 0.85 AND 0.95;
 
--- Equivalent to:
+-- 等价于：
 SELECT * FROM models
 WHERE accuracy >= 0.85 AND accuracy <= 0.95;
 ```
 
-### LIKE Pattern Matching
+### LIKE 模式匹配
 
 ```sql
--- Models with names starting with 'BERT'
+-- 名称以 'BERT' 开头的模型
 SELECT * FROM models WHERE name LIKE 'BERT%';
 
--- Models with names ending with 'Net'
+-- 名称以 'Net' 结尾的模型
 SELECT * FROM models WHERE name LIKE '%Net';
 
--- Models with names containing 'GPT'
+-- 名称包含 'GPT' 的模型
 SELECT * FROM models WHERE name LIKE '%GPT%';
 
--- _ matches single character
+-- _ 匹配单个字符
 SELECT * FROM models WHERE name LIKE 'GPT-_';  -- GPT-2, GPT-3
 ```
 
-**Wildcards:**
-- `%`: Matches any sequence of characters
-- `_`: Matches exactly one character
+**通配符：**
+- `%`：匹配任意字符序列
+- `_`：匹配恰好一个字符
 
-### NULL Handling
+### NULL 处理
 
 ```sql
--- Find models without accuracy scores
+-- 查找没有准确率分数的模型
 SELECT * FROM models WHERE accuracy IS NULL;
 
--- Find models with accuracy scores
+-- 查找有准确率分数的模型
 SELECT * FROM models WHERE accuracy IS NOT NULL;
 
--- Note: Use IS NULL, not = NULL
--- This is WRONG:
-SELECT * FROM models WHERE accuracy = NULL;  -- Returns nothing!
+-- 注意：使用 IS NULL，而不是 = NULL
+-- 这是错误的：
+SELECT * FROM models WHERE accuracy = NULL;  -- 什么也不返回！
 ```
 
-## Sorting and Limiting Results
+## 排序与限制结果
 
 ### ORDER BY
 
 ```sql
--- Sort by accuracy (ascending - lowest first)
+-- 按准确率排序（升序——最低在前）
 SELECT * FROM models ORDER BY accuracy;
 
--- Sort by accuracy (descending - highest first)
+-- 按准确率排序（降序——最高在前）
 SELECT * FROM models ORDER BY accuracy DESC;
 
--- Sort by multiple columns
+-- 按多列排序
 SELECT * FROM models
 ORDER BY framework ASC, accuracy DESC;
--- First sort by framework alphabetically,
--- then by accuracy (high to low) within each framework
+-- 首先按框架字母排序，
+-- 然后在每个框架内按准确率（高到低）排序
 ```
 
 ### LIMIT
 
 ```sql
--- Get top 5 most accurate models
+-- 获取准确率最高的前 5 个模型
 SELECT * FROM models
 ORDER BY accuracy DESC
 LIMIT 5;
 
--- Get models 11-20 (pagination)
+-- 获取第 11-20 条记录（分页）
 SELECT * FROM models
 ORDER BY created_at DESC
 LIMIT 10 OFFSET 10;
--- Skip first 10, return next 10
+-- 跳过前 10 条，返回接下来的 10 条
 ```
 
-### Combining WHERE, ORDER BY, LIMIT
+### 组合 WHERE、ORDER BY、LIMIT
 
 ```sql
--- Top 3 PyTorch models by accuracy
+-- 按准确率排序的前 3 个 PyTorch 模型
 SELECT name, framework, accuracy
 FROM models
 WHERE framework = 'PyTorch'
@@ -791,16 +791,16 @@ ORDER BY accuracy DESC
 LIMIT 3;
 ```
 
-## Inserting Data
+## 插入数据
 
-### Insert Single Row
+### 插入单行
 
 ```sql
 INSERT INTO models (name, framework, accuracy, status)
 VALUES ('BERT-large', 'PyTorch', 0.94, 'ready');
 ```
 
-### Insert Multiple Rows
+### 插入多行
 
 ```sql
 INSERT INTO models (name, framework, accuracy, status)
@@ -810,39 +810,39 @@ VALUES
     ('EfficientNet-B0', 'TensorFlow', 0.87, 'training');
 ```
 
-### Insert with Default Values
+### 使用默认值插入
 
 ```sql
--- Use defaults for version, created_at, status
+-- 使用 version、created_at、status 的默认值
 INSERT INTO models (name, framework, accuracy)
 VALUES ('MobileNet-v2', 'TensorFlow', 0.85);
--- version will be '1.0.0', status will be 'training'
--- created_at will be current timestamp
+-- version 将为 '1.0.0'，status 将为 'training'
+-- created_at 将为当前时间戳
 ```
 
-### Insert from SELECT
+### 从 SELECT 插入
 
 ```sql
--- Copy data from another table
+-- 从另一个表复制数据
 INSERT INTO models_backup
 SELECT * FROM models WHERE status = 'archived';
 ```
 
-## Updating Data
+## 更新数据
 
-### Update Single Column
+### 更新单列
 
 ```sql
--- Update model status
+-- 更新模型状态
 UPDATE models
 SET status = 'deployed'
 WHERE model_id = 1;
 ```
 
-### Update Multiple Columns
+### 更新多列
 
 ```sql
--- Update model after retraining
+-- 重新训练后更新模型
 UPDATE models
 SET
     accuracy = 0.96,
@@ -851,66 +851,66 @@ SET
 WHERE model_id = 1;
 ```
 
-### Update with Conditions
+### 带条件的更新
 
 ```sql
--- Archive old models
+-- 归档旧模型
 UPDATE models
 SET status = 'archived'
 WHERE created_at < '2024-01-01' AND status != 'deployed';
 ```
 
-### Update All Rows (DANGEROUS!)
+### 更新所有行（危险！）
 
 ```sql
--- This updates ALL rows!
+-- 这将更新所有行！
 UPDATE models SET status = 'archived';
 
--- Always use WHERE unless you really want to update everything
+-- 除非确实要更新所有内容，否则始终使用 WHERE
 ```
 
-## Deleting Data
+## 删除数据
 
-### Delete Specific Rows
+### 删除特定行
 
 ```sql
--- Delete a specific model
+-- 删除特定模型
 DELETE FROM models WHERE model_id = 5;
 ```
 
-### Delete with Conditions
+### 带条件的删除
 
 ```sql
--- Delete archived models from 2023
+-- 删除 2023 年已归档的模型
 DELETE FROM models
 WHERE status = 'archived'
   AND created_at < '2024-01-01';
 ```
 
-### Delete All Rows (VERY DANGEROUS!)
+### 删除所有行（非常危险！）
 
 ```sql
--- This deletes ALL rows!
+-- 这将删除所有行！
 DELETE FROM models;
 
--- Better: Use WHERE clause
-DELETE FROM models WHERE 1=0;  -- Deletes nothing (safe test)
+-- 更好：使用 WHERE 子句
+DELETE FROM models WHERE 1=0;  -- 不删除任何内容（安全测试）
 ```
 
-### TRUNCATE (Faster Alternative)
+### TRUNCATE（更快的替代方案）
 
 ```sql
--- Remove all rows quickly (resets auto-increment)
+-- 快速删除所有行（重置自增）
 TRUNCATE TABLE models;
--- Warning: Cannot be rolled back in some databases!
+-- 警告：某些数据库中无法回滚！
 ```
 
-## Databases in ML Infrastructure
+## ML 基础设施中的数据库
 
-### Use Case 1: Model Registry
+### 使用场景 1：模型注册
 
 ```sql
--- Track all trained models
+-- 跟踪所有已训练的模型
 CREATE TABLE model_registry (
     model_id INTEGER PRIMARY KEY,
     name VARCHAR(100),
@@ -923,7 +923,7 @@ CREATE TABLE model_registry (
     status VARCHAR(20)
 );
 
--- Query: Find best models
+-- 查询：找到最佳模型
 SELECT name, accuracy, framework
 FROM model_registry
 WHERE accuracy > 0.90 AND status = 'production'
@@ -931,21 +931,21 @@ ORDER BY accuracy DESC
 LIMIT 10;
 ```
 
-### Use Case 2: Experiment Tracking
+### 使用场景 2：实验跟踪
 
 ```sql
--- Log all training experiments
+-- 记录所有训练实验
 CREATE TABLE experiments (
     experiment_id INTEGER PRIMARY KEY,
     model_name VARCHAR(100),
-    hyperparameters TEXT,  -- JSON string
+    hyperparameters TEXT,  -- JSON 字符串
     accuracy DECIMAL(5,4),
     loss DECIMAL(10,6),
     training_time_seconds INTEGER,
     created_at TIMESTAMP
 );
 
--- Query: Find best hyperparameters
+-- 查询：找到最佳超参数
 SELECT hyperparameters, accuracy
 FROM experiments
 WHERE model_name = 'BERT-classifier'
@@ -953,10 +953,10 @@ ORDER BY accuracy DESC
 LIMIT 1;
 ```
 
-### Use Case 3: Prediction Logging
+### 使用场景 3：预测日志记录
 
 ```sql
--- Log all predictions for monitoring
+-- 记录所有预测以进行监控
 CREATE TABLE prediction_logs (
     log_id INTEGER PRIMARY KEY,
     model_id INTEGER,
@@ -968,7 +968,7 @@ CREATE TABLE prediction_logs (
     user_id VARCHAR(50)
 );
 
--- Query: Monitor model performance
+-- 查询：监控模型性能
 SELECT
     DATE(timestamp) as date,
     AVG(confidence) as avg_confidence,
@@ -980,20 +980,20 @@ WHERE model_id = 1
 GROUP BY DATE(timestamp);
 ```
 
-## Best Practices
+## 最佳实践
 
-### 1. Always Use WHERE with UPDATE/DELETE
+### 1. 始终在 UPDATE/DELETE 中使用 WHERE
 
 ```sql
--- BAD: Accidentally updates all rows!
+-- 不好：意外更新所有行！
 UPDATE models SET status = 'archived';
 
--- GOOD: Updates specific rows
+-- 好：更新特定行
 UPDATE models SET status = 'archived'
 WHERE model_id = 5;
 ```
 
-### 2. Use Transactions for Multiple Operations
+### 2. 对多个操作使用事务
 
 ```sql
 BEGIN TRANSACTION;
@@ -1001,34 +1001,34 @@ BEGIN TRANSACTION;
 UPDATE models SET status = 'deployed' WHERE model_id = 1;
 INSERT INTO deployment_log (model_id, deployed_at) VALUES (1, CURRENT_TIMESTAMP);
 
-COMMIT;  -- Or ROLLBACK if something fails
+COMMIT;  -- 或者如果出错则 ROLLBACK
 ```
 
-### 3. Index Important Columns
+### 3. 为重要列建立索引
 
 ```sql
--- Create index for faster queries
+-- 创建索引以加快查询速度
 CREATE INDEX idx_models_framework ON models(framework);
 CREATE INDEX idx_models_accuracy ON models(accuracy);
 
--- Now queries on these columns are much faster
+-- 现在对这些列的查询快得多
 SELECT * FROM models WHERE framework = 'PyTorch';
 ```
 
-### 4. Use Meaningful Names
+### 4. 使用有意义的名称
 
 ```sql
--- BAD
+-- 不好
 CREATE TABLE t1 (c1 INT, c2 VARCHAR(50));
 
--- GOOD
+-- 好
 CREATE TABLE models (
     model_id INTEGER,
     model_name VARCHAR(50)
 );
 ```
 
-### 5. Validate Data with Constraints
+### 5. 使用约束验证数据
 
 ```sql
 CREATE TABLE models (
@@ -1039,80 +1039,80 @@ CREATE TABLE models (
 );
 ```
 
-### 6. Regular Backups
+### 6. 定期备份
 
 ```bash
-# SQLite backup
+# SQLite 备份
 sqlite3 ml_database.db ".backup backup.db"
 
-# PostgreSQL backup
+# PostgreSQL 备份
 pg_dump ml_database > backup.sql
 ```
 
-## Summary and Key Takeaways
+## 总结与关键要点
 
-### Core Concepts
+### 核心概念
 
-1. **Databases** organize and store structured data efficiently
-2. **SQL** is the standard language for relational databases
-3. **Tables** consist of rows (records) and columns (fields)
-4. **Primary keys** uniquely identify rows
-5. **Foreign keys** create relationships between tables
+1. **数据库**有效地组织和存储结构化数据
+2. **SQL** 是与关系型数据库交互的标准语言
+3. **表**由行（记录）和列（字段）组成
+4. **主键**唯一标识行
+5. **外键**在表之间建立关系
 
-### Essential SQL Commands
+### 基本 SQL 命令
 
-**Data Retrieval:**
-- `SELECT`: Retrieve data
-- `WHERE`: Filter rows
-- `ORDER BY`: Sort results
-- `LIMIT`: Restrict number of results
+**数据检索：**
+- `SELECT`：检索数据
+- `WHERE`：过滤行
+- `ORDER BY`：排序结果
+- `LIMIT`：限制结果数量
 
-**Data Modification:**
-- `INSERT`: Add new rows
-- `UPDATE`: Modify existing rows
-- `DELETE`: Remove rows
+**数据修改：**
+- `INSERT`：添加新行
+- `UPDATE`：修改现有行
+- `DELETE`：删除行
 
-**Data Definition:**
-- `CREATE TABLE`: Define new table
-- `ALTER TABLE`: Modify table structure
-- `DROP TABLE`: Delete table
+**数据定义：**
+- `CREATE TABLE`：定义新表
+- `ALTER TABLE`：修改表结构
+- `DROP TABLE`：删除表
 
-### Best Practices
+### 最佳实践
 
-1. Always use `WHERE` with `UPDATE` and `DELETE`
-2. Use transactions for related operations
-3. Create indexes on frequently queried columns
-4. Validate data with constraints
-5. Use meaningful names for tables and columns
-6. Back up your databases regularly
+1. 始终在 `UPDATE` 和 `DELETE` 中使用 `WHERE`
+2. 对相关操作使用事务
+3. 对频繁查询的列创建索引
+4. 使用约束验证数据
+5. 为表和列使用有意义的名称
+6. 定期备份数据库
 
-### ML-Specific Insights
+### ML 特定见解
 
-Databases are essential for:
-- Model registry and versioning
-- Experiment tracking and comparison
-- Prediction logging and monitoring
-- Dataset metadata management
-- Performance metrics storage
+数据库对于以下方面至关重要：
+- 模型注册和版本控制
+- 实验跟踪与比较
+- 预测日志记录与监控
+- 数据集元数据管理
+- 性能指标存储
 
-### Next Steps
+### 后续步骤
 
-In the next lecture, we'll cover:
-- Database design principles
-- Normalization (1NF, 2NF, 3NF)
-- Relationships (one-to-many, many-to-many)
-- Entity-Relationship diagrams
-- Schema design for ML systems
+在下一讲中，我们将涵盖：
+- 数据库设计原则
+- 范式（1NF、2NF、3NF）
+- 关系（一对多、多对多）
+- 实体-关系图
+- ML 系统的 Schema 设计
 
-### Practice Exercises
+### 练习
 
-1. Create a database for tracking your ML experiments
-2. Write queries to find your best-performing models
-3. Design a schema for prediction logging
-4. Practice filtering with complex WHERE clauses
+1. 创建一个数据库来跟踪你的 ML 实验
+2. 编写查询来查找表现最佳的模型
+3. 为预测日志记录设计 schema
+4. 练习使用复杂 WHERE 子句进行过滤
 
 ---
 
-**Estimated Study Time:** 4-5 hours
-**Hands-on Practice:** Complete Exercise 01: SQL Basics
-**Assessment:** Quiz 01 covers database fundamentals and basic SQL
+**预计学习时间：** 4-5 小时
+**动手练习：** 完成练习 01：SQL 基础
+**评估：** 测验 01 涵盖数据库基础和基本 SQL

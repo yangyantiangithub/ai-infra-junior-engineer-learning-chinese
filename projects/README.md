@@ -1,3 +1,3 @@
-# Projects
+# 项目
 
-Store hands-on projects and capstones for this track here.
+在此存储本轨道的实践项目和毕业设计。

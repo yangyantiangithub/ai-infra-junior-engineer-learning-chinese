@@ -1,115 +1,115 @@
-# Midterm Practical Exam
+# 期中实践考试
 
-## Overview
+## 概述
 
-**Purpose**: Assess hands-on competency in Docker containerization, basic model deployment, and troubleshooting
+**目的**：评估 Docker 容器化、基础模型部署和问题排查的动手能力
 
-**Duration**: 3 hours
+**时长**：3 小时
 
-**Prerequisites**: Completed Modules 1-2 and Projects 1-2
+**先决条件**：完成模块 1-2 和项目 1-2
 
-**Passing Score**: 75/100 points
+**及格分数**：75/100 分
 
-**Format**: Hands-on coding and deployment tasks
+**形式**：动手编码和部署任务
 
-**Environment**: Your local development machine with Docker installed
+**环境**：已安装 Docker 的本地开发机器
 
 ---
 
-## Exam Instructions
+## 考试说明
 
-### Before You Begin
+### 开始之前
 
-1. **Setup your workspace**:
+1. **设置工作空间**：
    ```bash
    mkdir midterm-exam
    cd midterm-exam
    git init
    ```
 
-2. **Required tools**:
+2. **所需工具**：
    - Python 3.9+
-   - Docker and Docker Compose
-   - Text editor/IDE
+   - Docker 和 Docker Compose
+   - 文本编辑器/IDE
    - Git
 
-3. **Time management**:
-   - Task 1: 45 minutes
-   - Task 2: 60 minutes
-   - Task 3: 45 minutes
-   - Review/testing: 30 minutes
+3. **时间管理**：
+   - 任务 1：45 分钟
+   - 任务 2：60 分钟
+   - 任务 3：45 分钟
+   - 复习/测试：30 分钟
 
-4. **Submission requirements**:
-   - All code in a Git repository
-   - README.md with setup instructions
-   - Working Docker containers
-   - Documentation of any issues encountered
+4. **提交要求**：
+   - 所有代码在 Git 仓库中
+   - README.md 包含搭建说明
+   - Docker 容器正常运行
+   - 记录遇到的任何问题
 
-### General Rules
+### 通用规则
 
-- You may use official documentation
-- No collaboration with others
-- No pre-built solutions
-- All code must be your own work
-- Save your work frequently
+- 可以使用官方文档
+- 不得与他人协作
+- 不得使用预构建的解决方案
+- 所有代码必须是你自己的原创
+- 经常保存你的工作
 
 ---
 
-## Task 1: Containerize a Machine Learning Model (30 points)
+## 任务 1：容器化机器学习模型（30 分）
 
-### Scenario
+### 场景
 
-You've been provided with a Python script that loads a pre-trained sentiment analysis model. Your task is to containerize this application and expose it via a REST API.
+你得到了一个 Python 脚本，用于加载预训练的情感分析模型。你的任务是容器化此应用程序并通过 REST API 暴露它。
 
-### Provided Code
+### 提供的代码
 
-**model_server.py** (you need to create this based on requirements):
+**model_server.py**（你需要根据需求创建）：
 
 ```python
-# TODO: Import necessary libraries (Flask/FastAPI, transformers, etc.)
+# TODO: 导入必要的库 (Flask/FastAPI, transformers 等)
 
-# TODO: Load a pre-trained sentiment analysis model
-# Suggestion: Use transformers library with a small model like
+# TODO: 加载预训练的情感分析模型
+# 建议：使用 transformers 库中的小型模型
 # "distilbert-base-uncased-finetuned-sst-2-english"
 
-# TODO: Create API endpoint POST /predict
-# Input: {"text": "some text to analyze"}
-# Output: {"sentiment": "POSITIVE/NEGATIVE", "score": 0.95}
+# TODO: 创建 API 端点 POST /predict
+# 输入：{"text": "some text to analyze"}
+# 输出：{"sentiment": "POSITIVE/NEGATIVE", "score": 0.95}
 
-# TODO: Create health check endpoint GET /health
+# TODO: 创建健康检查端点 GET /health
 
-# TODO: Run the server on port 8000
+# TODO: 在端口 8000 上运行服务器
 ```
 
-### Requirements
+### 要求
 
-1. **Application** (12 points):
-   - [ ] Implement the model server with all TODOs completed
-   - [ ] POST /predict endpoint accepts text and returns sentiment
-   - [ ] GET /health endpoint returns service status
-   - [ ] Proper error handling for invalid inputs
-   - [ ] Model loads successfully on startup
+1. **应用程序**（12 分）：
+   - [ ] 实现模型服务器，完成所有 TODO
+   - [ ] POST /predict 端点接收文本并返回情感分析结果
+   - [ ] GET /health 端点返回服务状态
+   - [ ] 对无效输入进行适当的错误处理
+   - [ ] 模型在启动时成功加载
 
-2. **Dockerfile** (10 points):
-   - [ ] Uses appropriate base image (Python 3.9+)
-   - [ ] Installs all dependencies
-   - [ ] Copies application code
-   - [ ] Exposes correct port (8000)
-   - [ ] Runs as non-root user
-   - [ ] Image size < 2GB
+2. **Dockerfile**（10 分）：
+   - [ ] 使用合适的基础镜像（Python 3.9+）
+   - [ ] 安装所有依赖
+   - [ ] 复制应用程序代码
+   - [ ] 暴露正确的端口（8000）
+   - [ ] 以非 root 用户运行
+   - [ ] 镜像大小 < 2GB
 
-3. **Documentation** (5 points):
-   - [ ] README with build instructions
-   - [ ] How to run the container
-   - [ ] Example API requests
-   - [ ] Known limitations
+3. **文档**（5 分）：
+   - [ ] README 包含构建说明
+   - [ ] 如何运行容器
+   - [ ] 示例 API 请求
+   - [ ] 已知限制
 
-4. **Testing** (3 points):
-   - [ ] Successfully builds without errors
-   - [ ] Container runs and stays healthy
-   - [ ] API responds to requests correctly
+4. **测试**（3 分）：
+   - [ ] 成功构建，无错误
+   - [ ] 容器运行且保持健康状态
+   - [ ] API 正确响应请求
 
-### Deliverables
+### 交付物
 
 ```
 task1/
@@ -120,72 +120,72 @@ task1/
 └── README.md
 ```
 
-### Evaluation Criteria
+### 评估标准
 
-| Criterion | Points | Your Score |
-|-----------|--------|------------|
-| Working API endpoints | 6 | |
-| Error handling | 3 | |
-| Model loads correctly | 3 | |
-| Dockerfile best practices | 6 | |
-| Image optimization | 4 | |
-| Documentation quality | 5 | |
-| Successfully runs | 3 | |
-| **Total** | **30** | |
+| 标准 | 分数 | 你的得分 |
+|------|------|----------|
+| API 端点正常工作 | 6 | |
+| 错误处理 | 3 | |
+| 模型正确加载 | 3 | |
+| Dockerfile 最佳实践 | 6 | |
+| 镜像优化 | 4 | |
+| 文档质量 | 5 | |
+| 成功运行 | 3 | |
+| **总计** | **30** | |
 
 ---
 
-## Task 2: Multi-Container Application with Monitoring (40 points)
+## 任务 2：带监控的多容器应用程序（40 分）
 
-### Scenario
+### 场景
 
-Extend your Task 1 application to include a PostgreSQL database for logging predictions and Prometheus for monitoring. Use Docker Compose to orchestrate all services.
+扩展你的任务 1 应用程序，加入 PostgreSQL 数据库用于记录预测结果，以及 Prometheus 用于监控。使用 Docker Compose 编排所有服务。
 
-### Requirements
+### 要求
 
-1. **Enhanced Application** (15 points):
-   - [ ] Modified model_server.py to log predictions to PostgreSQL
-   - [ ] Database schema with predictions table (id, text, sentiment, score, timestamp)
-   - [ ] New endpoint GET /predictions to retrieve history
-   - [ ] Prometheus metrics exposed at /metrics
-   - [ ] Track: request count, request duration, prediction distribution
+1. **增强版应用程序**（15 分）：
+   - [ ] 修改 model_server.py 将预测记录到 PostgreSQL
+   - [ ] 包含 predictions 表（id, text, sentiment, score, timestamp）的数据库 schema
+   - [ ] 新增端点 GET /predictions 用于检索历史记录
+   - [ ] 在 /metrics 暴露 Prometheus metrics
+   - [ ] 追踪：请求计数、请求时长、预测分布
 
-2. **Docker Compose Configuration** (15 points):
-   - [ ] Service: model-server (your application)
-   - [ ] Service: postgres (with volume for persistence)
-   - [ ] Service: prometheus (with config file)
-   - [ ] Proper networking between services
-   - [ ] Environment variables for configuration
-   - [ ] Health checks for all services
+2. **Docker Compose 配置**（15 分）：
+   - [ ] 服务：model-server（你的应用程序）
+   - [ ] 服务：postgres（带数据卷用于持久化）
+   - [ ] 服务：prometheus（带配置文件）
+   - [ ] 服务之间的正确网络连接
+   - [ ] 用于配置的环境变量
+   - [ ] 所有服务的健康检查
 
-3. **Database Integration** (5 points):
-   - [ ] Connection to PostgreSQL works
-   - [ ] Predictions saved successfully
-   - [ ] Retrieval endpoint works
-   - [ ] Proper error handling for DB issues
+3. **数据库集成**（5 分）：
+   - [ ] 成功连接到 PostgreSQL
+   - [ ] 预测结果成功保存
+   - [ ] 检索端点正常工作
+   - [ ] 对数据库问题的适当错误处理
 
-4. **Monitoring Setup** (5 points):
-   - [ ] Prometheus scrapes metrics
-   - [ ] Custom metrics visible in Prometheus UI
-   - [ ] Prometheus accessible at localhost:9090
+4. **监控搭建**（5 分）：
+   - [ ] Prometheus 抓取 metrics
+   - [ ] 自定义 metrics 在 Prometheus UI 中可见
+   - [ ] Prometheus 可通过 localhost:9090 访问
 
-### Deliverables
+### 交付物
 
 ```
 task2/
-├── model_server.py (updated)
-├── requirements.txt (updated)
-├── Dockerfile (updated)
+├── model_server.py（已更新）
+├── requirements.txt（已更新）
+├── Dockerfile（已更新）
 ├── docker-compose.yml
 ├── prometheus.yml
-├── init-db.sql (optional)
+├── init-db.sql（可选）
 ├── .env.example
 └── README.md
 ```
 
-### Database Schema
+### 数据库 Schema
 
-Create a table with this structure:
+创建具有以下结构的表：
 
 ```sql
 CREATE TABLE predictions (
@@ -197,7 +197,7 @@ CREATE TABLE predictions (
 );
 ```
 
-### Prometheus Configuration Template
+### Prometheus 配置模板
 
 ```yaml
 global:
@@ -209,75 +209,75 @@ scrape_configs:
       - targets: ['model-server:8000']
 ```
 
-### Example API Interactions
+### 示例 API 交互
 
-**Make a prediction**:
+**进行预测**：
 ```bash
 curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{"text": "This is amazing!"}'
 ```
 
-**Get prediction history**:
+**获取预测历史**：
 ```bash
 curl http://localhost:8000/predictions?limit=10
 ```
 
-**Check metrics**:
+**检查 metrics**：
 ```bash
 curl http://localhost:8000/metrics
 ```
 
-### Evaluation Criteria
+### 评估标准
 
-| Criterion | Points | Your Score |
-|-----------|--------|------------|
-| Database integration works | 8 | |
-| Predictions stored correctly | 4 | |
-| History endpoint functional | 3 | |
-| Docker Compose configuration | 10 | |
-| Service networking | 5 | |
-| Prometheus metrics exposed | 3 | |
-| Metrics are meaningful | 2 | |
-| All services start successfully | 5 | |
-| **Total** | **40** | |
+| 标准 | 分数 | 你的得分 |
+|------|------|----------|
+| 数据库集成正常 | 8 | |
+| 预测结果正确存储 | 4 | |
+| 历史端点功能正常 | 3 | |
+| Docker Compose 配置 | 10 | |
+| 服务网络连接 | 5 | |
+| Prometheus metrics 已暴露 | 3 | |
+| Metrics 有意义 | 2 | |
+| 所有服务成功启动 | 5 | |
+| **总计** | **40** | |
 
 ---
 
-## Task 3: Troubleshooting and Documentation (30 points)
+## 任务 3：问题排查与文档（30 分）
 
-### Scenario
+### 场景
 
-You've inherited a broken Docker application. Your task is to identify and fix the issues, then document the problems and solutions.
+你接手了一个损坏的 Docker 应用程序。你的任务是识别和修复问题，然后记录问题和解决方案。
 
-### Provided Files
+### 提供的文件
 
-You'll be given (create these intentionally broken):
+你将获得以下文件（故意破坏的版本）：
 
-**broken_app.py**:
+**broken_app.py**：
 ```python
 from flask import Flask, request, jsonify
 import os
 
 app = Flask(__name__)
 
-# TODO: Fix issue - missing database connection
+# TODO: 修复问题 - 缺少数据库连接
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 @app.route('/api/data', methods=['GET'])
 def get_data():
-    # TODO: Fix issue - improper error handling
+    # TODO: 修复问题 - 不当的错误处理
     data = fetch_from_database()
     return jsonify(data)
 
 @app.route('/api/data', methods=['POST'])
 def post_data():
-    # TODO: Fix issue - no input validation
+    # TODO: 修复问题 - 没有输入验证
     content = request.json
     save_to_database(content)
     return jsonify({"status": "success"})
 
-# TODO: Fix issue - functions not implemented
+# TODO: 修复问题 - 函数未实现
 def fetch_from_database():
     pass
 
@@ -285,29 +285,29 @@ def save_to_database(data):
     pass
 
 if __name__ == '__main__':
-    # TODO: Fix issue - running as root, binding to wrong port
+    # TODO: 修复问题 - 以 root 运行，绑定到错误端口
     app.run(host='0.0.0.0', port=5000)
 ```
 
-**Broken Dockerfile**:
+**Broken Dockerfile**：
 ```dockerfile
-# TODO: Fix issue - using outdated base image
+# TODO: 修复问题 - 使用过时的基础镜像
 FROM python:2.7
 
-# TODO: Fix issue - not setting working directory
+# TODO: 修复问题 - 未设置工作目录
 COPY . .
 
-# TODO: Fix issue - installing unnecessary packages
+# TODO: 修复问题 - 安装不必要的包
 RUN pip install flask requests numpy pandas scikit-learn tensorflow
 
-# TODO: Fix issue - exposing wrong port
+# TODO: 修复问题 - 暴露错误端口
 EXPOSE 8080
 
-# TODO: Fix issue - running as root
+# TODO: 修复问题 - 以 root 运行
 CMD ["python", "broken_app.py"]
 ```
 
-**Broken docker-compose.yml**:
+**Broken docker-compose.yml**：
 ```yaml
 version: '3.8'
 
@@ -315,70 +315,70 @@ services:
   app:
     build: .
     ports:
-      # TODO: Fix issue - port mapping mismatch
+      # TODO: 修复问题 - 端口映射不匹配
       - "5000:8080"
     environment:
-      # TODO: Fix issue - exposing sensitive data
+      # TODO: 修复问题 - 暴露敏感数据
       - DATABASE_URL=postgresql://admin:password123@db:5432/mydb
-    # TODO: Fix issue - missing dependency
+    # TODO: 修复问题 - 缺少依赖关系
 
-  # TODO: Fix issue - database service not defined
+  # TODO: 修复问题 - 数据库服务未定义
 ```
 
-### Your Tasks
+### 你的任务
 
-1. **Identify Issues** (10 points):
-   - [ ] List all problems found in the code
-   - [ ] Categorize by severity (Critical, High, Medium, Low)
-   - [ ] Explain why each is a problem
+1. **识别问题**（10 分）：
+   - [ ] 列出代码中发现的所有问题
+   - [ ] 按严重程度分类（严重、高、中、低）
+   - [ ] 解释每个问题为何存在风险
 
-2. **Fix All Issues** (15 points):
-   - [ ] Correct the Python application
-   - [ ] Fix the Dockerfile
-   - [ ] Fix the docker-compose.yml
-   - [ ] Add proper error handling
-   - [ ] Implement missing functions (can be stubs)
-   - [ ] Add input validation
+2. **修复所有问题**（15 分）：
+   - [ ] 修正 Python 应用程序
+   - [ ] 修复 Dockerfile
+   - [ ] 修复 docker-compose.yml
+   - [ ] 添加适当的错误处理
+   - [ ] 实现缺失的函数（可以是存根）
+   - [ ] 添加输入验证
 
-3. **Documentation** (5 points):
-   - [ ] Create ISSUES.md listing all problems
-   - [ ] Create FIXES.md explaining all corrections
-   - [ ] Update README.md with proper setup instructions
+3. **文档**（5 分）：
+   - [ ] 创建 ISSUES.md 列出所有问题
+   - [ ] 创建 FIXES.md 解释所有修正
+   - [ ] 更新 README.md 包含正确的搭建说明
 
-### Expected Issues to Find and Fix
+### 预期发现并修复的问题
 
-You should identify at least these issues:
+你应至少识别这些问题：
 
-**Code Issues**:
-- Missing database connection implementation
-- No error handling in endpoints
-- No input validation
-- Missing function implementations
-- Security concerns (exposed credentials)
+**代码问题**：
+- 缺少数据库连接实现
+- 端点中没有错误处理
+- 没有输入验证
+- 缺少函数实现
+- 安全问题（暴露的凭据）
 
-**Dockerfile Issues**:
-- Outdated Python version
-- No working directory set
-- Excessive package installations
-- Wrong port exposed
-- Running as root user
-- Missing .dockerignore
+**Dockerfile 问题**：
+- Python 版本过时
+- 未设置工作目录
+- 安装过多包
+- 暴露错误端口
+- 以 root 用户运行
+- 缺少 .dockerignore
 
-**Docker Compose Issues**:
-- Port mapping mismatch
-- Hardcoded credentials (should use secrets/env file)
-- Missing database service
-- No health checks
-- Missing depends_on
+**Docker Compose 问题**：
+- 端口映射不匹配
+- 硬编码凭据（应使用 secrets/env 文件）
+- 缺少数据库服务
+- 没有健康检查
+- 缺少 depends_on
 
-### Deliverables
+### 交付物
 
 ```
 task3/
-├── broken_app.py (fixed)
+├── broken_app.py（已修复）
 ├── requirements.txt
-├── Dockerfile (fixed)
-├── docker-compose.yml (fixed)
+├── Dockerfile（已修复）
+├── docker-compose.yml（已修复）
 ├── .dockerignore
 ├── .env.example
 ├── ISSUES.md
@@ -386,62 +386,59 @@ task3/
 └── README.md
 ```
 
-### ISSUES.md Template
+### ISSUES.md 模板
 
 ```markdown
-# Issues Found
+# 发现的问题
 
-## Critical Issues
-1. **Issue**: Description
-   - **Location**: File and line number
-   - **Impact**: Why this is critical
-   - **Fix**: How to resolve
+## 严重问题
+1. **问题**：描述
+   - **位置**：文件和行号
+   - **影响**：为何严重
+   - **修复**：如何解决
 
-## High Priority Issues
+## 高优先级问题
 ...
 
-## Medium Priority Issues
+## 中优先级问题
 ...
 
-## Low Priority Issues
+## 低优先级问题
 ...
 ```
 
-### FIXES.md Template
+### FIXES.md 模板
 
 ```markdown
-# Fixes Applied
+# 已应用的修复
 
-## Issue 1: [Title]
-- **Original Code**: ```[problematic code]```
-- **Fixed Code**: ```[corrected code]```
-- **Explanation**: Why this fix works
-- **Testing**: How to verify the fix
-
-## Issue 2: [Title]
-...
+## 问题 1：[标题]
+- **原始代码**：```[有问题的代码]```
+- **修复后代码**：```[修正后的代码]```
+- **解释**：为什么这个修复有效
+- **测试**：如何验证修复
 ```
 
-### Evaluation Criteria
+### 评估标准
 
-| Criterion | Points | Your Score |
-|-----------|--------|------------|
-| Identified critical issues | 5 | |
-| Identified all issues | 5 | |
-| Fixed application code | 5 | |
-| Fixed Dockerfile | 5 | |
-| Fixed docker-compose.yml | 5 | |
-| Documentation quality | 3 | |
-| Testing verification | 2 | |
-| **Total** | **30** | |
+| 标准 | 分数 | 你的得分 |
+|------|------|----------|
+| 识别了严重问题 | 5 | |
+| 识别了所有问题 | 5 | |
+| 修复了应用程序代码 | 5 | |
+| 修复了 Dockerfile | 5 | |
+| 修复了 docker-compose.yml | 5 | |
+| 文档质量 | 3 | |
+| 测试验证 | 2 | |
+| **总计** | **30** | |
 
 ---
 
-## Submission Guidelines
+## 提交指南
 
-### What to Submit
+### 提交内容
 
-1. **Git repository** with all three tasks:
+1. **Git 仓库**，包含全部三个任务：
    ```
    midterm-exam/
    ├── task1/
@@ -450,151 +447,151 @@ task3/
    └── EXAM_SUMMARY.md
    ```
 
-2. **EXAM_SUMMARY.md** containing:
-   - Time spent on each task
-   - Challenges encountered
-   - How you resolved issues
-   - Self-assessment scores
-   - Resources consulted
+2. **EXAM_SUMMARY.md** 包含：
+   - 每个任务花费的时间
+   - 遇到的挑战
+   - 如何解决问题
+   - 自我评估分数
+   - 参考的资源
 
-### How to Submit
+### 如何提交
 
-1. **Create final commit**:
+1. **创建最终提交**：
    ```bash
    git add .
    git commit -m "Midterm exam submission"
    ```
 
-2. **Verify all works**:
-   - [ ] All Docker images build successfully
-   - [ ] All containers run without errors
-   - [ ] All API endpoints respond correctly
-   - [ ] Documentation is complete
+2. **验证所有功能正常**：
+   - [ ] 所有 Docker 镜像成功构建
+   - [ ] 所有容器运行无错误
+   - [ ] 所有 API 端点正确响应
+   - [ ] 文档完整
 
-3. **Export your work**:
+3. **导出你的工作**：
    ```bash
    git archive --format=zip HEAD > midterm-exam-submission.zip
    ```
 
-4. **Submit via your learning platform** or as instructed
+4. **通过学习平台**或按照指示提交
 
 ---
 
-## Grading Rubric Summary
+## 评分标准汇总
 
-| Section | Points | Your Score |
-|---------|--------|------------|
-| Task 1: Containerized Model | 30 | |
-| Task 2: Multi-Container App | 40 | |
-| Task 3: Troubleshooting | 30 | |
-| **Total** | **100** | |
+| 部分 | 分数 | 你的得分 |
+|------|------|----------|
+| 任务 1：容器化模型 | 30 | |
+| 任务 2：多容器应用 | 40 | |
+| 任务 3：问题排查 | 30 | |
+| **总计** | **100** | |
 
-### Score Interpretation
+### 分数解读
 
-- **90-100**: Exceptional - Advanced understanding
-- **75-89**: Proficient - Ready to proceed
-- **60-74**: Adequate - Review recommended
-- **<60**: Needs improvement - Retake after review
-
----
-
-## Time Management Tips
-
-### First Hour
-- Read all requirements completely
-- Set up your workspace
-- Start with Task 1 (most straightforward)
-
-### Second Hour
-- Complete Task 1
-- Begin Task 2
-- Test as you go
-
-### Third Hour
-- Complete Task 2
-- Tackle Task 3 (troubleshooting)
-- Document findings
-
-### Final 30 Minutes
-- Review all deliverables
-- Test everything works
-- Write EXAM_SUMMARY.md
-- Commit and prepare submission
+- **90-100**：卓越 - 高级理解
+- **75-89**：精通 - 可以继续
+- **60-74**：合格 - 建议复习
+- **<60**：需要改进 - 复习后重考
 
 ---
 
-## Resources Allowed
+## 时间管理建议
 
-### Permitted
-- Official Python documentation
-- Docker documentation
-- Flask/FastAPI documentation
-- PostgreSQL documentation
-- Prometheus documentation
-- Stack Overflow (for syntax reference)
-- Your own notes from completed modules
+### 第一个小时
+- 完整阅读所有需求
+- 设置工作空间
+- 从任务 1 开始（最直接）
 
-### Not Permitted
-- Copying complete solutions
-- AI assistance for entire implementations
-- Collaboration with other students
-- Pre-built project templates
+### 第二个小时
+- 完成任务 1
+- 开始任务 2
+- 边做边测试
 
----
+### 第三个小时
+- 完成任务 2
+- 攻克任务 3（问题排查）
+- 记录发现
 
-## Common Pitfalls to Avoid
-
-1. **Not reading requirements carefully** - Make sure you understand what's asked
-2. **Spending too long on one task** - Move on if stuck, come back later
-3. **Not testing incrementally** - Test each component as you build
-4. **Poor time management** - Watch the clock, allocate time wisely
-5. **Incomplete documentation** - Don't skip the README files
-6. **Not handling errors** - Always include try-catch blocks
-7. **Hardcoding values** - Use environment variables
-8. **Running as root** - Always create a non-root user in Docker
+### 最后 30 分钟
+- 检查所有交付物
+- 测试一切正常运行
+- 编写 EXAM_SUMMARY.md
+- 提交并准备最终提交
 
 ---
 
-## After the Exam
+## 允许使用的资源
 
-### If You Pass (75%+)
-1. Review any weak areas
-2. Continue to Module 3
-3. Keep your solutions as reference
-4. Help others in study groups
+### 允许的
+- Python 官方文档
+- Docker 文档
+- Flask/FastAPI 文档
+- PostgreSQL 文档
+- Prometheus 文档
+- Stack Overflow（用于语法参考）
+- 你自己在已完成模块中的笔记
 
-### If You Don't Pass (<75%)
-1. Review the grading feedback
-2. Identify specific gaps
-3. Revisit relevant lessons
-4. Practice weak areas
-5. Retake after 1 week
-
----
-
-## Study Recommendations
-
-Before taking this exam, make sure you can:
-- [ ] Write a Dockerfile from scratch
-- [ ] Create a Flask/FastAPI application
-- [ ] Use Docker Compose with multiple services
-- [ ] Connect to PostgreSQL from Python
-- [ ] Expose Prometheus metrics
-- [ ] Debug container issues
-- [ ] Read and write technical documentation
+### 不允许的
+- 复制完整解决方案
+- 使用 AI 完成整个实现
+- 与其他学生协作
+- 使用预构建的项目模板
 
 ---
 
-## Questions or Issues
+## 需避免的常见陷阱
 
-If you encounter technical difficulties during the exam:
-1. Document the issue thoroughly
-2. Include it in your EXAM_SUMMARY.md
-3. Show your troubleshooting steps
-4. Attempt workarounds
-
-Technical issues won't count against you if properly documented.
+1. **没有仔细阅读需求** - 确保理解题目要求
+2. **在一个任务上花费太多时间** - 卡住了就先跳过，稍后回来
+3. **没有增量测试** - 每构建一个组件就测试一个
+4. **时间管理不当** - 注意时间，合理分配
+5. **文档不完整** - 不要跳过 README 文件
+6. **没有处理错误** - 始终包含 try-catch 块
+7. **硬编码值** - 使用环境变量
+8. **以 root 运行** - 始终在 Docker 中创建非 root 用户
 
 ---
 
-**Good luck!** Remember: This exam tests practical skills you'll use daily as a Junior AI Infrastructure Engineer. Take your time, test thoroughly, and document well.
+## 考试之后
+
+### 如果你通过了（75%+）
+1. 复习薄弱环节
+2. 继续到模块 3
+3. 保存你的解决方案作为参考
+4. 在学习小组中帮助他人
+
+### 如果你未通过（<75%）
+1. 查看评分反馈
+2. 找出具体的知识盲区
+3. 重新学习相关课程
+4. 练习薄弱环节
+5. 1 周后重考
+
+---
+
+## 学习建议
+
+参加本考试之前，确保你能：
+- [ ] 从零编写 Dockerfile
+- [ ] 创建 Flask/FastAPI 应用程序
+- [ ] 使用 Docker Compose 管理多个服务
+- [ ] 从 Python 连接到 PostgreSQL
+- [ ] 暴露 Prometheus metrics
+- [ ] 调试容器问题
+- [ ] 阅读和编写技术文档
+
+---
+
+## 问题或疑问
+
+如果考试期间遇到技术问题：
+1. 详细记录问题
+2. 将其包含在 EXAM_SUMMARY.md 中
+3. 展示你的排查步骤
+4. 尝试变通方案
+
+技术问题如果得到妥善记录，不会影响你的分数。
+
+---
+
+**祝你好运！** 记住：这场考试测试的是你作为初级 AI 基础设施工程师日常使用的实践技能。不要着急，充分测试，做好文档。

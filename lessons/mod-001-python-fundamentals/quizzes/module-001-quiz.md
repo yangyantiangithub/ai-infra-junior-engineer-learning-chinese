@@ -1,157 +1,157 @@
-# Module 001: Python Fundamentals for Infrastructure - Comprehensive Quiz
+# Module 001：基础设施的 Python 基础 - 综合测验
 
-## Overview
+## 概述
 
-This quiz assesses your understanding of Python fundamentals for AI infrastructure, covering all three lectures and seven exercises from Module 001. The quiz includes multiple choice, true/false, code analysis, and scenario-based questions.
+本测验评估你对 AI 基础设施 Python 基础的理解，涵盖 Module 001 的三个讲座和七个练习。测验包括选择题、判断题、代码分析和场景题。
 
-**Time Limit**: 60 minutes
-**Total Questions**: 30
-**Passing Score**: 75% (23/30 correct)
+**时间限制**：60 分钟
+**题目总数**：30
+**及格分数**：75%（23/30 正确）
 
 ---
 
-## Section 1: Python Environment and Package Management (Questions 1-5)
+## 第 1 节：Python 环境与包管理（第 1-5 题）
 
-### Question 1: Virtual Environments
+### 第 1 题：虚拟环境
 
-**Which command creates a new virtual environment named `ml_env` in Python?**
+**哪个命令在 Python 中创建一个名为 `ml_env` 的新虚拟环境？**
 
 A) `python -m env ml_env`
 B) `python -m venv ml_env`
 C) `python create_env ml_env`
 D) `pip install virtualenv ml_env`
 
-**Answer**: B
+**答案**：B
 
-**Explanation**: The correct command is `python -m venv ml_env`. The `venv` module is Python's built-in tool for creating virtual environments. Option A uses wrong module name, C isn't a valid command, and D is for installing virtualenv (a third-party tool), not creating an environment.
-
----
-
-### Question 2: Dependency Management
-
-**What is the purpose of freezing requirements with `pip freeze > requirements.txt`?**
-
-A) To reduce the size of installed packages
-B) To create an editable requirements file
-C) To capture exact versions of all installed packages for reproducibility
-D) To update all packages to their latest versions
-
-**Answer**: C
-
-**Explanation**: `pip freeze` creates a snapshot of all installed packages with their exact versions, ensuring reproducible environments. This captures both direct dependencies and transitive dependencies. It doesn't reduce size (A), create an editable file format (B), or update packages (D).
+**解析**：正确的命令是 `python -m venv ml_env`。`venv` 模块是 Python 内置的用于创建虚拟环境的工具。选项 A 使用了错误的模块名称，C 不是有效命令，D 是用于安装 virtualenv（第三方工具），而不是创建环境。
 
 ---
 
-### Question 3: Type Hints
+### 第 2 题：依赖管理
 
-**What does this type hint indicate: `def train_model(config: Dict[str, Any]) -> Optional[Model]:`?**
+**使用 `pip freeze > requirements.txt` 冻结需求的目的是什么？**
 
-A) The function requires a dictionary and always returns a Model
-B) The function requires a dictionary and may return a Model or None
-C) The function accepts any type and returns a dictionary
-D) The function requires optional parameters and returns a Model
+A) 减小已安装包的大小
+B) 创建可编辑的 requirements 文件
+C) 捕获所有已安装包的精确版本以实现可重现性
+D) 将所有包更新到最新版本
 
-**Answer**: B
+**答案**：C
 
-**Explanation**: `Dict[str, Any]` indicates the parameter must be a dictionary with string keys and values of any type. `Optional[Model]` (equivalent to `Union[Model, None]`) means the function may return a Model object or None. The function doesn't always return a Model (A), doesn't return a dictionary (C), and Optional applies to the return type, not parameters (D).
-
----
-
-### Question 4: Environment Variables
-
-**Which is the MOST secure way to handle database credentials in an ML application?**
-
-A) Hard-code credentials directly in the script
-B) Store credentials in a `.env` file and add it to `.gitignore`
-C) Put credentials in `config.yaml` and commit to git
-D) Store credentials in a Python module and import it
-
-**Answer**: B
-
-**Explanation**: Storing credentials in a `.env` file (excluded from git via `.gitignore`) is the most secure option listed. This keeps secrets out of version control while allowing different environments to have different credentials. Hard-coding (A) exposes secrets in code, committing to git (C) exposes secrets in version control, and importing from a Python module (D) still requires the credentials to be stored somewhere secure.
+**解析**：`pip freeze` 创建所有已安装包及其精确版本的快照，确保可重现的环境。它同时捕获直接依赖和传递依赖。它不会减小大小（A），不会创建可编辑的文件格式（B），也不会更新包（D）。
 
 ---
 
-### Question 5: Package Installation
+### 第 3 题：类型提示
 
-**What's the difference between `pip install pandas` and `pip install pandas==1.5.0`?**
+**这个类型提示表示什么：`def train_model(config: Dict[str, Any]) -> Optional[Model]:`？**
 
-A) The first installs the latest version, the second installs version 1.5.0
-B) The first installs from PyPI, the second from a local file
-C) There is no difference; both install the latest version
-D) The first is for development, the second is for production
+A) 该函数需要一个字典，并且总是返回一个 Model
+B) 该函数需要一个字典，可能返回 Model 或 None
+C) 该函数接受任何类型并返回一个字典
+D) 该函数需要可选参数并返回一个 Model
 
-**Answer**: A
+**答案**：B
 
-**Explanation**: Without version specification, pip installs the latest available version. With `==1.5.0`, it installs exactly that version. This version pinning is crucial for reproducibility in production environments. Both install from PyPI by default (B is incorrect), they behave differently (C is incorrect), and version pinning is important for both dev and prod (D is misleading).
+**解析**：`Dict[str, Any]` 表示参数必须是键为字符串、值为任意类型的字典。`Optional[Model]`（等价于 `Union[Model, None]`）表示函数可能返回 Model 对象或 None。该函数并不总是返回 Model（A），不返回字典（C），且 Optional 应用于返回类型，而不是参数（D）。
 
 ---
 
-## Section 2: Data Structures (Questions 6-10)
+### 第 4 题：环境变量
 
-### Question 6: List Comprehension
+**处理 ML 应用程序中数据库凭据的最安全方式是什么？**
 
-**What does this code output? `result = [x**2 for x in range(5) if x % 2 == 0]`**
+A) 在脚本中硬编码凭据
+B) 将凭据存储在 `.env` 文件中并将其添加到 `.gitignore`
+C) 将凭据放在 `config.yaml` 中并提交到 git
+D) 将凭据存储在 Python 模块中并导入
+
+**答案**：B
+
+**解析**：将凭据存储在 `.env` 文件（通过 `.gitignore` 排除在 git 之外）中是最安全的选择。这样可以防止密钥暴露在版本控制中，同时允许不同环境使用不同凭据。硬编码（A）会在代码中暴露密钥，提交到 git（C）会在版本控制中暴露密钥，从 Python 模块导入（D）仍需要将凭据存储在安全的地方。
+
+---
+
+### 第 5 题：包安装
+
+**`pip install pandas` 和 `pip install pandas==1.5.0` 有什么区别？**
+
+A) 第一个安装最新版本，第二个安装 1.5.0 版本
+B) 第一个从 PyPI 安装，第二个从本地文件安装
+C) 没有区别，两者都安装最新版本
+D) 第一个用于开发，第二个用于生产
+
+**答案**：A
+
+**解析**：未指定版本时，pip 安装可用的最新版本。使用 `==1.5.0` 时，它精确安装该版本。这种版本固定对于生产环境的可重现性至关重要。两者默认都从 PyPI 安装（B 错误），它们行为不同（C 错误），且版本固定对开发和产品都很重要（D 具有误导性）。
+
+---
+
+## 第 2 节：数据结构（第 6-10 题）
+
+### 第 6 题：列表推导式
+
+**这段代码输出什么？`result = [x**2 for x in range(5) if x % 2 == 0]`**
 
 A) `[0, 1, 4, 9, 16]`
 B) `[0, 4, 16]`
 C) `[0, 2, 4]`
 D) `[1, 9]`
 
-**Answer**: B
+**答案**：B
 
-**Explanation**: The comprehension squares numbers from 0-4 that are even. Even numbers in range(5) are 0, 2, and 4. Their squares are 0, 4, and 16. Option A includes all squares (missing the filter), C shows the even numbers themselves (not squared), and D shows odd number squares (wrong filter).
-
----
-
-### Question 7: Dictionary Methods
-
-**Given `config = {"lr": 0.001, "epochs": 100}`, what happens with `config.get("batch_size", 32)`?**
-
-A) Raises a KeyError
-B) Returns None
-C) Returns 32
-D) Adds "batch_size": 32 to the dictionary
-
-**Answer**: C
-
-**Explanation**: The `.get()` method returns the default value (32) when the key doesn't exist. This prevents KeyError exceptions. It doesn't raise an error (A), returns None only if no default is provided (B), and doesn't modify the dictionary (D) - use `.setdefault()` for that.
+**解析**：该推导式计算 0-4 中偶数的平方。range(5) 中的偶数有 0、2 和 4。它们的平方是 0、4 和 16。选项 A 包含所有平方（缺少过滤），C 显示的是偶数本身（未平方），D 显示的是奇数的平方（过滤错误）。
 
 ---
 
-### Question 8: Set Operations
+### 第 7 题：字典方法
 
-**What does this code do? `train_ids & test_ids`**
+**给定 `config = {"lr": 0.001, "epochs": 100}`，`config.get("batch_size", 32)` 会发生什么？**
 
-A) Combines all unique IDs from both sets
-B) Finds IDs that appear in both sets (intersection)
-C) Finds IDs only in train_ids
-D) Removes test_ids from train_ids
+A) 引发 KeyError
+B) 返回 None
+C) 返回 32
+D) 将 `"batch_size": 32` 添加到字典中
 
-**Answer**: B
+**答案**：C
 
-**Explanation**: The `&` operator performs set intersection, returning elements common to both sets. This is crucial for detecting data leakage in ML train/test splits. Option A describes union (`|`), C describes difference (`-`), and D also describes difference in reverse.
-
----
-
-### Question 9: Tuple Immutability
-
-**Why would you use a tuple instead of a list for model configuration?**
-
-A) Tuples are faster than lists
-B) Tuples can store more data than lists
-C) Tuples are immutable, preventing accidental modification
-D) Tuples have more built-in methods than lists
-
-**Answer**: C
-
-**Explanation**: Tuples are immutable, making them ideal for configuration data that shouldn't change during execution. While tuples can be slightly faster for iteration (A), the main reason to choose them is immutability. They have the same storage capacity as lists (B), and actually have fewer methods than lists (D).
+**解析**：`.get()` 方法在键不存在时返回默认值（32）。这样可以防止 KeyError 异常。它不会引发错误（A），仅在未提供默认值时返回 None（B），并且不会修改字典（D）——应使用 `.setdefault()` 来实现该目的。
 
 ---
 
-### Question 10: Nested Data Structures
+### 第 8 题：集合运算
 
-**What's the output of `experiments["exp_001"]["metrics"]["accuracy"]` where experiments is properly initialized?**
+**这段代码做什么？`train_ids & test_ids`**
+
+A) 合并两个集合中的所有唯一 ID
+B) 查找出现在两个集合中的 ID（交集）
+C) 查找仅在 train_ids 中的 ID
+D) 从 train_ids 中移除 test_ids
+
+**答案**：B
+
+**解析**：`&` 运算符执行集合交集，返回两个集合共有的元素。这对于检测 ML 训练/测试分割中的数据泄露至关重要。选项 A 描述并集（`|`），C 描述差集（`-`），D 也描述反向差集。
+
+---
+
+### 第 9 题：元组的不可变性
+
+**为什么在模型配置中使用元组而不是列表？**
+
+A) 元组比列表更快
+B) 元组可以存储比列表更多的数据
+C) 元组是不可变的，防止意外修改
+D) 元组比列表有更多内置方法
+
+**答案**：C
+
+**解析**：元组是不可变的，使其成为不应在执行期间更改的配置数据的理想选择。虽然元组在迭代方面可能略快（A），但选择元组的主要原因是其不可变性。它们具有与列表相同的存储容量（B），且实际上比列表的方法更少（D）。
+
+---
+
+### 第 10 题：嵌套数据结构
+
+**在 experiments 已正确初始化的情况下，`experiments["exp_001"]["metrics"]["accuracy"]` 的输出是什么？**
 
 ```python
 experiments = {
@@ -167,47 +167,47 @@ B) `0.92`
 C) `"accuracy"`
 D) KeyError
 
-**Answer**: B
+**答案**：B
 
-**Explanation**: This chain of dictionary accesses retrieves the nested value 0.92. First, it gets the "exp_001" dictionary, then the "metrics" dictionary inside it, then the "accuracy" value. Option A returns the entire metrics dict (missing final key access), C returns the string key itself (wrong syntax), and D would only occur if keys were misspelled.
-
----
-
-## Section 3: Functions and Modules (Questions 11-15)
-
-### Question 11: Function Arguments
-
-**What's wrong with this function signature? `def train(data, epochs=10, batch_size, lr=0.001):`**
-
-A) Nothing is wrong
-B) Default arguments must come after non-default arguments
-C) Too many parameters
-D) Parameter names are too short
-
-**Answer**: B
-
-**Explanation**: In Python, parameters with default values must come after parameters without defaults. The correct order would be: `def train(data, batch_size, epochs=10, lr=0.001):`. This is a syntax requirement, not a style preference. A is incorrect, C and D are not syntax errors.
+**解析**：这个字典访问链检索嵌套值 0.92。首先获取 "exp_001" 字典，然后获取其中的 "metrics" 字典，最后获取 "accuracy" 值。选项 A 返回整个 metrics 字典（缺少最终键访问），C 返回字符串键本身（语法错误），D 只有在键拼写错误时才会发生。
 
 ---
 
-### Question 12: Type Hints with Multiple Types
+## 第 3 节：函数与模块（第 11-15 题）
 
-**What does `Union[int, float, None]` mean?**
+### 第 11 题：函数参数
 
-A) The value must be int, float, and None simultaneously
-B) The value can be int, float, or None
-C) The value is optional with default None
-D) The value is always None
+**这个函数签名有什么问题？`def train(data, epochs=10, batch_size, lr=0.001):`**
 
-**Answer**: B
+A) 没有任何问题
+B) 默认参数必须位于非默认参数之后
+C) 参数太多
+D) 参数名称太短
 
-**Explanation**: `Union[int, float, None]` indicates the value can be any one of these types. This is equivalent to `Optional[Union[int, float]]`. A value can't be multiple types simultaneously (A), Optional specifically means Union with None (C is partially correct but not the full explanation), and D is completely wrong.
+**答案**：B
+
+**解析**：在 Python 中，具有默认值的参数必须位于没有默认值的参数之后。正确的顺序应为：`def train(data, batch_size, epochs=10, lr=0.001):`。这是一个语法要求，而非风格偏好。A 错误，C 和 D 不是语法错误。
 
 ---
 
-### Question 13: Decorators
+### 第 12 题：多类型类型提示
 
-**What does this decorator do?**
+**`Union[int, float, None]` 表示什么？**
+
+A) 该值必须同时是 int、float 和 None
+B) 该值可以是 int、float 或 None
+C) 该值是可选的，默认值为 None
+D) 该值始终为 None
+
+**答案**：B
+
+**解析**：`Union[int, float, None]` 表示该值可以是这些类型中的任意一种。这等价于 `Optional[Union[int, float]]`。一个值不能同时是多种类型（A），Optional 特指与 None 的联合（C 部分正确但不完整），D 完全错误。
+
+---
+
+### 第 13 题：装饰器
+
+**这个装饰器做什么？**
 
 ```python
 @timing_decorator
@@ -216,129 +216,129 @@ def train_model():
     pass
 ```
 
-A) Makes the function run in parallel
-B) Measures and logs the function execution time
-C) Caches the function results
-D) Validates function inputs
+A) 使函数并行运行
+B) 测量并记录函数执行时间
+C) 缓存函数结果
+D) 验证函数输入
 
-**Answer**: B
+**答案**：B
 
-**Explanation**: A timing decorator typically measures how long a function takes to execute and logs or returns that information. The decorator name suggests timing functionality. Parallel execution (A), caching (C), and validation (D) would require different decorators with different names.
-
----
-
-### Question 14: Module Imports
-
-**What's the difference between `from ml_utils import metrics` and `from ml_utils.metrics import accuracy`?**
-
-A) No difference, they're equivalent
-B) First imports the metrics module, second imports the accuracy function
-C) First is for production, second is for development
-D) Second is faster
-
-**Answer**: B
-
-**Explanation**: The first imports the entire `metrics` module (you'd call `metrics.accuracy()`), while the second imports just the `accuracy` function (you'd call `accuracy()` directly). This affects namespace and how you reference the function. A is incorrect, C is arbitrary, and D isn't meaningfully true.
+**解析**：计时装饰器通常测量函数执行所需时间，并记录或返回该信息。装饰器名称暗示了计时功能。并行执行（A）、缓存（C）和验证（D）需要不同的装饰器名称。
 
 ---
 
-### Question 15: *args and **kwargs
+### 第 14 题：模块导入
 
-**What does this function signature accept? `def log_metrics(*args, **kwargs):`**
+**`from ml_utils import metrics` 和 `from ml_utils.metrics import accuracy` 有什么区别？**
 
-A) Only positional arguments
-B) Only keyword arguments
-C) Any number of positional arguments and any number of keyword arguments
-D) Exactly one argument of any type
+A) 没有区别，它们是等价的
+B) 第一个导入 metrics 模块，第二个导入 accuracy 函数
+C) 第一个用于生产，第二个用于开发
+D) 第二个更快
 
-**Answer**: C
+**答案**：B
 
-**Explanation**: `*args` captures any number of positional arguments as a tuple, and `**kwargs` captures any number of keyword arguments as a dictionary. This makes the function extremely flexible. A and B are partially correct but incomplete, and D is completely wrong.
-
----
-
-## Section 4: File I/O (Questions 16-20)
-
-### Question 16: Context Managers
-
-**Why use `with open(file, 'r') as f:` instead of `f = open(file, 'r')`?**
-
-A) It's faster
-B) It automatically closes the file, even if an error occurs
-C) It allows reading binary files
-D) It's required for large files
-
-**Answer**: B
-
-**Explanation**: Context managers (the `with` statement) ensure resources are properly cleaned up, even if exceptions occur. The file is automatically closed when the block exits. While this might have minor performance benefits (A), the main reason is proper resource management. File mode determines binary vs text (C), and neither approach is required for large files specifically (D).
+**解析**：第一个导入整个 `metrics` 模块（你需要调用 `metrics.accuracy()`），而第二个只导入 `accuracy` 函数（你可以直接调用 `accuracy()`）。这影响命名空间以及如何引用函数。A 错误，C 是随意的，D 没有实际意义。
 
 ---
 
-### Question 17: JSON vs Pickle
+### 第 15 题：*args 和 **kwargs
 
-**Which format should you use to save a trained ML model for long-term storage?**
+**这个函数签名接受什么？`def log_metrics(*args, **kwargs):`**
 
-A) JSON - it's more readable
-B) CSV - it's more compatible
-C) Pickle - it's native Python
-D) A framework-specific format (like PyTorch's .pth or TensorFlow's SavedModel)
+A) 仅位置参数
+B) 仅关键字参数
+C) 任意数量的位置参数和任意数量的关键字参数
+D) 恰好一个任何类型的参数
 
-**Answer**: D
+**答案**：C
 
-**Explanation**: Framework-specific formats are designed for model persistence and are the best practice. They handle model architecture, weights, and metadata properly. JSON (A) can't serialize complex Python objects, CSV (B) is for tabular data, and pickle (C) has compatibility and security issues across Python versions.
-
----
-
-### Question 18: CSV Reading
-
-**What's the advantage of `csv.DictReader` over `csv.reader`?**
-
-A) It's faster
-B) It can read larger files
-C) It returns rows as dictionaries with column names as keys, improving readability
-D) It can read files with missing values
-
-**Answer**: C
-
-**Explanation**: `DictReader` maps columns to their names from the header row, returning dictionaries instead of lists. This makes code more readable and maintainable (`row['accuracy']` vs `row[3]`). It's not necessarily faster (A), file size handling is similar (B), and both can handle missing values (D).
+**解析**：`*args` 将任意数量的位置参数捕获为元组，`**kwargs` 将任意数量的关键字参数捕获为字典。这使得函数非常灵活。A 和 B 部分正确但不完整，D 完全错误。
 
 ---
 
-### Question 19: File Paths
+## 第 4 节：文件 I/O（第 16-20 题）
 
-**Why use `Path` from `pathlib` instead of string concatenation for file paths?**
+### 第 16 题：上下文管理器
 
-A) It's faster
-B) It handles OS-specific path separators automatically
-C) It uses less memory
-D) It's required by Python 3.10+
+**为什么使用 `with open(file, 'r') as f:` 而不是 `f = open(file, 'r')`？**
 
-**Answer**: B
+A) 它更快
+B) 它会自动关闭文件，即使发生错误
+C) 它允许读取二进制文件
+D) 大文件必须使用它
 
-**Explanation**: `pathlib.Path` automatically handles differences between operating systems (forward slashes vs backslashes), provides useful methods (`.exists()`, `.glob()`), and makes path operations clearer. Minor speed differences (A) exist but aren't the main reason, memory usage (C) is similar, and it's not required but recommended (D).
+**答案**：B
 
----
-
-### Question 20: YAML Configuration
-
-**Why prefer YAML over JSON for configuration files?**
-
-A) YAML is faster to parse
-B) YAML supports comments and is more human-readable
-C) YAML is more secure
-D) YAML files are smaller
-
-**Answer**: B
-
-**Explanation**: YAML allows comments, has cleaner syntax (no quotes required for strings, no commas), and is generally more human-friendly for configuration files. JSON is actually often faster to parse (A), neither is inherently more secure (C), and file size is comparable (D). The human-readability and comments are the key advantages.
+**解析**：上下文管理器（`with` 语句）确保资源得到正确清理，即使发生异常。文件在块退出时自动关闭。虽然这可能带来微小的性能优势（A），但主要原因是正确的资源管理。文件模式决定二进制还是文本（C），且大文件并不强制要求使用哪种方式（D）。
 
 ---
 
-## Section 5: Error Handling (Questions 21-25)
+### 第 17 题：JSON 与 Pickle
 
-### Question 21: Exception Handling
+**应该使用哪种格式来保存训练好的 ML 模型以便长期存储？**
 
-**What's printed by this code?**
+A) JSON - 它更具可读性
+B) CSV - 它更兼容
+C) Pickle - 它是 Python 原生格式
+D) 框架特定格式（如 PyTorch 的 .pth 或 TensorFlow 的 SavedModel）
+
+**答案**：D
+
+**解析**：框架特定格式专为模型持久化设计，是最佳实践。它们能正确处理模型架构、权重和元数据。JSON（A）无法序列化复杂的 Python 对象，CSV（B）用于表格数据，pickle（C）存在跨 Python 版本的兼容性和安全问题。
+
+---
+
+### 第 18 题：CSV 读取
+
+**`csv.DictReader` 相比 `csv.reader` 的优势是什么？**
+
+A) 它更快
+B) 它可以读取更大的文件
+C) 它将每行作为字典返回，以列名作为键，提高了可读性
+D) 它可以读取包含缺失值的文件
+
+**答案**：C
+
+**解析**：`DictReader` 将列名从头行映射到列名，返回字典而不是列表。这使得代码更易读和维护（`row['accuracy']` vs `row[3]`）。它不一定更快（A），文件大小处理类似（B），且两者都能处理缺失值（D）。
+
+---
+
+### 第 19 题：文件路径
+
+**为什么使用 `pathlib` 中的 `Path` 而不是字符串拼接来处理文件路径？**
+
+A) 它更快
+B) 它自动处理操作系统特定的路径分隔符
+C) 它使用更少的内存
+D) Python 3.10+ 必须使用它
+
+**答案**：B
+
+**解析**：`pathlib.Path` 自动处理操作系统之间的差异（正斜杠与反斜杠），提供有用的方法（`.exists()`、`.glob()`），并使路径操作更清晰。存在微小的速度差异（A）但不是主要原因，内存使用（C）类似，不是必须的但推荐使用（D）。
+
+---
+
+### 第 20 题：YAML 配置
+
+**为什么在配置文件中倾向于使用 YAML 而不是 JSON？**
+
+A) YAML 解析更快
+B) YAML 支持注释，更易于人类阅读
+C) YAML 更安全
+D) YAML 文件更小
+
+**答案**：B
+
+**解析**：YAML 允许注释，语法更简洁（字符串不需要引号，不需要逗号），对于配置文件通常更友好。JSON 通常解析更快（A），两者都没有天生更安全（C），文件大小相当（D）。人类可读性和注释是关键优势。
+
+---
+
+## 第 5 节：错误处理（第 21-25 题）
+
+### 第 21 题：异常处理
+
+**这段代码打印什么？**
 
 ```python
 try:
@@ -356,32 +356,32 @@ finally:
 A) A, D
 B) B, D
 C) C, D
-D) Only D
+D) 仅 D
 
-**Answer**: A
+**答案**：A
 
-**Explanation**: The ZeroDivisionError is caught, printing "A". The `else` block (C) only runs if no exception occurs. The `finally` block (D) always runs, so output is "A" then "D". Option B would occur with a different exception, C would occur with no exception, and D alone would only happen if exceptions weren't caught.
-
----
-
-### Question 22: Custom Exceptions
-
-**When should you create a custom exception class?**
-
-A) Never, built-in exceptions are sufficient
-B) For every function you write
-C) When you need domain-specific error handling with additional context
-D) Only for fatal errors
-
-**Answer**: C
-
-**Explanation**: Custom exceptions are useful when you need to add domain-specific information (like which model failed, at what epoch) or when you want to distinguish your application errors from system errors for targeted handling. A is too restrictive, B is excessive, and D is unnecessary - custom exceptions can represent any severity.
+**解析**：ZeroDivisionError 被捕获，打印 "A"。`else` 块（C）仅在未发生异常时运行。`finally` 块（D）始终运行，因此输出是 "A" 然后 "D"。选项 B 在出现不同异常时发生，C 在没有异常时发生，D 仅在异常未被捕获时发生。
 
 ---
 
-### Question 23: Context Managers for Resources
+### 第 22 题：自定义异常
 
-**What does this context manager ensure?**
+**什么时候应该创建自定义异常类？**
+
+A) 永远不需要，内置异常就足够了
+B) 为你编写的每个函数都创建
+C) 当你需要带额外上下文的领域特定错误处理时
+D) 仅用于致命错误
+
+**答案**：C
+
+**解析**：当你需要添加领域特定信息（如哪个模型失败、在哪个 epoch）或希望将应用程序错误与系统错误区分开来以便针对性处理时，自定义异常很有用。A 过于严格，B 过度，D 不必要——自定义异常可以表示任何严重级别。
+
+---
+
+### 第 23 题：资源的上下文管理器
+
+**这个上下文管理器确保什么？**
 
 ```python
 class GPUContext:
@@ -391,67 +391,67 @@ class GPUContext:
         release_gpu()
 ```
 
-A) GPU is allocated and released even if errors occur
-B) GPU operations run faster
-C) Multiple GPUs can be used simultaneously
-D) GPU memory is increased
+A) 即使发生错误，GPU 也会被分配和释放
+B) GPU 操作运行更快
+C) 可以同时使用多个 GPU
+D) GPU 内存增加
 
-**Answer**: A
+**答案**：A
 
-**Explanation**: Context managers guarantee cleanup code (in `__exit__`) runs even if exceptions occur in the `with` block. This ensures GPU resources are properly released, preventing memory leaks. It doesn't affect speed (B), enable multi-GPU (C requires different implementation), or increase memory (D).
-
----
-
-### Question 24: Retry Logic
-
-**When implementing retry logic for model downloads, what should you consider?**
-
-A) Retry immediately without delay
-B) Use exponential backoff to avoid overwhelming servers
-C) Retry indefinitely until success
-D) Never retry, always fail immediately
-
-**Answer**: B
-
-**Explanation**: Exponential backoff (increasing delay between retries: 1s, 2s, 4s, etc.) prevents overwhelming servers and is respectful to rate limits. Immediate retries (A) can make problems worse, infinite retries (C) can hang applications, and never retrying (D) reduces resilience.
+**解析**：上下文管理器保证清理代码（在 `__exit__` 中）即使在 `with` 块中发生异常也会运行。这确保了 GPU 资源被正确释放，防止内存泄漏。它不会影响速度（B），不能启用多 GPU（C 需要不同的实现），也不会增加内存（D）。
 
 ---
 
-### Question 25: Error Logging
+### 第 24 题：重试逻辑
 
-**What information should be logged when an ML pipeline fails?**
+**在为模型下载实现重试逻辑时，应考虑什么？**
 
-A) Only the error message
-B) Error message, timestamp, affected data/models, and stack trace
-C) Nothing, to keep logs clean
-D) Only the function name where it failed
+A) 立即重试，不延迟
+B) 使用指数退避以避免压垮服务器
+C) 无限重试直到成功
+D) 从不重试，始终立即失败
 
-**Answer**: B
+**答案**：B
 
-**Explanation**: Comprehensive logging should include: what happened (error message), when (timestamp), where (stack trace), and what was affected (data/model identifiers). This enables effective debugging. A, C, and D all provide insufficient information for troubleshooting complex ML pipelines.
-
----
-
-## Section 6: Async Programming (Questions 26-28)
-
-### Question 26: Async vs Sync
-
-**When is async programming MOST beneficial for ML workflows?**
-
-A) Training a single model on GPU
-B) Performing CPU-intensive matrix calculations
-C) Downloading multiple datasets from remote storage concurrently
-D) Running a for loop over training samples
-
-**Answer**: C
-
-**Explanation**: Async shines for I/O-bound operations like network requests or file I/O where you're waiting for external resources. Downloading multiple datasets concurrently can dramatically reduce total time. GPU training (A) and CPU calculations (B) are CPU-bound (better suited to multiprocessing), and simple loops (D) don't benefit from async unless they contain I/O operations.
+**解析**：指数退避（重试之间的延迟递增：1s、2s、4s 等）可防止压垮服务器，并尊重速率限制。立即重试（A）可能使问题恶化，无限重试（C）可能挂起应用程序，从不重试（D）降低弹性。
 
 ---
 
-### Question 27: Async Syntax
+### 第 25 题：错误日志记录
 
-**What's wrong with this code?**
+**当 ML 管道失败时，应记录哪些信息？**
+
+A) 仅错误消息
+B) 错误消息、时间戳、受影响的数据/模型和堆栈跟踪
+C) 不记录任何内容，保持日志清洁
+D) 仅记录失败位置的函数名称
+
+**答案**：B
+
+**解析**：全面的日志记录应包括：发生了什么（错误消息）、何时（时间戳）、在哪里（堆栈跟踪）以及什么受到影响（数据/模型标识符）。这才能实现有效的调试。A、C 和 D 都为排查复杂的 ML 管道问题提供的信息不足。
+
+---
+
+## 第 6 节：异步编程（第 26-28 题）
+
+### 第 26 题：异步 vs 同步
+
+**何时异步编程对 ML 工作流最有益？**
+
+A) 在 GPU 上训练单个模型
+B) 执行 CPU 密集型的矩阵计算
+C) 并发从远程存储下载多个数据集
+D) 对训练样本运行 for 循环
+
+**答案**：C
+
+**解析**：异步编程在 I/O 密集型操作（如等待外部资源的网络请求或文件 I/O）中表现出色。并发下载多个数据集可以显著减少总时间。GPU 训练（A）和 CPU 计算（B）是 CPU 密集型（更适合 multiprocessing），简单循环（D）除非包含 I/O 操作，否则不会从异步编程中受益。
+
+---
+
+### 第 27 题：异步语法
+
+**这段代码有什么问题？**
 
 ```python
 async def process_data():
@@ -459,166 +459,166 @@ async def process_data():
     return data
 ```
 
-A) Nothing is wrong
-B) Missing `await` before `load_data()`
-C) Should use `async with` instead
-D) The function should not be async
+A) 没有任何问题
+B) `load_data()` 前缺少 `await`
+C) 应使用 `async with` 代替
+D) 该函数不应是 async
 
-**Answer**: B
+**答案**：B
 
-**Explanation**: When calling an async function, you must use `await`: `data = await load_data()`. Without `await`, you get a coroutine object instead of the result. A is incorrect, C would be for async context managers, and D is incorrect because the function contains async operations.
-
----
-
-### Question 28: Asyncio.gather()
-
-**What does `await asyncio.gather(task1, task2, task3)` do?**
-
-A) Runs tasks sequentially and returns results
-B) Runs tasks concurrently and returns results when all complete
-C) Runs only the fastest task
-D) Runs tasks and returns the first result
-
-**Answer**: B
-
-**Explanation**: `asyncio.gather()` runs multiple coroutines concurrently and waits for all to complete, returning results in the same order as the input tasks. It doesn't run sequentially (A), doesn't pick the fastest (C), and waits for all, not just the first (D - that's `asyncio.wait()` with FIRST_COMPLETED).
+**解析**：调用异步函数时，必须使用 `await`：`data = await load_data()`。没有 `await`，你将获得一个协程对象而不是结果。A 错误，C 适用于异步上下文管理器，D 错误，因为该函数包含异步操作。
 
 ---
 
-## Section 7: Testing (Questions 29-30)
+### 第 28 题：Asyncio.gather()
 
-### Question 29: Pytest Fixtures
+**`await asyncio.gather(task1, task2, task3)` 做什么？**
 
-**What's the purpose of pytest fixtures?**
+A) 按顺序运行任务并返回结果
+B) 并发运行任务，并在所有任务完成后返回结果
+C) 仅运行最快的任务
+D) 运行任务并返回第一个结果
 
-A) To fix broken tests automatically
-B) To provide reusable test data and setup code
-C) To make tests run faster
-D) To mock all external dependencies
+**答案**：B
 
-**Answer**: B
-
-**Explanation**: Fixtures provide reusable setup code and test data that can be shared across multiple tests. They handle setup and teardown, reducing code duplication. They don't fix broken tests (A), don't necessarily speed up tests though they can help (C), and don't automatically mock dependencies (D) - that's a separate feature.
+**解析**：`asyncio.gather()` 并发运行多个协程，等待所有协程完成，并以与输入任务相同的顺序返回结果。它不会按顺序运行（A），不会选择最快的（C），也不会只等待第一个（D——那是 `asyncio.wait()` 配合 FIRST_COMPLETED）。
 
 ---
 
-### Question 30: Test Coverage
+## 第 7 节：测试（第 29-30 题）
 
-**You have 85% test coverage. What does this mean?**
+### 第 29 题：Pytest 夹具
 
-A) 85% of your tests pass
-B) 85% of your code is executed by tests
-C) Your code is 85% correct
-D) You need to write 15% more tests
+**pytest 夹具的目的是什么？**
 
-**Answer**: B
+A) 自动修复损坏的测试
+B) 提供可重用的测试数据和设置代码
+C) 使测试运行更快
+D) 模拟所有外部依赖
 
-**Explanation**: Test coverage measures what percentage of your code (lines, branches, functions) is executed when tests run. 85% coverage means 15% of code isn't tested. It doesn't measure pass rate (A), doesn't guarantee correctness (C - even 100% coverage can have bugs), and D is oversimplified - you need tests for the untested code, but quantity matters less than quality.
+**答案**：B
 
----
-
-## Bonus Question 31: Practical Application
-
-**You're building an ML inference service. Which combination of Python concepts is MOST important?**
-
-A) Virtual environments, lists, and print statements
-B) Type hints, async programming, error handling, and testing
-C) List comprehensions and for loops
-D) Only numpy and pandas knowledge
-
-**Answer**: B
-
-**Explanation**: Production inference services need:
-- **Type hints**: Clear interfaces and IDE support
-- **Async programming**: Handle multiple concurrent requests efficiently
-- **Error handling**: Graceful degradation when models fail
-- **Testing**: Ensure reliability
-
-While A, C, and D contain useful elements, B represents the core professional infrastructure skills needed for production systems.
+**解析**：夹具提供可跨多个测试共享的可重用设置代码和测试数据。它们处理设置和拆卸，减少代码重复。它们不会修复损坏的测试（A），虽然可能有助于加速但并非必须（C），也不会自动模拟依赖（D）——那是另一项功能。
 
 ---
 
-## Bonus Question 32: Debugging Scenario
+### 第 30 题：测试覆盖率
 
-**Your ML pipeline intermittently fails with "Connection refused" when loading data from S3. What's the BEST fix?**
+**你有 85% 的测试覆盖率。这意味着什么？**
 
-A) Ignore the error and continue
-B) Implement retry logic with exponential backoff
-C) Restart the pipeline manually when it fails
-D) Switch to loading from local disk
+A) 85% 的测试通过
+B) 85% 的代码被测试执行
+C) 你的代码 85% 正确
+D) 你需要再写 15% 的测试
 
-**Answer**: B
+**答案**：B
 
-**Explanation**: Transient network issues are common. Retry logic with exponential backoff handles temporary failures gracefully while respecting server resources. A loses data, C isn't automated, and D might not be feasible (data might only be in S3) and doesn't address the root cause of network reliability.
+**解析**：测试覆盖率衡量运行测试时执行了多少百分比的代码（行、分支、函数）。85% 覆盖率意味着 15% 的代码未经测试。它不衡量通过率（A），不保证正确性（C——即使 100% 覆盖率也可能有 bug），D 过于简化——你需要对未测试的代码进行测试，但数量不如质量重要。
 
 ---
 
-## Answer Key Summary
+## 附加题 31：实际应用
 
-1. B - Virtual environment creation
-2. C - Freezing requirements
-3. B - Optional return type
-4. B - Secure credential storage
-5. A - Version pinning
-6. B - List comprehension with filter
-7. C - Dictionary .get() method
-8. B - Set intersection
-9. C - Tuple immutability
-10. B - Nested dictionary access
-11. B - Default argument order
-12. B - Union type hints
-13. B - Timing decorator
-14. B - Import specificity
-15. C - Variable arguments
-16. B - Context manager cleanup
-17. D - Model storage format
-18. C - DictReader advantages
-19. B - Path handling
+**你正在构建一个 ML 推理服务。哪一组 Python 概念最重要？**
+
+A) 虚拟环境、列表和 print 语句
+B) 类型提示、异步编程、错误处理和测试
+C) 列表推导式和 for 循环
+D) 仅 numpy 和 pandas 知识
+
+**答案**：B
+
+**解析**：生产推理服务需要：
+- **类型提示**：清晰的接口和 IDE 支持
+- **异步编程**：高效处理多个并发请求
+- **错误处理**：模型失败时的优雅降级
+- **测试**：确保可靠性
+
+虽然 A、C 和 D 包含有用的元素，但 B 代表了生产系统所需的核心专业基础设施技能。
+
+---
+
+## 附加题 32：调试场景
+
+**你的 ML 管道在从 S3 加载数据时间歇性失败，出现"Connection refused"。最佳修复方案是什么？**
+
+A) 忽略错误并继续
+B) 实现带指数退避的重试逻辑
+C) 失败时手动重启管道
+D) 切换到从本地磁盘加载
+
+**答案**：B
+
+**解析**：临时网络问题很常见。带指数退避的重试逻辑能够在尊重服务器资源的同时优雅处理临时故障。A 会丢失数据，C 未能自动化，D 可能不可行（数据可能只存在于 S3）且未解决网络可靠性的根本原因。
+
+---
+
+## 答案汇总
+
+1. B - 虚拟环境创建
+2. C - 冻结需求
+3. B - 可选返回类型
+4. B - 安全凭据存储
+5. A - 版本固定
+6. B - 带过滤的列表推导式
+7. C - 字典 .get() 方法
+8. B - 集合交集
+9. C - 元组不可变性
+10. B - 嵌套字典访问
+11. B - 默认参数顺序
+12. B - 联合类型提示
+13. B - 计时装饰器
+14. B - 导入特异性
+15. C - 可变参数
+16. B - 上下文管理器清理
+17. D - 模型存储格式
+18. C - DictReader 优势
+19. B - 路径处理
 20. B - YAML vs JSON
-21. A - Exception flow control
-22. C - Custom exceptions
-23. A - Resource management
-24. B - Retry strategies
-25. B - Error logging
-26. C - Async use cases
-27. B - Await keyword
+21. A - 异常流程控制
+22. C - 自定义异常
+23. A - 资源管理
+24. B - 重试策略
+25. B - 错误日志记录
+26. C - 异步用例
+27. B - Await 关键字
 28. B - Asyncio.gather
-29. B - Pytest fixtures
-30. B - Test coverage meaning
-31. B - Production concepts (Bonus)
-32. B - Network resilience (Bonus)
+29. B - Pytest 夹具
+30. B - 测试覆盖率含义
+31. B - 生产概念（附加题）
+32. B - 网络弹性（附加题）
 
 ---
 
-## Scoring Guide
+## 评分指南
 
-- **27-30+ correct (90-100%)**: Excellent! You have strong Python fundamentals for AI infrastructure
-- **23-26 correct (75-89%)**: Good! Review the topics you missed
-- **18-22 correct (60-74%)**: Passing, but review key concepts before moving to Module 002
-- **Below 18 (< 60%)**: Review Module 001 lectures and exercises before proceeding
-
----
-
-## Review Recommendations
-
-**If you scored below 75%**, focus on:
-
-1. **Environment Management**: Re-do Exercise 01
-2. **Data Structures**: Practice Exercise 02 problems
-3. **Error Handling**: Review Lecture 03 and Exercise 05
-4. **Async Programming**: Complete Exercise 06 examples
-5. **Testing**: Work through Exercise 07 systematically
-
-**Next Steps:**
-- Review incorrect answers and explanations
-- Complete any exercises you skipped
-- Build a small project combining these concepts
-- Proceed to Module 002: Linux Essentials
+- **27-30+ 正确（90-100%）**：优秀！你的 AI 基础设施 Python 基础扎实
+- **23-26 正确（75-89%）**：良好！复习你遗漏的主题
+- **18-22 正确（60-74%）**：及格，但在进入 Module 002 前复习关键概念
+- **低于 18（< 60%）**：继续前复习 Module 001 讲座和练习
 
 ---
 
-**Module Completed**: Ready for Module 002 when scoring 75%+
-**Time to Review**: Estimated 2-4 hours for concepts needing reinforcement
-**Practice Projects**: Build a tested async ML utility library
+## 复习建议
 
-Good luck! These fundamentals are critical for success as an AI Infrastructure Engineer.
+**如果你得分低于 75%**，重点关注：
+
+1. **环境管理**：重新完成练习 01
+2. **数据结构**：练习练习 02 的问题
+3. **错误处理**：复习 Lecture 03 和练习 05
+4. **异步编程**：完成练习 06 中的示例
+5. **测试**：系统地学习练习 07
+
+**后续步骤：**
+- 复习错误的答案和解析
+- 完成你跳过的任何练习
+- 构建一个结合这些概念的小项目
+- 进入 Module 002：Linux 基础
+
+---
+
+**模块完成**：评分达到 75%+ 即可准备进入 Module 002
+**复习时间**：预计 2-4 小时用于需要加强的概念
+**练习项目**：构建一个经过测试的异步 ML 实用库
+
+祝你好运！这些基础知识对于成为一名 AI 基础设施工程师至关重要。

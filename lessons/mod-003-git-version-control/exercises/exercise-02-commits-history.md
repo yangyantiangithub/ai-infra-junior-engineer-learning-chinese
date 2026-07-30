@@ -1,77 +1,77 @@
-# Exercise 02: Working with Commits and History
+# 练习 02：处理 Commit 与历史
 
-## Overview
+## 概述
 
-**Difficulty**: Beginner
-**Estimated Time**: 75-90 minutes
-**Prerequisites**: Exercise 01 - Creating Your First Repository, Lecture 01 - Git Fundamentals
+**难度**：入门
+**预计时间**：75-90 分钟
+**前置条件**：练习 01 - 创建你的第一个仓库，讲座 01 - Git 基础
 
-In this exercise, you'll learn advanced commit techniques and how to effectively work with Git history. You'll practice making effective commits, viewing and searching history, amending commits, and reverting changes in a realistic ML project scenario.
+在本练习中，你将学习高级 commit 技术以及如何有效使用 Git 历史。你将练习制作有效的 commit、查看和搜索历史、修改 commit 以及在真实的 ML 项目场景中还原变更。
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
+完成本练习后，你将：
 
-- Create atomic, well-documented commits following best practices
-- Write professional commit messages using conventional formats
-- Navigate commit history using various `git log` options
-- Search commit history for specific changes
-- Amend commits to fix mistakes
-- Revert changes safely without losing history
-- Use `git show` to inspect specific commits
-- Understand when and how to modify commits
-- Apply Git best practices for ML infrastructure projects
+- 制作原子性、文档良好的 commit，遵循最佳实践
+- 使用常规格式编写专业的 commit 消息
+- 使用各种 `git log` 选项浏览 commit 历史
+- 搜索 commit 历史以查找特定变更
+- 修改 commit 以修复错误
+- 安全地还原变更而不丢失历史
+- 使用 `git show` 检查特定 commit
+- 理解何时以及如何修改 commit
+- 对 ML 基础设施项目应用 Git 最佳实践
 
-## Scenario
+## 场景
 
-You're continuing work on the ML inference API from Exercise 01. Your team has established commit message conventions and code review practices. You need to implement new features, fix bugs, and maintain a clean, searchable Git history that helps your team understand the evolution of the codebase.
+你正在继续练习 01 中 ML 推理 API 的开发工作。你的团队已经建立了 commit 消息约定和代码审查实践。你需要实现新功能、修复 bug 并维护一个干净、可搜索的 Git 历史，帮助团队理解代码库的演进。
 
-Today's tasks:
-- Add model performance monitoring
-- Fix a bug in image preprocessing
-- Implement request rate limiting
-- Add comprehensive logging
-- Document API endpoints
+今天的任务：
+- 添加模型性能监控
+- 修复图像预处理中的 bug
+- 实现请求频率限制
+- 添加全面的日志功能
+- 记录 API 端点
 
-## Prerequisites
+## 前置条件
 
-Before starting, ensure you have:
+开始之前，确保你有：
 
 ```bash
-# Git repository from Exercise 01
+# 练习 01 中的 Git 仓库
 cd ml-inference-api
 
-# Verify you're in the right place
+# 验证你在正确的位置
 git status
 git log --oneline
 
-# Should show clean working tree and previous commits
+# 应为干净的工作树和之前的 commit
 ```
 
-If you don't have the repository from Exercise 01, create a new one:
+如果你没有练习 01 的仓库，创建一个新的：
 
 ```bash
 mkdir ml-inference-api
 cd ml-inference-api
 git init
 git config init.defaultBranch main
-# Follow Exercise 01 to create basic structure
+# 按照练习 01 创建基本结构
 ```
 
 ---
 
-## Part 1: Writing Effective Commit Messages
+## 第一部分：编写有效的 Commit 消息
 
-### Task 1.1: Implement Feature with Conventional Commits
+### 任务 1.1：使用 Conventional Commits 实现功能
 
-Add a performance monitoring module following conventional commit format.
+添加一个性能监控模块，遵循常规 commit 格式。
 
-**Instructions:**
+**说明：**
 
-Create the monitoring module:
+创建监控模块：
 
 ```bash
-# Create monitoring file
+# 创建监控文件
 cat > src/utils/monitoring.py << 'EOF'
 """
 Performance Monitoring Module
@@ -172,13 +172,13 @@ monitor = PerformanceMonitor()
 EOF
 ```
 
-Now commit using conventional commit format:
+现在使用常规 commit 格式提交：
 
 ```bash
-# Stage the file
+# 暂存文件
 git add src/utils/monitoring.py
 
-# Commit with conventional format
+# 使用常规格式提交
 git commit -m "feat: add performance monitoring for inference tracking
 
 Implement PerformanceMetrics and PerformanceMonitor classes to track:
@@ -194,23 +194,23 @@ The monitor uses a decorator pattern for easy integration with
 existing inference functions."
 ```
 
-**Checkpoint Questions:**
-- What does "feat:" indicate in the commit message?
-- Why include both what changed and why in the message?
-- How does this help when reviewing history?
+**检查点问题：**
+- 消息中的"feat:"表示什么？
+- 为什么消息中要包括变更内容和变更原因？
+- 这在审查历史时有什么帮助？
 
 ---
 
-### Task 1.2: Fix a Bug with Proper Documentation
+### 任务 1.2：用适当的文档修复 Bug
 
-Find and fix a bug in the preprocessing module.
+查找并修复预处理模块中的 bug。
 
-**Instructions:**
+**说明：**
 
-First, create the bug:
+首先，创建 bug：
 
 ```bash
-# Modify preprocessing to have a bug
+# 修改预处理文件以包含 bug
 cat > src/preprocessing/image.py << 'EOF'
 """
 Image Preprocessing Module
@@ -294,17 +294,17 @@ def validate_image(image_bytes: bytes, max_size_mb: int = 10) -> bool:
         return False
 EOF
 
-# Commit the buggy version
+# 提交有 bug 的版本
 git add src/preprocessing/image.py
 git commit -m "refactor: improve image validation
 
 Add file size checking to image validation function"
 ```
 
-Now fix the bug:
+现在修复 bug：
 
 ```bash
-# Fix the bug
+# 修复 bug
 cat > src/preprocessing/image.py << 'EOF'
 """
 Image Preprocessing Module
@@ -390,7 +390,7 @@ def validate_image(image_bytes: bytes, max_size_mb: int = 10) -> bool:
         return False
 EOF
 
-# Commit the fix with proper documentation
+# 使用适当的文档提交修复
 git add src/preprocessing/image.py
 git commit -m "fix: convert images to RGB before preprocessing
 
@@ -407,28 +407,28 @@ dimensions causing inference to fail.
 Fixes issue where grayscale medical images caused 500 errors."
 ```
 
-**Expected Output:**
+**预期输出：**
 ```
 [main abc123] fix: convert images to RGB before preprocessing
  1 file changed, 4 insertions(+), 1 deletion(-)
 ```
 
-**Checkpoint:**
-View your commit history:
+**检查点：**
+查看你的 commit 历史：
 ```bash
 git log --oneline -3
 ```
 
 ---
 
-### Task 1.3: Add Configuration Feature
+### 任务 1.3：添加配置功能
 
-Add rate limiting configuration.
+添加频率限制配置。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Update configuration
+# 更新配置
 cat >> configs/default.yaml << 'EOF'
 
 # Rate Limiting
@@ -444,7 +444,7 @@ timeout:
   inference_timeout_seconds: 10
 EOF
 
-# Create rate limiter implementation
+# 创建频率限制器实现
 cat > src/utils/rate_limiter.py << 'EOF'
 """
 Rate Limiting Module
@@ -538,10 +538,10 @@ class RateLimiter:
         logger.info("Rate limiter reset")
 EOF
 
-# Stage both files
+# 暂存两个文件
 git add configs/default.yaml src/utils/rate_limiter.py
 
-# Commit with proper scope
+# 使用合适的 scope 提交
 git commit -m "feat(api): implement request rate limiting
 
 Add token bucket rate limiter to prevent API abuse:
@@ -565,199 +565,199 @@ traffic spikes."
 
 ---
 
-## Part 2: Viewing and Searching History
+## 第二部分：查看和搜索历史
 
-### Task 2.1: Explore Commit History
+### 任务 2.1：探索 Commit 历史
 
-Learn different ways to view your Git history.
+学习查看 Git 历史的不同方式。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Basic log
+# 基本日志
 git log
 
-# Compact one-line format
+# 紧凑单行格式
 git log --oneline
 
-# Last 5 commits
+# 最近 5 个 commit
 git log --oneline -5
 
-# With file statistics
+# 带有文件统计信息
 git log --stat
 
-# With actual changes
+# 带有实际变更
 git log -p
 
-# With specific number of commits
+# 特定数量的 commit
 git log -p -2
 
-# Graphical representation (useful with branches)
+# 图形化表示（与分支一起使用时很有用）
 git log --oneline --graph --all
 
-# Pretty format with author and date
+# 带有作者和日期的漂亮格式
 git log --pretty=format:"%h - %an, %ar : %s"
 
-# Commits in last 24 hours
+# 最近 24 小时的 commit
 git log --since="24 hours ago"
 
-# Commits by specific author
+# 特定作者的 commit
 git log --author="Your Name"
 
-# Commits affecting specific file
+# 影响特定文件的 commit
 git log -- src/utils/monitoring.py
 
-# Commits with specific word in message
+# 消息中包含特定单词的 commit
 git log --grep="fix"
 
-# See what changed in each commit
+# 查看每个 commit 的变化
 git log --oneline --stat
 ```
 
-**Checkpoint Exercise:**
+**检查点练习：**
 
-Answer these using `git log`:
+使用 `git log` 回答：
 
-1. How many commits have you made?
-2. What was your most recent commit message?
-3. Which files did your third commit modify?
-4. How many commits modified `configs/default.yaml`?
+1. 你做了多少个 commit？
+2. 你最近的 commit 消息是什么？
+3. 你的第三个 commit 修改了哪些文件？
+4. 有多少 commit 修改了 `configs/default.yaml`？
 
 ---
 
-### Task 2.2: Search for Specific Changes
+### 任务 2.2：搜索特定变更
 
-Practice searching commit history for content.
+练习搜索 commit 历史中的内容。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Find commits that added/removed "RateLimiter"
+# 查找添加/删除了"RateLimiter"的 commit
 git log -S "RateLimiter"
 
-# Find commits with "RateLimiter" in diff (more specific)
+# 在 diff 中查找"RateLimiter"（更具体）
 git log -G "RateLimiter"
 
-# Show the actual changes
+# 显示实际的变更
 git log -S "RateLimiter" -p
 
-# Find when a function was added
+# 查找函数被添加的时间
 git log -S "def preprocess_image" --source --all
 
-# Search for changes in specific file
+# 搜索特定文件中的变更
 git log -p -- src/preprocessing/image.py
 
-# Show commits that changed a specific line range
+# 显示更改了特定行范围的 commit
 git log -L 30,50:src/utils/monitoring.py
 ```
 
-**Practical Exercise:**
+**实用练习：**
 
-Use Git to answer:
+使用 Git 回答：
 
-1. When was the `PerformanceMonitor` class added?
-2. Which commit fixed the RGB conversion bug?
-3. What changes were made to `default.yaml`?
+1. `PerformanceMonitor` 类是何时添加的？
+2. 哪个 commit 修复了 RGB 转换 bug？
+3. `default.yaml` 做了哪些变更？
 
 ```bash
-# Example answer for #1:
+# 问题 1 的示例答案：
 git log -S "class PerformanceMonitor" --oneline
 
-# Example for #2:
+# 问题 2 的示例：
 git log --grep="RGB" --oneline
 
-# Example for #3:
+# 问题 3 的示例：
 git log --oneline -- configs/default.yaml
 git show <commit-hash>
 ```
 
 ---
 
-### Task 2.3: Inspect Specific Commits
+### 任务 2.3：检查特定 Commit
 
-Use `git show` to examine commits in detail.
+使用 `git show` 详细检查 commit。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Show latest commit
+# 显示最新的 commit
 git show
 
-# Show specific commit
-git show HEAD~1  # Previous commit
-git show HEAD~2  # Two commits ago
+# 显示特定 commit
+git show HEAD~1  # 前一个 commit
+git show HEAD~2  # 两个 commit 前
 
-# Show commit by hash
-git log --oneline -5  # Get hash
-git show abc123  # Replace with actual hash
+# 通过哈希显示 commit
+git log --oneline -5  # 获取哈希
+git show abc123  # 替换为实际哈希
 
-# Show only the commit message and stats
+# 仅显示 commit 消息和统计信息
 git show --stat HEAD
 
-# Show specific file in a commit
+# 显示 commit 中的特定文件
 git show HEAD:src/utils/monitoring.py
 
-# Show file from previous commit
+# 显示来自前一个 commit 的文件
 git show HEAD~1:configs/default.yaml
 
-# Compare file between commits
+# 比较 commit 之间的文件
 git diff HEAD~1 HEAD -- src/preprocessing/image.py
 ```
 
-**Checkpoint:**
+**检查点：**
 
-Practice these commands:
+练习这些命令：
 
 ```bash
-# What files changed in the rate limiting commit?
+# 频率限制 commit 中更改了哪些文件？
 git log --grep="rate limiting" --oneline
 git show <hash> --stat
 
-# What was the exact change to preprocessing?
+# 对预处理做了哪些精确更改？
 git log -- src/preprocessing/image.py --oneline
 git show <hash>
 ```
 
 ---
 
-## Part 3: Amending Commits
+## 第三部分：修改 Commit
 
-### Task 3.1: Fix Commit Message
+### 任务 3.1：修复 Commit 消息
 
-Practice amending the last commit message.
+练习修改最后一个 commit 的消息。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# First, make a commit with a typo
+# 首先，制作一个有拼写错误的 commit
 echo "# API Documentation" > docs/api.md
 git add docs/api.md
-git commit -m "doc: add API documentaton"  # Note the typo
+git commit -m "doc: add API documentaton"  # 注意拼写错误
 
-# Oops! Fix the commit message
+# 哦！修复 commit 消息
 git commit --amend -m "docs: add API documentation
 
 Create initial API documentation file for endpoint reference."
 
-# View the corrected commit
+# 查看更正后的 commit
 git log --oneline -1
 ```
 
-**Important Notes:**
-- `--amend` rewrites the last commit
-- Only amend commits that haven't been pushed!
-- Amending changes the commit hash
+**重要说明：**
+- `--amend` 重写最后一个 commit
+- 只修改尚未推送的 commit！
+- 修改会变更 commit 哈希
 
 ---
 
-### Task 3.2: Add Forgotten Files
+### 任务 3.2：添加遗漏的文件
 
-Practice adding files to the last commit.
+练习将文件添加到最后一个 commit。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Add endpoint documentation
+# 添加端点文档
 cat > docs/api.md << 'EOF'
 # ML Inference API Documentation
 
@@ -811,11 +811,11 @@ List available models.
 ```
 EOF
 
-# Commit it
+# 提交它
 git add docs/api.md
 git commit -m "docs: add API endpoint documentation"
 
-# Oops! Forgot to add the README update
+# 哦！忘记添加 README 更新
 cat >> README.md << 'EOF'
 
 ## API Documentation
@@ -823,29 +823,29 @@ cat >> README.md << 'EOF'
 See [API Documentation](docs/api.md) for detailed endpoint information.
 EOF
 
-# Add the forgotten file to the last commit
+# 将遗漏的文件添加到最后一个 commit
 git add README.md
 git commit --amend --no-edit
 
-# The --no-edit flag keeps the same commit message
-# View the amended commit
+# --no-edit 标志保留相同的 commit 消息
+# 查看修改后的 commit
 git show --stat
 ```
 
-**Checkpoint:**
-- What files are in the last commit now?
-- What happens to the commit hash when you amend?
+**检查点：**
+- 最后一个 commit 现在包含哪些文件？
+- 修改时 commit 哈希会怎样？
 
 ---
 
-### Task 3.3: Amend with Message and Files
+### 任务 3.3：同时修改消息和文件
 
-Practice amending both message and content.
+练习同时修改消息和内容。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create incomplete implementation
+# 创建不完整的实现
 cat > src/api/middleware.py << 'EOF'
 """
 API Middleware
@@ -868,7 +868,7 @@ EOF
 git add src/api/middleware.py
 git commit -m "feat: add middleware"
 
-# Realize we should add rate limiting and improve message
+# 意识到我们应该添加频率限制并改进消息
 cat > src/api/middleware.py << 'EOF'
 """
 API Middleware
@@ -932,7 +932,7 @@ async def rate_limit_middleware(request: Request, call_next):
     return await call_next(request)
 EOF
 
-# Amend with better message and updated file
+# 使用更好的消息和更新的文件来修改
 git add src/api/middleware.py
 git commit --amend -m "feat(api): add request logging and rate limiting middleware
 
@@ -950,22 +950,22 @@ Implement two middleware components:
 
 These middleware protect the API and provide observability."
 
-# View the result
+# 查看结果
 git show
 ```
 
 ---
 
-## Part 4: Reverting Changes
+## 第四部分：还原变更
 
-### Task 4.1: Revert a Commit
+### 任务 4.1：还原一个 Commit
 
-Learn to safely undo commits.
+学习安全地撤销 commit。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# First, make a bad change
+# 首先，做一个坏的变更
 cat > src/utils/cache.py << 'EOF'
 """
 Caching Module - EXPERIMENTAL
@@ -985,46 +985,46 @@ EOF
 git add src/utils/cache.py
 git commit -m "feat: add caching module"
 
-# Check history
+# 检查历史
 git log --oneline -3
 
-# Oops, this cache implementation is broken!
-# Revert the commit (creates a new commit that undoes changes)
+# 哦，这个缓存实现有问题！
+# 还原该 commit（创建一个撤销变更的新 commit）
 git revert HEAD
 
-# Git will open an editor with a default message like:
+# Git 会打开编辑器，显示默认消息：
 # "Revert "feat: add caching module""
 #
-# You can modify it to be more descriptive:
-git revert HEAD --no-commit  # Let's try again with no-commit
+# 你可以修改使其更具描述性：
+git revert HEAD --no-commit  # 让我们用 no-commit 再试一次
 
-# Actually, let's do it properly:
-git revert --abort  # Cancel the above
-git revert HEAD     # Revert with editor
+# 实际上，让我们正确地做：
+git revert --abort  # 取消上述操作
+git revert HEAD     # 用编辑器还原
 
-# In the editor, change message to:
+# 在编辑器中，将消息改为：
 # Revert "feat: add caching module"
 #
 # The cache implementation has thread-safety issues.
 # Will reimplement using proper locking mechanisms.
 
-# Check the result
+# 检查结果
 git log --oneline -4
 git show HEAD
 ```
 
-**Important:** `git revert` creates a NEW commit that undoes changes. It doesn't delete history!
+**重要：** `git revert` 创建一个撤销变更的**新** commit。它不会删除历史！
 
 ---
 
-### Task 4.2: Revert Multiple Commits
+### 任务 4.2：还原多个 Commit
 
-Practice reverting a range of commits.
+练习还原一系列 commit。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Make several bad commits
+# 做几个坏的 commit
 echo "config1" > bad_config1.txt
 git add bad_config1.txt
 git commit -m "bad commit 1"
@@ -1037,78 +1037,78 @@ echo "config3" > bad_config3.txt
 git add bad_config3.txt
 git commit -m "bad commit 3"
 
-# Check history
+# 检查历史
 git log --oneline -6
 
-# Revert all three (in reverse order)
+# 还原全部三个（按相反顺序）
 git revert HEAD HEAD~1 HEAD~2 --no-edit
 
-# Check result
+# 检查结果
 git log --oneline -9
-ls *.txt  # Files should be gone
+ls *.txt  # 文件应该已经消失
 ```
 
 ---
 
-### Task 4.3: Revert vs Reset (Understanding the Difference)
+### 任务 4.3：Revert vs Reset（理解区别）
 
-**Instructions:**
+**说明：**
 
 ```bash
-# DEMONSTRATION ONLY - DO NOT RUN ON IMPORTANT CODE
+# 仅演示 - 不要在重要代码上运行
 
-# Show current state
+# 显示当前状态
 git log --oneline
 
-# git reset moves the branch pointer (DESTRUCTIVE!)
-# git reset --hard HEAD~1  # ⚠️ DELETES last commit and changes!
+# git reset 移动分支指针（破坏性！）
+# git reset --hard HEAD~1  # ⚠️ 删除最后一个 commit 及其变更！
 
-# git revert creates new commit (SAFE!)
-# git revert HEAD  # ✅ Keeps history, undoes changes
+# git revert 创建新 commit（安全！）
+# git revert HEAD  # ✅ 保留历史，撤销变更
 
-# Let's demonstrate reset in a safe way
-# Create a test branch
+# 让我们以安全的方式演示 reset
+# 创建一个测试分支
 git branch test-branch
 git checkout test-branch
 
-# Make a commit
+# 制作一个 commit
 echo "test" > test.txt
 git add test.txt
 git commit -m "test commit"
 
-# Reset it (only on test branch)
+# 重置它（只在 test 分支上）
 git reset --hard HEAD~1
 
-# test.txt is gone, commit is gone
-ls test.txt  # File not found
+# test.txt 消失，commit 消失
+ls test.txt  # 文件未找到
 
-# Go back to main
+# 回到 main
 git checkout main
 
-# The test branch commit is gone, but main is safe
+# test 分支的 commit 消失了，但 main 安全
 ```
 
-**Key Differences:**
+**关键区别：**
 
-| Command | Effect | History | Use When |
+| 命令 | 效果 | 历史 | 使用时机 |
 |---------|--------|---------|----------|
-| `git revert` | New commit that undoes changes | Preserved | Changes are pushed/shared |
-| `git reset` | Moves branch pointer | Rewritten | Changes are local only |
+| `git revert` | 撤销变更的新 commit | 保留 | 变更已推送/共享 |
+| `git reset` | 移动分支指针 | 重写 | 变更仅本地 |
 
-**Rule:** Use `revert` for published commits, `reset` only for local commits!
+**规则：** 对已发布的 commit 使用 `revert`，仅对本地 commit 使用 `reset`！
 
 ---
 
-## Part 5: Practical Workflow Exercise
+## 第五部分：实用工作流练习
 
-### Task 5.1: Complete Feature Development Workflow
+### 任务 5.1：完整功能开发工作流
 
-Implement a complete feature following best practices.
+按照最佳实践实现一个完整的功能。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# 1. Add metrics endpoint
+# 1. 添加指标端点
 cat > src/api/metrics.py << 'EOF'
 """
 Metrics Endpoint
@@ -1157,7 +1157,7 @@ Includes /metrics/reset for admin use.
 This enables integration with Prometheus and Grafana
 for infrastructure monitoring."
 
-# 2. Realize we need to add this to main app
+# 2. 意识到需要将其添加到主应用
 cat >> src/api/app.py << 'EOF'
 
 # Import metrics router
@@ -1172,7 +1172,7 @@ git commit -m "feat(api): register metrics router in main application
 
 Include metrics endpoints in FastAPI app routing."
 
-# 3. Add tests
+# 3. 添加测试
 cat > tests/unit/test_metrics.py << 'EOF'
 """Tests for metrics endpoint."""
 
@@ -1204,7 +1204,7 @@ git commit -m "test: add unit tests for metrics endpoint
 
 Test metrics retrieval and reset functionality."
 
-# 4. Update documentation
+# 4. 更新文档
 cat >> docs/api.md << 'EOF'
 
 ### GET /metrics
@@ -1237,84 +1237,84 @@ git commit -m "docs: document metrics endpoints
 
 Add documentation for metrics retrieval and reset endpoints."
 
-# 5. View your work
+# 5. 查看你的工作
 git log --oneline -10
 git log --graph --oneline --all
 ```
 
 ---
 
-## Validation and Review
+## 验证与审查
 
-### Task 6.1: Audit Your Commit History
+### 任务 6.1：审计你的 Commit 历史
 
-Review the quality of your commits.
+审查你的 commit 质量。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# View all commit messages
+# 查看所有 commit 消息
 git log --oneline
 
-# Check commit message quality
+# 检查 commit 消息质量
 git log --pretty=format:"%s" | head -10
 
-# Find commits without conventional format
+# 查找没有常规格式的 commit
 git log --pretty=format:"%s" --grep="^feat:" --grep="^fix:" --grep="^docs:" --all-match --invert-grep
 
-# View commits with statistics
+# 查看带有统计信息的 commit
 git log --stat --oneline -10
 
-# Check for large commits (should be atomic)
+# 检查大 commit（应为原子性）
 git log --shortstat | grep -E "files? changed"
 ```
 
-**Quality Checklist:**
+**质量检查清单：**
 
-- [ ] Commits follow conventional format (feat:, fix:, docs:, etc.)
-- [ ] Commit messages explain WHY, not just WHAT
-- [ ] Commits are atomic (one logical change each)
-- [ ] No "WIP" or "fix typo" commits (should be amended)
-- [ ] No secrets or large files committed
+- [ ] Commits 遵循常规格式（feat:、fix:、docs: 等）
+- [ ] Commit 消息解释为什么，而不仅仅是什么
+- [ ] Commits 是原子性的（每个一个逻辑变更）
+- [ ] 没有"WIP"或"fix typo"的 commit（应该被修改）
+- [ ] 没有提交密钥或大文件
 
 ---
 
-## Challenge Tasks (Optional)
+## 挑战任务（可选）
 
-### Challenge 1: Interactive Rebase Preview
+### 挑战 1：交互式 Rebase 预览
 
-Learn about interactive rebase (covered more in Exercise 07):
+了解交互式 rebase（在练习 07 中会更多介绍）：
 
 ```bash
-# View what interactive rebase looks like
+# 查看交互式 rebase 的样子
 git rebase -i HEAD~5 --dry-run
 
-# Don't actually run it yet - just see the interface
-# This shows how you can reorder, squash, or edit commits
+# 先不要实际运行 - 只是查看界面
+# 这显示了如何重新排序、压缩或编辑 commit
 ```
 
-### Challenge 2: Bisect to Find a Bug
+### 挑战 2：Bisect 查找 Bug
 
-Use `git bisect` to find when a bug was introduced:
+使用 `git bisect` 查找 bug 是何时引入的：
 
 ```bash
-# We'll simulate this
+# 我们将模拟这个过程
 # git bisect start
-# git bisect bad                 # Current version is bad
-# git bisect good HEAD~10        # 10 commits ago was good
-# Git will checkout middle commit
-# Test it, then:
-# git bisect good   # or bad
-# Repeat until git finds the problematic commit
-# git bisect reset  # when done
+# git bisect bad                 # 当前版本坏了
+# git bisect good HEAD~10        # 10 个 commit 前是好的
+# Git 会检出中间的 commit
+# 测试它，然后：
+# git bisect good   # 或 bad
+# 重复直到 Git 找到有问题的 commit
+# git bisect reset  # 完成后
 ```
 
-### Challenge 3: Create a Release Tag
+### 挑战 3：创建发布标签
 
-Tag an important commit:
+标记一个重要的 commit：
 
 ```bash
-# Tag current commit as a release
+# 将当前 commit 标记为发布
 git tag -a v0.1.0 -m "Release version 0.1.0
 
 Features:
@@ -1325,108 +1325,108 @@ Features:
 
 This is the first stable release."
 
-# View tags
+# 查看标签
 git tag -l
 
-# View tag details
+# 查看标签详情
 git show v0.1.0
 ```
 
 ---
 
-## Troubleshooting
+## 故障排除
 
-### Common Issues
+### 常见问题
 
-**Issue**: "Cannot amend because commit was pushed"
+**问题**："无法修改因为 commit 已推送"
 ```bash
-# Solution: Don't amend pushed commits!
-# Instead, create a new commit with the fix
+# 解决方案：不要修改已推送的 commit！
+# 而是，用修复创建一个新 commit
 ```
 
-**Issue**: "Accidentally amended wrong commit"
+**问题**："意外修改了错误的 commit"
 ```bash
-# Solution: Use reflog to find the original commit
+# 解决方案：使用 reflog 查找原始 commit
 git reflog
-git reset --hard HEAD@{1}  # Go back one step
+git reset --hard HEAD@{1}  # 后退一步
 ```
 
-**Issue**: "Revert created conflicts"
+**问题**："还原产生了冲突"
 ```bash
-# Solution: Resolve conflicts manually
-git status  # See conflicted files
-# Edit files to resolve conflicts
+# 解决方案：手动解决冲突
+git status  # 查看冲突文件
+# 编辑文件解决冲突
 git add <resolved-files>
 git revert --continue
 ```
 
-**Issue**: "Can't find a specific commit"
+**问题**："找不到特定的 commit"
 ```bash
-# Solution: Use more search options
+# 解决方案：使用更多搜索选项
 git log --all --grep="search-term"
 git log --all -S "code-snippet"
-git reflog  # Shows all HEAD movements
+git reflog  # 显示所有 HEAD 移动
 ```
 
 ---
 
-## Reflection Questions
+## 反思问题
 
-1. **Why use conventional commit format (feat:, fix:, docs:)?**
-   - How does this help with automation and changelog generation?
+1. **为什么使用常规 commit 格式（feat:、fix:、docs:）？**
+   - 这对自动化和 changelog 生成有何帮助？
 
-2. **When should you amend a commit vs. creating a new one?**
-   - What are the risks of amending?
+2. **何时应该修改 commit vs. 创建一个新 commit？**
+   - 修改的风险是什么？
 
-3. **What's the difference between `git revert` and `git reset`?**
-   - When would you use each?
+3. **`git revert` 和 `git reset` 之间的区别是什么？**
+   - 何时使用哪个？
 
-4. **Why is atomic commit practice important?**
-   - Give an example from this exercise.
+4. **为什么原子性 commit 实践很重要？**
+   - 从本练习中举一个例子。
 
-5. **How does good commit history help in debugging?**
-   - How would you use `git log` to find when a bug was introduced?
+5. **良好的 commit 历史如何帮助调试？**
+   - 你如何使用 `git log` 来查找 bug 是何时引入的？
 
-6. **What information should be in a commit message body?**
-   - Why not just rely on the subject line?
+6. **Commit 消息正文中应包含哪些信息？**
+   - 为什么不能只依赖主题行？
 
 ---
 
-## Summary
+## 总结
 
-Congratulations! You've completed Exercise 02. You learned:
+恭喜！你已经完成了练习 02。你学会了：
 
-- ✅ Writing effective commit messages with conventional format
-- ✅ Navigating Git history with various `git log` options
-- ✅ Searching commit history for specific changes
-- ✅ Inspecting commits with `git show`
-- ✅ Amending commits to fix messages or add files
-- ✅ Reverting commits safely without losing history
-- ✅ Understanding revert vs. reset
-- ✅ Following a complete feature development workflow
-- ✅ Auditing commit history for quality
+- ✅ 使用常规格式编写有效的 commit 消息
+- ✅ 使用各种 `git log` 选项浏览 Git 历史
+- ✅ 搜索 commit 历史以查找特定变更
+- ✅ 使用 `git show` 检查 commit
+- ✅ 修改 commit 以修复消息或添加文件
+- ✅ 安全地还原 commit 而不丢失历史
+- ✅ 理解 revert 与 reset 的区别
+- ✅ 遵循完整的功能开发工作流
+- ✅ 审计 commit 历史的质量
 
-### Key Commands Learned
+### 学会的关键命令
 
 ```bash
-git commit -m "message"           # Create commit
-git commit --amend                # Amend last commit
-git log                           # View history
-git log --oneline                 # Compact history
-git log --stat                    # With file stats
-git log -p                        # With changes
-git log --grep="term"             # Search messages
-git log -S "code"                 # Search for code
-git show <commit>                 # Show commit details
-git revert <commit>               # Safely undo commit
-git reset                         # Move branch (careful!)
-git tag                           # Create tags
+git commit -m "message"           # 创建 commit
+git commit --amend                # 修改最后一个 commit
+git log                           # 查看历史
+git log --oneline                 # 紧凑历史
+git log --stat                    # 带有文件统计信息
+git log -p                        # 带有变更
+git log --grep="term"             # 搜索消息
+git log -S "code"                 # 搜索代码
+git show <commit>                 # 显示 commit 详情
+git revert <commit>               # 安全地撤销 commit
+git reset                         # 移动分支（小心！）
+git tag                           # 创建标签
 ```
 
-### Next Steps
+### 下一步
 
-- Complete Exercise 03 to learn branching strategies
-- Practice conventional commits in your projects
-- Review Lecture 02 on branching and merging
+- 完成练习 03 学习分支策略
+- 在你的项目中练习 conventional commits
+- 复习讲座 02 关于分支与合并的内容
 
-**Excellent work!** You now have the skills to maintain a clean, professional Git history.
+**出色的工作！** 你现在拥有了维护干净、专业 Git 历史的技能。

@@ -1,76 +1,76 @@
-# Module 010 — Cloud Platforms Resources
+# Module 010 — 云平台资源
 
-## Official documentation
+## 官方文档
 
 ### AWS
 
-- **AWS documentation** — [docs.aws.amazon.com](https://docs.aws.amazon.com/). The authoritative reference.
-- **AWS Well-Architected Framework** — [aws.amazon.com/architecture/well-architected](https://aws.amazon.com/architecture/well-architected/). Reads like a textbook on production-grade cloud architecture.
-- **AWS Machine Learning Lens** — [docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens](https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/). Well-Architected applied to ML workloads.
+- **AWS 文档** — [docs.aws.amazon.com](https://docs.aws.amazon.com/)。权威参考。
+- **AWS Well-Architected Framework** — [aws.amazon.com/architecture/well-architected](https://aws.amazon.com/architecture/well-architected/)。读起来像一本生产级云架构教科书。
+- **AWS Machine Learning Lens** — [docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens](https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/)。Well-Architected 应用于 ML 工作负载。
 
 ### GCP
 
-- **GCP documentation** — [cloud.google.com/docs](https://cloud.google.com/docs).
-- **GCP Architecture Framework** — [cloud.google.com/architecture/framework](https://cloud.google.com/architecture/framework). GCP's equivalent to AWS Well-Architected.
+- **GCP 文档** — [cloud.google.com/docs](https://cloud.google.com/docs)。
+- **GCP Architecture Framework** — [cloud.google.com/architecture/framework](https://cloud.google.com/architecture/framework)。GCP 版的 AWS Well-Architected。
 
 ### Azure
 
-- **Azure documentation** — [learn.microsoft.com/en-us/azure](https://learn.microsoft.com/en-us/azure/).
-- **Azure Well-Architected Framework** — [learn.microsoft.com/en-us/azure/architecture/framework](https://learn.microsoft.com/en-us/azure/architecture/framework/).
+- **Azure 文档** — [learn.microsoft.com/en-us/azure](https://learn.microsoft.com/en-us/azure/)。
+- **Azure Well-Architected Framework** — [learn.microsoft.com/en-us/azure/architecture/framework](https://learn.microsoft.com/en-us/azure/architecture/framework/)。
 
-## Certifications
+## 认证
 
-Worth knowing the certifications exist; some employers value them. Don't chase them for their own sake.
+值得了解这些认证的存在；有些雇主看重它们。但不要为了认证而考证。
 
-- **AWS Certified Cloud Practitioner** — entry-level, broad.
-- **AWS Solutions Architect Associate** — the standard mid-level cert.
-- **AWS Machine Learning Specialty** — ML-specific.
-- **GCP Associate Cloud Engineer** — equivalent to the AWS Solutions Architect Associate level.
-- **Azure Fundamentals (AZ-900)** — entry-level Azure.
+- **AWS Certified Cloud Practitioner** — 入门级，覆盖面广。
+- **AWS Solutions Architect Associate** — 标准中级认证。
+- **AWS Machine Learning Specialty** — ML 专项。
+- **GCP Associate Cloud Engineer** — 对标 AWS Solutions Architect Associate 级别。
+- **Azure Fundamentals（AZ-900）** — Azure 入门级。
 
-## Books
+## 书籍
 
-- **AWS Cookbook (2nd ed.)** by John Culkin & Mike Zazon. Recipe-style. Excellent reference.
-- **Cloud Native Patterns** by Cornelia Davis. Architectural patterns that apply across clouds.
-- **Architecting Modern Data Platforms** (O'Reilly). Cross-cloud data architecture.
+- **《AWS Cookbook（第 2 版）》**— John Culkin & Mike Zazon。菜谱风格。优秀参考书。
+- **《Cloud Native Patterns》**— Cornelia Davis。跨云适用的架构模式。
+- **《Architecting Modern Data Platforms》**（O'Reilly）。跨云数据架构。
 
-## ML-specific cloud services
+## ML 特定云服务
 
-- **AWS SageMaker documentation** — [docs.aws.amazon.com/sagemaker](https://docs.aws.amazon.com/sagemaker/). AWS's managed ML platform.
-- **GCP Vertex AI documentation** — [cloud.google.com/vertex-ai/docs](https://cloud.google.com/vertex-ai/docs). GCP's managed ML platform.
-- **Azure ML documentation** — [learn.microsoft.com/en-us/azure/machine-learning](https://learn.microsoft.com/en-us/azure/machine-learning/). Azure's managed ML platform.
+- **AWS SageMaker 文档** — [docs.aws.amazon.com/sagemaker](https://docs.aws.amazon.com/sagemaker/)。AWS 的托管 ML 平台。
+- **GCP Vertex AI 文档** — [cloud.google.com/vertex-ai/docs](https://cloud.google.com/vertex-ai/docs)。GCP 的托管 ML 平台。
+- **Azure ML 文档** — [learn.microsoft.com/en-us/azure/machine-learning](https://learn.microsoft.com/en-us/azure/machine-learning/)。Azure 的托管 ML 平台。
 
-The trade-off across all three: faster time-to-value, but vendor lock-in for the managed pieces (training pipelines, model registry, monitoring). Decide deliberately; don't drift in.
+三者的权衡：上线速度更快，但托管组件（训练流水线、模型注册表、监控）存在供应商锁定。要有意识地决策，不要随波逐流。
 
-## Infrastructure as Code
+## 基础设施即代码
 
-- **Terraform documentation** — [developer.hashicorp.com/terraform/docs](https://developer.hashicorp.com/terraform/docs). The de facto IaC tool across clouds.
-- **AWS CDK** — [aws.amazon.com/cdk](https://aws.amazon.com/cdk/). AWS's IaC framework in your language of choice (Python, TypeScript, etc.).
-- **Pulumi** — [pulumi.com/docs](https://www.pulumi.com/docs/). Multi-cloud IaC in real programming languages.
-- **OpenTofu** — [opentofu.org](https://opentofu.org/). Community fork of Terraform after the license change.
+- **Terraform 文档** — [developer.hashicorp.com/terraform/docs](https://developer.hashicorp.com/terraform/docs)。跨云 IaC 的事实标准。
+- **AWS CDK** — [aws.amazon.com/cdk](https://aws.amazon.com/cdk/)。AWS 的 IaC 框架，支持你选择的语言（Python、TypeScript 等）。
+- **Pulumi** — [pulumi.com/docs](https://www.pulumi.com/docs/)。使用真实编程语言的多云 IaC。
+- **OpenTofu** — [opentofu.org](https://opentofu.org/)。Terraform 许可证变更后的社区分支。
 
-## Cost management
+## 成本管理
 
-- **AWS Cost Explorer + Budgets** — built-in tools.
-- **GCP Cost Management** — [cloud.google.com/cost-management](https://cloud.google.com/cost-management).
-- **OpenCost** — [opencost.io](https://www.opencost.io/). Open standard for Kubernetes cost attribution.
-- **Vantage / Kubecost** — commercial cost-visibility tools.
+- **AWS Cost Explorer + Budgets** — 内置工具。
+- **GCP Cost Management** — [cloud.google.com/cost-management](https://cloud.google.com/cost-management)。
+- **OpenCost** — [opencost.io](https://www.opencost.io/)。Kubernetes 成本归因的开放标准。
+- **Vantage / Kubecost** — 商业成本可视化工具。
 
-For ML workloads, cost surprises usually come from: idle GPU instances, egress traffic, S3 storage classes, untracked dev environments. Set alarms.
+对于 ML 工作负载，成本意外通常来自：闲置的 GPU 实例、出站流量、S3 存储类、未跟踪的开发环境。设置告警。
 
-## Multi-cloud and cross-cloud
+## 多云与跨云
 
-- **Cilium ClusterMesh** — [docs.cilium.io/en/stable/network/clustermesh](https://docs.cilium.io/en/stable/network/clustermesh/). Multi-cluster networking.
-- **Karpenter** — [karpenter.sh](https://karpenter.sh/). AWS-native node autoscaler; good for ML burst capacity.
-- **Crossplane** — [crossplane.io](https://www.crossplane.io/). Kubernetes-native IaC across clouds.
+- **Cilium ClusterMesh** — [docs.cilium.io/en/stable/network/clustermesh](https://docs.cilium.io/en/stable/network/clustermesh/)。多集群网络。
+- **Karpenter** — [karpenter.sh](https://karpenter.sh/)。AWS 原生的节点自动伸缩器；适合 ML 突发容量。
+- **Crossplane** — [crossplane.io](https://www.crossplane.io/)。Kubernetes 原生的跨云 IaC。
 
-## Cross-references in this curriculum
+## 本课程中的交叉参考
 
-- Module 006 (Kubernetes) — orchestration layer that runs on top of every cloud.
-- Engineer track's `mod-102-cloud-computing` covers production cloud patterns in depth.
-- Engineer track's `mod-109-infrastructure-as-code` for Terraform + GitOps.
-- Senior-engineer track's `mod-205-multi-cloud` for cross-cloud architecture.
+- 模块 006（Kubernetes）— 运行在每个云之上的编排层。
+- 工程师轨道的 `mod-102-cloud-computing` 深入涵盖生产云模式。
+- 工程师轨道的 `mod-109-infrastructure-as-code` 涉及 Terraform + GitOps。
+- 高级工程师轨道的 `mod-205-multi-cloud` 涉及跨云架构。
 
-## A note on "which cloud should I learn"
+## 关于"应该学哪个云"的说明
 
-If you're starting fresh: **AWS** has the largest market share and the broadest job market. Learn AWS first. Add GCP / Azure once you're comfortable with cloud fundamentals — most concepts transfer; the specifics differ.
+如果你是新手：**AWS** 市场份额最大，就业市场也最广。先学 AWS。等你对云基础熟悉后，再学习 GCP/Azure —— 大多数概念是相通的；只是具体实现有所不同。

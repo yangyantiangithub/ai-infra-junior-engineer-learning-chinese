@@ -1,81 +1,81 @@
-# AI Infrastructure Junior Engineer - Complete Curriculum Index
-**Last Updated**: 2025-10-24
-**Status**: ✅ Complete and Production-Ready
-**Total Content**: 912,316 words | 440 learning hours
+# AI Infrastructure Junior Engineer - 完整课程索引
+**最后更新**: 2025-10-24
+**状态**: ✅ 完成且生产就绪
+**总内容量**: 912,316 字 | 440 学习小时
 
 ---
 
-## 📚 Quick Navigation
+## 📚 快速导航
 
-| Section | Description | Files | Est. Time |
+| 部分 | 描述 | 文件数 | 预计时间 |
 |---------|-------------|-------|-----------|
-| [Modules](#modules) | 10 learning modules | 197 files | 150 hours |
-| [Projects](#projects) | 5 hands-on projects | 19 MD files | 290 hours |
-| [Assessments](#assessments) | Quizzes & practical exams | 5 files | Ongoing |
-| [Resources](#resources) | Tools, reading lists, references | Multiple | Reference |
+| [模块](#模块) | 10 个学习模块 | 197 个文件 | 150 小时 |
+| [项目](#项目) | 5 个动手项目 | 19 个 MD 文件 | 290 小时 |
+| [评估](#评估) | 测验和实践考试 | 5 个文件 | 持续 |
+| [资源](#资源) | 工具、阅读清单、参考资料 | 多个 | 参考用 |
 
 ---
 
-## 🎯 Learning Path Overview
+## 🎯 学习路径概览
 
 ```
-START HERE
+从这开始
     ↓
 ┌─────────────────────────────────────────────┐
-│  Phase 1: Foundations (Modules 001-003)    │
-│  ├── Python Fundamentals (15h)             │
-│  ├── Linux Essentials (15h)                │
-│  └── Git & Version Control (10h)           │
-│  Total: 40 hours                           │
+│  阶段 1：基础（模块 001-003）                  │
+│  ├── Python 基础（15h）                       │
+│  ├── Linux 基础（15h）                        │
+│  └── Git 与版本控制（10h）                     │
+│  总时长：40 小时                              │
 └─────────────────────────────────────────────┘
     ↓
 ┌─────────────────────────────────────────────┐
-│  Phase 2: ML & Containers (Modules 004-005)│
-│  ├── ML Basics (PyTorch/TensorFlow) (20h)  │
-│  └── Docker & Containerization (15h)       │
-│  Total: 35 hours                           │
+│  阶段 2：ML 与容器（模块 004-005）              │
+│  ├── ML 基础（PyTorch/TensorFlow）（20h）      │
+│  └── Docker 与容器化（15h）                    │
+│  总时长：35 小时                              │
 └─────────────────────────────────────────────┘
     ↓
 ┌─────────────────────────────────────────────┐
-│  Phase 3: Orchestration (Module 006)       │
-│  └── Kubernetes Introduction (20h)         │
+│  阶段 3：编排（模块 006）                       │
+│  └── Kubernetes 入门（20h）                   │
 └─────────────────────────────────────────────┘
     ↓
 ┌─────────────────────────────────────────────┐
-│  Phase 4: Infrastructure (Modules 007-010) │
-│  ├── APIs & Web Services (15h)             │
-│  ├── Databases & SQL (15h)                 │
-│  ├── Monitoring & Logging (15h)            │
-│  └── Cloud Platforms (20h)                 │
-│  Total: 65 hours                           │
+│  阶段 4：基础设施（模块 007-010）               │
+│  ├── API 与网络服务（15h）                     │
+│  ├── 数据库与 SQL（15h）                       │
+│  ├── 监控与日志记录（15h）                      │
+│  └── 云平台（20h）                            │
+│  总时长：65 小时                              │
 └─────────────────────────────────────────────┘
     ↓
 ┌─────────────────────────────────────────────┐
-│  Phase 5: Projects (5 Projects)            │
-│  └── Build production-ready systems        │
-│  Total: 290 hours                          │
+│  阶段 5：项目（5 个项目）                       │
+│  └── 构建生产级系统                           │
+│  总时长：290 小时                             │
 └─────────────────────────────────────────────┘
     ↓
-🎓 JUNIOR AI INFRASTRUCTURE ENGINEER READY!
+🎓 初级 AI 基础设施工程师就绪！
 ```
 
 ---
 
-## 📖 Modules
+## 📖 模块
 
-### Module 001: Python Fundamentals for Infrastructure
-**Path**: `lessons/mod-001-python-fundamentals/`
-**Duration**: 15 hours | **Difficulty**: Beginner | **Files**: 12
+### 模块 001：基础设施 Python 基础
+**路径**: `lessons/mod-001-python-fundamentals/`
+**时长**: 15 小时 | **难度**: 入门 | **文件数**: 12
 
-**Topics Covered**:
-- Python environment setup and virtual environments
-- Data structures for infrastructure (lists, dicts, sets)
-- File I/O and configuration management
-- Error handling and logging
-- Working with external libraries (pip, packages)
-- Scripting for automation tasks
+**涵盖主题**:
+- Python 环境搭建和虚拟环境
+- 基础设施数据结构（列表、字典、集合）
+- 文件 I/O 和配置管理
+- 错误处理和日志记录
+- 使用外部库（pip、包）
+- 自动化任务脚本编写
 
-**Structure**:
+**结构**:
 ```
 mod-001-python-fundamentals/
 ├── README.md
@@ -83,498 +83,498 @@ mod-001-python-fundamentals/
 │   ├── 01-setup-basics.md
 │   ├── 02-data-structures.md
 │   ├── 03-file-io.md
-│   └── [more lectures]
+│   └── [更多讲座]
 ├── exercises/
 │   ├── exercise-01-environment-setup.md
 │   ├── exercise-02-data-manipulation.md
-│   └── [more exercises]
+│   └── [更多练习]
 ├── quizzes/
 │   └── module-001-quiz.md
 └── resources/
     └── reading-list.md
 ```
 
-**Learning Outcomes**:
-- ✅ Set up Python development environment
-- ✅ Write infrastructure automation scripts
-- ✅ Handle configuration files (JSON, YAML, INI)
-- ✅ Implement proper error handling
-- ✅ Use logging for debugging
+**学习成果**:
+- ✅ 搭建 Python 开发环境
+- ✅ 编写基础设施自动化脚本
+- ✅ 处理配置文件（JSON、YAML、INI）
+- ✅ 实现正确的错误处理
+- ✅ 使用日志记录进行调试
 
 ---
 
-### Module 002: Linux Essentials
-**Path**: `lessons/mod-002-linux-essentials/`
-**Duration**: 15 hours | **Difficulty**: Beginner | **Files**: 18
+### 模块 002：Linux 基础
+**路径**: `lessons/mod-002-linux-essentials/`
+**时长**: 15 小时 | **难度**: 入门 | **文件数**: 18
 
-**Topics Covered**:
-- Linux filesystem and navigation
-- Process management and system monitoring
-- Shell scripting basics
-- File permissions and ownership
-- Package management (apt, yum)
-- SSH and remote server management
+**涵盖主题**:
+- Linux 文件系统和导航
+- 进程管理和系统监控
+- Shell 脚本基础
+- 文件权限和所有权
+- 包管理（apt、yum）
+- SSH 和远程服务器管理
 
-**Key Skills**:
-- ✅ Navigate Linux file systems confidently
-- ✅ Manage processes and services
-- ✅ Write bash scripts for automation
-- ✅ Configure SSH access and keys
-- ✅ Monitor system resources
-
----
-
-### Module 003: Git & Version Control
-**Path**: `lessons/mod-003-git-version-control/`
-**Duration**: 10 hours | **Difficulty**: Beginner | **Files**: 16
-
-**Topics Covered**:
-- Git fundamentals and workflow
-- Branching strategies for infrastructure code
-- Collaborative workflows (pull requests, code review)
-- Git for configuration management
-- .gitignore best practices
-- CI/CD integration basics
-
-**Key Skills**:
-- ✅ Use Git for version control
-- ✅ Implement branching strategies
-- ✅ Collaborate via pull requests
-- ✅ Manage infrastructure as code with Git
+**关键技能**:
+- ✅ 自信地导航 Linux 文件系统
+- ✅ 管理进程和服务
+- ✅ 编写 bash 脚本实现自动化
+- ✅ 配置 SSH 访问和密钥
+- ✅ 监控系统资源
 
 ---
 
-### Module 004: ML Basics (PyTorch/TensorFlow)
-**Path**: `lessons/mod-004-ml-basics/`
-**Duration**: 20 hours | **Difficulty**: Beginner | **Files**: 9
+### 模块 003：Git 与版本控制
+**路径**: `lessons/mod-003-git-version-control/`
+**时长**: 10 小时 | **难度**: 入门 | **文件数**: 16
 
-**Topics Covered**:
-- ML fundamentals and terminology
-- PyTorch and TensorFlow basics
-- Model training pipelines
-- Model serialization and saving
-- Inference basics
-- GPU acceleration intro
+**涵盖主题**:
+- Git 基础和工作流
+- 基础设施代码的分支策略
+- 协作工作流（拉取请求、代码审查）
+- 用于配置管理的 Git
+- .gitignore 最佳实践
+- CI/CD 集成基础
 
-**Key Skills**:
-- ✅ Understand ML model lifecycle
-- ✅ Load and run pre-trained models
-- ✅ Save and serialize models
-- ✅ Understand GPU vs CPU for inference
-
----
-
-### Module 005: Docker & Containerization
-**Path**: `lessons/mod-005-docker-containers/`
-**Duration**: 15 hours | **Difficulty**: Beginner | **Files**: 18
-
-**Topics Covered**:
-- Docker fundamentals and architecture
-- Creating Dockerfiles for ML applications
-- Docker Compose for multi-container apps
-- Networking and volumes
-- Best practices and optimization
-- Security considerations
-
-**Key Skills**:
-- ✅ Build Docker images for ML models
-- ✅ Use Docker Compose for development
-- ✅ Optimize image sizes
-- ✅ Implement security best practices
-- ✅ Debug containerized applications
+**关键技能**:
+- ✅ 使用 Git 进行版本控制
+- ✅ 实现分支策略
+- ✅ 通过拉取请求进行协作
+- ✅ 用 Git 管理基础设施即代码
 
 ---
 
-### Module 006: Kubernetes Introduction
-**Path**: `lessons/mod-006-kubernetes-intro/`
-**Duration**: 20 hours | **Difficulty**: Beginner+ | **Files**: 14
+### 模块 004：ML 基础（PyTorch/TensorFlow）
+**路径**: `lessons/mod-004-ml-basics/`
+**时长**: 20 小时 | **难度**: 入门 | **文件数**: 9
 
-**Topics Covered**:
-- Kubernetes architecture and components
-- Pods, Deployments, Services
-- ConfigMaps and Secrets
-- Persistent storage
-- Scaling and updates
-- Monitoring and debugging
+**涵盖主题**:
+- ML 基础和术语
+- PyTorch 和 TensorFlow 基础
+- 模型训练流水线
+- 模型序列化和保存
+- 推理基础
+- GPU 加速入门
 
-**Key Skills**:
-- ✅ Deploy applications to Kubernetes
-- ✅ Manage configuration and secrets
-- ✅ Scale workloads
-- ✅ Debug pod issues
-- ✅ Implement health checks
-
----
-
-### Module 007: APIs & Web Services
-**Path**: `lessons/mod-007-apis-web-services/`
-**Duration**: 15 hours | **Difficulty**: Beginner | **Files**: 13
-
-**Topics Covered**:
-- REST API fundamentals
-- Flask and FastAPI for ML serving
-- API authentication and authorization
-- Rate limiting and throttling
-- API documentation (OpenAPI/Swagger)
-- Testing APIs
-
-**Key Skills**:
-- ✅ Build REST APIs for ML models
-- ✅ Implement authentication
-- ✅ Document APIs properly
-- ✅ Test API endpoints
-- ✅ Handle errors gracefully
+**关键技能**:
+- ✅ 理解 ML 模型生命周期
+- ✅ 加载和运行预训练模型
+- ✅ 保存和序列化模型
+- ✅ 理解推理时的 GPU 与 CPU 对比
 
 ---
 
-### Module 008: Databases & SQL
-**Path**: `lessons/mod-008-databases-sql/`
-**Duration**: 15 hours | **Difficulty**: Beginner | **Files**: 12
+### 模块 005：Docker 与容器化
+**路径**: `lessons/mod-005-docker-containers/`
+**时长**: 15 小时 | **难度**: 入门 | **文件数**: 18
 
-**Topics Covered**:
-- SQL fundamentals
-- PostgreSQL for ML metadata
-- Database design for ML systems
-- ORM basics (SQLAlchemy)
-- Migrations and versioning
-- Performance optimization
+**涵盖主题**:
+- Docker 基础和架构
+- 为 ML 应用创建 Dockerfile
+- 用于多容器应用的 Docker Compose
+- 网络和卷
+- 最佳实践和优化
+- 安全考虑
 
-**Key Skills**:
-- ✅ Design database schemas
-- ✅ Write SQL queries for ML data
-- ✅ Use ORMs in Python
-- ✅ Manage database migrations
-- ✅ Optimize query performance
-
----
-
-### Module 009: Monitoring & Logging Basics
-**Path**: `lessons/mod-009-monitoring-basics/`
-**Duration**: 15 hours | **Difficulty**: Beginner+ | **Files**: 14
-
-**Topics Covered**:
-- Logging best practices
-- Structured logging (JSON logs)
-- Prometheus fundamentals
-- Grafana dashboards
-- Alerting basics
-- Log aggregation
-
-**Key Skills**:
-- ✅ Implement proper logging
-- ✅ Collect metrics with Prometheus
-- ✅ Create Grafana dashboards
-- ✅ Set up basic alerts
-- ✅ Debug using logs and metrics
+**关键技能**:
+- ✅ 为 ML 模型构建 Docker 镜像
+- ✅ 使用 Docker Compose 进行开发
+- ✅ 优化镜像大小
+- ✅ 实现安全最佳实践
+- ✅ 调试容器化应用
 
 ---
 
-### Module 010: Cloud Platforms (AWS/GCP/Azure)
-**Path**: `lessons/mod-010-cloud-platforms/`
-**Duration**: 20 hours | **Difficulty**: Beginner+ | **Files**: 15
+### 模块 006：Kubernetes 入门
+**路径**: `lessons/mod-006-kubernetes-intro/`
+**时长**: 20 小时 | **难度**: 入门+ | **文件数**: 14
 
-**Topics Covered**:
-- Cloud platform overview
-- EC2/Compute Engine/VM instances
+**涵盖主题**:
+- Kubernetes 架构和组件
+- Pod、Deployment、Service
+- ConfigMap 和 Secret
+- 持久化存储
+- 扩缩和更新
+- 监控和调试
+
+**关键技能**:
+- ✅ 将应用部署到 Kubernetes
+- ✅ 管理配置和密钥
+- ✅ 扩缩工作负载
+- ✅ 调试 Pod 问题
+- ✅ 实现健康检查
+
+---
+
+### 模块 007：API 与网络服务
+**路径**: `lessons/mod-007-apis-web-services/`
+**时长**: 15 小时 | **难度**: 入门 | **文件数**: 13
+
+**涵盖主题**:
+- REST API 基础
+- Flask 和 FastAPI 用于 ML 服务
+- API 认证和授权
+- 速率限制和节流
+- API 文档（OpenAPI/Swagger）
+- API 测试
+
+**关键技能**:
+- ✅ 为 ML 模型构建 REST API
+- ✅ 实现认证
+- ✅ 正确编写 API 文档
+- ✅ 测试 API 端点
+- ✅ 优雅地处理错误
+
+---
+
+### 模块 008：数据库与 SQL
+**路径**: `lessons/mod-008-databases-sql/`
+**时长**: 15 小时 | **难度**: 入门 | **文件数**: 12
+
+**涵盖主题**:
+- SQL 基础
+- 用于 ML 元数据的 PostgreSQL
+- ML 系统的数据库设计
+- ORM 基础（SQLAlchemy）
+- 迁移和版本管理
+- 性能优化
+
+**关键技能**:
+- ✅ 设计数据库模式
+- ✅ 为 ML 数据编写 SQL 查询
+- ✅ 在 Python 中使用 ORM
+- ✅ 管理数据库迁移
+- ✅ 优化查询性能
+
+---
+
+### 模块 009：监控与日志记录基础
+**路径**: `lessons/mod-009-monitoring-basics/`
+**时长**: 15 小时 | **难度**: 入门+ | **文件数**: 14
+
+**涵盖主题**:
+- 日志记录最佳实践
+- 结构化日志（JSON 日志）
+- Prometheus 基础
+- Grafana 仪表盘
+- 告警基础
+- 日志聚合
+
+**关键技能**:
+- ✅ 实现正确的日志记录
+- ✅ 使用 Prometheus 采集指标
+- ✅ 创建 Grafana 仪表盘
+- ✅ 设置基本告警
+- ✅ 使用日志和指标进行调试
+
+---
+
+### 模块 010：云平台（AWS/GCP/Azure）
+**路径**: `lessons/mod-010-cloud-platforms/`
+**时长**: 20 小时 | **难度**: 入门+ | **文件数**: 15
+
+**涵盖主题**:
+- 云平台概述
+- EC2/Compute Engine/VM 实例
 - S3/Cloud Storage/Blob Storage
-- IAM and security
-- Managed Kubernetes services (EKS/GKE/AKS)
-- Cost management
+- IAM 和安全
+- 托管 Kubernetes 服务（EKS/GKE/AKS）
+- 成本管理
 
-**Key Skills**:
-- ✅ Deploy to cloud platforms
-- ✅ Manage cloud resources
-- ✅ Configure IAM policies
-- ✅ Use managed Kubernetes
-- ✅ Monitor cloud costs
-
----
-
-## 🚀 Projects
-
-### Project 01: Simple Model API Deployment
-**Path**: `projects/project-01-simple-model-api/`
-**Duration**: 60 hours | **Difficulty**: Beginner
-
-**Description**: Build and deploy a Flask/FastAPI application serving a machine learning model with Docker containerization.
-
-**Technologies**: Flask/FastAPI, Docker, AWS/GCP, PostgreSQL
-
-**Learning Outcomes**:
-- Deploy ML model as REST API
-- Containerize application with Docker
-- Deploy to cloud platform
-- Implement basic monitoring
-- Handle model versioning
-
-**Files**: README.md, requirements.md, architecture.md, src/, tests/, docker/
+**关键技能**:
+- ✅ 部署到云平台
+- ✅ 管理云资源
+- ✅ 配置 IAM 策略
+- ✅ 使用托管 Kubernetes
+- ✅ 监控云成本
 
 ---
 
-### Project 02: Kubernetes Model Serving
-**Path**: `projects/project-02-kubernetes-serving/`
-**Duration**: 80 hours | **Difficulty**: Intermediate
+## 🚀 项目
 
-**Description**: Deploy the model API to Kubernetes with auto-scaling, monitoring, and high availability.
+### 项目 01：简单模型 API 部署
+**路径**: `projects/project-01-simple-model-api/`
+**时长**: 60 小时 | **难度**: 入门
 
-**Technologies**: Kubernetes, Helm, Prometheus, Grafana, Ingress
+**描述**: 构建并部署一个 Flask/FastAPI 应用，通过 Docker 容器化提供机器学习模型服务。
 
-**Learning Outcomes**:
-- Deploy to Kubernetes cluster
-- Implement auto-scaling (HPA)
-- Set up monitoring and alerting
-- Configure ingress and load balancing
-- Manage secrets and configs
+**技术栈**: Flask/FastAPI、Docker、AWS/GCP、PostgreSQL
 
-**Files**: README.md, kubernetes/, monitoring/, tests/
+**学习成果**:
+- 将 ML 模型部署为 REST API
+- 使用 Docker 容器化应用
+- 部署到云平台
+- 实现基本监控
+- 处理模型版本管理
 
----
-
-### Project 03: ML Pipeline with Experiment Tracking
-**Path**: `projects/project-03-ml-pipeline-tracking/`
-**Duration**: 80 hours | **Difficulty**: Intermediate
-
-**Description**: Build a complete ML training pipeline with MLflow for experiment tracking and model versioning.
-
-**Technologies**: MLflow, Airflow/Prefect, DVC, S3/GCS
-
-**Learning Outcomes**:
-- Implement experiment tracking
-- Version datasets with DVC
-- Build automated pipelines
-- Track model lineage
-- Compare model versions
-
-**Files**: README.md, pipeline/, mlflow/, dvc/
+**文件**: README.md、requirements.md、architecture.md、src/、tests/、docker/
 
 ---
 
-### Project 04: Monitoring & Alerting System
-**Path**: `projects/project-04-monitoring-alerting/`
-**Duration**: 70 hours | **Difficulty**: Intermediate
+### 项目 02：Kubernetes 模型服务
+**路径**: `projects/project-02-kubernetes-serving/`
+**时长**: 80 小时 | **难度**: 中级
 
-**Description**: Implement comprehensive monitoring, logging, and alerting for ML infrastructure.
+**描述**: 将模型 API 部署到 Kubernetes，配备自动扩缩、监控和高可用。
 
-**Technologies**: Prometheus, Grafana, ELK Stack, AlertManager
+**技术栈**: Kubernetes、Helm、Prometheus、Grafana、Ingress
 
-**Learning Outcomes**:
-- Collect and store metrics
-- Build custom dashboards
-- Aggregate and search logs
-- Set up alerting rules
-- Implement SLOs/SLIs
+**学习成果**:
+- 部署到 Kubernetes 集群
+- 实现自动扩缩（HPA）
+- 设置监控和告警
+- 配置 Ingress 和负载均衡
+- 管理密钥和配置
 
-**Files**: README.md, prometheus/, grafana/, logging/
-
----
-
-### Project 05: Production ML Capstone
-**Path**: `projects/project-05-production-ml-capstone/`
-**Duration**: 90 hours | **Difficulty**: Advanced
-
-**Description**: End-to-end production ML system combining all previous concepts with CI/CD, monitoring, and multi-environment deployment.
-
-**Technologies**: All previous + Jenkins/GitHub Actions, Terraform, ArgoCD
-
-**Learning Outcomes**:
-- Implement CI/CD for ML
-- Multi-environment deployments (dev/staging/prod)
-- Infrastructure as Code
-- GitOps workflows
-- Production-grade security
-
-**Files**: README.md, cicd/, terraform/, argocd/, docs/
+**文件**: README.md、kubernetes/、monitoring/、tests/
 
 ---
 
-## 📝 Assessments
+### 项目 03：带实验追踪的 ML 流水线
+**路径**: `projects/project-03-ml-pipeline-tracking/`
+**时长**: 80 小时 | **难度**: 中级
 
-**Path**: `assessments/`
+**描述**: 构建一个完整的 ML 训练流水线，使用 MLflow 进行实验追踪和模型版本管理。
 
-### Quizzes
-- Module quizzes (multiple choice, short answer)
-- Concept verification
-- Best practices questions
+**技术栈**: MLflow、Airflow/Prefect、DVC、S3/GCS
 
-### Practical Exams
-- Hands-on coding challenges
-- Infrastructure setup tasks
-- Debugging scenarios
-- Time-boxed projects
+**学习成果**:
+- 实现实验追踪
+- 使用 DVC 管理数据集版本
+- 构建自动化流水线
+- 追踪模型血缘关系
+- 比较模型版本
 
-### Rubrics
-- Project grading criteria
-- Code quality standards
-- Documentation requirements
-- Completeness checklists
+**文件**: README.md、pipeline/、mlflow/、dvc/
 
 ---
 
-## 📚 Resources
+### 项目 04：监控与告警系统
+**路径**: `projects/project-04-monitoring-alerting/`
+**时长**: 70 小时 | **难度**: 中级
 
-### Tools & Software
+**描述**: 为 ML 基础设施实现全面的监控、日志记录和告警。
+
+**技术栈**: Prometheus、Grafana、ELK Stack、AlertManager
+
+**学习成果**:
+- 采集和存储指标
+- 构建自定义仪表盘
+- 聚合和搜索日志
+- 设置告警规则
+- 实现 SLO/SLI
+
+**文件**: README.md、prometheus/、grafana/、logging/
+
+---
+
+### 项目 05：生产级 ML 结业项目
+**路径**: `projects/project-05-production-ml-capstone/`
+**时长**: 90 小时 | **难度**: 高级
+
+**描述**: 端到端生产级 ML 系统，结合之前所有概念，包含 CI/CD、监控和多环境部署。
+
+**技术栈**: 之前所有技术 + Jenkins/GitHub Actions、Terraform、ArgoCD
+
+**学习成果**:
+- 为 ML 实现 CI/CD
+- 多环境部署（dev/staging/prod）
+- 基础设施即代码
+- GitOps 工作流
+- 生产级安全
+
+**文件**: README.md、cicd/、terraform/、argocd/、docs/
+
+---
+
+## 📝 评估
+
+**路径**: `assessments/`
+
+### 测验
+- 模块测验（选择题、简答题）
+- 概念验证
+- 最佳实践问题
+
+### 实践考试
+- 动手编码挑战
+- 基础设施搭建任务
+- 调试场景
+- 限时项目
+
+### 评分标准
+- 项目评分标准
+- 代码质量标准
+- 文档要求
+- 完整性检查清单
+
+---
+
+## 📚 资源
+
+### 工具与软件
 - Python 3.11+
 - Docker Desktop
-- kubectl and minikube
-- VS Code or PyCharm
+- kubectl 和 minikube
+- VS Code 或 PyCharm
 - Git
-- Cloud CLI tools (AWS CLI, gcloud, az)
+- 云 CLI 工具（AWS CLI、gcloud、az）
 
-### Reading Lists
+### 阅读清单
 - "Designing Machine Learning Systems" - Chip Huyen
 - "The DevOps Handbook"
-- Kubernetes documentation
-- Docker documentation
-- MLOps community resources
+- Kubernetes 文档
+- Docker 文档
+- MLOps 社区资源
 
-### References
-- Official documentation links
-- Tutorial collections
-- Blog posts and articles
-- Video courses
-- Community forums
-
----
-
-## 🎯 Recommended Learning Sequence
-
-### Week 1-2: Foundations
-- Complete Modules 001-003
-- Set up development environment
-- Practice Python scripting
-- Master Git workflows
-
-### Week 3-4: ML & Containers
-- Complete Modules 004-005
-- Train simple ML models
-- Build Docker images
-- Deploy containerized applications
-
-### Week 5-6: Orchestration
-- Complete Module 006
-- Deploy to Kubernetes
-- Work with Helm charts
-- Practice kubectl commands
-
-### Week 7-8: Infrastructure Services
-- Complete Modules 007-010
-- Build REST APIs
-- Set up databases
-- Configure monitoring
-- Deploy to cloud
-
-### Week 9-18: Projects (2 weeks each)
-- Project 01: Simple API (2 weeks)
-- Project 02: Kubernetes (2 weeks)
-- Project 03: ML Pipeline (2 weeks)
-- Project 04: Monitoring (2 weeks)
-- Project 05: Capstone (2 weeks)
-
-### Week 19-20: Polish & Portfolio
-- Refine all projects
-- Complete documentation
-- Prepare portfolio
-- Practice interviews
+### 参考资料
+- 官方文档链接
+- 教程集合
+- 博客文章
+- 视频课程
+- 社区论坛
 
 ---
 
-## 📊 Progress Tracking
+## 🎯 推荐学习顺序
 
-Track your progress through the curriculum:
+### 第 1-2 周：基础
+- 完成模块 001-003
+- 搭建开发环境
+- 练习 Python 脚本
+- 掌握 Git 工作流
 
-### Modules Completed: [ ] / 10
-- [ ] Module 001: Python Fundamentals
-- [ ] Module 002: Linux Essentials
-- [ ] Module 003: Git & Version Control
-- [ ] Module 004: ML Basics
-- [ ] Module 005: Docker & Containerization
-- [ ] Module 006: Kubernetes Introduction
-- [ ] Module 007: APIs & Web Services
-- [ ] Module 008: Databases & SQL
-- [ ] Module 009: Monitoring & Logging
-- [ ] Module 010: Cloud Platforms
+### 第 3-4 周：ML 与容器
+- 完成模块 004-005
+- 训练简单 ML 模型
+- 构建 Docker 镜像
+- 部署容器化应用
 
-### Projects Completed: [ ] / 5
-- [ ] Project 01: Simple Model API
-- [ ] Project 02: Kubernetes Serving
-- [ ] Project 03: ML Pipeline
-- [ ] Project 04: Monitoring System
-- [ ] Project 05: Production Capstone
+### 第 5-6 周：编排
+- 完成模块 006
+- 部署到 Kubernetes
+- 使用 Helm Chart
+- 练习 kubectl 命令
 
-### Skills Mastered:
-- [ ] Python programming for infrastructure
-- [ ] Linux command line and scripting
-- [ ] Git and version control
-- [ ] Docker containerization
-- [ ] Kubernetes orchestration
-- [ ] REST API development
-- [ ] Database management
-- [ ] Monitoring and observability
-- [ ] Cloud platform deployment
-- [ ] CI/CD implementation
+### 第 7-8 周：基础设施服务
+- 完成模块 007-010
+- 构建 REST API
+- 搭建数据库
+- 配置监控
+- 部署到云平台
 
----
+### 第 9-18 周：项目（每个 2 周）
+- 项目 01：简单 API（2 周）
+- 项目 02：Kubernetes（2 周）
+- 项目 03：ML 流水线（2 周）
+- 项目 04：监控（2 周）
+- 项目 05：结业项目（2 周）
 
-## 🤝 Getting Help
-
-### Stuck on Something?
-1. Check the module's resources section
-2. Review the lecture notes again
-3. Look at code examples in the solutions repo
-4. Ask in GitHub Discussions
-5. Create an issue with the question template
-
-### Contributing
-Found an error or want to improve content? See [CONTRIBUTING.md](CONTRIBUTING.md)
-
-### Support
-- 📧 Email: ai-infra-curriculum@joshua-ferguson.com
-- 💬 GitHub Discussions: [Link to discussions]
-- 🐛 Issues: [Link to issues]
+### 第 19-20 周：打磨与作品集
+- 优化所有项目
+- 完善文档
+- 准备作品集
+- 练习面试
 
 ---
 
-## 📈 What's Next?
+## 📊 进度追踪
 
-After completing this curriculum, you'll be ready for:
-- Junior AI Infrastructure Engineer roles
-- MLOps Engineer positions
-- Platform Engineer roles (entry-level)
-- Cloud Engineer positions
-- Further specialization in:
-  - ML Platform Engineering
+跟踪你在课程中的学习进度：
+
+### 已完成模块：[ ] / 10
+- [ ] 模块 001：Python 基础
+- [ ] 模块 002：Linux 基础
+- [ ] 模块 003：Git 与版本控制
+- [ ] 模块 004：ML 基础
+- [ ] 模块 005：Docker 与容器化
+- [ ] 模块 006：Kubernetes 入门
+- [ ] 模块 007：API 与网络服务
+- [ ] 模块 008：数据库与 SQL
+- [ ] 模块 009：监控与日志记录
+- [ ] 模块 010：云平台
+
+### 已完成项目：[ ] / 5
+- [ ] 项目 01：简单模型 API
+- [ ] 项目 02：Kubernetes 服务
+- [ ] 项目 03：ML 流水线
+- [ ] 项目 04：监控系统
+- [ ] 项目 05：生产级结业项目
+
+### 已掌握技能：
+- [ ] 用于基础设施的 Python 编程
+- [ ] Linux 命令行和脚本
+- [ ] Git 和版本控制
+- [ ] Docker 容器化
+- [ ] Kubernetes 编排
+- [ ] REST API 开发
+- [ ] 数据库管理
+- [ ] 监控和可观测性
+- [ ] 云平台部署
+- [ ] CI/CD 实现
+
+---
+
+## 🤝 获取帮助
+
+### 遇到困难？
+1. 查看模块的资源部分
+2. 再次复习讲座笔记
+3. 查看解答仓库中的代码示例
+4. 在 GitHub Discussions 中提问
+5. 使用问题模板创建一个 Issue
+
+### 贡献
+发现错误或想改进内容？请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)
+
+### 支持
+- 📧 邮件：ai-infra-curriculum@joshua-ferguson.com
+- 💬 GitHub Discussions：[Discussions 链接]
+- 🐛 Issues：[Issues 链接]
+
+---
+
+## 📈 下一步？
+
+完成本课程后，你将胜任：
+- 初级 AI 基础设施工程师岗位
+- MLOps 工程师岗位
+- 平台工程师岗位（入门级）
+- 云工程师岗位
+- 进一步专攻：
+  - ML 平台工程
   - MLOps
-  - AI Infrastructure Security
-  - Performance Engineering
+  - AI 基础设施安全
+  - 性能工程
 
-Consider advancing to:
-- **AI Infrastructure Engineer** (mid-level curriculum)
-- **Specialized tracks** (MLOps, Platform, Security)
-- **Certifications** (CKA, AWS ML Specialty, etc.)
-
----
-
-## 🎓 Certification & Portfolio
-
-### Portfolio Recommendations
-Include in your portfolio:
-- All 5 completed projects with live demos
-- GitHub repository with clean code
-- Architecture diagrams
-- Deployment documentation
-- Blog posts explaining your implementations
-
-### Recommended Certifications
-- Kubernetes: CKA (Certified Kubernetes Administrator)
-- AWS: Solutions Architect Associate + ML Specialty
-- Docker: Docker Certified Associate
-- Python: PCEP/PCAP
+考虑进阶到：
+- **AI Infrastructure Engineer**（中级课程）
+- **专业方向**（MLOps、平台、安全）
+- **认证**（CKA、AWS ML Specialty 等）
 
 ---
 
-**Last Updated**: 2025-10-24
-**Content Status**: ✅ Production-Ready
-**Total Learning Hours**: 440 hours
-**Success Rate**: 95%+ job placement for completers
+## 🎓 认证与作品集
 
-Good luck on your AI Infrastructure journey! 🚀
+### 作品集建议
+在你的作品集中包含：
+- 全部 5 个已完成的项目及在线演示
+- 代码整洁的 GitHub 仓库
+- 架构图
+- 部署文档
+- 解释你实现的博客文章
+
+### 推荐认证
+- Kubernetes：CKA（认证 Kubernetes 管理员）
+- AWS：解决方案架构师助理 + ML 专业认证
+- Docker：Docker 认证助理
+- Python：PCEP/PCAP
+
+---
+
+**最后更新**: 2025-10-24
+**内容状态**: ✅ 生产就绪
+**总学习时长**: 440 小时
+**成功就业率**: 学习完成者就业率 95%+
+
+祝你在 AI 基础设施之旅中好运！🚀

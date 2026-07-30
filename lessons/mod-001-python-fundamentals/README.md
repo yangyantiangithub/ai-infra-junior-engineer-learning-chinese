@@ -1,391 +1,391 @@
-# Module 001: Python Fundamentals for AI Infrastructure
-
-## Module Overview
-
-Welcome to the foundational module for Python programming in AI Infrastructure! This module is specifically designed to equip you with the Python skills needed to build, deploy, and manage AI/ML systems in production environments.
-
-Unlike general Python courses, this curriculum focuses on the intersection of Python programming and infrastructure engineering - teaching you not just how to write Python code, but how to write production-grade infrastructure code that supports machine learning workloads.
-
-## Why Python for AI Infrastructure?
-
-Python has become the lingua franca of AI/ML infrastructure for several compelling reasons:
-
-1. **ML Framework Ecosystem**: TensorFlow, PyTorch, scikit-learn, and virtually all major ML frameworks use Python as their primary interface
-2. **Infrastructure Tooling**: Tools like Airflow, MLflow, Kubeflow, and Ray are all Python-based
-3. **Automation & Orchestration**: Python excels at scripting, automation, and orchestrating complex workflows
-4. **Cloud SDK Support**: Every major cloud provider offers comprehensive Python SDKs
-5. **Data Processing**: Libraries like pandas, numpy, and dask make data manipulation straightforward
-6. **Community & Resources**: Massive ecosystem with solutions for virtually any infrastructure challenge
-
-## Learning Objectives
-
-By the end of this module, you will be able to:
-
-### Core Python Competencies
-- Set up and manage isolated Python environments using venv and virtualenv
-- Manage dependencies with pip, requirements.txt, and understand dependency resolution
-- Write type-annotated Python code using modern type hints (PEP 484, 585, 604)
-- Implement comprehensive logging strategies for production systems
-- Handle configuration management for applications across multiple environments
-- Work with file systems, subprocess calls, and system-level operations
-- Build command-line interfaces (CLIs) using argparse and modern alternatives
-
-### Infrastructure-Specific Skills
-- Write Python scripts that orchestrate infrastructure operations
-- Implement error handling and retry logic for distributed systems
-- Use Python for monitoring data collection and metric aggregation
-- Parse and generate configuration files (YAML, JSON, TOML)
-- Interact with REST APIs using requests and httpx
-- Implement concurrent operations using threading, multiprocessing, and asyncio
-- Write testable, maintainable infrastructure code
-
-### Professional Development Practices
-- Write comprehensive unit tests using pytest
-- Implement code quality checks with linters (pylint, flake8, ruff)
-- Format code consistently using black and isort
-- Generate and maintain documentation with docstrings and type hints
-- Debug Python applications using pdb and logging
-- Profile Python code to identify performance bottlenecks
-
-## Module Structure
-
-This module is organized into five comprehensive lectures, each building upon the previous:
-
-### Lecture 01: Python Environment & Dependency Management (Week 1)
-**Duration**: 6-8 hours
-- Virtual environments and isolation
-- Package management with pip
-- Requirements files and lock files
-- Python version management with pyenv
-- Setting up development environments
-
-### Lecture 02: Advanced Python for Infrastructure (Week 2)
-**Duration**: 8-10 hours
-- Type hints and static type checking
-- Logging best practices for production systems
-- Configuration management patterns
-- Working with different data formats
-- Error handling and exception strategies
-
-### Lecture 03: Python for DevOps Operations (Week 3)
-**Duration**: 8-10 hours
-- Subprocess management and shell interaction
-- File and directory operations
-- Building CLI tools with argparse
-- Working with environment variables
-- Parsing command-line arguments
-
-### Lecture 04: Asynchronous Programming (Week 4)
-**Duration**: 6-8 hours
-- Understanding async/await syntax
-- Running concurrent tasks with asyncio
-- Async HTTP requests with httpx
-- Error handling in async code
-- Async context managers and generators
-- Common async patterns for AI infrastructure
-
-### Lecture 05: Testing and Code Quality (Week 5)
-**Duration**: 8-10 hours
-- Unit testing with pytest
-- Test fixtures and parametrization
-- Testing async functions
-- Mocking and patching in tests
-- Code coverage analysis
-- Linting and formatting tools (Black, Ruff, isort)
-- Type checking with mypy
-- Pre-commit hooks and automation
-
-## Prerequisites
-
-### Required Knowledge
-- Basic programming concepts (variables, loops, conditionals, functions)
-- Familiarity with command-line interfaces
-- Basic understanding of software development concepts
-- Access to a Linux/Unix environment (WSL on Windows is acceptable)
-
-### Recommended Background
-- Some exposure to Python (even tutorial-level)
-- Basic understanding of how applications use libraries
-- Awareness of version control concepts (covered in Module 003)
-
-### Technical Requirements
-- Computer with at least 8GB RAM
-- Python 3.11 or later installed
-- Text editor or IDE (VS Code, PyCharm, or vim)
-- Terminal/shell access
-- Internet connection for package downloads
-
-## Learning Timeline
-
-### Week 1: Environment Setup & Fundamentals
-- **Day 1-2**: Lecture 01 (Python Environment)
-- **Day 3**: Exercise 01 (Environment Setup)
-- **Day 4**: Practice and exploration
-- **Day 5**: Module 001 Quiz (sections 1-2)
-
-### Week 2: Advanced Patterns
-- **Day 1-2**: Lecture 02 (Advanced Python)
-- **Day 3**: Exercise 02 (Type Hints)
-- **Day 4**: Exercise 03 (Logging)
-- **Day 5**: Review and practice
-
-### Week 3: DevOps Operations
-- **Day 1-2**: Lecture 03 (Python DevOps)
-- **Day 3-4**: Practice exercises
-- **Day 5**: Integration practice
-
-### Week 4: Asynchronous Programming
-- **Day 1-2**: Lecture 04 (Async Programming)
-- **Day 3**: Exercise 06 (Async Programming)
-- **Day 4-5**: Practice and experimentation
-
-### Week 5: Quality & Testing
-- **Day 1-2**: Lecture 05 (Testing & Code Quality)
-- **Day 3**: Exercise 07 (Testing)
-- **Day 4**: Practice and project work
-- **Day 5**: Complete module assessment
-
-**Total Estimated Time**: 38-48 hours
-
-## Topics Covered
-
-### 1. Python Environment Management
-- Virtual environment creation and activation
-- Understanding site-packages and Python paths
-- Managing multiple Python versions
-- Dependency isolation strategies
-- Reproducible environment creation
-
-### 2. Package & Dependency Management
-- Using pip effectively
-- Requirements.txt best practices
-- Understanding semantic versioning
-- Lock files and deterministic builds
-- Private package repositories
-
-### 3. Type Hints & Static Typing
-- Basic type annotations (str, int, float, bool)
-- Complex types (List, Dict, Optional, Union)
-- Type aliases and custom types
-- Generic types and protocols
-- Using mypy for type checking
-
-### 4. Logging for Production Systems
-- Python logging module architecture
-- Log levels and when to use them
-- Structured logging with JSON
-- Log formatters and handlers
-- Centralized logging considerations
-
-### 5. Configuration Management
-- Configuration file formats (YAML, JSON, TOML, .env)
-- Environment-specific configurations
-- Configuration validation
-- Secrets management basics
-- Configuration precedence patterns
-
-### 6. File & System Operations
-- Path manipulation with pathlib
-- Reading and writing files safely
-- Directory traversal and manipulation
-- File permissions and attributes
-- Temporary files and cleanup
-
-### 7. Subprocess & Shell Integration
-- Running external commands safely
-- Capturing stdout and stderr
-- Error handling for subprocess calls
-- Streaming output from long-running processes
-- Shell vs direct command execution
-
-### 8. Building CLI Tools
-- Argument parsing with argparse
-- Subcommands and nested parsers
-- Input validation
-- Help text and documentation
-- Interactive prompts
-
-### 9. Testing with pytest
-- Writing effective unit tests
-- Test organization and discovery
-- Fixtures for setup and teardown
-- Parametrized tests for multiple scenarios
-- Test coverage measurement
-
-### 10. Code Quality & Tooling
-- Linting with pylint, flake8, and ruff
-- Automatic formatting with black
-- Import sorting with isort
-- Type checking with mypy
-- Pre-commit hooks for automation
-
-## Exercises
-
-### Exercise 01: Environment Setup & Management
-**Difficulty**: Beginner
-**Duration**: 2-3 hours
-**Related to**: Lecture 01
-
-Create a complete Python project with proper environment management, including:
-- Virtual environment setup
-- Requirements file with pinned versions
-- Development vs production dependencies
-- Environment activation scripts
-- README with setup instructions
-
-### Exercise 02: Type Hints Implementation
-**Difficulty**: Intermediate
-**Duration**: 2-3 hours
-**Related to**: Lecture 02
-
-Take a provided untyped Python module and add comprehensive type hints:
-- Function signatures with input/output types
-- Complex nested types
-- Type aliases for readability
-- Pass mypy strict mode checks
-- Document type design decisions
-
-### Exercise 03: Logging Implementation
-**Difficulty**: Intermediate
-**Duration**: 3-4 hours
-**Related to**: Lecture 02
-
-Implement a comprehensive logging strategy for a multi-module application:
-- Configure root and module-level loggers
-- Implement structured JSON logging
-- Add context to log messages
-- Configure file and console handlers
-- Implement log rotation
-
-### Exercise 06: Async Programming
-**Difficulty**: Intermediate
-**Duration**: 4-5 hours
-**Related to**: Lecture 04
-
-Build a concurrent model monitoring system using async/await:
-- Monitor multiple model endpoints concurrently
-- Implement async HTTP health checks
-- Handle timeouts and retries
-- Aggregate monitoring results
-- Generate health status reports
-
-### Exercise 07: Testing with pytest
-**Difficulty**: Intermediate
-**Duration**: 4-5 hours
-**Related to**: Lecture 05
-
-Write comprehensive test suites for infrastructure code:
-- Unit tests with pytest
-- Test fixtures for reusable setup
-- Parametrized tests for multiple scenarios
-- Test async functions
-- Mock external dependencies
-- Achieve >80% code coverage
-
-## Quizzes & Assessments
-
-### Module 001 Quiz
-**Format**: 20 multiple-choice and short-answer questions
-**Duration**: 30-45 minutes
-**Passing Score**: 80% (16/20 correct)
-
-**Topics Covered**:
-- Virtual environment concepts (4 questions)
-- Package management (3 questions)
-- Type hints syntax and usage (4 questions)
-- Logging best practices (3 questions)
-- Testing fundamentals (3 questions)
-- Code quality tools (3 questions)
-
-### Practical Assessment
-After completing all exercises, you'll work on a capstone project that combines all module topics:
-- Build a CLI tool for managing ML model deployments
-- Implement proper logging and error handling
-- Include comprehensive type hints
-- Write unit tests with 80%+ coverage
-- Follow code quality standards
-
-## Resources
-
-### Official Documentation
-- [Python Official Documentation](https://docs.python.org/3/)
-- [Python Packaging User Guide](https://packaging.python.org/)
-- [pytest Documentation](https://docs.pytest.org/)
-- [mypy Documentation](https://mypy.readthedocs.io/)
-
-### Recommended Reading
-- See `resources/recommended-reading.md` for curated articles and books
-- Python Enhancement Proposals (PEPs) for language features
-- Real Python tutorials for practical examples
-
-### Tools & Libraries
-- **Environment Management**: venv, virtualenv, pyenv, poetry
-- **Testing**: pytest, pytest-cov, pytest-mock
-- **Code Quality**: black, isort, flake8, pylint, ruff, mypy
-- **CLI Development**: argparse, click, typer
-- **Configuration**: pyyaml, python-dotenv, pydantic
-
-## Success Criteria
-
-You will have successfully completed this module when you can:
-
-✅ Create and manage virtual environments without looking up commands
-✅ Write requirements.txt files that ensure reproducible builds
-✅ Add type hints to any Python function or class
-✅ Implement logging that helps debug production issues
-✅ Build CLI tools that handle edge cases gracefully
-✅ Write unit tests that actually catch bugs
-✅ Run linters and formatters as part of your normal workflow
-✅ Debug Python code efficiently using logs and debugging tools
-✅ Handle configuration for multiple environments (dev, staging, prod)
-✅ Score 80% or higher on the module quiz
-
-## Connection to AI Infrastructure
-
-Everything in this module directly supports AI infrastructure work:
-
-- **Environment Management**: Ensures ML models run with correct dependency versions
-- **Type Hints**: Makes complex ML pipeline code maintainable
-- **Logging**: Critical for debugging model serving issues in production
-- **Configuration**: Manages hyperparameters and environment-specific settings
-- **Subprocess Calls**: Interacts with training jobs and infrastructure tools
-- **Testing**: Validates infrastructure code before deployment
-- **CLI Tools**: Builds utilities for model deployment and management
-
-## What's Next?
-
-After completing this module, you'll move on to:
-- **Module 002**: Linux Essentials for AI Infrastructure
-- **Module 003**: Git & Version Control
-- **Module 004**: Machine Learning Basics
-
-The Python skills you develop here will be used extensively in all subsequent modules and projects.
-
-## Getting Help
-
-### During the Module
-- Review lecture notes multiple times
-- Complete all exercises, even if challenging
-- Experiment with code examples
-- Read error messages carefully
-- Use Python's built-in help() function
-
-### External Resources
-- Python community forums and Stack Overflow
-- Python Discord servers and communities
-- Documentation for specific libraries
-- GitHub repositories with example code
-
-### Office Hours & Support
-- Refer to the main repository README for community support options
-- Create GitHub issues for content questions
-- Join discussion forums for peer learning
+# Module 001: AI 基础设施的 Python 基础
+
+## 模块概述
+
+欢迎来到 AI 基础设施中 Python 编程的基础模块！本模块专门设计用于为你提供构建、部署和管理生产环境中 AI/ML 系统所需的 Python 技能。
+
+与通用的 Python 课程不同，本课程聚焦于 Python 编程与基础设施工程的交叉领域——不仅教你如何编写 Python 代码，更教你如何编写支持机器学习工作负载的生产级基础设施代码。
+
+## 为什么选择 Python 用于 AI 基础设施？
+
+Python 已成为 AI/ML 基础设施的通用语言，原因如下：
+
+1. **ML 框架生态**：TensorFlow、PyTorch、scikit-learn 以及几乎所有主流 ML 框架都使用 Python 作为主要接口
+2. **基础设施工具**：Airflow、MLflow、Kubeflow 和 Ray 等工具均基于 Python
+3. **自动化与编排**：Python 擅长脚本编写、自动化和编排复杂工作流
+4. **云 SDK 支持**：每个主流云提供商都提供全面的 Python SDK
+5. **数据处理**：pandas、numpy 和 dask 等库使数据处理变得简单直接
+6. **社区与资源**：庞大的生态系统，几乎能为任何基础设施挑战提供解决方案
+
+## 学习目标
+
+完成本模块后，你将能够：
+
+### 核心 Python 能力
+- 使用 venv 和 virtualenv 设置和管理隔离的 Python 环境
+- 使用 pip、requirements.txt 管理依赖，并理解依赖解析
+- 使用现代类型提示（PEP 484, 585, 604）编写类型注解的 Python 代码
+- 为生产系统实现全面的日志记录策略
+- 处理跨多环境的应用程序配置管理
+- 使用文件系统、子进程调用和系统级操作
+- 使用 argparse 和现代替代方案构建命令行界面（CLI）
+
+### 基础设施特定技能
+- 编写编排基础设施操作的 Python 脚本
+- 为分布式系统实现错误处理和重试逻辑
+- 使用 Python 进行监控数据收集和指标聚合
+- 解析和生成配置文件（YAML、JSON、TOML）
+- 使用 requests 和 httpx 与 REST API 交互
+- 使用 threading、multiprocessing 和 asyncio 实现并发操作
+- 编写可测试、可维护的基础设施代码
+
+### 专业开发实践
+- 使用 pytest 编写全面的单元测试
+- 使用 linter（pylint、flake8、ruff）实施代码质量检查
+- 使用 black 和 isort 保持代码格式一致
+- 使用文档字符串和类型提示生成并维护文档
+- 使用 pdb 和日志记录调试 Python 应用程序
+- 分析 Python 代码以识别性能瓶颈
+
+## 模块结构
+
+本模块包含五个全面的讲座，每个讲座都建立在前一个的基础上：
+
+### Lecture 01：Python 环境与依赖管理（第 1 周）
+**时长**：6-8 小时
+- 虚拟环境与隔离
+- 使用 pip 进行包管理
+- 需求文件与锁定文件
+- 使用 pyenv 进行 Python 版本管理
+- 设置开发环境
+
+### Lecture 02：基础设施高级 Python（第 2 周）
+**时长**：8-10 小时
+- 类型提示与静态类型检查
+- 生产系统日志最佳实践
+- 配置管理模式
+- 处理不同数据格式
+- 错误处理与异常策略
+
+### Lecture 03：DevOps 操作的 Python（第 3 周）
+**时长**：8-10 小时
+- 子进程管理与 shell 交互
+- 文件和目录操作
+- 使用 argparse 构建 CLI 工具
+- 使用环境变量
+- 解析命令行参数
+
+### Lecture 04：异步编程（第 4 周）
+**时长**：6-8 小时
+- 理解 async/await 语法
+- 使用 asyncio 运行并发任务
+- 使用 httpx 进行异步 HTTP 请求
+- 异步代码中的错误处理
+- 异步上下文管理器和生成器
+- AI 基础设施的常见异步模式
+
+### Lecture 05：测试与代码质量（第 5 周）
+**时长**：8-10 小时
+- 使用 pytest 进行单元测试
+- 测试夹具与参数化
+- 测试异步函数
+- 测试中的模拟与修补
+- 代码覆盖率分析
+- 代码检查与格式化工具（Black、Ruff、isort）
+- 使用 mypy 进行类型检查
+- Pre-commit 钩子与自动化
+
+## 先决条件
+
+### 必备知识
+- 基本编程概念（变量、循环、条件语句、函数）
+- 熟悉命令行界面
+- 基本了解软件开发概念
+- 可访问 Linux/Unix 环境（Windows 上可使用 WSL）
+
+### 推荐背景
+- 有一些 Python 经验（即使是教程级别）
+- 基本了解应用程序如何使用库
+- 了解版本控制概念（将在 Module 003 中介绍）
+
+### 技术需求
+- 至少 8GB 内存的计算机
+- 已安装 Python 3.11 或更高版本
+- 文本编辑器或 IDE（VS Code、PyCharm 或 vim）
+- 终端/shell 访问权限
+- 用于下载包的网络连接
+
+## 学习时间线
+
+### 第 1 周：环境设置与基础
+- **第 1-2 天**：Lecture 01（Python 环境）
+- **第 3 天**：练习 01（环境设置）
+- **第 4 天**：练习与探索
+- **第 5 天**：Module 001 测验（第 1-2 节）
+
+### 第 2 周：高级模式
+- **第 1-2 天**：Lecture 02（高级 Python）
+- **第 3 天**：练习 02（类型提示）
+- **第 4 天**：练习 03（日志记录）
+- **第 5 天**：复习与练习
+
+### 第 3 周：DevOps 操作
+- **第 1-2 天**：Lecture 03（Python DevOps）
+- **第 3-4 天**：练习
+- **第 5 天**：集成练习
+
+### 第 4 周：异步编程
+- **第 1-2 天**：Lecture 04（异步编程）
+- **第 3 天**：练习 06（异步编程）
+- **第 4-5 天**：练习与实践
+
+### 第 5 周：质量与测试
+- **第 1-2 天**：Lecture 05（测试与代码质量）
+- **第 3 天**：练习 07（测试）
+- **第 4 天**：练习与项目工作
+- **第 5 天**：完成模块评估
+
+**预计总时间**：38-48 小时
+
+## 涵盖的主题
+
+### 1. Python 环境管理
+- 虚拟环境的创建与激活
+- 理解 site-packages 和 Python 路径
+- 管理多个 Python 版本
+- 依赖隔离策略
+- 可重现环境创建
+
+### 2. 包与依赖管理
+- 有效使用 pip
+- Requirements.txt 最佳实践
+- 理解语义化版本
+- 锁定文件与确定性构建
+- 私有包仓库
+
+### 3. 类型提示与静态类型
+- 基本类型注解（str、int、float、bool）
+- 复杂类型（List、Dict、Optional、Union）
+- 类型别名与自定义类型
+- 泛型类型与协议
+- 使用 mypy 进行类型检查
+
+### 4. 生产系统日志记录
+- Python 日志模块架构
+- 日志级别与使用时机
+- 使用 JSON 的结构化日志
+- 日志格式化程序与处理器
+- 集中式日志记录考虑
+
+### 5. 配置管理
+- 配置文件格式（YAML、JSON、TOML、.env）
+- 环境特定配置
+- 配置验证
+- 密钥管理基础
+- 配置优先级模式
+
+### 6. 文件与系统操作
+- 使用 pathlib 进行路径操作
+- 安全读写文件
+- 目录遍历与操作
+- 文件权限与属性
+- 临时文件与清理
+
+### 7. 子进程与 Shell 集成
+- 安全运行外部命令
+- 捕获标准输出和标准错误
+- 子进程调用的错误处理
+- 流式输出长时间运行的进程
+- Shell 与直接命令执行
+
+### 8. 构建 CLI 工具
+- 使用 argparse 进行参数解析
+- 子命令与嵌套解析器
+- 输入验证
+- 帮助文本与文档
+- 交互式提示
+
+### 9. 使用 pytest 进行测试
+- 编写有效的单元测试
+- 测试组织与发现
+- 用于设置和拆卸的夹具
+- 多场景参数化测试
+- 测试覆盖率测量
+
+### 10. 代码质量与工具
+- 使用 pylint、flake8 和 ruff 进行代码检查
+- 使用 black 自动格式化
+- 使用 isort 进行导入排序
+- 使用 mypy 进行类型检查
+- 用于自动化的 Pre-commit 钩子
+
+## 练习
+
+### 练习 01：环境设置与管理
+**难度**：入门
+**时长**：2-3 小时
+**关联**：Lecture 01
+
+创建一个具有适当环境管理的完整 Python 项目，包括：
+- 虚拟环境设置
+- 带有固定版本的 requirements 文件
+- 开发与生产依赖分离
+- 环境激活脚本
+- 包含设置说明的 README
+
+### 练习 02：类型提示实现
+**难度**：中级
+**时长**：2-3 小时
+**关联**：Lecture 02
+
+为一个提供的无类型 Python 模块添加全面的类型提示：
+- 带输入/输出类型的函数签名
+- 复杂嵌套类型
+- 提高可读性的类型别名
+- 通过 mypy 严格模式检查
+- 记录类型设计决策
+
+### 练习 03：日志记录实现
+**难度**：中级
+**时长**：3-4 小时
+**关联**：Lecture 02
+
+为一个多模块应用程序实现全面的日志记录策略：
+- 配置根日志记录器和模块级日志记录器
+- 实现结构化 JSON 日志记录
+- 向日志消息添加上下文
+- 配置文件和控制台处理器
+- 实现日志轮转
+
+### 练习 06：异步编程
+**难度**：中级
+**时长**：4-5 小时
+**关联**：Lecture 04
+
+使用 async/await 构建一个并发的模型监控系统：
+- 并发监控多个模型端点
+- 实现异步 HTTP 健康检查
+- 处理超时和重试
+- 聚合监控结果
+- 生成健康状态报告
+
+### 练习 07：使用 pytest 进行测试
+**难度**：中级
+**时长**：4-5 小时
+**关联**：Lecture 05
+
+为基础架构代码编写全面的测试套件：
+- 使用 pytest 进行单元测试
+- 用于可重用设置的测试夹具
+- 多场景参数化测试
+- 测试异步函数
+- 模拟外部依赖
+- 实现 >80% 代码覆盖率
+
+## 测验与评估
+
+### Module 001 测验
+**格式**：20 道选择题和简答题
+**时长**：30-45 分钟
+**及格分数**：80%（16/20 正确）
+
+**涵盖主题**：
+- 虚拟环境概念（4 题）
+- 包管理（3 题）
+- 类型提示语法与用法（4 题）
+- 日志记录最佳实践（3 题）
+- 测试基础（3 题）
+- 代码质量工具（3 题）
+
+### 实践评估
+完成所有练习后，你将进行一个综合所有模块主题的结业项目：
+- 构建用于管理 ML 模型部署的 CLI 工具
+- 实现适当的日志记录和错误处理
+- 包括全面的类型提示
+- 编写覆盖率 80%+ 的单元测试
+- 遵循代码质量标准
+
+## 资源
+
+### 官方文档
+- [Python 官方文档](https://docs.python.org/3/)
+- [Python 打包用户指南](https://packaging.python.org/)
+- [pytest 文档](https://docs.pytest.org/)
+- [mypy 文档](https://mypy.readthedocs.io/)
+
+### 推荐阅读
+- 参见 `resources/recommended-reading.md` 获取精选文章和书籍
+- 语言特性的 Python 增强提案（PEP）
+- Real Python 教程获取实用示例
+
+### 工具与库
+- **环境管理**：venv、virtualenv、pyenv、poetry
+- **测试**：pytest、pytest-cov、pytest-mock
+- **代码质量**：black、isort、flake8、pylint、ruff、mypy
+- **CLI 开发**：argparse、click、typer
+- **配置**：pyyaml、python-dotenv、pydantic
+
+## 成功标准
+
+当你能做到以下事项时，你已成功完成本模块：
+
+✅ 无需查阅命令即可创建和管理虚拟环境
+✅ 编写确保可重现构建的 requirements.txt 文件
+✅ 为任何 Python 函数或类添加类型提示
+✅ 实现有助于调试生产问题的日志记录
+✅ 构建能够优雅处理边缘情况的 CLI 工具
+✅ 编写能真正捕获错误的单元测试
+✅ 将 linter 和格式化工具作为日常工作流程的一部分
+✅ 使用日志和调试工具高效调试 Python 代码
+✅ 处理多环境（开发、预发布、生产）的配置
+✅ 在模块测验中得分 80% 或更高
+
+## 与 AI 基础设施的联系
+
+本模块中的所有内容都直接支持 AI 基础设施工作：
+
+- **环境管理**：确保 ML 模型使用正确的依赖版本运行
+- **类型提示**：使复杂的 ML 管道代码易于维护
+- **日志记录**：对调试生产中的模型服务问题至关重要
+- **配置**：管理超参数和环境特定设置
+- **子进程调用**：与训练作业和基础设施工具交互
+- **测试**：在部署前验证基础设施代码
+- **CLI 工具**：为模型部署和管理构建实用程序
+
+## 下一步是什么？
+
+完成本模块后，你将进入：
+- **Module 002**：AI 基础设施的 Linux 基础
+- **Module 003**：Git 与版本控制
+- **Module 004**：机器学习基础
+
+你在此处学习的 Python 技能将在所有后续模块和项目中广泛使用。
+
+## 获取帮助
+
+### 模块学习期间
+- 多次复习讲稿
+- 完成所有练习，即使有难度
+- 尝试代码示例
+- 仔细阅读错误消息
+- 使用 Python 内置的 help() 函数
+
+### 外部资源
+- Python 社区论坛和 Stack Overflow
+- Python Discord 服务器和社区
+- 特定库的文档
+- 包含示例代码的 GitHub 仓库
+
+### 办公时间与支持
+- 参考主仓库的 README 获取社区支持选项
+- 为内容问题创建 GitHub Issues
+- 加入讨论论坛进行同伴学习
 
 ---
 
-**Module Version**: 1.0
-**Last Updated**: October 2025
-**Estimated Completion Time**: 38-48 hours
-**Difficulty Level**: Beginner to Intermediate
+**模块版本**：1.0
+**最后更新**：2025 年 10 月
+**预计完成时间**：38-48 小时
+**难度级别**：入门到中级
 
-**Ready to begin?** Start with `lecture-notes/01-python-environment.md`
+**准备好开始了吗？** 从 `lecture-notes/01-python-environment.md` 开始

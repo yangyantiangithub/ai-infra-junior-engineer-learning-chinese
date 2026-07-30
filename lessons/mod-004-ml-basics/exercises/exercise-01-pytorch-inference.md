@@ -1,49 +1,49 @@
-# Exercise 01: PyTorch Model Inference
+# 练习 01：PyTorch 模型推理
 
-## Exercise Overview
+## 练习概述
 
-**Objective**: Load a pre-trained PyTorch image classification model, run inference on real images, and measure performance metrics.
+**目标**：加载预训练的 PyTorch 图像分类模型，对真实图像运行推理，并测量性能指标。
 
-**Difficulty**: Beginner
-**Estimated Time**: 2-3 hours
-**Prerequisites**: Lecture 02 (PyTorch Basics)
+**难度**：初级
+**预计时间**：2-3 小时
+**前置要求**：讲座 02（PyTorch 基础）
 
-**What You'll Learn**:
-- Loading pre-trained models from PyTorch Hub
-- Preprocessing images for model input
-- Running inference in eval mode
-- Measuring inference latency and throughput
-- Handling CPU vs GPU execution
-
----
-
-## Learning Objectives
-
-By the end of this exercise, you will be able to:
-
-✅ Load pre-trained PyTorch models from various sources
-✅ Preprocess images to match model requirements
-✅ Run inference correctly with `model.eval()` and `torch.no_grad()`
-✅ Measure and optimize inference performance
-✅ Handle device management (CPU/GPU)
-✅ Debug common inference errors
+**你将学到**：
+- 从 PyTorch Hub 加载预训练模型
+- 预处理图像以供模型输入
+- 在 eval 模式下运行推理
+- 测量推理延迟和吞吐量
+- 处理 CPU vs GPU 执行
 
 ---
 
-## Part 1: Environment Setup
+## 学习目标
 
-### Step 1.1: Install Dependencies
+到本练习结束时，你将能够：
+
+✅ 从多种来源加载预训练 PyTorch 模型
+✅ 预处理图像以匹配模型要求
+✅ 使用 `model.eval()` 和 `torch.no_grad()` 正确运行推理
+✅ 测量和优化推理性能
+✅ 处理设备管理（CPU/GPU）
+✅ 调试常见的推理错误
+
+---
+
+## 第 1 部分：环境设置
+
+### 步骤 1.1：安装依赖
 
 ```bash
-# Create virtual environment
+# 创建虚拟环境
 python -m venv pytorch_inference_env
-source pytorch_inference_env/bin/activate  # On Windows: pytorch_inference_env\Scripts\activate
+source pytorch_inference_env/bin/activate  # Windows: pytorch_inference_env\Scripts\activate
 
-# Install PyTorch and dependencies
+# 安装 PyTorch 和依赖
 pip install torch torchvision pillow requests
 ```
 
-### Step 1.2: Verify Installation
+### 步骤 1.2：验证安装
 
 ```python
 # verify_installation.py
@@ -61,7 +61,7 @@ else:
     print("Running on CPU")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 PyTorch version: 2.1.0+cu118
 Torchvision version: 0.16.0+cu118
@@ -70,13 +70,13 @@ CUDA version: 11.8
 GPU: NVIDIA Tesla T4
 ```
 
-### Step 1.3: Download Test Images
+### 步骤 1.3：下载测试图像
 
 ```python
 # download_images.py
 import urllib.request
 
-# Download sample images
+# 下载样本图像
 images = {
     "dog.jpg": "https://github.com/pytorch/hub/raw/master/images/dog.jpg",
     "cat.jpg": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg",
@@ -90,30 +90,30 @@ for filename, url in images.items():
 print("All images downloaded!")
 ```
 
-✅ **Checkpoint**: You should have Python environment set up and 3 test images downloaded.
+✅ **检查点**：你应该已经设置好 Python 环境并下载了 3 张测试图像。
 
 ---
 
-## Part 2: Loading Pre-trained Models
+## 第 2 部分：加载预训练模型
 
-### Step 2.1: Load ResNet50 from PyTorch Hub
+### 步骤 2.1：从 PyTorch Hub 加载 ResNet50
 
 ```python
 # load_model.py
 import torch
 
-# Load pre-trained ResNet50
+# 加载预训练 ResNet50
 print("Loading ResNet50...")
 model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet50', pretrained=True)
 
-# CRITICAL: Set to evaluation mode
+# 关键：设置为评估模式
 model.eval()
 
 print(f"Model loaded: {model.__class__.__name__}")
 print(f"Number of parameters: {sum(p.numel() for p in model.parameters()):,}")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 Loading ResNet50...
 Downloading: 100%|██████████| 97.8M/97.8M
@@ -121,9 +121,9 @@ Model loaded: ResNet
 Number of parameters: 25,557,032
 ```
 
-### Step 2.2: Understanding Model Architecture
+### 步骤 2.2：理解模型架构
 
-**Task**: Examine the model structure to understand its layers.
+**任务**：检查模型结构以理解其层。
 
 ```python
 # examine_model.py
@@ -131,11 +131,11 @@ import torch
 
 model = torch.hub.load('pytorch/vision', 'resnet50', pretrained=True)
 
-# Print model summary
+# 打印模型摘要
 print("Model Architecture:")
 print(model)
 
-# Count layers by type
+# 按类型统计层数
 layer_counts = {}
 for name, module in model.named_modules():
     layer_type = module.__class__.__name__
@@ -145,25 +145,25 @@ print("\nLayer Counts:")
 for layer_type, count in sorted(layer_counts.items()):
     print(f"  {layer_type}: {count}")
 
-# Model input requirements
+# 模型输入要求
 print("\nModel Expectations:")
 print("  Input shape: [batch_size, 3, 224, 224]")
 print("  Input type: float32 tensor")
 print("  Output shape: [batch_size, 1000] (ImageNet classes)")
 ```
 
-**Questions to Answer** (write your answers):
-1. How many convolutional layers does ResNet50 have?
-2. What is the expected input shape?
-3. How many output classes does the model predict?
+**要回答的问题**（写下你的答案）：
+1. ResNet50 有多少个卷积层？
+2. 预期的输入形状是什么？
+3. 模型预测多少个输出类别？
 
-✅ **Checkpoint**: Model loaded successfully and you understand its architecture.
+✅ **检查点**：模型加载成功，你理解了其架构。
 
 ---
 
-## Part 3: Image Preprocessing
+## 第 3 部分：图像预处理
 
-### Step 3.1: Implement Preprocessing Pipeline
+### 步骤 3.1：实现预处理管道
 
 ```python
 # preprocess.py
@@ -172,24 +172,24 @@ from torchvision import transforms
 from PIL import Image
 
 def create_preprocessing_pipeline():
-    """Create image preprocessing pipeline for ResNet models"""
+    """为 ResNet 模型创建图像预处理管道"""
     return transforms.Compose([
-        transforms.Resize(256),                # Resize shortest side to 256
-        transforms.CenterCrop(224),            # Crop center 224x224
-        transforms.ToTensor(),                 # Convert to tensor [0, 1]
-        transforms.Normalize(                  # Normalize with ImageNet stats
+        transforms.Resize(256),                # 将最短边调整为 256
+        transforms.CenterCrop(224),            # 中心裁剪 224x224
+        transforms.ToTensor(),                 # 转换为 tensor [0, 1]
+        transforms.Normalize(                  # 使用 ImageNet 统计数据进行归一化
             mean=[0.485, 0.456, 0.406],
             std=[0.229, 0.224, 0.225]
         ),
     ])
 
 def preprocess_image(image_path: str):
-    """Load and preprocess an image"""
-    # Load image
+    """加载并预处理图像"""
+    # 加载图像
     image = Image.open(image_path).convert('RGB')
     print(f"Original image size: {image.size}")
 
-    # Apply preprocessing
+    # 应用预处理
     preprocess = create_preprocessing_pipeline()
     tensor = preprocess(image)
 
@@ -197,17 +197,17 @@ def preprocess_image(image_path: str):
     print(f"Tensor dtype: {tensor.dtype}")
     print(f"Tensor range: [{tensor.min():.3f}, {tensor.max():.3f}]")
 
-    # Add batch dimension [C, H, W] -> [1, C, H, W]
+    # 添加 batch 维度 [C, H, W] -> [1, C, H, W]
     batch = tensor.unsqueeze(0)
     print(f"Batch shape: {batch.shape}")
 
     return batch
 
-# Test preprocessing
+# 测试预处理
 image_tensor = preprocess_image("dog.jpg")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 Original image size: (576, 768)
 Preprocessed tensor shape: torch.Size([3, 224, 224])
@@ -216,27 +216,27 @@ Tensor range: [-2.118, 2.640]
 Batch shape: torch.Size([1, 3, 224, 224])
 ```
 
-### Step 3.2: Understand Preprocessing Steps
+### 步骤 3.2：理解预处理步骤
 
-**Task**: Answer these questions about preprocessing:
+**任务**：回答这些关于预处理的问题：
 
-1. **Why resize to 256 then crop to 224?**
-   - Hint: Preserves aspect ratio while getting correct size
+1. **为什么先缩放到 256 再裁剪到 224？**
+   - 提示：在保持纵横比的同时获得正确尺寸
 
-2. **What do the normalization values mean?**
-   - mean=[0.485, 0.456, 0.406]: ImageNet dataset mean for R, G, B
-   - std=[0.229, 0.224, 0.225]: ImageNet dataset std for R, G, B
+2. **归一化值的含义是什么？**
+   - mean=[0.485, 0.456, 0.406]：ImageNet 数据集的 R, G, B 均值
+   - std=[0.229, 0.224, 0.225]：ImageNet 数据集的 R, G, B 标准差
 
-3. **Why is the tensor range negative?**
-   - Hint: Normalization formula is (x - mean) / std
+3. **为什么 tensor 范围是负数？**
+   - 提示：归一化公式是 (x - mean) / std
 
-✅ **Checkpoint**: You can preprocess images correctly.
+✅ **检查点**：你能正确预处理图像了。
 
 ---
 
-## Part 4: Running Inference
+## 第 4 部分：运行推理
 
-### Step 4.1: Basic Inference
+### 步骤 4.1：基本推理
 
 ```python
 # inference.py
@@ -245,11 +245,11 @@ from torchvision import transforms
 from PIL import Image
 import urllib.request
 
-# Load model
+# 加载模型
 model = torch.hub.load('pytorch/vision', 'resnet50', pretrained=True)
-model.eval()  # IMPORTANT!
+model.eval()  # 重要！
 
-# Load and preprocess image
+# 加载并预处理图像
 preprocess = transforms.Compose([
     transforms.Resize(256),
     transforms.CenterCrop(224),
@@ -261,23 +261,23 @@ image = Image.open("dog.jpg")
 input_tensor = preprocess(image)
 input_batch = input_tensor.unsqueeze(0)
 
-# Run inference
-with torch.no_grad():  # IMPORTANT: Disable gradient computation
+# 运行推理
+with torch.no_grad():  # 重要：禁用梯度计算
     output = model(input_batch)
 
 print(f"Output shape: {output.shape}")  # [1, 1000]
 print(f"Output type: {output.dtype}")
-print(f"Output sample: {output[0, :5]}")  # First 5 values
+print(f"Output sample: {output[0, :5]}")  # 前 5 个值
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 Output shape: torch.Size([1, 1000])
 Output type: torch.float32
 Output sample: tensor([-1.2345,  0.5678, -0.9123,  1.4567, -0.3456])
 ```
 
-### Step 4.2: Get Top Predictions
+### 步骤 4.2：获取 Top 预测
 
 ```python
 # get_predictions.py
@@ -286,14 +286,14 @@ from torchvision import transforms
 from PIL import Image
 import urllib.request
 
-# Load ImageNet class labels
+# 加载 ImageNet 类别标签
 labels_url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
 urllib.request.urlretrieve(labels_url, "imagenet_classes.txt")
 
 with open("imagenet_classes.txt") as f:
     labels = [line.strip() for line in f.readlines()]
 
-# Load model and image
+# 加载模型和图像
 model = torch.hub.load('pytorch/vision', 'resnet50', pretrained=True)
 model.eval()
 
@@ -308,14 +308,14 @@ image = Image.open("dog.jpg")
 input_tensor = preprocess(image)
 input_batch = input_tensor.unsqueeze(0)
 
-# Run inference
+# 运行推理
 with torch.no_grad():
     output = model(input_batch)
 
-# Get probabilities
+# 获取概率
 probabilities = torch.nn.functional.softmax(output[0], dim=0)
 
-# Get top 5 predictions
+# 获取 top 5 预测
 top5_prob, top5_idx = torch.topk(probabilities, 5)
 
 print("Top 5 Predictions:")
@@ -325,7 +325,7 @@ for i in range(5):
     print(f"  {i+1}. {labels[class_idx]:<30} {prob*100:>6.2f}%")
 ```
 
-**Expected Output**:
+**预期输出**：
 ```
 Top 5 Predictions:
   1. Samoyed                      89.32%
@@ -335,13 +335,13 @@ Top 5 Predictions:
   5. Great Pyrenees                1.42%
 ```
 
-✅ **Checkpoint**: You can run inference and get meaningful predictions!
+✅ **检查点**：你能运行推理并得到有意义的预测结果了！
 
 ---
 
-## Part 5: Performance Measurement
+## 第 5 部分：性能测量
 
-### Step 5.1: Measure Inference Latency
+### 步骤 5.1：测量推理延迟
 
 ```python
 # measure_latency.py
@@ -350,11 +350,11 @@ from torchvision import transforms
 from PIL import Image
 import time
 
-# Load model
+# 加载模型
 model = torch.hub.load('pytorch/vision', 'resnet50', pretrained=True)
 model.eval()
 
-# Prepare input
+# 准备输入
 preprocess = transforms.Compose([
     transforms.Resize(256),
     transforms.CenterCrop(224),
@@ -365,13 +365,13 @@ preprocess = transforms.Compose([
 image = Image.open("dog.jpg")
 input_tensor = preprocess(image).unsqueeze(0)
 
-# Warmup (first run is slower)
+# 预热（首次运行较慢）
 print("Warming up...")
 with torch.no_grad():
     for _ in range(10):
         _ = model(input_tensor)
 
-# Measure latency
+# 测量延迟
 print("\nMeasuring latency...")
 iterations = 100
 start = time.time()
@@ -387,7 +387,7 @@ print(f"Average latency: {avg_latency_ms:.2f} ms")
 print(f"Throughput: {1000/avg_latency_ms:.2f} images/second")
 ```
 
-### Step 5.2: Batch Inference Performance
+### 步骤 5.2：批量推理性能
 
 ```python
 # batch_inference.py
@@ -397,20 +397,20 @@ import time
 model = torch.hub.load('pytorch/vision', 'resnet50', pretrained=True)
 model.eval()
 
-# Test different batch sizes
+# 测试不同的批大小
 batch_sizes = [1, 4, 8, 16, 32]
 print(f"{'Batch Size':<12} {'Latency (ms)':<15} {'Throughput (img/s)':<20}")
 
 for batch_size in batch_sizes:
-    # Create dummy batch
+    # 创建虚拟批次
     dummy_input = torch.rand(batch_size, 3, 224, 224)
 
-    # Warmup
+    # 预热
     with torch.no_grad():
         for _ in range(10):
             _ = model(dummy_input)
 
-    # Measure
+    # 测量
     iterations = 50
     start = time.time()
 
@@ -425,7 +425,7 @@ for batch_size in batch_sizes:
     print(f"{batch_size:<12} {latency_per_batch:<15.2f} {throughput:<20.2f}")
 ```
 
-**Expected Output (CPU)**:
+**预期输出（CPU）**：
 ```
 Batch Size   Latency (ms)    Throughput (img/s)
 1            45.23           22.11
@@ -435,32 +435,32 @@ Batch Size   Latency (ms)    Throughput (img/s)
 32           1156.78         27.67
 ```
 
-✅ **Checkpoint**: You can measure and understand inference performance.
+✅ **检查点**：你能测量和理解推理性能了。
 
 ---
 
-## Part 6: GPU Acceleration
+## 第 6 部分：GPU 加速
 
-### Step 6.1: CPU vs GPU Comparison
+### 步骤 6.1：CPU vs GPU 对比
 
 ```python
 # cpu_vs_gpu.py
 import torch
 import time
 
-# Load model
+# 加载模型
 model = torch.hub.load('pytorch/vision', 'resnet50', pretrained=True)
 model.eval()
 
-# Prepare input
+# 准备输入
 dummy_input = torch.rand(1, 3, 224, 224)
 
 def benchmark(model, input_tensor, device, iterations=100):
-    """Benchmark inference on specific device"""
+    """在特定设备上对推理进行基准测试"""
     model = model.to(device)
     input_tensor = input_tensor.to(device)
 
-    # Warmup
+    # 预热
     with torch.no_grad():
         for _ in range(10):
             _ = model(input_tensor)
@@ -468,7 +468,7 @@ def benchmark(model, input_tensor, device, iterations=100):
     if device.type == 'cuda':
         torch.cuda.synchronize()
 
-    # Measure
+    # 测量
     start = time.time()
     with torch.no_grad():
         for _ in range(iterations):
@@ -480,11 +480,11 @@ def benchmark(model, input_tensor, device, iterations=100):
     elapsed = time.time() - start
     return (elapsed / iterations) * 1000  # ms
 
-# Benchmark CPU
+# CPU 基准测试
 cpu_latency = benchmark(model, dummy_input, torch.device('cpu'))
 print(f"CPU latency: {cpu_latency:.2f} ms")
 
-# Benchmark GPU (if available)
+# GPU 基准测试（如果可用）
 if torch.cuda.is_available():
     gpu_latency = benchmark(model, dummy_input, torch.device('cuda'))
     print(f"GPU latency: {gpu_latency:.2f} ms")
@@ -493,20 +493,20 @@ else:
     print("GPU not available")
 ```
 
-**Expected Output (with GPU)**:
+**预期输出（有 GPU）**：
 ```
 CPU latency: 45.23 ms
 GPU latency: 3.45 ms
 Speedup: 13.11x
 ```
 
-✅ **Checkpoint**: You understand CPU vs GPU performance differences.
+✅ **检查点**：你理解了 CPU vs GPU 的性能差异。
 
 ---
 
-## Part 7: Complete Application
+## 第 7 部分：完整应用
 
-### Step 7.1: Build Image Classifier CLI
+### 步骤 7.1：构建图像分类器 CLI
 
 ```python
 # image_classifier.py
@@ -518,10 +518,10 @@ import time
 
 class ImageClassifier:
     def __init__(self, model_name='resnet50', device='auto'):
-        """Initialize image classifier"""
+        """初始化图像分类器"""
         print(f"Loading {model_name}...")
 
-        # Determine device
+        # 确定设备
         if device == 'auto':
             self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         else:
@@ -529,12 +529,12 @@ class ImageClassifier:
 
         print(f"Using device: {self.device}")
 
-        # Load model
+        # 加载模型
         self.model = torch.hub.load('pytorch/vision', model_name, pretrained=True)
         self.model.to(self.device)
         self.model.eval()
 
-        # Load labels
+        # 加载标签
         import urllib.request
         labels_url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
         urllib.request.urlretrieve(labels_url, "imagenet_classes.txt")
@@ -542,7 +542,7 @@ class ImageClassifier:
         with open("imagenet_classes.txt") as f:
             self.labels = [line.strip() for line in f.readlines()]
 
-        # Preprocessing pipeline
+        # 预处理管道
         self.preprocess = transforms.Compose([
             transforms.Resize(256),
             transforms.CenterCrop(224),
@@ -553,22 +553,22 @@ class ImageClassifier:
         print("Classifier ready!")
 
     def predict(self, image_path, top_k=5):
-        """Predict image class"""
-        # Load and preprocess image
+        """预测图像类别"""
+        # 加载并预处理图像
         image = Image.open(image_path).convert('RGB')
         input_tensor = self.preprocess(image)
         input_batch = input_tensor.unsqueeze(0).to(self.device)
 
-        # Run inference
+        # 运行推理
         start = time.time()
         with torch.no_grad():
             output = self.model(input_batch)
         inference_time = (time.time() - start) * 1000
 
-        # Get probabilities
+        # 获取概率
         probabilities = torch.nn.functional.softmax(output[0], dim=0)
 
-        # Get top k predictions
+        # 获取 top k 预测
         topk_prob, topk_idx = torch.topk(probabilities, top_k)
 
         results = []
@@ -592,14 +592,14 @@ def main():
 
     args = parser.parse_args()
 
-    # Create classifier
+    # 创建分类器
     classifier = ImageClassifier(model_name=args.model, device=args.device)
 
-    # Run prediction
+    # 运行预测
     print(f"\nClassifying: {args.image}")
     results, inference_time = classifier.predict(args.image, top_k=args.top_k)
 
-    # Print results
+    # 打印结果
     print(f"\nTop {args.top_k} Predictions (inference: {inference_time:.2f}ms):")
     for i, result in enumerate(results):
         print(f"  {i+1}. {result['class']:<30} {result['probability']*100:>6.2f}%")
@@ -608,80 +608,80 @@ if __name__ == "__main__":
     main()
 ```
 
-**Usage**:
+**使用方法**：
 ```bash
-# Classify an image
+# 分类一张图像
 python image_classifier.py dog.jpg
 
-# Use different model
+# 使用不同模型
 python image_classifier.py dog.jpg --model resnet18
 
-# Force CPU
+# 强制使用 CPU
 python image_classifier.py dog.jpg --device cpu
 
-# Get top 10 predictions
+# 获取 top 10 预测
 python image_classifier.py dog.jpg --top-k 10
 ```
 
-✅ **Checkpoint**: You have a complete, working image classifier!
+✅ **检查点**：你有了一个完整、可运行的图像分类器！
 
 ---
 
-## Stretch Goals (Optional Challenges)
+## 拓展目标（可选挑战）
 
-### Challenge 1: Multi-Image Batch Processing
+### 挑战 1：多图像批处理
 
-**Task**: Modify the classifier to process multiple images in a single batch.
+**任务**：修改分类器以在单批次中处理多张图像。
 
 ```python
 def predict_batch(self, image_paths, top_k=5):
-    """Predict classes for multiple images"""
-    # TODO: Implement batch prediction
-    # Hint: Stack preprocessed images into a single batch
+    """预测多张图像的类别"""
+    # TODO: 实现批量预测
+    # 提示：将预处理后的图像堆叠成一个批次
     pass
 ```
 
-### Challenge 2: Model Comparison
+### 挑战 2：模型比较
 
-**Task**: Compare different model architectures (ResNet18, ResNet50, MobileNet).
+**任务**：比较不同的模型架构（ResNet18, ResNet50, MobileNet）。
 
-Measure:
-- Inference latency
-- Accuracy (on same images)
-- Model size
+测量：
+- 推理延迟
+- 准确率（在同一图像上）
+- 模型大小
 
-### Challenge 3: Error Handling
+### 挑战 3：错误处理
 
-**Task**: Add proper error handling for:
-- Invalid image files
-- Out of memory errors
-- Missing GPU
+**任务**：添加适当的错误处理：
+- 无效的图像文件
+- 内存不足错误
+- 缺少 GPU
 
 ---
 
-## Validation and Testing
+## 验证和测试
 
-### Test Your Implementation
+### 测试你的实现
 
 ```python
 # test_classifier.py
 import os
 
 def test_classifier():
-    """Test image classifier implementation"""
+    """测试图像分类器实现"""
     from image_classifier import ImageClassifier
 
-    # Test initialization
+    # 测试初始化
     classifier = ImageClassifier(model_name='resnet18', device='cpu')
     assert classifier.device.type == 'cpu', "Device should be CPU"
 
-    # Test prediction
+    # 测试预测
     results, latency = classifier.predict('dog.jpg', top_k=5)
     assert len(results) == 5, "Should return 5 predictions"
     assert results[0]['probability'] > results[1]['probability'], "Should be sorted by probability"
     assert latency > 0, "Latency should be positive"
 
-    # Test probabilities sum to ~1
+    # 测试概率之和约为 1
     total_prob = sum(r['probability'] for r in results[:5])
     assert 0.95 <= total_prob <= 1.05, f"Top 5 probabilities should sum close to 1, got {total_prob}"
 
@@ -693,55 +693,55 @@ if __name__ == "__main__":
 
 ---
 
-## Reflection Questions
+## 反思问题
 
-Answer these questions to solidify your learning:
+回答这些问题以巩固你的学习：
 
-1. **Why is `model.eval()` necessary?**
-   - Your answer:
+1. **为什么 `model.eval()` 是必要的？**
+   - 你的答案：
 
-2. **What happens if you forget `torch.no_grad()`?**
-   - Your answer:
+2. **如果忘记 `torch.no_grad()` 会怎样？**
+   - 你的答案：
 
-3. **Why do we need to normalize images with ImageNet statistics?**
-   - Your answer:
+3. **为什么我们需要用 ImageNet 统计数据归一化图像？**
+   - 你的答案：
 
-4. **How does batch size affect throughput and latency?**
-   - Your answer:
+4. **批大小如何影响吞吐量和延迟？**
+   - 你的答案：
 
-5. **When would you choose CPU over GPU for inference?**
-   - Your answer:
-
----
-
-## Summary
-
-**What You Accomplished**:
-✅ Loaded and used pre-trained PyTorch models
-✅ Preprocessed images correctly
-✅ Ran inference with proper eval mode and no_grad context
-✅ Measured inference performance
-✅ Compared CPU vs GPU execution
-✅ Built a complete image classification application
-
-**Key Skills Gained**:
-- Model loading from PyTorch Hub
-- Image preprocessing with torchvision.transforms
-- Proper inference patterns (eval, no_grad)
-- Performance measurement and optimization
-- Device management (CPU/GPU)
+5. **什么时候你会选择 CPU 而非 GPU 进行推理？**
+   - 你的答案：
 
 ---
 
-## Next Steps
+## 总结
 
-1. **Complete Exercise 02**: TensorFlow Model Inference
-2. **Compare frameworks**: Notice differences between PyTorch and TensorFlow
-3. **Experiment**: Try different models and images
+**你完成了什么**：
+✅ 加载并使用预训练 PyTorch 模型
+✅ 正确预处理图像
+✅ 使用适当的 eval 模式和 no_grad 上下文运行推理
+✅ 测量推理性能
+✅ 比较 CPU 和 GPU 执行
+✅ 构建了完整的图像分类应用
+
+**获得的关键技能**：
+- 从 PyTorch Hub 加载模型
+- 使用 torchvision.transforms 进行图像预处理
+- 正确的推理模式（eval, no_grad）
+- 性能测量和优化
+- 设备管理（CPU/GPU）
 
 ---
 
-**Exercise Version**: 1.0
-**Last Updated**: October 2025
-**Estimated Time**: 2-3 hours
-**Difficulty**: Beginner
+## 下一步
+
+1. **完成练习 02**：TensorFlow 模型推理
+2. **比较框架**：注意 PyTorch 和 TensorFlow 之间的差异
+3. **实验**：尝试不同的模型和图像
+
+---
+
+**练习版本**: 1.0
+**最后更新**: 2025 年 10 月
+**预计时间**: 2-3 小时
+**难度**: 初级

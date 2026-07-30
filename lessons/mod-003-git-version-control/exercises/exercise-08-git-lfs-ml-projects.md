@@ -1,38 +1,38 @@
-# Exercise 08: Git LFS and Managing Large ML Projects
+# 练习 08：Git LFS 与管理大型 ML 项目
 
-## Overview
+## 概述
 
-This hands-on exercise focuses on using Git LFS (Large File Storage) for managing ML artifacts, implementing proper .gitignore patterns for ML projects, versioning models alongside code, and integrating with DVC (Data Version Control) for complete ML reproducibility.
+本动手练习专注于使用 Git LFS（Large File Storage）管理 ML 制品，为 ML 项目实现合适的 .gitignore 模式，将模型与代码一起进行版本控制，以及与 DVC（Data Version Control）集成以实现完整的 ML 可重现性。
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
-- Install and configure Git LFS for ML artifacts
-- Track models, datasets, and checkpoints with LFS
-- Create comprehensive .gitignore for ML projects
-- Version models with semantic versioning
-- Integrate Git with DVC for data versioning
-- Implement model lineage tracking
-- Clone and work with LFS repositories efficiently
-- Migrate existing projects to Git LFS
+完成本练习后，你将：
+- 为 ML 制品安装和配置 Git LFS
+- 使用 LFS 跟踪模型、数据集和检查点
+- 为 ML 项目创建全面的 .gitignore
+- 使用语义化版本控制模型
+- 将 Git 与 DVC 集成用于数据版本控制
+- 实现模型溯源跟踪
+- 高效地克隆和使用 LFS 仓库
+- 将现有项目迁移到 Git LFS
 
-## Prerequisites
+## 前置条件
 
-- Completed exercises 01-07 in this module
-- Lecture 05 (Git for Large-Scale ML Projects)
-- Understanding of ML workflows and artifacts
-- Git fundamentals
+- 完成本模块的练习 01-07
+- 讲座 05（用于大规模 ML 项目的 Git）
+- 理解 ML 工作流和制品
+- Git 基础
 
-## Time Required
+## 所需时间
 
-- Estimated: 90-120 minutes
-- Difficulty: Intermediate
+- 预计：90-120 分钟
+- 难度：中级
 
 ---
 
-## Part 1: Setting Up Git LFS
+## 第一部分：设置 Git LFS
 
-### Task 1.1: Install Git LFS
+### 任务 1.1：安装 Git LFS
 
 ```bash
 # Ubuntu/Debian
@@ -44,58 +44,58 @@ brew install git-lfs
 # RHEL/CentOS
 sudo yum install git-lfs
 
-# Initialize Git LFS (one-time setup)
+# 初始化 Git LFS（一次性设置）
 git lfs install
 
-# Verify installation
+# 验证安装
 git lfs version
-# Output: git-lfs/3.x.x
+# 输出：git-lfs/3.x.x
 ```
 
-### Task 1.2: Create ML Project with LFS
+### 任务 1.2：创建带 LFS 的 ML 项目
 
 ```bash
-# Create new project
+# 创建新项目
 mkdir ml-model-repository
 cd ml-model-repository
 git init
 git config init.defaultBranch main
 
-# Configure LFS tracking
-git lfs track "*.pt"           # PyTorch models
-git lfs track "*.pth"          # PyTorch checkpoints
-git lfs track "*.onnx"         # ONNX models
-git lfs track "*.h5"           # Keras models
-git lfs track "*.pb"           # TensorFlow models
-git lfs track "*.safetensors"  # SafeTensors format
-git lfs track "models/**"      # Everything in models/
-git lfs track "*.parquet"      # Dataset files
-git lfs track "*.pkl"          # Pickle files
+# 配置 LFS 跟踪
+git lfs track "*.pt"           # PyTorch 模型
+git lfs track "*.pth"          # PyTorch 检查点
+git lfs track "*.onnx"         # ONNX 模型
+git lfs track "*.h5"           # Keras 模型
+git lfs track "*.pb"           # TensorFlow 模型
+git lfs track "*.safetensors"  # SafeTensors 格式
+git lfs track "models/**"      # models/ 中的所有内容
+git lfs track "*.parquet"      # 数据集文件
+git lfs track "*.pkl"          # Pickle 文件
 
-# IMPORTANT: Always commit .gitattributes!
+# 重要：始终提交 .gitattributes！
 git add .gitattributes
 git commit -m "Configure Git LFS for ML artifacts"
 
-# View LFS tracking
+# 查看 LFS 跟踪
 cat .gitattributes
 ```
 
 ---
 
-## Part 2: Versioning ML Models
+## 第二部分：版本控制 ML 模型
 
-### Task 2.1: Add Models to Repository
+### 任务 2.1：将模型添加到仓库
 
 ```bash
-# Create project structure
+# 创建项目结构
 mkdir -p models/production models/experiments
 mkdir -p configs data/sample src tests
 
-# Create sample model file (simulate trained model)
+# 创建示例模型文件（模拟训练好的模型）
 dd if=/dev/urandom of=models/production/bert-classifier-v1.0.0.onnx bs=1M count=100
-# Creates a 100MB dummy model file
+# 创建一个 100MB 的虚拟模型文件
 
-# Create model metadata
+# 创建模型元数据
 cat > models/production/bert-classifier-v1.0.0.yaml << 'EOF'
 model:
   name: bert-classifier
@@ -131,10 +131,10 @@ artifacts:
   training_logs: s3://ml-artifacts/logs/exp_12345/
 EOF
 
-# Add to Git
+# 添加到 Git
 git add models/production/bert-classifier-v1.0.0.*
 
-# Commit model
+# 提交模型
 git commit -m "model: add BERT classifier v1.0.0
 
 - Accuracy: 94.5%
@@ -142,14 +142,14 @@ git commit -m "model: add BERT classifier v1.0.0
 - Inference latency (p99): 45ms
 - Trained on sentiment-analysis-v2 dataset"
 
-# Tag the model version
+# 标记模型版本
 git tag -a model-bert-v1.0.0 -m "BERT Classifier v1.0.0 - Production Release"
 
-# Verify LFS is tracking the model
+# 验证 LFS 正在跟踪模型
 git lfs ls-files
 ```
 
-### Task 2.2: Create Comprehensive .gitignore
+### 任务 2.2：创建全面的 .gitignore
 
 ```bash
 cat > .gitignore << 'EOF'
@@ -251,59 +251,59 @@ git commit -m "chore: add comprehensive .gitignore for ML projects"
 
 ---
 
-## Part 3: Working with LFS Repositories
+## 第三部分：使用 LFS 仓库
 
-### Task 3.1: Clone LFS Repository
+### 任务 3.1：克隆 LFS 仓库
 
 ```bash
-# Create remote repository (simulate GitHub)
+# 创建远程仓库（模拟 GitHub）
 cd ..
 git clone --bare ml-model-repository ml-model-repository.git
 
-# Clone with LFS (downloads all LFS files)
+# 克隆并下载 LFS（下载所有 LFS 文件）
 git clone ml-model-repository.git ml-model-clone
 cd ml-model-clone
 
-# Verify model was downloaded
+# 验证模型已下载
 ls -lh models/production/
-# Should show 100MB model file
+# 应显示 100MB 模型文件
 
-# Check LFS status
+# 检查 LFS 状态
 git lfs ls-files
 ```
 
-### Task 3.2: Clone Without LFS Files (Save Bandwidth)
+### 任务 3.2：不下载 LFS 文件的情况下克隆（节省带宽）
 
 ```bash
-# Clone without downloading LFS files
+# 不下载 LFS 文件的情况下克隆
 cd ..
 GIT_LFS_SKIP_SMUDGE=1 git clone ml-model-repository.git ml-model-clone-minimal
 cd ml-model-clone-minimal
 
-# LFS files are pointers (tiny)
+# LFS 文件是指针（很小）
 ls -lh models/production/
-# Shows 133 bytes (pointer file, not 100MB)
+# 显示 133 字节（指针文件，不是 100MB）
 
-# Download specific LFS files when needed
+# 在需要时下载特定的 LFS 文件
 git lfs pull --include="models/production/bert-classifier-v1.0.0.onnx"
 
-# Now file is 100MB
+# 现在文件是 100MB
 ls -lh models/production/
 ```
 
 ---
 
-## Part 4: Model Versioning Workflow
+## 第四部分：模型版本控制工作流
 
-### Task 4.1: Release New Model Version
+### 任务 4.1：发布新模型版本
 
 ```bash
 cd ../ml-model-repository
 
-# Simulate training a new model
+# 模拟训练新模型
 dd if=/dev/urandom of=models/production/bert-classifier-v1.1.0.onnx bs=1M count=105
 
-# Create metadata
+# 创建元数据
 cat > models/production/bert-classifier-v1.1.0.yaml << 'EOF'
 model:
   name: bert-classifier
@@ -324,7 +324,7 @@ performance:
   inference_latency_p99_ms: 42  # -3ms improvement
 EOF
 
-# Commit new version
+# 提交新版本
 git add models/production/bert-classifier-v1.1.0.*
 git commit -m "model: release BERT classifier v1.1.0
 
@@ -338,19 +338,19 @@ Changes:
 - Added data augmentation
 - Improved preprocessing pipeline"
 
-# Tag new version
+# 标记新版本
 git tag -a model-bert-v1.1.0 -m "BERT Classifier v1.1.0 - Accuracy Improvement"
 
-# Push to remote (including tags and LFS)
+# 推送到远程（包括标签和 LFS）
 git push origin main
 git push origin --tags
 git lfs push origin main
 ```
 
-### Task 4.2: Model Lineage Tracking
+### 任务 4.2：模型溯源跟踪
 
 ```bash
-# Create lineage tracking file
+# 创建溯源跟踪文件
 cat > MODELS.md << 'EOF'
 # Model Registry
 
@@ -391,190 +391,190 @@ git commit -m "docs: add model registry and deployment guide"
 
 ---
 
-## Part 5: DVC Integration (Data Version Control)
+## 第五部分：DVC 集成（Data Version Control）
 
-### Task 5.1: Install and Setup DVC
+### 任务 5.1：安装和设置 DVC
 
 ```bash
-# Install DVC
+# 安装 DVC
 pip install dvc dvc-s3
 
-# Initialize DVC in your Git repo
+# 在 Git 仓库中初始化 DVC
 dvc init
 
-# This creates:
-# - .dvc/ directory
+# 这会创建：
+# - .dvc/ 目录
 # - .dvc/.gitignore
 # - .dvc/config
 
-# Commit DVC configuration
+# 提交 DVC 配置
 git add .dvc .dvcignore
 git commit -m "chore: initialize DVC for data versioning"
 ```
 
-### Task 5.2: Track Dataset with DVC
+### 任务 5.2：使用 DVC 跟踪数据集
 
 ```bash
-# Create sample dataset
+# 创建示例数据集
 mkdir -p data/raw
 echo "Sample training data" > data/raw/train.csv
 for i in {1..1000}; do
     echo "sample_id_$i,feature1,feature2,label" >> data/raw/train.csv
 done
 
-# Track dataset with DVC
+# 使用 DVC 跟踪数据集
 dvc add data/raw/train.csv
 
-# This creates data/raw/train.csv.dvc (metadata file)
-# And adds data/raw/train.csv to .gitignore
+# 这会创建 data/raw/train.csv.dvc（元数据文件）
+# 并将 data/raw/train.csv 添加到 .gitignore
 
-# Commit DVC metadata (NOT the actual data)
+# 提交 DVC 元数据（而不是实际数据）
 git add data/raw/train.csv.dvc data/raw/.gitignore
 git commit -m "data: add training dataset v1 (tracked with DVC)"
 
-# Configure remote storage (use S3, GCS, or local for this exercise)
+# 配置远程存储（本练习使用 S3、GCS 或本地）
 dvc remote add -d storage /tmp/dvc-storage
 dvc remote modify storage type local
 
-# Push data to DVC remote
+# 将数据推送到 DVC 远程
 dvc push
 ```
 
-### Task 5.3: Version Data Updates
+### 任务 5.3：版本控制数据更新
 
 ```bash
-# Update dataset
+# 更新数据集
 echo "New sample data" >> data/raw/train.csv
 
-# Track new version
+# 跟踪新版本
 dvc add data/raw/train.csv
 
-# Commit metadata
+# 提交元数据
 git add data/raw/train.csv.dvc
 git commit -m "data: update training dataset to v2"
 git tag -a data-v2 -m "Training dataset v2"
 
-# Push data
+# 推送数据
 dvc push
 
-# Push Git
+# 推送 Git
 git push origin main
 git push origin --tags
 ```
 
 ---
 
-## Part 6: LFS Maintenance and Optimization
+## 第六部分：LFS 维护与优化
 
-### Task 6.1: Check LFS Storage Usage
+### 任务 6.1：检查 LFS 存储使用量
 
 ```bash
-# View LFS file list
+# 查看 LFS 文件列表
 git lfs ls-files
 
-# Check LFS storage stats
+# 检查 LFS 存储统计
 git lfs ls-files --size
 
-# Show LFS bandwidth usage
+# 显示 LFS 带宽使用
 git lfs env
 
-# Find large files
+# 查找大文件
 git lfs ls-files --size | sort -k2 -hr | head -10
 ```
 
-### Task 6.2: Prune Old LFS Files
+### 任务 6.2：修剪旧的 LFS 文件
 
 ```bash
-# Remove LFS files not needed for current checkout
+# 移除当前检出不需要的 LFS 文件
 git lfs prune
 
-# Dry run to see what would be removed
+# 试运行以查看将被移除的内容
 git lfs prune --dry-run
 
-# Verify LFS objects
+# 验证 LFS 对象
 git lfs fsck
 
-# Fetch only LFS files for specific commits
+# 仅获取特定 commit 的 LFS 文件
 git lfs fetch --recent  # Last 10 commits
 ```
 
 ---
 
-## Part 7: Migrating Existing Project to LFS
+## 第七部分：将现有项目迁移到 LFS
 
-### Task 7.1: Convert Existing Repository
+### 任务 7.1：转换现有仓库
 
 ```bash
-# If you accidentally committed large files without LFS
+# 如果你在没有 LFS 的情况下意外提交了大文件
 
-# 1. Install BFG Repo-Cleaner
+# 1. 安装 BFG Repo-Cleaner
 wget https://repo1.maven.org/maven2/com/madgag/bfg/1.14.0/bfg-1.14.0.jar
 
-# 2. Configure LFS tracking
+# 2. 配置 LFS 跟踪
 git lfs track "*.onnx"
 git lfs track "*.pt"
 
-# 3. Migrate existing large files
+# 3. 迁移现有大文件
 git lfs migrate import --include="*.onnx,*.pt" --everything
 
-# 4. Verify migration
+# 4. 验证迁移
 git lfs ls-files
 
-# 5. Force push (WARNING: rewrites history)
+# 5. 强制推送（警告：会重写历史）
 git push --force origin main
 ```
 
 ---
 
-## Deliverables
+## 交付物
 
-Submit the following:
+请提交以下内容：
 
-1. **Git Repository**:
-   - Configured .gitattributes for LFS
-   - Comprehensive .gitignore
-   - At least 2 model versions with metadata
-   - MODELS.md registry file
+1. **Git 仓库**：
+   - 为 LFS 配置了 .gitattributes
+   - 全面的 .gitignore
+   - 至少 2 个带元数据的模型版本
+   - MODELS.md 注册表文件
 
-2. **DVC Setup**:
-   - Initialized DVC
-   - At least one dataset tracked with DVC
-   - DVC remote configured
+2. **DVC 设置**：
+   - 已初始化 DVC
+   - 至少有一个使用 DVC 跟踪的数据集
+   - 已配置 DVC 远程
 
-3. **Documentation**:
-   - README explaining project structure
-   - Model deployment guide
-   - Data versioning workflow
+3. **文档**：
+   - 解释项目结构的 README
+   - 模型部署指南
+   - 数据版本控制工作流
 
-4. **Evidence**:
-   - `git lfs ls-files` output
-   - `git log --oneline --graph` output
-   - `dvc status` output
-
----
-
-## Challenge Questions
-
-1. **Storage Costs**: If your model is 500MB and you release 100 versions per year, how much LFS storage will you need? How can you reduce this?
-
-2. **Bandwidth**: Your CI/CD pipeline clones the repo 1000 times/day. How can you minimize LFS bandwidth costs?
-
-3. **Monorepo**: You have 50 models in one repository. How do you allow teams to clone only their model's files?
-
-4. **Disaster Recovery**: If GitHub LFS goes down, how do you ensure models are still accessible?
-
-5. **Compliance**: How do you track which model version is deployed in which environment for audit purposes?
+4. **证据**：
+   - `git lfs ls-files` 输出
+   - `git log --oneline --graph` 输出
+   - `dvc status` 输出
 
 ---
 
-## Additional Resources
+## 挑战问题
 
-- [Git LFS Documentation](https://git-lfs.github.com/)
-- [DVC Documentation](https://dvc.org/doc)
-- [Model Versioning Best Practices](https://neptune.ai/blog/version-control-for-ml-models)
-- [MLflow Model Registry](https://www.mlflow.org/docs/latest/model-registry.html)
-- [Semantic Versioning](https://semver.org/)
+1. **存储成本**：如果你的模型是 500MB，每年发布 100 个版本，你需要多少 LFS 存储？如何减少？
+
+2. **带宽**：你的 CI/CD 流水线每天克隆仓库 1000 次。如何最小化 LFS 带宽成本？
+
+3. **单仓库**：你在一个仓库中有 50 个模型。如何让团队只克隆他们模型的文件？
+
+4. **灾难恢复**：如果 GitHub LFS 宕机，你如何确保模型仍然可访问？
+
+5. **合规性**：你如何为审计目的跟踪哪个模型版本部署在哪个环境中？
 
 ---
 
-**Congratulations!** You can now manage large ML projects with Git LFS, version models alongside code, and integrate with DVC for complete reproducibility.
+## 额外资源
+
+- [Git LFS 文档](https://git-lfs.github.com/)
+- [DVC 文档](https://dvc.org/doc)
+- [模型版本控制最佳实践](https://neptune.ai/blog/version-control-for-ml-models)
+- [MLflow 模型注册表](https://www.mlflow.org/docs/latest/model-registry.html)
+- [语义化版本控制](https://semver.org/)
+
+---
+
+**恭喜！** 你现在可以使用 Git LFS 管理大型 ML 项目，将模型与代码一起进行版本控制，并与 DVC 集成以实现完整的可重现性。

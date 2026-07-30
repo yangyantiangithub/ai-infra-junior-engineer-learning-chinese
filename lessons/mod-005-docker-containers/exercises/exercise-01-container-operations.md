@@ -2,20 +2,20 @@
 
 ## Exercise Overview
 
-**Objective**: Master fundamental Docker container operations including running, managing, and debugging containers.
+**Objective**: 掌握基本的 Docker container 操作，包括运行、管理和调试 container。
 
-**Difficulty**: Beginner
-**Estimated Time**: 2-3 hours
+**Difficulty**: 初级
+**Estimated Time**: 2-3 小时
 **Prerequisites**: Lecture 01 (Docker Fundamentals)
 
 **What You'll Learn**:
-- Running containers in different modes
-- Managing container lifecycle
-- Viewing logs and debugging
-- Port mapping and networking basics
-- Environment variables
-- Resource constraints
-- Container inspection
+- 在不同模式下运行 container
+- 管理 container 生命周期
+- 查看日志和调试
+- 端口映射和网络基础
+- 环境变量
+- 资源约束
+- Container 检查
 
 ---
 
@@ -24,13 +24,13 @@
 ### Step 1.1: Verify Docker Installation
 
 ```bash
-# Check Docker version
+# 检查 Docker 版本
 docker --version
 
-# Check Docker info
+# 检查 Docker 信息
 docker info
 
-# Test with hello-world
+# 使用 hello-world 测试
 docker run hello-world
 ```
 
@@ -41,7 +41,7 @@ Docker version 24.0.6, build ed223bc
 Hello from Docker!
 ```
 
-✅ **Checkpoint**: Docker is installed and running.
+✅ **Checkpoint**: Docker 已安装并正在运行。
 
 ---
 
@@ -50,47 +50,47 @@ Hello from Docker!
 ### Step 2.1: Run Your First Container
 
 ```bash
-# Run nginx in foreground
+# 在前台运行 nginx
 docker run nginx
 
-# Press Ctrl+C to stop
+# 按 Ctrl+C 停止
 
-# What happened?
-# 1. Downloaded nginx image (if not present)
-# 2. Created container from image
-# 3. Started nginx process
-# 4. Attached to container output
+# 发生了什么？
+# 1. 下载 nginx image（如果不存在）
+# 2. 从 image 创建 container
+# 3. 启动 nginx 进程
+# 4. 附加到 container 输出
 ```
 
 ### Step 2.2: Detached Mode
 
 ```bash
-# Run in background (-d = detached)
+# 在后台运行（-d = detached）
 docker run -d nginx
 
-# Output: Container ID
+# 输出：Container ID
 # abc123def456...
 
-# Container is running in background!
+# Container 在后台运行！
 ```
 
 ### Step 2.3: Naming Containers
 
 ```bash
-# Give container a friendly name
+# 给 container 一个友好的名称
 docker run -d --name my-nginx nginx
 
-# Verify it's running
+# 验证它正在运行
 docker ps
 
-# Output shows your named container
+# 输出显示你的命名 container
 ```
 
 **Questions**:
-1. Why is naming containers useful?
-2. What happens if you try to create another container with the same name?
+1. 为什么命名 container 很有用？
+2. 如果尝试创建另一个同名 container 会发生什么？
 
-✅ **Checkpoint**: You can run containers in detached mode with custom names.
+✅ **Checkpoint**: 你可以使用自定义名称以分离模式运行 container。
 
 ---
 
@@ -99,64 +99,64 @@ docker ps
 ### Step 3.1: List Containers
 
 ```bash
-# List running containers
+# 列出运行中的 container
 docker ps
 
-# List all containers (including stopped)
+# 列出所有 container（包括已停止的）
 docker ps -a
 
-# List with custom format
+# 使用自定义格式列出
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 ```
 
 ### Step 3.2: Stop and Start Containers
 
 ```bash
-# Stop a running container
+# 停止运行中的 container
 docker stop my-nginx
 
-# Verify it's stopped
+# 验证它已停止
 docker ps -a
 
-# Start it again
+# 再次启动
 docker start my-nginx
 
-# Restart container
+# 重启 container
 docker restart my-nginx
 ```
 
 ### Step 3.3: Pause and Unpause
 
 ```bash
-# Pause container (freezes processes)
+# 暂停 container（冻结进程）
 docker pause my-nginx
 
-# Check status
+# 检查状态
 docker ps
 
-# Unpause
+# 恢复
 docker unpause my-nginx
 ```
 
 ### Step 3.4: Remove Containers
 
 ```bash
-# Stop container first
+# 先停止 container
 docker stop my-nginx
 
-# Remove container
+# 删除 container
 docker rm my-nginx
 
-# Remove running container (force)
+# 强制删除运行中的 container
 docker rm -f my-nginx
 
-# Run container that auto-removes when stopped
+# 运行在停止时自动删除的 container
 docker run -d --rm --name temp-nginx nginx
 docker stop temp-nginx
-docker ps -a  # Container is gone!
+docker ps -a  # Container 已消失！
 ```
 
-**Task**: Create a script that manages nginx lifecycle
+**Task**: 创建管理 nginx 生命周期的脚本
 
 ```bash
 #!/bin/bash
@@ -177,7 +177,7 @@ docker rm web
 echo "Done!"
 ```
 
-✅ **Checkpoint**: You can manage container lifecycle (start, stop, remove).
+✅ **Checkpoint**: 你可以管理 container 生命周期（start、stop、remove）。
 
 ---
 
@@ -186,69 +186,69 @@ echo "Done!"
 ### Step 4.1: Expose Container Ports
 
 ```bash
-# Map host port 8080 to container port 80
+# 将主机端口 8080 映射到 container 端口 80
 docker run -d -p 8080:80 --name web nginx
 
-# Test in browser or with curl
+# 在浏览器或使用 curl 测试
 curl http://localhost:8080
 
-# You should see nginx welcome page!
+# 你应该看到 nginx 欢迎页面！
 ```
 
 ### Step 4.2: Multiple Port Mappings
 
 ```bash
-# Map multiple ports
+# 映射多个端口
 docker run -d \
   -p 8080:80 \
   -p 8443:443 \
   --name web-secure \
   nginx
 
-# Check port mappings
+# 检查端口映射
 docker port web-secure
 ```
 
 ### Step 4.3: Random Port Assignment
 
 ```bash
-# Let Docker assign random host port
+# 让 Docker 分配随机主机端口
 docker run -d -P --name web-random nginx
 
-# Find assigned port
+# 查找分配的端口
 docker port web-random
 
-# Output: 80/tcp -> 0.0.0.0:32768
+# 输出：80/tcp -> 0.0.0.0:32768
 ```
 
 ### Step 4.4: Bind to Specific Interface
 
 ```bash
-# Only accessible from localhost
+# 仅限 localhost 访问
 docker run -d -p 127.0.0.1:8080:80 --name web-local nginx
 
-# Accessible from any interface
+# 可从任何接口访问
 docker run -d -p 0.0.0.0:8080:80 --name web-public nginx
 ```
 
-**Challenge**: Run 3 nginx containers on ports 8081, 8082, 8083
+**Challenge**: 在端口 8081、8082、8083 上运行 3 个 nginx container
 
 ```bash
-# Your code here
+# 你的代码
 docker run -d -p 8081:80 --name web1 nginx
 docker run -d -p 8082:80 --name web2 nginx
 docker run -d -p 8083:80 --name web3 nginx
 
-# Verify all running
+# 验证全部运行
 docker ps
 
-# Test all ports
+# 测试所有端口
 curl http://localhost:8081
 curl http://localhost:8082
 curl http://localhost:8083
 ```
 
-✅ **Checkpoint**: You can map container ports to host.
+✅ **Checkpoint**: 你可以将 container 端口映射到主机。
 
 ---
 
@@ -257,14 +257,14 @@ curl http://localhost:8083
 ### Step 5.1: Pass Environment Variables
 
 ```bash
-# Single variable
+# 单个变量
 docker run -d -e MY_VAR=hello --name env-test alpine sleep 3600
 
-# Verify
+# 验证
 docker exec env-test env | grep MY_VAR
 # MY_VAR=hello
 
-# Multiple variables
+# 多个变量
 docker run -d \
   -e DB_HOST=localhost \
   -e DB_PORT=5432 \
@@ -276,7 +276,7 @@ docker run -d \
 ### Step 5.2: Use Environment File
 
 ```bash
-# Create .env file
+# 创建 .env 文件
 cat > app.env << EOF
 DB_HOST=postgres
 DB_PORT=5432
@@ -285,17 +285,17 @@ DB_PASSWORD=secret123
 DEBUG=true
 EOF
 
-# Run with env file
+# 使用 env 文件运行
 docker run -d --env-file app.env --name app-env alpine sleep 3600
 
-# Verify
+# 验证
 docker exec app-env env
 ```
 
 ### Step 5.3: Real Example - PostgreSQL
 
 ```bash
-# Run PostgreSQL with environment variables
+# 使用环境变量运行 PostgreSQL
 docker run -d \
   --name postgres-db \
   -e POSTGRES_USER=myuser \
@@ -304,18 +304,18 @@ docker run -d \
   -p 5432:5432 \
   postgres:15
 
-# Check logs
+# 检查日志
 docker logs postgres-db
 
-# Connect to database
+# 连接到数据库
 docker exec -it postgres-db psql -U myuser -d mydb
 
-# Inside psql:
-# \l  - list databases
-# \q  - quit
+# 在 psql 中：
+# \l  - 列出数据库
+# \q  - 退出
 ```
 
-✅ **Checkpoint**: You can configure containers with environment variables.
+✅ **Checkpoint**: 你可以使用环境变量配置 container。
 
 ---
 
@@ -324,38 +324,38 @@ docker exec -it postgres-db psql -U myuser -d mydb
 ### Step 6.1: Basic Logging
 
 ```bash
-# View logs
+# 查看日志
 docker logs web
 
-# Follow logs (like tail -f)
+# 跟踪日志（类似 tail -f）
 docker logs -f web
 
-# Last 50 lines
+# 最后 50 行
 docker logs --tail 50 web
 
-# Logs since specific time
-docker logs --since 10m web  # Last 10 minutes
+# 自特定时间起的日志
+docker logs --since 10m web  # 最近 10 分钟
 
-# With timestamps
+# 带时间戳
 docker logs -f --timestamps web
 ```
 
 ### Step 6.2: Generate Some Logs
 
 ```bash
-# Generate traffic to nginx
+# 生成 nginx 流量
 for i in {1..10}; do
   curl http://localhost:8080
 done
 
-# View access logs
+# 查看访问日志
 docker logs web
 ```
 
 ### Step 6.3: Log Driver Configuration
 
 ```bash
-# Run with JSON log driver (default)
+# 使用 JSON 日志驱动运行（默认）
 docker run -d \
   --log-driver json-file \
   --log-opt max-size=10m \
@@ -363,11 +363,11 @@ docker run -d \
   --name web-logs \
   nginx
 
-# Run with no logs (for performance)
+# 不记录日志（用于性能）
 docker run -d --log-driver none --name no-logs nginx
 ```
 
-✅ **Checkpoint**: You can view and manage container logs.
+✅ **Checkpoint**: 你可以查看和管理 container 日志。
 
 ---
 
@@ -376,13 +376,13 @@ docker run -d --log-driver none --name no-logs nginx
 ### Step 7.1: Basic Exec
 
 ```bash
-# Execute single command
+# 执行单个命令
 docker exec web ls /usr/share/nginx/html
 
-# Run interactive shell
+# 运行交互式 shell
 docker exec -it web bash
 
-# Inside container:
+# 在 container 内部：
 ls
 pwd
 whoami
@@ -392,48 +392,48 @@ exit
 ### Step 7.2: Execute as Different User
 
 ```bash
-# Execute as root (default)
+# 以 root 用户执行（默认）
 docker exec -u root web whoami
 
-# Execute as www-data
+# 以 www-data 用户执行
 docker exec -u www-data web whoami
 ```
 
 ### Step 7.3: Practical Examples
 
 ```bash
-# Check nginx configuration
+# 检查 nginx 配置
 docker exec web nginx -t
 
-# View nginx process
+# 查看 nginx 进程
 docker exec web ps aux
 
-# Check disk usage
+# 检查磁盘使用情况
 docker exec web df -h
 
-# Install tools and use them
+# 安装工具并使用
 docker exec web apt-get update
 docker exec web apt-get install -y curl
 docker exec web curl localhost
 ```
 
-**Challenge**: Create a Python container and execute Python commands
+**Challenge**: 创建 Python container 并执行 Python 命令
 
 ```bash
-# Run Python container
+# 运行 Python container
 docker run -d --name python-app python:3.11 sleep 3600
 
-# Execute Python commands
+# 执行 Python 命令
 docker exec python-app python --version
 docker exec python-app pip list
 docker exec -it python-app python
 
-# In Python REPL:
+# 在 Python REPL 中：
 # >>> print("Hello from Docker!")
 # >>> exit()
 ```
 
-✅ **Checkpoint**: You can execute commands inside running containers.
+✅ **Checkpoint**: 你可以在运行中的 container 内部执行命令。
 
 ---
 
@@ -442,10 +442,10 @@ docker exec -it python-app python
 ### Step 8.1: Container Inspection
 
 ```bash
-# Get all details
+# 获取所有详情
 docker inspect web
 
-# Get specific fields
+# 获取特定字段
 docker inspect web --format='{{.State.Status}}'
 docker inspect web --format='{{.NetworkSettings.IPAddress}}'
 docker inspect web --format='{{json .Config.Env}}'
@@ -454,39 +454,39 @@ docker inspect web --format='{{json .Config.Env}}'
 ### Step 8.2: Resource Usage
 
 ```bash
-# Real-time stats
+# 实时统计
 docker stats
 
-# Single container
+# 单个 container
 docker stats web
 
-# No streaming (one shot)
+# 不持续输出（单次）
 docker stats --no-stream
 ```
 
 ### Step 8.3: Process Information
 
 ```bash
-# View processes in container
+# 查看 container 中的进程
 docker top web
 
-# With custom format
+# 使用自定义格式
 docker top web aux
 ```
 
 ### Step 8.4: File System Changes
 
 ```bash
-# See file changes in container
+# 查看 container 中的文件变更
 docker diff web
 
-# Legend:
-# A - Added
-# D - Deleted
-# C - Changed
+# 图例：
+# A - 添加
+# D - 删除
+# C - 修改
 ```
 
-✅ **Checkpoint**: You can inspect container details and resource usage.
+✅ **Checkpoint**: 你可以检查 container 详情和资源使用情况。
 
 ---
 
@@ -495,27 +495,27 @@ docker diff web
 ### Step 9.1: Memory Limits
 
 ```bash
-# Limit memory to 512MB
+# 内存限制为 512MB
 docker run -d --memory="512m" --name limited-mem nginx
 
-# Memory with swap limit
+# 带 swap 限制的内存
 docker run -d \
   --memory="512m" \
   --memory-swap="1g" \
   --name mem-with-swap \
   nginx
 
-# Verify limits
+# 验证限制
 docker stats limited-mem --no-stream
 ```
 
 ### Step 9.2: CPU Limits
 
 ```bash
-# Limit to 1 CPU
+# 限制为 1 个 CPU
 docker run -d --cpus="1.0" --name limited-cpu nginx
 
-# CPU shares (relative weight)
+# CPU 份额（相对权重）
 docker run -d --cpu-shares=512 --name low-priority nginx
 docker run -d --cpu-shares=1024 --name high-priority nginx
 ```
@@ -523,20 +523,20 @@ docker run -d --cpu-shares=1024 --name high-priority nginx
 ### Step 9.3: Test Resource Limits
 
 ```bash
-# Run container that will consume memory
+# 运行会消耗内存的 container
 docker run -d \
   --memory="100m" \
   --name stress-test \
   progrium/stress --vm 1 --vm-bytes 150M
 
-# Watch what happens
+# 观察会发生什么
 docker logs stress-test
 docker stats stress-test
 
-# Container should be killed due to OOM
+# Container 应因 OOM 被杀死
 ```
 
-✅ **Checkpoint**: You can set and monitor resource limits.
+✅ **Checkpoint**: 你可以设置和监控资源限制。
 
 ---
 
@@ -545,10 +545,10 @@ docker stats stress-test
 ### Step 10.1: Interactive Mode
 
 ```bash
-# Run Ubuntu interactively
+# 以交互方式运行 Ubuntu
 docker run -it ubuntu bash
 
-# Inside container:
+# 在 container 内部：
 apt-get update
 apt-get install -y curl
 curl https://api.github.com
@@ -558,35 +558,35 @@ exit
 ### Step 10.2: Attach to Running Container
 
 ```bash
-# Run container
+# 运行 container
 docker run -d --name myapp alpine sh -c "while true; do echo Hello; sleep 2; done"
 
-# Attach to see output
+# 附加以查看输出
 docker attach myapp
 
-# Detach: Ctrl+P, Ctrl+Q (keeps container running)
-# Or Ctrl+C (stops container)
+# 分离：Ctrl+P, Ctrl+Q（保持 container 运行）
+# 或 Ctrl+C（停止 container）
 ```
 
 ### Step 10.3: Copy Files
 
 ```bash
-# Create test file
+# 创建测试文件
 echo "Hello from host" > test.txt
 
-# Copy to container
+# 复制到 container
 docker cp test.txt web:/tmp/
 
-# Verify
+# 验证
 docker exec web cat /tmp/test.txt
 
-# Copy from container
+# 从 container 复制
 docker exec web sh -c "echo 'From container' > /tmp/from-container.txt"
 docker cp web:/tmp/from-container.txt .
 cat from-container.txt
 ```
 
-✅ **Checkpoint**: You can work with containers interactively.
+✅ **Checkpoint**: 你可以与 container 进行交互式操作。
 
 ---
 
@@ -595,39 +595,39 @@ cat from-container.txt
 ### Step 11.1: Remove Stopped Containers
 
 ```bash
-# Remove all stopped containers
+# 删除所有已停止的 container
 docker container prune
 
-# Confirm: y
+# 确认：y
 ```
 
 ### Step 11.2: Remove All Containers
 
 ```bash
-# Stop all running containers
+# 停止所有运行中的 container
 docker stop $(docker ps -q)
 
-# Remove all containers
+# 删除所有 container
 docker rm $(docker ps -a -q)
 ```
 
 ### Step 11.3: System Cleanup
 
 ```bash
-# View disk usage
+# 查看磁盘使用情况
 docker system df
 
-# Detailed view
+# 详细视图
 docker system df -v
 
-# Clean up everything unused
+# 清理所有未使用的资源
 docker system prune
 
-# Including volumes
+# 包括 volume
 docker system prune -a --volumes
 ```
 
-✅ **Checkpoint**: You can clean up Docker resources.
+✅ **Checkpoint**: 你可以清理 Docker 资源。
 
 ---
 
@@ -635,41 +635,41 @@ docker system prune -a --volumes
 
 ### Challenge: Web Application Stack
 
-**Task**: Set up a complete web application environment
+**Task**: 设置完整的 web 应用环境
 
 ```bash
-# 1. Run PostgreSQL database
+# 1. 运行 PostgreSQL 数据库
 docker run -d \
   --name db \
   -e POSTGRES_PASSWORD=secret \
   -e POSTGRES_DB=appdb \
   postgres:15
 
-# 2. Run Redis cache
+# 2. 运行 Redis 缓存
 docker run -d \
   --name cache \
   redis:7-alpine
 
-# 3. Wait for services to start
+# 3. 等待服务启动
 sleep 5
 
-# 4. Check all running
+# 4. 检查所有正在运行
 docker ps
 
-# 5. Test database
+# 5. 测试数据库
 docker exec db psql -U postgres -d appdb -c "SELECT version();"
 
-# 6. Test Redis
+# 6. 测试 Redis
 docker exec cache redis-cli ping
 
-# 7. View logs
+# 7. 查看日志
 docker logs db
 docker logs cache
 
-# 8. Check resource usage
+# 8. 检查资源使用情况
 docker stats --no-stream
 
-# 9. Cleanup
+# 9. 清理
 docker stop db cache
 docker rm db cache
 ```
@@ -677,20 +677,20 @@ docker rm db cache
 ### Challenge: Debug a Failing Container
 
 ```bash
-# Run container that fails
+# 运行会失败的 container
 docker run -d --name failing-app nginx:nonexistent
 
-# What went wrong? Debug it:
-# 1. Check status
+# 出了什么问题？调试：
+# 1. 检查状态
 docker ps -a
 
-# 2. View logs
+# 2. 查看日志
 docker logs failing-app
 
-# 3. Inspect
+# 3. 检查
 docker inspect failing-app
 
-# 4. Fix and rerun
+# 4. 修复并重新运行
 docker rm failing-app
 docker run -d --name working-app nginx:latest
 ```
@@ -701,18 +701,18 @@ docker run -d --name working-app nginx:latest
 
 ### Test Your Knowledge
 
-Create a bash script that:
-1. Runs 3 nginx containers on different ports
-2. Generates traffic to each
-3. Views logs from all containers
-4. Checks resource usage
-5. Stops and removes all containers
+创建一个 bash 脚本：
+1. 在不同端口上运行 3 个 nginx container
+2. 向每个生成流量
+3. 查看所有 container 的日志
+4. 检查资源使用情况
+5. 停止并删除所有 container
 
 ```bash
 #!/bin/bash
 # solution.sh
 
-# Your implementation here
+# 你的实现
 echo "Starting containers..."
 docker run -d -p 8081:80 --name web1 nginx
 docker run -d -p 8082:80 --name web2 nginx
@@ -747,55 +747,55 @@ echo "Done!"
 
 ## Reflection Questions
 
-1. **What's the difference between `docker stop` and `docker kill`?**
-   - Your answer:
+1. **`docker stop` 和 `docker kill` 有什么区别？**
+   - 你的答案：
 
-2. **When would you use `--rm` flag?**
-   - Your answer:
+2. **什么时候会使用 `--rm` 标志？**
+   - 你的答案：
 
-3. **How do you troubleshoot a container that exits immediately?**
-   - Your answer:
+3. **如何调试一个立即退出的 container？**
+   - 你的答案：
 
-4. **What's the difference between `docker run` and `docker exec`?**
-   - Your answer:
+4. **`docker run` 和 `docker exec` 有什么区别？**
+   - 你的答案：
 
-5. **Why is it important to limit container resources?**
-   - Your answer:
+5. **为什么限制 container 资源很重要？**
+   - 你的答案：
 
 ---
 
 ## Summary
 
 **What You Accomplished**:
-✅ Ran containers in multiple modes
-✅ Managed container lifecycle
-✅ Configured port mapping
-✅ Used environment variables
-✅ Viewed and analyzed logs
-✅ Executed commands in containers
-✅ Set resource limits
-✅ Inspected container details
-✅ Cleaned up resources
+✅ 在多种模式下运行了 container
+✅ 管理了 container 生命周期
+✅ 配置了端口映射
+✅ 使用了环境变量
+✅ 查看并分析了日志
+✅ 在 container 中执行了命令
+✅ 设置了资源限制
+✅ 检查了 container 详情
+✅ 清理了资源
 
 **Key Commands Mastered**:
-- `docker run` - Create and start containers
-- `docker ps` - List containers
-- `docker logs` - View container logs
-- `docker exec` - Execute commands
-- `docker stop/start/restart` - Manage lifecycle
-- `docker rm` - Remove containers
-- `docker stats` - Monitor resources
-- `docker inspect` - View details
+- `docker run` - 创建和启动 container
+- `docker ps` - 列出 container
+- `docker logs` - 查看 container 日志
+- `docker exec` - 执行命令
+- `docker stop/start/restart` - 管理生命周期
+- `docker rm` - 删除 container
+- `docker stats` - 监控资源
+- `docker inspect` - 查看详情
 
 ---
 
 ## Next Steps
 
 **Practice More**:
-1. Run different types of applications (databases, web servers, etc.)
-2. Experiment with different resource limits
-3. Practice debugging failing containers
-4. Create more complex multi-container setups
+1. 运行不同类型的应用（数据库、web 服务器等）
+2. 尝试不同的资源限制
+3. 练习调试失败的 container
+4. 创建更复杂的多 container 设置
 
 **Continue Learning**:
 - **Exercise 02**: Building Custom Images
@@ -805,5 +805,5 @@ echo "Done!"
 
 **Exercise Version**: 1.0
 **Last Updated**: October 2025
-**Estimated Time**: 2-3 hours
-**Difficulty**: Beginner
+**Estimated Time**: 2-3 小时
+**Difficulty**: 初级

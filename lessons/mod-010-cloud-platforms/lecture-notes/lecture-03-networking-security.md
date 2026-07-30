@@ -1,95 +1,96 @@
-# Lecture 03: AWS Networking and Security for AI Infrastructure
+# Lecture 03：用于 AI 基础设施的 AWS 网络与安全
 
-## Lecture Overview
+## 讲座概述
 
-Secure, well-architected network infrastructure is fundamental to production ML systems. This lecture covers AWS networking services—VPCs, subnets, routing, security groups, NACLs—and how to design isolated, secure network architectures for AI/ML workloads. You'll learn to build multi-tier networks with public-facing load balancers, private application servers, and isolated data tiers, implementing defense-in-depth security principles.
+安全、架构良好的网络基础设施是生产级 ML 系统的基础。本讲座涵盖 AWS 网络服务——VPC、子网、路由、安全组、NACL——以及如何为 AI/ML 工作负载设计隔离、安全的网络架构。你将学习构建多层网络，包括面向公网的负载均衡器、私有应用服务器和隔离的数据层，实施纵深防御安全原则。
 
-By the end, you'll understand how to create production-grade VPC architectures, configure security groups following least-privilege principles, implement network segmentation for compliance, and troubleshoot connectivity issues. You'll also learn advanced IAM patterns for cross-account access and service-to-service authentication in microservices architectures.
+到本讲座结束时，你将了解如何创建生产级 VPC 架构、遵循最小权限原则配置安全组、为合规实施网络分段以及排查连接问题。你还将学习跨账户访问和微服务架构中服务间认证的高级 IAM 模式。
 
-**Estimated Reading Time:** 75-90 minutes
-**Hands-on Companion Lab:** Exercise 03 – Networking & Security Lab
-**Prerequisites:** Lecture 02 (AWS Core Services), basic understanding of IP addressing and subnetting, familiarity with TCP/IP protocols
+**预计阅读时间：** 75-90 分钟
+**动手实验：** 练习 03 – 网络与安全实验
+**前置要求：** Lecture 02（AWS 核心服务）、IP 地址和子网划分的基础知识、熟悉 TCP/IP 协议
 
 ---
 
-## 1. VPC (Virtual Private Cloud) Fundamentals
+## 1. VPC（Virtual Private Cloud）基础
 
-### 1.1 What is a VPC?
+### 1.1 什么是 VPC？
 
-**VPC = Isolated Virtual Network in AWS Cloud**
+**VPC = AWS 云中的隔离虚拟网络**
 
-Think of a VPC as your own private data center in AWS, where you have complete control over:
-- **IP address range** (CIDR blocks)
-- **Subnets** (network segments)
-- **Route tables** (how traffic flows)
-- **Network gateways** (internet access, VPN connections)
-- **Security policies** (firewalls, access control)
+将 VPC 想象成你在 AWS 中的私有数据中心，你可以完全控制：
+- **IP 地址范围**（CIDR 块）
+- **子网**（网络段）
+- **路由表**（流量如何流动）
+- **网络网关**（互联网访问、VPN 连接）
+- **安全策略**（防火墙、访问控制）
 
-**Default VPC:**
-- AWS creates a default VPC in each region when you create an account
-- CIDR: 172.31.0.0/16 (65,536 IP addresses)
-- Public subnets in each AZ
-- Internet Gateway attached
-- **Good for getting started, NOT recommended for production**
+**默认 VPC：**
+- 创建账户时 AWS 在每个区域创建一个默认 VPC
+- 默认即可使用
+- CIDR：172.31.0.0/16（65536 个 IP 地址）
+- 每个 AZ 中的公有子网
+- 已附加 Internet Gateway
+- **适合入门，不推荐用于生产**
 
-### 1.2 VPC CIDR Blocks and IP Addressing
+### 1.2 VPC CIDR 块和 IP 寻址
 
-**CIDR Notation:** `10.0.0.0/16`
-- **Network portion:** First 16 bits (10.0)
-- **Host portion:** Last 16 bits (65,536 addresses: 10.0.0.0 - 10.0.255.255)
+**CIDR 表示法：** `10.0.0.0/16`
+- **网络部分**：前 16 位（10.0）
+- **主机部分**：后 16 位（65536 个地址：10.0.0.0 - 10.0.255.255）
 
-**Common VPC CIDR Blocks:**
+**常见 VPC CIDR 块：**
 
-| CIDR | IP Range | Usable IPs | Use Case |
-|------|----------|------------|----------|
-| 10.0.0.0/16 | 10.0.0.0 - 10.0.255.255 | 65,531 | Large production VPC |
-| 10.0.0.0/24 | 10.0.0.0 - 10.0.0.255 | 251 | Small dev/test VPC |
-| 172.16.0.0/12 | 172.16.0.0 - 172.31.255.255 | 1,048,571 | Very large VPC |
-| 192.168.0.0/16 | 192.168.0.0 - 192.168.255.255 | 65,531 | Common for on-prem integration |
+| CIDR | IP 范围 | 可用 IP | 用例 |
+|------|----------|----------|------|
+| 10.0.0.0/16 | 10.0.0.0 - 10.0.255.255 | 65531 | 大型生产 VPC |
+| 10.0.0.0/24 | 10.0.0.0 - 10.0.0.255 | 251 | 小型开发/测试 VPC |
+| 172.16.0.0/12 | 172.16.0.0 - 172.31.255.255 | 1048571 | 非常大的 VPC |
+| 192.168.0.0/16 | 192.168.0.0 - 192.168.255.255 | 65531 | 常用于本地集成 |
 
-**AWS Reserves 5 IPs per Subnet:**
-- **x.x.x.0**: Network address
-- **x.x.x.1**: VPC router
-- **x.x.x.2**: DNS server (AWS-provided)
-- **x.x.x.3**: Reserved for future use
-- **x.x.x.255**: Broadcast address (not used in VPC, but reserved)
+**AWS 为每个子网保留 5 个 IP：**
+- **x.x.x.0**：网络地址
+- **x.x.x.1**：VPC 路由器
+- **x.x.x.2**：DNS 服务器（AWS 提供）
+- **x.x.x.3**：保留供将来使用
+- **x.x.x.255**：广播地址（VPC 中不使用，但保留）
 
-**Example:** 10.0.0.0/24 subnet
-- Total IPs: 256
-- Usable IPs: 256 - 5 = **251**
-- First usable: 10.0.0.4
-- Last usable: 10.0.0.254
+**示例：** 10.0.0.0/24 子网
+- 总 IP：256
+- 可用 IP：256 - 5 = **251**
+- 第一个可用：10.0.0.4
+- 最后一个可用：10.0.0.254
 
-### 1.3 Creating a VPC (CLI)
+### 1.3 创建 VPC（CLI）
 
-**Create VPC:**
+**创建 VPC：**
 
 ```bash
-# Create VPC with 10.0.0.0/16 CIDR block
+# 使用 10.0.0.0/16 CIDR 块创建 VPC
 aws ec2 create-vpc \
   --cidr-block 10.0.0.0/16 \
   --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=ml-production-vpc}]'
 
-# Output includes VpcId (e.g., vpc-0abcdef1234567890)
+# 输出包含 VpcId（例如 vpc-0abcdef1234567890）
 
-# Enable DNS hostnames (required for RDS, ELB)
+# 启用 DNS 主机名（RDS、ELB 需要）
 aws ec2 modify-vpc-attribute \
   --vpc-id vpc-0abcdef1234567890 \
   --enable-dns-hostnames
 
-# Enable DNS support (enabled by default)
+# 启用 DNS 支持（默认已启用）
 aws ec2 modify-vpc-attribute \
   --vpc-id vpc-0abcdef1234567890 \
   --enable-dns-support
 ```
 
-**View VPCs:**
+**查看 VPC：**
 
 ```bash
-# List all VPCs
+# 列出所有 VPC
 aws ec2 describe-vpcs --query 'Vpcs[*].[VpcId,CidrBlock,Tags[?Key==`Name`].Value|[0]]' --output table
 
-# Output:
+# 输出：
 -----------------------------------------------------
 |                  DescribeVpcs                     |
 +----------------------+----------------+-----------+
@@ -100,88 +101,88 @@ aws ec2 describe-vpcs --query 'Vpcs[*].[VpcId,CidrBlock,Tags[?Key==`Name`].Value
 
 ---
 
-## 2. Subnets: Network Segmentation
+## 2. 子网：网络分段
 
-### 2.1 Public vs Private Subnets
+### 2.1 公有 vs 私有子网
 
-**Public Subnet:**
-- **Route to Internet Gateway** (0.0.0.0/0 → igw-xxxxx)
-- Instances have **public IP addresses**
-- **Use case**: Load balancers, bastion hosts, NAT gateways
+**公有子网：**
+- **路由到 Internet Gateway**（0.0.0.0/0 → igw-xxxxx）
+- 实例具有**公有 IP 地址**
+- **用例**：负载均衡器、堡垒机、NAT Gateway
 
-**Private Subnet:**
-- **No direct route to Internet Gateway**
-- Instances have **private IP addresses only**
-- Outbound internet via **NAT Gateway** in public subnet
-- **Use case**: Application servers, databases (security best practice)
+**私有子网：**
+- **没有直接到 Internet Gateway 的路由**
+- 实例只有**私有 IP 地址**
+- 通过公有子网中的 **NAT Gateway** 进行出站互联网访问
+- **用例**：应用服务器、数据库（安全最佳实践）
 
-### 2.2 Multi-Tier Network Architecture
+### 2.2 多层网络架构
 
-**Typical Production ML Architecture:**
+**典型生产 ML 架构：**
 
 ```
-VPC: 10.0.0.0/16
+VPC：10.0.0.0/16
 
-├─ Public Subnet 1 (10.0.1.0/24) [us-east-1a]
-│  └─ Application Load Balancer (ALB)
+├─ 公有子网 1（10.0.1.0/24）[us-east-1a]
+│  └─ Application Load Balancer（ALB）
 │  └─ NAT Gateway
-├─ Public Subnet 2 (10.0.2.0/24) [us-east-1b]
-│  └─ ALB (for HA)
-│  └─ NAT Gateway (for HA)
+├─ 公有子网 2（10.0.2.0/24）[us-east-1b]
+│  └─ ALB（用于高可用）
+│  └─ NAT Gateway（用于高可用）
 │
-├─ Private Subnet 1 (10.0.11.0/24) [us-east-1a]
-│  └─ EC2 Inference Servers
-│  └─ ECS/EKS worker nodes
-├─ Private Subnet 2 (10.0.12.0/24) [us-east-1b]
-│  └─ EC2 Inference Servers (HA)
+├─ 私有子网 1（10.0.11.0/24）[us-east-1a]
+│  └─ EC2 推理服务器
+│  └─ ECS/EKS 工作节点
+├─ 私有子网 2（10.0.12.0/24）[us-east-1b]
+│  └─ EC2 推理服务器（高可用）
 │
-├─ Data Subnet 1 (10.0.21.0/24) [us-east-1a]
-│  └─ RDS Primary
+├─ 数据子网 1（10.0.21.0/24）[us-east-1a]
+│  └─ RDS 主库
 │  └─ ElastiCache Redis
-├─ Data Subnet 2 (10.0.22.0/24) [us-east-1b]
-│  └─ RDS Standby (Multi-AZ)
+├─ 数据子网 2（10.0.22.0/24）[us-east-1b]
+│  └─ RDS 备用库（Multi-AZ）
 ```
 
-**Why Multi-Tier?**
-- **Security**: Internet cannot directly reach application servers or databases
-- **Compliance**: Meet requirements for network isolation (PCI-DSS, HIPAA)
-- **Defense in Depth**: Multiple layers of security
+**为什么多层？**
+- **安全**：互联网不能直接访问应用服务器或数据库
+- **合规**：满足网络隔离要求（PCI-DSS、HIPAA）
+- **纵深防御**：多层安全
 
-### 2.3 Creating Subnets (CLI)
+### 2.3 创建子网（CLI）
 
-**Create Public Subnet:**
+**创建公有子网：**
 
 ```bash
-# Public Subnet in us-east-1a
+# 在 us-east-1a 中创建公有子网
 aws ec2 create-subnet \
   --vpc-id vpc-0abcdef1234567890 \
   --cidr-block 10.0.1.0/24 \
   --availability-zone us-east-1a \
   --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=public-subnet-1a},{Key=Tier,Value=public}]'
 
-# Enable auto-assign public IP (makes it "public")
+# 启用自动分配公有 IP（使其成为"公有"子网）
 aws ec2 modify-subnet-attribute \
   --subnet-id subnet-0abc111 \
   --map-public-ip-on-launch
 ```
 
-**Create Private Subnet:**
+**创建私有子网：**
 
 ```bash
-# Private Subnet in us-east-1a
+# 在 us-east-1a 中创建私有子网
 aws ec2 create-subnet \
   --vpc-id vpc-0abcdef1234567890 \
   --cidr-block 10.0.11.0/24 \
   --availability-zone us-east-1a \
   --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=private-subnet-1a},{Key=Tier,Value=private}]'
 
-# No auto-assign public IP (makes it "private")
+# 不启用自动分配公有 IP（使其成为"私有"子网）
 ```
 
-**Create Subnets in Multiple AZs (High Availability):**
+**在多个 AZ 中创建子网（高可用性）：**
 
 ```bash
-# Public Subnet in us-east-1b
+# 在 us-east-1b 中创建公有子网
 aws ec2 create-subnet \
   --vpc-id vpc-0abcdef1234567890 \
   --cidr-block 10.0.2.0/24 \
@@ -190,7 +191,7 @@ aws ec2 create-subnet \
 
 aws ec2 modify-subnet-attribute --subnet-id subnet-0abc222 --map-public-ip-on-launch
 
-# Private Subnet in us-east-1b
+# 在 us-east-1b 中创建私有子网
 aws ec2 create-subnet \
   --vpc-id vpc-0abcdef1234567890 \
   --cidr-block 10.0.12.0/24 \
@@ -198,84 +199,84 @@ aws ec2 create-subnet \
   --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=private-subnet-1b}]'
 ```
 
-### 2.4 Subnet IP Planning Best Practices
+### 2.4 子网 IP 规划最佳实践
 
-**Reserve CIDR Space for Growth:**
+**为增长预留 CIDR 空间：**
 
 ```
-VPC: 10.0.0.0/16 (65,536 IPs)
+VPC：10.0.0.0/16（65536 个 IP）
 
-├─ Public Subnets: 10.0.0.0/20 (4,096 IPs)
-│  ├─ us-east-1a: 10.0.1.0/24 (256 IPs)
-│  ├─ us-east-1b: 10.0.2.0/24 (256 IPs)
-│  ├─ us-east-1c: 10.0.3.0/24 (256 IPs)
-│  └─ Reserved: 10.0.4.0/22 (1,024 IPs for future AZs)
+├─ 公有子网：10.0.0.0/20（4096 个 IP）
+│  ├─ us-east-1a：10.0.1.0/24（256 个 IP）
+│  ├─ us-east-1b：10.0.2.0/24（256 个 IP）
+│  ├─ us-east-1c：10.0.3.0/24（256 个 IP）
+│  └─ 预留：10.0.4.0/22（1024 个 IP 供将来 AZ 使用）
 │
-├─ Private Subnets: 10.0.16.0/20 (4,096 IPs)
-│  ├─ us-east-1a: 10.0.16.0/24 (256 IPs)
-│  ├─ us-east-1b: 10.0.17.0/24 (256 IPs)
-│  ├─ us-east-1c: 10.0.18.0/24 (256 IPs)
-│  └─ Reserved: 10.0.20.0/22 (1,024 IPs)
+├─ 私有子网：10.0.16.0/20（4096 个 IP）
+│  ├─ us-east-1a：10.0.16.0/24（256 个 IP）
+│  ├─ us-east-1b：10.0.17.0/24（256 个 IP）
+│  ├─ us-east-1c：10.0.18.0/24（256 个 IP）
+│  └─ 预留：10.0.20.0/22（1024 个 IP）
 │
-├─ Data Subnets: 10.0.32.0/20 (4,096 IPs)
-│  ├─ us-east-1a: 10.0.32.0/24 (256 IPs)
-│  ├─ us-east-1b: 10.0.33.0/24 (256 IPs)
-│  └─ Reserved: 10.0.34.0/23 (512 IPs)
+├─ 数据子网：10.0.32.0/20（4096 个 IP）
+│  ├─ us-east-1a：10.0.32.0/24（256 个 IP）
+│  ├─ us-east-1b：10.0.33.0/24（256 个 IP）
+│  └─ 预留：10.0.34.0/23（512 个 IP）
 │
-└─ Reserved for future tiers: 10.0.48.0/20 - 10.0.255.0/20
+└─ 为将来层级预留：10.0.48.0/20 - 10.0.255.0/20
 ```
 
-**Tips:**
-- Use /24 subnets (256 IPs) for most use cases
-- Use /20 or /22 for EKS node pools (many pods = many IPs)
-- Leave gaps for future growth
-- Document your IP allocation scheme
+**提示：**
+- 对大多数用例使用 /24 子网（256 个 IP）
+- 对 EKS 节点池使用 /20 或 /22（许多 pod = 许多 IP）
+- 为未来增长留出间隙
+- 记录你的 IP 分配方案
 
 ---
 
-## 3. Internet Gateway and NAT Gateway
+## 3. Internet Gateway 和 NAT Gateway
 
-### 3.1 Internet Gateway (IGW)
+### 3.1 Internet Gateway（IGW）
 
-**Internet Gateway = Door to the Internet for VPC**
+**Internet Gateway = VPC 通往互联网的门**
 
-**Characteristics:**
-- Horizontally scaled, redundant, highly available (AWS-managed)
-- No bandwidth constraints
-- Free (no hourly charge, only data transfer out)
+**特征：**
+- 水平扩展、冗余、高可用（AWS 管理）
+- 无带宽限制
+- 免费（无小时费用，仅数据传出收费）
 
-**Create and Attach IGW:**
+**创建并挂载 IGW：**
 
 ```bash
-# Create Internet Gateway
+# 创建 Internet Gateway
 aws ec2 create-internet-gateway \
   --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=ml-vpc-igw}]'
 
-# Output: igw-0xyz789
+# 输出：igw-0xyz789
 
-# Attach to VPC
+# 附加到 VPC
 aws ec2 attach-internet-gateway \
   --internet-gateway-id igw-0xyz789 \
   --vpc-id vpc-0abcdef1234567890
 ```
 
-**Create Route Table for Public Subnets:**
+**为公有子网创建路由表：**
 
 ```bash
-# Create route table
+# 创建路由表
 aws ec2 create-route-table \
   --vpc-id vpc-0abcdef1234567890 \
   --tag-specifications 'ResourceType=route-table,Tags=[{Key=Name,Value=public-route-table}]'
 
-# Output: rtb-0public123
+# 输出：rtb-0public123
 
-# Add route to Internet Gateway (0.0.0.0/0 → IGW)
+# 添加指向 Internet Gateway 的路由（0.0.0.0/0 → IGW）
 aws ec2 create-route \
   --route-table-id rtb-0public123 \
   --destination-cidr-block 0.0.0.0/0 \
   --gateway-id igw-0xyz789
 
-# Associate route table with public subnets
+# 将路由表与公有子网关联
 aws ec2 associate-route-table \
   --route-table-id rtb-0public123 \
   --subnet-id subnet-0abc111  # public-subnet-1a
@@ -287,77 +288,77 @@ aws ec2 associate-route-table \
 
 ### 3.2 NAT Gateway
 
-**NAT Gateway = Allows Private Subnet Instances to Access Internet (Outbound Only)**
+**NAT Gateway = 允许私有子网实例访问互联网（仅出站）**
 
-**Why NAT Gateway?**
-- Private subnet instances need to download packages (apt update, pip install)
-- Need to call external APIs (S3, DynamoDB, external services)
-- But should NOT be reachable from the internet (security)
+**为什么需要 NAT Gateway？**
+- 私有子网实例需要下载包（apt update、pip install）
+- 需要调用外部 API（S3、DynamoDB、外部服务）
+- 但**不应**从互联网可达（安全）
 
-**NAT Gateway vs NAT Instance:**
+**NAT Gateway vs NAT Instance：**
 
-| Feature | NAT Gateway (Managed) | NAT Instance (EC2) |
+| 功能 | NAT Gateway（托管） | NAT Instance（EC2） |
 |---------|----------------------|--------------------|
-| **Availability** | AWS-managed HA | Manual (single instance) |
-| **Bandwidth** | Up to 45 Gbps | Depends on instance type |
-| **Maintenance** | AWS handles | You patch/maintain |
-| **Cost** | $0.045/hour + $0.045/GB | EC2 instance cost |
-| **Recommended** | ✅ Yes | ❌ No (legacy) |
+| **可用性** | AWS 托管高可用 | 手动（单实例） |
+| **带宽** | 最高 45 Gbps | 取决于实例类型 |
+| **维护** | AWS 处理 | 你打补丁/维护 |
+| **成本** | $0.045/小时 + $0.045/GB | EC2 实例成本 |
+| **推荐** | ✅ 是 | ❌ 否（传统） |
 
-**Create NAT Gateway:**
+**创建 NAT Gateway：**
 
 ```bash
-# Step 1: Allocate Elastic IP (static public IP for NAT Gateway)
+# 第 1 步：分配弹性 IP（NAT Gateway 的静态公有 IP）
 aws ec2 allocate-address --domain vpc
-# Output: AllocationId: eipalloc-0natip123
+# 输出：AllocationId：eipalloc-0natip123
 
-# Step 2: Create NAT Gateway in public subnet
+# 第 2 步：在公有子网中创建 NAT Gateway
 aws ec2 create-nat-gateway \
   --subnet-id subnet-0abc111 \
   --allocation-id eipalloc-0natip123 \
   --tag-specifications 'ResourceType=nat-gateway,Tags=[{Key=Name,Value=nat-gateway-1a}]'
 
-# Output: NatGatewayId: nat-0natgw123
+# 输出：NatGatewayId：nat-0natgw123
 
-# Wait for NAT Gateway to become available (takes 2-3 minutes)
+# 等待 NAT Gateway 变为可用（大约 2-3 分钟）
 aws ec2 wait nat-gateway-available --nat-gateway-ids nat-0natgw123
 ```
 
-**Create Route Table for Private Subnets:**
+**为私有子网创建路由表：**
 
 ```bash
-# Create private route table
+# 创建私有路由表
 aws ec2 create-route-table \
   --vpc-id vpc-0abcdef1234567890 \
   --tag-specifications 'ResourceType=route-table,Tags=[{Key=Name,Value=private-route-table-1a}]'
 
-# Output: rtb-0private123
+# 输出：rtb-0private123
 
-# Add route to NAT Gateway (0.0.0.0/0 → NAT Gateway)
+# 添加指向 NAT Gateway 的路由（0.0.0.0/0 → NAT Gateway）
 aws ec2 create-route \
   --route-table-id rtb-0private123 \
   --destination-cidr-block 0.0.0.0/0 \
   --nat-gateway-id nat-0natgw123
 
-# Associate with private subnet
+# 与私有子网关联
 aws ec2 associate-route-table \
   --route-table-id rtb-0private123 \
   --subnet-id subnet-0private111  # private-subnet-1a
 ```
 
-**High Availability: NAT Gateway in Each AZ:**
+**高可用：每个 AZ 中的 NAT Gateway：**
 
 ```bash
-# Create NAT Gateway in us-east-1b (for HA)
+# 在 us-east-1b 中创建 NAT Gateway（用于高可用）
 aws ec2 allocate-address --domain vpc
-# Output: eipalloc-0natip456
+# 输出：eipalloc-0natip456
 
 aws ec2 create-nat-gateway \
   --subnet-id subnet-0abc222 \
   --allocation-id eipalloc-0natip456 \
   --tag-specifications 'ResourceType=nat-gateway,Tags=[{Key=Name,Value=nat-gateway-1b}]'
 
-# Create separate route table for private subnet in us-east-1b
+# 为 us-east-1b 中的私有子网创建单独的路由表
 aws ec2 create-route-table \
   --vpc-id vpc-0abcdef1234567890 \
   --tag-specifications 'ResourceType=route-table,Tags=[{Key=Name,Value=private-route-table-1b}]'
@@ -372,78 +373,78 @@ aws ec2 associate-route-table \
   --subnet-id subnet-0private222
 ```
 
-**Cost Consideration:**
-- **NAT Gateway**: $0.045/hour × 2 AZs × 730 hours = $65.70/month
-- **Data processing**: $0.045/GB transferred
-- **Alternative for dev**: Single NAT Gateway in one AZ (not HA, saves $32.85/month)
+**成本考量：**
+- **NAT Gateway**：$0.045/小时 × 2 个 AZ × 730 小时 = 每月 $65.70
+- **数据处理**：$0.045/GB 传输
+- **开发替代方案**：单个 AZ 中的单个 NAT Gateway（非高可用，每月节省 $32.85）
 
 ---
 
-## 4. Security Groups: Instance-Level Firewalls
+## 4. 安全组：实例级防火墙
 
-### 4.1 Security Group Fundamentals
+### 4.1 安全组基础
 
-**Security Group = Stateful Firewall for EC2 Instances**
+**安全组 = EC2 实例的有状态防火墙**
 
-**Key Characteristics:**
-- **Stateful**: If you allow inbound request, outbound response is automatically allowed
-- **Default Deny**: Everything blocked unless explicitly allowed
-- **Allow Rules Only**: Cannot create deny rules (use NACLs for that)
-- **Instance-Level**: Applied to network interfaces (ENIs)
+**关键特征：**
+- **有状态**：如果允许入站请求，出站响应自动允许
+- **默认拒绝**：除非明确允许，一切被阻止
+- **仅允许规则**：不能创建拒绝规则（使用 NACL 实现）
+- **实例级**：应用于网络接口（ENI）
 
-**Example: Web Server Security Group**
+**示例：Web 服务器安全组**
 
 ```bash
-# Create security group
+# 创建安全组
 aws ec2 create-security-group \
   --group-name web-server-sg \
   --description "Allow HTTP/HTTPS from internet" \
   --vpc-id vpc-0abcdef1234567890
 
-# Output: GroupId: sg-0websg123
+# 输出：GroupId：sg-0websg123
 
-# Allow HTTP (port 80) from anywhere
+# 允许来自任何地方的 HTTP（端口 80）
 aws ec2 authorize-security-group-ingress \
   --group-id sg-0websg123 \
   --protocol tcp \
   --port 80 \
   --cidr 0.0.0.0/0
 
-# Allow HTTPS (port 443) from anywhere
+# 允许来自任何地方的 HTTPS（端口 443）
 aws ec2 authorize-security-group-ingress \
   --group-id sg-0websg123 \
   --protocol tcp \
   --port 443 \
   --cidr 0.0.0.0/0
 
-# Allow SSH (port 22) from your IP only (security best practice)
+# 仅允许来自你 IP 的 SSH（端口 22）（安全最佳实践）
 aws ec2 authorize-security-group-ingress \
   --group-id sg-0websg123 \
   --protocol tcp \
   --port 22 \
-  --cidr 203.0.113.25/32  # Your IP address
+  --cidr 203.0.113.25/32  # 你的 IP 地址
 ```
 
-**View Security Group Rules:**
+**查看安全组规则：**
 
 ```bash
 aws ec2 describe-security-groups --group-ids sg-0websg123
 
-# Output shows inbound/outbound rules
+# 输出显示入站/出站规则
 ```
 
-### 4.2 Multi-Tier Security Group Architecture
+### 4.2 多层安全组架构
 
-**Best Practice: Reference Other Security Groups (Not CIDR Blocks)**
+**最佳实践：引用其他安全组（而非 CIDR 块）**
 
 ```bash
-# Create ALB security group (public-facing)
+# 创建 ALB 安全组（面向公网）
 aws ec2 create-security-group \
   --group-name alb-sg \
   --description "Load balancer security group" \
   --vpc-id vpc-0abcdef1234567890
 
-# Allow HTTP/HTTPS from internet
+# 允许来自互联网的 HTTP/HTTPS
 aws ec2 authorize-security-group-ingress \
   --group-id sg-0albsg123 \
   --protocol tcp --port 80 --cidr 0.0.0.0/0
@@ -452,73 +453,73 @@ aws ec2 authorize-security-group-ingress \
   --group-id sg-0albsg123 \
   --protocol tcp --port 443 --cidr 0.0.0.0/0
 
-# Create application server security group
+# 创建应用服务器安全组
 aws ec2 create-security-group \
   --group-name app-server-sg \
   --description "Application servers" \
   --vpc-id vpc-0abcdef1234567890
 
-# Allow traffic ONLY from ALB security group (not from internet!)
+# 仅允许来自 ALB 安全组的流量（不来自互联网！）
 aws ec2 authorize-security-group-ingress \
   --group-id sg-0appsg123 \
   --protocol tcp --port 5000 \
-  --source-group sg-0albsg123  # Reference ALB SG, not CIDR
+  --source-group sg-0albsg123  # 引用 ALB SG，而非 CIDR
 
-# Create database security group
+# 创建数据库安全组
 aws ec2 create-security-group \
   --group-name database-sg \
   --description "RDS databases" \
   --vpc-id vpc-0abcdef1234567890
 
-# Allow PostgreSQL (port 5432) ONLY from app servers
+# 仅允许来自应用服务器的 PostgreSQL（端口 5432）
 aws ec2 authorize-security-group-ingress \
   --group-id sg-0dbsg123 \
   --protocol tcp --port 5432 \
-  --source-group sg-0appsg123  # Only from app servers
+  --source-group sg-0appsg123  # 仅来自应用服务器
 
-# Create bastion security group
+# 创建堡垒机安全组
 aws ec2 create-security-group \
   --group-name bastion-sg \
   --description "Bastion host for SSH access" \
   --vpc-id vpc-0abcdef1234567890
 
-# Allow SSH only from corporate VPN
+# 仅允许来自公司 VPN 的 SSH
 aws ec2 authorize-security-group-ingress \
   --group-id sg-0bastionsg123 \
   --protocol tcp --port 22 \
-  --cidr 198.51.100.0/24  # Corporate VPN CIDR
+  --cidr 198.51.100.0/24  # 公司 VPN CIDR
 
-# Allow SSH from bastion to app servers
+# 允许从堡垒机到应用服务器的 SSH
 aws ec2 authorize-security-group-ingress \
   --group-id sg-0appsg123 \
   --protocol tcp --port 22 \
   --source-group sg-0bastionsg123
 ```
 
-**Security Group Chain:**
+**安全组链：**
 
 ```
-Internet
-  ↓ (HTTP/HTTPS allowed)
+互联网
+  ↓（允许 HTTP/HTTPS）
 [ALB - sg-0albsg123]
-  ↓ (Port 5000 allowed from ALB SG only)
-[App Servers - sg-0appsg123]
-  ↓ (Port 5432 allowed from App SG only)
-[Database - sg-0dbsg123]
+  ↓（仅允许来自 ALB SG 的端口 5000）
+[应用服务器 - sg-0appsg123]
+  ↓（仅允许来自应用 SG 的端口 5432）
+[数据库 - sg-0dbsg123]
 
-[Bastion - sg-0bastionsg123]
-  ↓ (SSH allowed to App Servers)
-[App Servers - sg-0appsg123]
+[堡垒机 - sg-0bastionsg123]
+  ↓（允许 SSH 到应用服务器）
+[应用服务器 - sg-0appsg123]
 ```
 
-**Benefits:**
-- If you scale app servers (add instances), they automatically get access to DB
-- No need to update DB security group with new IP addresses
-- Clear security boundaries
+**优点：**
+- 如果扩展应用服务器（添加实例），它们自动获得数据库访问
+- 无需用新的 IP 地址更新数据库安全组
+- 清晰的安全边界
 
-### 4.3 Common Security Group Patterns for ML Infrastructure
+### 4.3 ML 基础设施的常见安全组模式
 
-**1. ML Training Instance Security Group:**
+**1. ML 训练实例安全组：**
 
 ```bash
 aws ec2 create-security-group \
@@ -526,22 +527,22 @@ aws ec2 create-security-group \
   --description "GPU instances for model training" \
   --vpc-id vpc-0abcdef1234567890
 
-# Allow SSH from bastion only
+# 仅允许来自堡垒机的 SSH
 aws ec2 authorize-security-group-ingress \
   --group-id sg-0trainsg123 \
   --protocol tcp --port 22 \
   --source-group sg-0bastionsg123
 
-# Allow Jupyter notebook access (port 8888) from VPN only
+# 仅允许来自 VPN 的 Jupyter notebook 访问（端口 8888）
 aws ec2 authorize-security-group-ingress \
   --group-id sg-0trainsg123 \
   --protocol tcp --port 8888 \
-  --cidr 198.51.100.0/24  # Corporate VPN
+  --cidr 198.51.100.0/24  # 公司 VPN
 
-# Allow S3 access (outbound) - default allows all outbound, no rule needed
+# 允许 S3 访问（出站）- 默认允许所有出站，无需规则
 ```
 
-**2. ML Inference Service Security Group:**
+**2. ML 推理服务安全组：**
 
 ```bash
 aws ec2 create-security-group \
@@ -549,62 +550,62 @@ aws ec2 create-security-group \
   --description "Inference API servers" \
   --vpc-id vpc-0abcdef1234567890
 
-# Allow API traffic (port 5000) from ALB only
+# 仅允许来自 ALB 的 API 流量（端口 5000）
 aws ec2 authorize-security-group-ingress \
   --group-id sg-0infersg123 \
   --protocol tcp --port 5000 \
   --source-group sg-0albsg123
 
-# Allow health checks from ALB
-# (Covered by above rule if health check uses same port)
+# 允许来自 ALB 的健康检查
+#（如果健康检查使用相同端口，以上规则已涵盖）
 ```
 
-**3. EKS Cluster Security Groups:**
+**3. EKS 集群安全组：**
 
 ```bash
-# EKS Control Plane Security Group (AWS-managed, but you can add rules)
-# EKS Worker Node Security Group
+# EKS 控制平面安全组（AWS 管理，但你可以添加规则）
+# EKS 工作节点安全组
 
 aws ec2 create-security-group \
   --group-name eks-worker-sg \
   --description "EKS worker nodes" \
   --vpc-id vpc-0abcdef1234567890
 
-# Allow kubelet API (port 10250) from control plane
+# 允许来自控制平面的 kubelet API（端口 10250）
 aws ec2 authorize-security-group-ingress \
   --group-id sg-0eksworkersg123 \
   --protocol tcp --port 10250 \
   --source-group sg-0ekscontrolsg123
 
-# Allow all traffic between worker nodes (pod-to-pod communication)
+# 允许工作节点之间的所有流量（pod-to-pod 通信）
 aws ec2 authorize-security-group-ingress \
   --group-id sg-0eksworkersg123 \
   --protocol -1 \
-  --source-group sg-0eksworkersg123  # Self-referencing
+  --source-group sg-0eksworkersg123  # 自引用
 ```
 
-### 4.4 Security Group Best Practices
+### 4.4 安全组最佳实践
 
-**1. Least Privilege:**
-- Only open ports that are absolutely necessary
-- Restrict source to specific IPs/security groups, not 0.0.0.0/0
+**1. 最小权限：**
+- 只打开绝对必要的端口
+- 将源限制到特定 IP/安全组，而非 0.0.0.0/0
 
-**2. Use Descriptive Names and Tags:**
+**2. 使用描述性名称和标签：**
 ```bash
 --tag-specifications 'ResourceType=security-group,Tags=[{Key=Name,Value=ml-inference-prod},{Key=Environment,Value=production},{Key=Team,Value=ml-platform}]'
 ```
 
-**3. Regular Audits:**
+**3. 定期审计：**
 ```bash
-# List security groups with overly permissive rules (open to 0.0.0.0/0)
+# 列出具有过于宽松规则（开放到 0.0.0.0/0）的安全组
 aws ec2 describe-security-groups \
   --query 'SecurityGroups[?IpPermissions[?IpRanges[?CidrIp==`0.0.0.0/0`]]].{Name:GroupName,ID:GroupId}' \
   --output table
 ```
 
-**4. Document Your Security Groups:**
+**4. 记录你的安全组：**
 ```bash
-# Add descriptions to rules (requires JSON input)
+# 为规则添加描述（需要 JSON 输入）
 cat > sg-rule.json <<'EOF'
 {
   "IpPermissions": [{
@@ -626,41 +627,41 @@ aws ec2 authorize-security-group-ingress \
 
 ---
 
-## 5. Network ACLs (NACLs)
+## 5. Network ACL（NACL）
 
-### 5.1 NACLs vs Security Groups
+### 5.1 NACL vs 安全组
 
-| Feature | Security Groups | NACLs |
-|---------|----------------|-------|
-| **Level** | Instance (ENI) | Subnet |
-| **State** | Stateful (return traffic auto-allowed) | Stateless (must explicitly allow return) |
-| **Rules** | Allow only | Allow and Deny |
-| **Rule Evaluation** | All rules evaluated | Rules evaluated in number order |
-| **Default** | Deny all inbound, allow all outbound | Allow all inbound/outbound |
-| **Use Case** | Primary defense | Additional layer of defense |
+| 功能 | 安全组 | NACL |
+|---------|--------|-------|
+| **层级** | 实例（ENI） | 子网 |
+| **状态** | 有状态（返回流量自动允许） | 无状态（必须明确允许返回） |
+| **规则** | 仅允许 | 允许和拒绝 |
+| **规则评估** | 所有规则被评估 | 规则按编号顺序评估 |
+| **默认** | 拒绝所有入站、允许所有出站 | 允许所有入站/出站 |
+| **用例** | 主要防御 | 额外防御层 |
 
-**When to Use NACLs:**
-- Block specific IP addresses (DDoS mitigation)
-- Compliance requirements for network-level controls
-- Defense in depth (additional layer beyond security groups)
+**何时使用 NACL：**
+- 阻止特定 IP 地址（DDoS 缓解）
+- 网络级控制的合规要求
+- 纵深防御（安全组之外的额外层）
 
-### 5.2 Creating Custom NACLs
+### 5.2 创建自定义 NACL
 
-**Create NACL:**
+**创建 NACL：**
 
 ```bash
-# Create network ACL
+# 创建网络 ACL
 aws ec2 create-network-acl \
   --vpc-id vpc-0abcdef1234567890 \
   --tag-specifications 'ResourceType=network-acl,Tags=[{Key=Name,Value=private-subnet-nacl}]'
 
-# Output: NetworkAclId: acl-0nacl123
+# 输出：NetworkAclId：acl-0nacl123
 ```
 
-**Add Rules:**
+**添加规则：**
 
 ```bash
-# Allow inbound HTTP (port 80) from anywhere
+# 允许来自任何地方的入站 HTTP（端口 80）
 aws ec2 create-network-acl-entry \
   --network-acl-id acl-0nacl123 \
   --rule-number 100 \
@@ -669,7 +670,7 @@ aws ec2 create-network-acl-entry \
   --cidr-block 0.0.0.0/0 \
   --rule-action allow
 
-# Allow inbound HTTPS (port 443)
+# 允许入站 HTTPS（端口 443）
 aws ec2 create-network-acl-entry \
   --network-acl-id acl-0nacl123 \
   --rule-number 110 \
@@ -678,8 +679,8 @@ aws ec2 create-network-acl-entry \
   --cidr-block 0.0.0.0/0 \
   --rule-action allow
 
-# Allow inbound ephemeral ports (return traffic for outbound connections)
-# Linux clients use ports 32768-60999, Windows uses 49152-65535
+# 允许入站临时端口（出站连接的返回流量）
+# Linux 客户端使用端口 32768-60999，Windows 使用 49152-65535
 aws ec2 create-network-acl-entry \
   --network-acl-id acl-0nacl123 \
   --rule-number 120 \
@@ -688,7 +689,7 @@ aws ec2 create-network-acl-entry \
   --cidr-block 0.0.0.0/0 \
   --rule-action allow
 
-# DENY traffic from specific malicious IP
+# 拒绝来自特定恶意 IP 的流量
 aws ec2 create-network-acl-entry \
   --network-acl-id acl-0nacl123 \
   --rule-number 50 \
@@ -696,7 +697,7 @@ aws ec2 create-network-acl-entry \
   --cidr-block 203.0.113.50/32 \
   --rule-action deny
 
-# Allow outbound HTTP/HTTPS
+# 允许出站 HTTP/HTTPS
 aws ec2 create-network-acl-entry \
   --network-acl-id acl-0nacl123 \
   --egress \
@@ -715,7 +716,7 @@ aws ec2 create-network-acl-entry \
   --cidr-block 0.0.0.0/0 \
   --rule-action allow
 
-# Allow outbound ephemeral ports (return traffic)
+# 允许出站临时端口（返回流量）
 aws ec2 create-network-acl-entry \
   --network-acl-id acl-0nacl123 \
   --egress \
@@ -725,23 +726,23 @@ aws ec2 create-network-acl-entry \
   --cidr-block 0.0.0.0/0 \
   --rule-action allow
 
-# Associate NACL with subnet
+# 将 NACL 与子网关联
 aws ec2 replace-network-acl-association \
   --association-id aclassoc-0abc123 \
   --network-acl-id acl-0nacl123
 ```
 
-**Rule Number Best Practices:**
-- Use increments of 10 (100, 110, 120...) to allow inserting rules later
-- Lower numbers evaluated first
-- Use numbers < 100 for deny rules (evaluated before allow rules)
+**规则编号最佳实践：**
+- 使用 10 的增量（100、110、120...）以允许以后插入规则
+- 较低编号的规则先被评估
+- 对拒绝规则使用小于 100 的编号（在允许规则之前评估）
 
-### 5.3 Example: Block Specific IP Range
+### 5.3 示例：阻止特定 IP 范围
 
 ```bash
-# Scenario: Block traffic from known malicious IP range 198.51.100.0/24
+# 场景：阻止来自已知恶意 IP 范围 198.51.100.0/24 的流量
 
-# Inbound deny rule
+# 入站拒绝规则
 aws ec2 create-network-acl-entry \
   --network-acl-id acl-0nacl123 \
   --rule-number 10 \
@@ -749,7 +750,7 @@ aws ec2 create-network-acl-entry \
   --cidr-block 198.51.100.0/24 \
   --rule-action deny
 
-# Outbound deny rule (stateless, need both directions)
+# 出站拒绝规则（无状态，需要双向）
 aws ec2 create-network-acl-entry \
   --network-acl-id acl-0nacl123 \
   --egress \
@@ -761,32 +762,32 @@ aws ec2 create-network-acl-entry \
 
 ---
 
-## 6. Advanced IAM for Network Security
+## 6. 网络安全的高级 IAM
 
-### 6.1 VPC Endpoints: Secure S3/DynamoDB Access
+### 6.1 VPC 端点：安全的 S3/DynamoDB 访问
 
-**Problem:** Traffic to S3/DynamoDB from private subnet goes through NAT Gateway → internet → AWS (expensive, less secure)
+**问题：** 从私有子网到 S3/DynamoDB 的流量经过 NAT Gateway → 互联网 → AWS（昂贵、安全性较差）
 
-**Solution:** VPC Endpoints (private connection to AWS services)
+**解决方案：** VPC 端点（到 AWS 服务的私有连接）
 
-**Types:**
-- **Gateway Endpoint**: S3, DynamoDB (free)
-- **Interface Endpoint**: Most other services (charged per hour + data)
+**类型：**
+- **Gateway Endpoint**：S3、DynamoDB（免费）
+- **Interface Endpoint**：大多数其他服务（按小时 + 数据收费）
 
-**Create S3 VPC Endpoint:**
+**创建 S3 VPC 端点：**
 
 ```bash
-# Create S3 gateway endpoint
+# 创建 S3 gateway 端点
 aws ec2 create-vpc-endpoint \
   --vpc-id vpc-0abcdef1234567890 \
   --service-name com.amazonaws.us-east-1.s3 \
   --route-table-ids rtb-0private123 rtb-0private456
 
-# Now S3 traffic stays within AWS network, doesn't use NAT Gateway
-# Traffic from private subnets: EC2 → S3 endpoint → S3 (never touches internet)
+# 现在 S3 流量留在 AWS 网络内，不使用 NAT Gateway
+# 来自私有子网的流量：EC2 → S3 端点 → S3（永不经互联网）
 ```
 
-**S3 Bucket Policy for VPC Endpoint:**
+**用于 VPC 端点的 S3 存储桶策略：**
 
 ```json
 {
@@ -811,14 +812,14 @@ aws ec2 create-vpc-endpoint \
 }
 ```
 
-**Benefits:**
-- **Cost Savings**: No NAT Gateway data charges for S3/DynamoDB traffic
-- **Security**: Traffic never leaves AWS network
-- **Performance**: Lower latency
+**优点：**
+- **成本节省**：S3/DynamoDB 流量无需 NAT Gateway 数据费用
+- **安全**：流量永不离开 AWS 网络
+- **性能**：更低的延迟
 
-### 6.2 IAM Policies with Network Conditions
+### 6.2 带有网络条件的 IAM 策略
 
-**Restrict EC2 Launch to Specific VPC:**
+**限制 EC2 启动到特定 VPC：**
 
 ```json
 {
@@ -838,7 +839,7 @@ aws ec2 create-vpc-endpoint \
 }
 ```
 
-**Require MFA for Security Group Modifications:**
+**要求 MFA 用于安全组修改：**
 
 ```json
 {
@@ -861,58 +862,58 @@ aws ec2 create-vpc-endpoint \
 }
 ```
 
-### 6.3 Cross-Account VPC Peering and IAM
+### 6.3 跨账户 VPC 对等连接和 IAM
 
-**VPC Peering:** Connect two VPCs (same account or different accounts) for private communication.
+**VPC 对等连接：** 连接两个 VPC（同一账户或不同账户）进行私有通信。
 
-**Create VPC Peering Connection:**
+**创建 VPC 对等连接：**
 
 ```bash
-# In Account A (Requester)
+# 在账户 A（请求方）
 aws ec2 create-vpc-peering-connection \
   --vpc-id vpc-0accountA123 \
   --peer-vpc-id vpc-0accountB456 \
   --peer-owner-id 987654321098 \
   --peer-region us-east-1
 
-# In Account B (Accepter)
+# 在账户 B（接受方）
 aws ec2 accept-vpc-peering-connection \
   --vpc-peering-connection-id pcx-0peering123
 
-# Update route tables in both VPCs
-# Account A: Add route 10.1.0.0/16 → pcx-0peering123
+# 更新两个 VPC 中的路由表
+# 账户 A：添加路由 10.1.0.0/16 → pcx-0peering123
 aws ec2 create-route \
   --route-table-id rtb-0accountA123 \
   --destination-cidr-block 10.1.0.0/16 \
   --vpc-peering-connection-id pcx-0peering123
 
-# Account B: Add route 10.0.0.0/16 → pcx-0peering123
+# 账户 B：添加路由 10.0.0.0/16 → pcx-0peering123
 aws ec2 create-route \
   --route-table-id rtb-0accountB456 \
   --destination-cidr-block 10.0.0.0/16 \
   --vpc-peering-connection-id pcx-0peering123
 
-# Update security groups to allow traffic from peered VPC CIDR
+# 更新安全组以允许来自对等 VPC CIDR 的流量
 ```
 
-**Use Case: ML Training in Account A, Inference in Account B**
-- Training VPC (Account A): 10.0.0.0/16
-- Inference VPC (Account B): 10.1.0.0/16
-- Peering allows models trained in Account A to be tested in Account B's inference environment
+**用例：账户 A 中的 ML 训练，账户 B 中的推理**
+- 训练 VPC（账户 A）：10.0.0.0/16
+- 推理 VPC（账户 B）：10.1.0.0/16
+- 对等连接允许在账户 A 中训练的模型在账户 B 的推理环境中进行测试
 
 ---
 
-## 7. Network Troubleshooting
+## 7. 网络故障排查
 
 ### 7.1 VPC Flow Logs
 
-**Enable Flow Logs to CloudWatch:**
+**将 Flow Logs 启用并发送到 CloudWatch：**
 
 ```bash
-# Create CloudWatch log group
+# 创建 CloudWatch 日志组
 aws logs create-log-group --log-group-name /aws/vpc/flowlogs
 
-# Create IAM role for Flow Logs
+# 为 Flow Logs 创建 IAM 角色
 cat > flow-logs-trust-policy.json <<'EOF'
 {
   "Version": "2012-10-17",
@@ -928,12 +929,12 @@ aws iam create-role \
   --role-name VPCFlowLogsRole \
   --assume-role-policy-document file://flow-logs-trust-policy.json
 
-# Attach policy to write to CloudWatch
+# 附加写入 CloudWatch 的策略
 aws iam attach-role-policy \
   --role-name VPCFlowLogsRole \
   --policy-arn arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
 
-# Create flow log
+# 创建 flow log
 aws ec2 create-flow-logs \
   --resource-type VPC \
   --resource-ids vpc-0abcdef1234567890 \
@@ -943,25 +944,25 @@ aws ec2 create-flow-logs \
   --deliver-logs-permission-arn arn:aws:iam::123456789012:role/VPCFlowLogsRole
 ```
 
-**Flow Log Format:**
+**Flow Log 格式：**
 
 ```
 version account-id interface-id srcaddr dstaddr srcport dstport protocol packets bytes start end action log-status
 
-Example:
+示例：
 2 123456789012 eni-0abc123 10.0.1.5 198.51.100.5 45678 443 6 10 5200 1634567890 1634567920 ACCEPT OK
 ```
 
-**Query Flow Logs (CloudWatch Logs Insights):**
+**查询 Flow Logs（CloudWatch Logs Insights）：**
 
 ```sql
-# Find rejected connections
+# 查找被拒绝的连接
 fields @timestamp, srcAddr, dstAddr, dstPort, action
 | filter action = "REJECT"
 | sort @timestamp desc
 | limit 100
 
-# Top talkers (source IPs with most traffic)
+# 最高流量源 IP
 stats sum(bytes) as totalBytes by srcAddr
 | sort totalBytes desc
 | limit 10
@@ -969,83 +970,83 @@ stats sum(bytes) as totalBytes by srcAddr
 
 ### 7.2 Reachability Analyzer
 
-**Test Connectivity Between Resources:**
+**测试资源之间的连接：**
 
 ```bash
-# Analyze path from EC2 instance to RDS
+# 分析从 EC2 实例到 RDS 的路径
 aws ec2 create-network-insights-path \
   --source eni-0source123 \
   --destination eni-0destination456 \
   --protocol tcp \
   --destination-port 5432
 
-# Run analysis
+# 运行分析
 aws ec2 start-network-insights-analysis \
   --network-insights-path-id nip-0path123
 
-# Check results
+# 检查结果
 aws ec2 describe-network-insights-analyses \
   --network-insights-analysis-ids nia-0analysis123
 
-# Output shows:
-# - Reachable: Yes/No
-# - Path: Source → SG → Route Table → NAT/IGW → Destination SG
-# - Blocking Rule: If unreachable, shows which SG/NACL/route is blocking
+# 输出显示：
+# - Reachable：是/否
+# - Path：源 → SG → 路由表 → NAT/IGW → 目标 SG
+# - Blocking Rule：如果不可达，显示哪个 SG/NACL/路由在阻塞
 ```
 
-### 7.3 Common Connectivity Issues
+### 7.3 常见连接问题
 
-**1. Cannot SSH to EC2 in Public Subnet:**
+**1. 无法 SSH 到公有子网中的 EC2：**
 
-Checklist:
-- [ ] Instance has public IP?
-- [ ] Internet Gateway attached to VPC?
-- [ ] Route table has 0.0.0.0/0 → IGW?
-- [ ] Security group allows SSH (port 22) from your IP?
-- [ ] NACL allows inbound SSH and outbound ephemeral ports?
-- [ ] Using correct SSH key?
+检查清单：
+- [ ] 实例有公有 IP？
+- [ ] Internet Gateway 已附加到 VPC？
+- [ ] 路由表有 0.0.0.0/0 → IGW？
+- [ ] 安全组允许来自你 IP 的 SSH（端口 22）？
+- [ ] NACL 允许入站 SSH 和出站临时端口？
+- [ ] 使用正确的 SSH 密钥？
 
 ```bash
-# Verify public IP
+# 验证公有 IP
 aws ec2 describe-instances --instance-ids i-0abc123 \
   --query 'Reservations[0].Instances[0].PublicIpAddress'
 
-# Verify route table
+# 验证路由表
 aws ec2 describe-route-tables --route-table-ids rtb-0public123
 
-# Check security group
+# 检查安全组
 aws ec2 describe-security-groups --group-ids sg-0websg123
 ```
 
-**2. EC2 in Private Subnet Cannot Reach Internet:**
+**2. 私有子网中的 EC2 无法访问互联网：**
 
-Checklist:
-- [ ] NAT Gateway exists in public subnet?
-- [ ] Route table has 0.0.0.0/0 → NAT Gateway?
-- [ ] NAT Gateway has Elastic IP?
-- [ ] Security group allows outbound traffic (default yes)?
-- [ ] NACL allows outbound HTTP/HTTPS and inbound ephemeral ports?
+检查清单：
+- [ ] NAT Gateway 存在于公有子网中？
+- [ ] 路由表有 0.0.0.0/0 → NAT Gateway？
+- [ ] NAT Gateway 有弹性 IP？
+- [ ] 安全组允许出站流量（默认为是）？
+- [ ] NACL 允许出站 HTTP/HTTPS 和入站临时端口？
 
-**3. RDS Not Accessible from EC2:**
+**3. RDS 不可从 EC2 访问：**
 
-Checklist:
-- [ ] RDS security group allows traffic from EC2 security group?
-- [ ] RDS in same VPC as EC2?
-- [ ] Using correct endpoint hostname (not IP)?
-- [ ] Port 5432 (PostgreSQL) or 3306 (MySQL) allowed?
+检查清单：
+- [ ] RDS 安全组允许来自 EC2 安全组的流量？
+- [ ] RDS 与 EC2 在同一个 VPC 中？
+- [ ] 使用正确的端点主机名（而非 IP）？
+- [ ] 允许端口 5432（PostgreSQL）或 3306（MySQL）？
 
 ```bash
-# Test connection from EC2
+# 从 EC2 测试连接
 telnet ml-metadata-db.abc123.us-east-1.rds.amazonaws.com 5432
 
-# If connection times out, check security groups
+# 如果连接超时，检查安全组
 ```
 
 ---
 
-## 8. Production VPC Architecture Example
+## 8. 生产 VPC 架构示例
 
-**Complete Terraform Template (Reference):**
+**完整 Terraform 模板（参考）：**
 
 ```hcl
 # VPC
@@ -1065,7 +1066,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.ml_production.id
 }
 
-# Public Subnets
+# 公有子网
 resource "aws_subnet" "public" {
   count             = 2
   vpc_id            = aws_vpc.ml_production.id
@@ -1079,7 +1080,7 @@ resource "aws_subnet" "public" {
   }
 }
 
-# Private Subnets
+# 私有子网
 resource "aws_subnet" "private" {
   count             = 2
   vpc_id            = aws_vpc.ml_production.id
@@ -1092,7 +1093,7 @@ resource "aws_subnet" "private" {
   }
 }
 
-# NAT Gateways (one per AZ for HA)
+# NAT Gateways（每个 AZ 一个用于高可用）
 resource "aws_eip" "nat" {
   count  = 2
   domain = "vpc"
@@ -1104,7 +1105,7 @@ resource "aws_nat_gateway" "main" {
   subnet_id     = aws_subnet.public[count.index].id
 }
 
-# Route Tables
+# 路由表
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.ml_production.id
 
@@ -1132,7 +1133,7 @@ resource "aws_route_table" "private" {
   }
 }
 
-# Route Table Associations
+# 路由表关联
 resource "aws_route_table_association" "public" {
   count          = 2
   subnet_id      = aws_subnet.public[count.index].id
@@ -1145,7 +1146,7 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private[count.index].id
 }
 
-# Security Groups
+# 安全组
 resource "aws_security_group" "alb" {
   name        = "alb-sg"
   description = "Allow HTTP/HTTPS from internet"
@@ -1213,7 +1214,7 @@ resource "aws_security_group" "db" {
   }
 }
 
-# VPC Endpoints
+# VPC 端点
 resource "aws_vpc_endpoint" "s3" {
   vpc_id       = aws_vpc.ml_production.id
   service_name = "com.amazonaws.${var.region}.s3"
@@ -1226,41 +1227,41 @@ resource "aws_vpc_endpoint" "s3" {
 
 ---
 
-## 9. Key Takeaways
+## 9. 关键要点
 
-1. **VPCs** provide isolated networks in AWS; plan CIDR blocks carefully with room for growth.
+1. **VPC** 在 AWS 中提供隔离的网络；仔细规划 CIDR 块并为增长留出空间。
 
-2. **Multi-tier architecture** (public/private/data subnets) is security best practice for production.
+2. **多层架构**（公有/私有/数据子网）是生产的安全最佳实践。
 
-3. **NAT Gateways** allow private instances to reach internet for updates/API calls without being reachable from internet.
+3. **NAT Gateway** 允许私有实例访问互联网进行更新/API 调用，同时不被互联网访问。
 
-4. **Security Groups** are stateful, instance-level firewalls; use group references (not CIDR) for multi-tier architectures.
+4. **安全组**是有状态的实例级防火墙；对多层架构使用组引用（而非 CIDR）。
 
-5. **NACLs** provide stateless, subnet-level defense; use for deny rules and compliance requirements.
+5. **NACL** 提供无状态的子网级防御；用于拒绝规则和合规要求。
 
-6. **VPC Endpoints** save costs and improve security by keeping S3/DynamoDB traffic within AWS network.
+6. **VPC 端点**通过将 S3/DynamoDB 流量保持在 AWS 网络内来节省成本并提高安全性。
 
-7. **Flow Logs** are essential for troubleshooting and security auditing; enable on production VPCs.
+7. **Flow Logs** 对故障排查和安全审计至关重要；在生产 VPC 上启用。
 
-8. **Multi-AZ deployments** (NAT Gateways in each AZ, subnets across AZs) provide high availability.
-
----
-
-## What's Next?
-
-**Lecture 04** covers **Deployment & ML Workloads**—Infrastructure as Code with Terraform, container orchestration with ECS/EKS, serverless ML with Lambda, managed ML platforms (SageMaker), and cost optimization strategies.
-
-**Exercise 03** provides hands-on practice building a production VPC with public/private subnets, configuring security groups for multi-tier architecture, deploying bastion hosts, and implementing VPC endpoints.
+8. **Multi-AZ 部署**（每个 AZ 中的 NAT Gateway、跨 AZ 的子网）提供高可用性。
 
 ---
 
-## Further Reading
+## 下一步是什么？
 
-- **AWS VPC User Guide**: https://docs.aws.amazon.com/vpc/
-- **AWS Well-Architected Framework - Security Pillar**: https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/
-- **VPC Peering Guide**: https://docs.aws.amazon.com/vpc/latest/peering/
-- **VPC Flow Logs**: https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html
-- **AWS Security Best Practices**: https://aws.amazon.com/architecture/security-identity-compliance/
+**Lecture 04** 介绍**部署和 ML 工作负载**——使用 Terraform 的基础设施即代码、使用 ECS/EKS 的容器编排、使用 Lambda 的无服务器 ML、托管 ML 平台（SageMaker）和成本优化策略。
+
+**练习 03** 提供构建生产 VPC（带公有/私有子网）、为多层架构配置安全组、部署堡垒机以及实施 VPC 端点的动手实践。
+
+---
+
+## 延伸阅读
+
+- **AWS VPC User Guide**：https://docs.aws.amazon.com/vpc/
+- **AWS Well-Architected Framework - Security Pillar**：https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/
+- **VPC Peering Guide**：https://docs.aws.amazon.com/vpc/latest/peering/
+- **VPC Flow Logs**：https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html
+- **AWS Security Best Practices**：https://aws.amazon.com/architecture/security-identity-compliance/
 
 ---
 

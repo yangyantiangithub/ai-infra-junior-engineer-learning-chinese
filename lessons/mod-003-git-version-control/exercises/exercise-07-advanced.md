@@ -1,47 +1,47 @@
-# Exercise 07: Advanced Git Techniques
+# 练习 07：高级 Git 技术
 
-## Overview
+## 概述
 
-**Difficulty**: Advanced
-**Estimated Time**: 120-150 minutes
-**Prerequisites**: Exercises 01-06, Lecture 04 - Advanced Git
+**难度**：高级
+**预计时间**：120-150 分钟
+**前置条件**：练习 01-06，讲座 04 - 高级 Git
 
-In this exercise, you'll master advanced Git techniques including interactive rebasing, Git hooks, cherry-picking, stashing advanced workflows, bisecting to find bugs, submodules, and recovery techniques. These skills are essential for complex ML infrastructure projects.
+在本练习中，你将掌握高级 Git 技术，包括交互式 rebasing、Git hooks、cherry-picking、高级 stashing 工作流、bisecting 查找 bug、子模块和恢复技术。这些技能对于复杂的 ML 基础设施项目至关重要。
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
+完成本练习后，你将：
 
-- Use interactive rebase to clean up commit history
-- Implement custom Git hooks for automation
-- Cherry-pick specific commits across branches
-- Master stashing workflows
-- Use git bisect to find bug-introducing commits
-- Work with Git submodules
-- Recover from Git mistakes
-- Reflog for time travel
-- Advanced merging strategies
+- 使用交互式 rebase 清理 commit 历史
+- 实现自定义 Git hooks 以实现自动化
+- 跨分支 cherry-pick 特定 commit
+- 掌握 stashing 工作流
+- 使用 git bisect 查找引入 bug 的 commit
+- 使用 Git 子模块
+- 从 Git 错误中恢复
+- 使用 Reflog 进行时间旅行
+- 高级合并策略
 
-## Scenario
+## 场景
 
-You're maintaining a large ML infrastructure codebase with complex history. You need to:
-- Clean up messy commit history before merging to main
-- Automate code quality checks with hooks
-- Selectively apply fixes from one branch to another
-- Find when a performance regression was introduced
-- Manage third-party dependencies as submodules
-- Recover from accidental data loss
+你正在维护一个拥有复杂历史的大型 ML 基础设施代码库。你需要：
+- 在合并到 main 之前清理混乱的 commit 历史
+- 使用 hooks 自动化代码质量检查
+- 从一个分支选择性应用修复到另一个分支
+- 查找性能退化是何时引入的
+- 将第三方依赖管理为子模块
+- 从意外的数据丢失中恢复
 
-## Prerequisites
+## 前置条件
 
 ```bash
-# Create project for advanced techniques
+# 为高级技术创建项目
 mkdir ml-platform-advanced
 cd ml-platform-advanced
 git init
 git config init.defaultBranch main
 
-# Create initial structure
+# 创建初始结构
 mkdir -p src/{api,models,pipeline} tests scripts
 touch README.md
 git add .
@@ -50,19 +50,19 @@ git commit -m "Initial commit"
 
 ---
 
-## Part 1: Interactive Rebase
+## 第一部分：交互式 Rebase
 
-### Task 1.1: Clean Up Commit History
+### 任务 1.1：清理 Commit 历史
 
-Use interactive rebase to reorganize commits.
+使用交互式 rebase 重新组织 commit。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create a messy feature branch
+# 创建一个混乱的功能分支
 git switch -c feature/model-serving
 
-# Make several small commits (simulating messy development)
+# 制作几个小 commit（模拟混乱的开发过程）
 echo "class ModelServer:" > src/api/server.py
 git add src/api/server.py
 git commit -m "wip"
@@ -87,13 +87,13 @@ echo "    def predict(self, data):" >> src/api/server.py
 git add src/api/server.py
 git commit -m "predict method"
 
-# View the messy history
+# 查看混乱的历史
 git log --oneline -6
 
-# Clean it up with interactive rebase
+# 使用交互式 rebase 清理
 git rebase -i HEAD~5
 
-# Editor opens with:
+# 编辑器打开，显示：
 # pick abc123 wip
 # pick def456 add init
 # pick ghi789 add model attr
@@ -101,7 +101,7 @@ git rebase -i HEAD~5
 # pick mno345 fix: typo in load
 # pick pqr678 predict method
 
-# Change to:
+# 改为：
 # pick abc123 wip
 # squash def456 add init
 # squash ghi789 add model attr
@@ -109,8 +109,8 @@ git rebase -i HEAD~5
 # fixup mno345 fix: typo in load
 # pick pqr678 predict method
 
-# Save and close. Editor opens again for commit message:
-# Change to:
+# 保存并关闭。编辑器再次打开用于 commit 消息：
+# 改为：
 # "feat(api): add model serving infrastructure
 #
 # Implement ModelServer class with:
@@ -119,28 +119,28 @@ git rebase -i HEAD~5
 #
 # Foundation for ML model deployment."
 
-# View cleaned history
+# 查看清理后的历史
 git log --oneline -3
 ```
 
-**Rebase Commands:**
-- `pick` - keep commit as-is
-- `reword` - keep changes, edit message
-- `edit` - pause to amend commit
-- `squash` - merge with previous, keep both messages
-- `fixup` - merge with previous, discard this message
-- `drop` - remove commit entirely
+**Rebase 命令：**
+- `pick` - 保持 commit 原样
+- `reword` - 保留变更，编辑消息
+- `edit` - 暂停以修改 commit
+- `squash` - 与前一个合并，保留两个消息
+- `fixup` - 与前一个合并，丢弃此消息
+- `drop` - 完全移除 commit
 
 ---
 
-### Task 1.2: Reorder Commits
+### 任务 1.2：重新排序 Commit
 
-Reorganize commit order logically.
+按逻辑顺序重新组织 commit。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create commits in wrong order
+# 创建顺序错误的 commit
 echo "# Tests" > tests/test_server.py
 git add tests/test_server.py
 git commit -m "test: add server tests"
@@ -149,27 +149,27 @@ echo "# Documentation" > docs/server.md
 git add docs/server.md
 git commit -m "docs: document server API"
 
-# Oops, should have added docs before tests
+# 哦，应该在测试之前添加文档
 git rebase -i HEAD~2
 
-# Reorder:
+# 重新排序：
 # pick <hash> docs: document server API
 # pick <hash> test: add server tests
 
-# Save - commits are now in logical order
+# 保存 - commit 现在按逻辑顺序排列
 git log --oneline -4
 ```
 
 ---
 
-### Task 1.3: Split a Large Commit
+### 任务 1.3：拆分大 Commit
 
-Break one commit into multiple logical commits.
+将一个 commit 拆分为多个逻辑 commit。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Make large commit with multiple changes
+# 制作包含多个变更的大 commit
 cat >> src/api/server.py << 'EOF'
 
     def health_check(self):
@@ -193,41 +193,41 @@ EOF
 git add src/api/
 git commit -m "Add features"
 
-# Oops, too many things in one commit. Split it:
+# 哦，一个 commit 里太多了。拆分它：
 git rebase -i HEAD~1
 
-# Change "pick" to "edit"
-# Git pauses at the commit
+# 将"pick"改为"edit"
+# Git 会在该 commit 处暂停
 
-# Reset the commit but keep changes
+# 重置 commit 但保留变更
 git reset HEAD^
 
-# Now commit parts separately
+# 现在分别提交各部分
 git add src/api/server.py
 git commit -m "feat(api): add health check and metrics endpoints"
 
 git add src/api/config.py
 git commit -m "feat(config): add server configuration module"
 
-# Continue rebase
+# 继续 rebase
 git rebase --continue
 
-# View split commits
+# 查看拆分后的 commit
 git log --oneline -3
 ```
 
 ---
 
-## Part 2: Git Hooks
+## 第二部分：Git Hooks
 
-### Task 2.1: Pre-Commit Hook
+### 任务 2.1：Pre-Commit Hook
 
-Create hook to run checks before committing.
+创建 hook 在提交前运行检查。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create pre-commit hook
+# 创建 pre-commit hook
 cat > .git/hooks/pre-commit << 'EOF'
 #!/bin/bash
 # Pre-commit hook: Run code quality checks
@@ -290,28 +290,28 @@ EOF
 
 chmod +x .git/hooks/pre-commit
 
-# Test the hook
+# 测试 hook
 echo "print('debug')" > src/test.py
 git add src/test.py
 git commit -m "test commit"
 
-# Hook should block it!
+# Hook 应该阻止它！
 
-# Remove debug
+# 移除调试语句
 echo "# No debug" > src/test.py
 git add src/test.py
 git commit -m "feat: add test module"
 
-# Should succeed
+# 应该成功
 ```
 
 ---
 
-### Task 2.2: Post-Commit Hook
+### 任务 2.2：Post-Commit Hook
 
-Run actions after successful commit.
+在成功提交后运行操作。
 
-**Instructions:**
+**说明：**
 
 ```bash
 cat > .git/hooks/post-commit << 'EOF'
@@ -330,22 +330,22 @@ EOF
 
 chmod +x .git/hooks/post-commit
 
-# Test it
+# 测试它
 echo "# Update" >> README.md
 git add README.md
 git commit -m "docs: update README"
 
-# Check log
+# 检查日志
 cat .git/commit-log.txt
 ```
 
 ---
 
-### Task 2.3: Pre-Push Hook
+### 任务 2.3：Pre-Push Hook
 
-Validate before pushing to remote.
+在推送到远程之前进行验证。
 
-**Instructions:**
+**说明：**
 
 ```bash
 cat > .git/hooks/pre-push << 'EOF'
@@ -391,22 +391,22 @@ EOF
 
 chmod +x .git/hooks/pre-push
 
-# Test (simulated - no actual remote)
+# 测试（模拟 - 没有实际远程）
 # git push origin feature-branch
 ```
 
 ---
 
-## Part 3: Cherry-Picking
+## 第三部分：Cherry-Picking
 
-### Task 3.1: Apply Specific Commits
+### 任务 3.1：应用特定 Commit
 
-Selectively apply commits to another branch.
+选择性将 commit 应用到另一个分支。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create hotfix on main
+# 在 main 上创建热修复
 git switch main
 git switch -c hotfix/critical-bug
 
@@ -419,190 +419,190 @@ echo "def another_fix():" >> src/api/fixes.py
 git add src/api/fixes.py
 git commit -m "fix: memory leak in model loading"
 
-# Return to feature branch
+# 返回到功能分支
 git switch feature/model-serving
 
-# Cherry-pick only the security fix
+# 只 cherry-pick 安全修复
 git log hotfix/critical-bug --oneline
-# Note the commit hash of security fix
+# 记下安全修复的 commit 哈希
 
 git cherry-pick <security-fix-hash>
 
-# Now feature branch has the security fix without other changes
+# 现在功能分支有了安全修复，没有其他变更
 
-# View history
+# 查看历史
 git log --oneline --graph --all -10
 ```
 
 ---
 
-### Task 3.2: Cherry-Pick Multiple Commits
+### 任务 3.2：Cherry-Pick 多个 Commit
 
-Pick a range of commits.
+挑选一系列 commit。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Cherry-pick multiple commits
+# Cherry-pick 多个 commit
 git cherry-pick <hash1> <hash2> <hash3>
 
-# Or cherry-pick a range
+# 或 cherry-pick 一个范围
 git cherry-pick <start-hash>..<end-hash>
 
-# If conflicts occur:
-# 1. Resolve conflicts
+# 如果出现冲突：
+# 1. 解决冲突
 # 2. git add <resolved-files>
 # 3. git cherry-pick --continue
 
-# To abort:
+# 要中止：
 # git cherry-pick --abort
 ```
 
 ---
 
-## Part 4: Stashing Advanced Workflows
+## 第四部分：高级 Stashing 工作流
 
-### Task 4.1: Stash with Message
+### 任务 4.1：带消息的 Stash
 
-Save work in progress with description.
+使用描述保存工作进度。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Make changes
+# 进行更改
 echo "# WIP feature" >> src/api/server.py
 
-# Stash with description
+# 带描述暂存
 git stash push -m "WIP: new caching feature for predictions"
 
-# List stashes
+# 列出 stash
 git stash list
 
-# Output:
+# 输出：
 # stash@{0}: On feature/model-serving: WIP: new caching feature
 
-# Apply later
+# 稍后应用
 git stash pop
 
-# Or apply without removing from stash
+# 或者应用而不从 stash 中删除
 # git stash apply stash@{0}
 ```
 
 ---
 
-### Task 4.2: Partial Stashing
+### 任务 4.2：部分 Stashing
 
-Stash only specific files.
+只暂存特定文件。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Make changes to multiple files
+# 对多个文件进行更改
 echo "# Change 1" >> src/api/server.py
 echo "# Change 2" >> src/models/model.py
 echo "# Change 3" >> tests/test_api.py
 
-# Stash only server.py
+# 只暂存 server.py
 git stash push -m "server changes" src/api/server.py
 
-# Other files still have changes
+# 其他文件仍有变更
 git status
 
-# Apply stash
+# 应用 stash
 git stash pop
 ```
 
 ---
 
-### Task 4.3: Create Branch from Stash
+### 任务 4.3：从 Stash 创建分支
 
-Turn stashed work into a branch.
+将暂存的工作转换为分支。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Stash some work
+# 暂存一些工作
 echo "# Experimental feature" >> src/api/server.py
 git stash
 
-# Create branch from stash
+# 从 stash 创建分支
 git stash branch experiment/new-feature
 
-# Now on new branch with stashed changes applied
+# 现在在新分支上，stash 的变更已应用
 git status
 ```
 
 ---
 
-## Part 5: Git Bisect
+## 第五部分：Git Bisect
 
-### Task 5.1: Find Bug with Bisect
+### 任务 5.1：使用 Bisect 查找 Bug
 
-Use binary search to find bug introduction.
+使用二分查找找到 bug 的引入。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create history with a bug introduced
+# 创建带有 bug 的历史
 git switch main
 git switch -c debug/find-bug
 
-# Make good commits
+# 制作好的 commit
 for i in {1..10}; do
     echo "version $i" >> src/models/model.py
     git add src/models/model.py
     git commit -m "Update model v$i"
 done
 
-# Introduce bug in commit 6
+# 在 commit 6 中引入 bug
 git checkout HEAD~4
 echo "BUGGY_CODE = True" >> src/models/model.py
 git add src/models/model.py
 git commit -m "Update model v6"
 
-# Continue with more commits
+# 继续添加更多 commit
 for i in {7..10}; do
     echo "version $i" >> src/models/model.py
     git add src/models/model.py
     git commit -m "Update model v$i"
 done
 
-# Now use bisect to find when bug was introduced
+# 现在使用 bisect 查找 bug 是何时引入的
 git bisect start
 
-# Mark current as bad
+# 标记当前为 bad
 git bisect bad
 
-# Mark earlier commit as good (before the bug)
+# 标记较早的 commit 为 good（在 bug 之前）
 git bisect good HEAD~10
 
-# Git checks out middle commit
-# Test it (manually or with script)
+# Git 检出中间的 commit
+# 测试它（手动或使用脚本）
 cat src/models/model.py | grep "BUGGY_CODE"
 
-# If bug exists:
+# 如果 bug 存在：
 git bisect bad
 
-# If no bug:
+# 如果没有 bug：
 # git bisect good
 
-# Git continues binary search
-# Repeat until Git finds the exact commit
+# Git 继续二分查找
+# 重复直到 Git 找到精确的 commit
 
-# Reset when done
+# 完成后重置
 git bisect reset
 ```
 
 ---
 
-### Task 5.2: Automate Bisect with Script
+### 任务 5.2：使用脚本自动化 Bisect
 
-Let Git automate the bisect process.
+让 Git 自动执行 bisect 过程。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create test script
+# 创建测试脚本
 cat > scripts/test_for_bug.sh << 'EOF'
 #!/bin/bash
 # Return 0 if good, 1 if bad
@@ -618,100 +618,100 @@ EOF
 
 chmod +x scripts/test_for_bug.sh
 
-# Run automated bisect
+# 运行自动 bisect
 git bisect start HEAD HEAD~10
 git bisect run scripts/test_for_bug.sh
 
-# Git automatically finds the bad commit!
+# Git 自动找到有问题的 commit！
 ```
 
 ---
 
-## Part 6: Git Reflog and Recovery
+## 第六部分：Git Reflog 与恢复
 
-### Task 6.1: Recover Lost Commits
+### 任务 6.1：恢复丢失的 Commit
 
-Use reflog to find and recover commits.
+使用 reflog 查找和恢复 commit。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Make some commits
+# 制作几个 commit
 echo "important work" > important.txt
 git add important.txt
 git commit -m "Important work"
 
-# Note the commit hash
+# 记下 commit 哈希
 git log --oneline -1
 
-# Accidentally reset (lose the commit)
+# 意外重置（丢失 commit）
 git reset --hard HEAD~1
 
-# Commit is gone!
+# Commit 消失了！
 git log --oneline -1
 
-# Use reflog to find it
+# 使用 reflog 找到它
 git reflog
 
-# Output shows:
+# 输出显示：
 # abc123 HEAD@{0}: reset: moving to HEAD~1
 # def456 HEAD@{1}: commit: Important work
 
-# Recover the commit
+# 恢复 commit
 git checkout HEAD@{1}
 
-# Or create branch at that point
+# 或者在该点创建分支
 git branch recovery HEAD@{1}
 git switch recovery
 
-# Your work is recovered!
+# 你的工作恢复了！
 ```
 
 ---
 
-### Task 6.2: Undo Rebase
+### 任务 6.2：撤销 Rebase
 
-Recover from bad rebase.
+从糟糕的 rebase 中恢复。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Before rebase
+# Rebase 之前
 git log --oneline -5
 
-# Do rebase
+# 执行 rebase
 git rebase -i HEAD~3
-# Make changes and complete
+# 进行更改并完成
 
-# Oops, messed up the rebase!
+# 哦，搞砸了 rebase！
 
-# Find pre-rebase state in reflog
+# 在 reflog 中找到 rebase 前的状态
 git reflog
 
-# Look for: "rebase -i (start)"
-# The entry before that is pre-rebase state
+# 查找："rebase -i (start)"
+# 之前的条目是 rebase 前的状态
 
-# Reset to pre-rebase
-git reset --hard HEAD@{5}  # Adjust number based on reflog
+# 重置到 rebase 前
+git reset --hard HEAD@{5}  # 根据 reflog 调整编号
 
-# Rebase undone!
+# Rebase 已撤销！
 ```
 
 ---
 
-## Part 7: Git Submodules
+## 第七部分：Git 子模块
 
-### Task 7.1: Add Submodule
+### 任务 7.1：添加子模块
 
-Manage external dependencies as submodules.
+将外部依赖管理为子模块。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Add a submodule (external library)
+# 添加子模块（外部库）
 # git submodule add https://github.com/user/ml-utils.git libs/ml-utils
 
-# Simulated for exercise:
+# 本练习模拟：
 mkdir -p libs
 cd libs
 mkdir ml-utils
@@ -722,10 +722,10 @@ git add README.md
 git commit -m "Initial commit"
 cd ../..
 
-# Register as submodule
+# 注册为子模块
 git submodule add ./libs/ml-utils libs/ml-utils
 
-# .gitmodules file created
+# 创建了 .gitmodules 文件
 cat .gitmodules
 
 git add .gitmodules libs/ml-utils
@@ -734,56 +734,56 @@ git commit -m "chore: add ml-utils submodule"
 
 ---
 
-### Task 7.2: Update Submodule
+### 任务 7.2：更新子模块
 
-Update to latest version of submodule.
+更新到子模块的最新版本。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Update submodule
+# 更新子模块
 cd libs/ml-utils
-# git pull origin main  # If real remote
+# git pull origin main  # 如果有真实的远程
 
-# Update to specific commit
+# 更新到特定 commit
 git checkout <commit-hash>
 cd ../..
 
-# Commit submodule update
+# 提交子模块更新
 git add libs/ml-utils
 git commit -m "chore: update ml-utils submodule to v2.0"
 ```
 
 ---
 
-### Task 7.3: Clone Repository with Submodules
+### 任务 7.3：克隆包含子模块的仓库
 
-**Instructions:**
+**说明：**
 
 ```bash
-# When cloning a repo with submodules:
+# 克隆包含子模块的仓库时：
 # git clone --recursive <repo-url>
 
-# Or if already cloned:
+# 如果已经克隆：
 # git submodule init
 # git submodule update
 
-# Or in one command:
+# 或者一步完成：
 # git submodule update --init --recursive
 ```
 
 ---
 
-## Part 8: Advanced Merge Strategies
+## 第八部分：高级合并策略
 
-### Task 8.1: Octopus Merge
+### 任务 8.1：八爪鱼合并
 
-Merge multiple branches at once.
+一次合并多个分支。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Create multiple feature branches
+# 创建多个功能分支
 git switch -c feature/a
 echo "Feature A" > feature-a.txt
 git add feature-a.txt
@@ -801,229 +801,229 @@ echo "Feature C" > feature-c.txt
 git add feature-c.txt
 git commit -m "feat: add feature C"
 
-# Merge all at once (if no conflicts)
+# 一次性合并所有（如果没有冲突）
 git switch main
 git merge feature/a feature/b feature/c -m "Merge features A, B, and C"
 
-# All three merged in one commit!
+# 三个都在一个 commit 中合并了！
 git log --oneline --graph -5
 ```
 
 ---
 
-### Task 8.2: Ours/Theirs Strategy
+### 任务 8.2：Ours/Theirs 策略
 
-Resolve conflicts automatically.
+自动解决冲突。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# When merging, use strategy to prefer one side
+# 合并时，使用策略优先选择一方
 
-# Always prefer current branch (ours)
+# 始终优先选择当前分支（ours）
 # git merge -X ours feature-branch
 
-# Always prefer incoming branch (theirs)
+# 始终优先选择传入分支（theirs）
 # git merge -X theirs feature-branch
 
-# Useful for generated files where one version is definitely correct
+# 适用于某个版本肯定正确的生成文件
 ```
 
 ---
 
-## Part 9: Git Worktrees
+## 第九部分：Git Worktrees
 
-### Task 9.1: Multiple Working Directories
+### 任务 9.1：多个工作目录
 
-Work on multiple branches simultaneously.
+同时在多个分支上工作。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Add worktree for another branch
+# 为另一个分支添加 worktree
 git worktree add ../ml-platform-feature feature/model-serving
 
-# Now you have two working directories:
-# - ml-platform-advanced/ (main branch)
-# - ml-platform-feature/ (feature/model-serving branch)
+# 现在你有两个工作目录：
+# - ml-platform-advanced/（main 分支）
+# - ml-platform-feature/（feature/model-serving 分支）
 
-# Work in both simultaneously
+# 同时在两个中工作
 cd ../ml-platform-feature
-# Make changes
+# 进行更改
 
 cd ../ml-platform-advanced
-# Different branch, different changes
+# 不同的分支，不同的变更
 
-# List worktrees
+# 列出 worktrees
 git worktree list
 
-# Remove worktree when done
+# 完成后移除 worktree
 git worktree remove ../ml-platform-feature
 ```
 
 ---
 
-## Part 10: Troubleshooting and Recovery
+## 第十部分：故障排除与恢复
 
-### Task 10.1: Fix Detached HEAD
+### 任务 10.1：修复 Detached HEAD
 
-Recover from detached HEAD state.
+从 detached HEAD 状态恢复。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# Accidentally checkout commit hash
+# 意外检出了 commit 哈希
 git checkout HEAD~5
 
-# You're in detached HEAD state!
-# Make some commits
+# 你处于 detached HEAD 状态！
+# 制作几个 commit
 echo "work" > work.txt
 git add work.txt
 git commit -m "Work in detached HEAD"
 
-# Create branch to save work
+# 创建分支以保存工作
 git branch temp-work
 
-# Switch to it
+# 切换到它
 git switch temp-work
 
-# Merge into main if needed
+# 如果需要，合并到 main
 git switch main
 git merge temp-work
 ```
 
 ---
 
-### Task 10.2: Remove Sensitive Data from History
+### 任务 10.2：从历史中移除敏感数据
 
-Clean up committed secrets.
+清理已提交的密钥。
 
-**Instructions:**
+**说明：**
 
 ```bash
-# If you committed a secret:
-# USE: git filter-branch or BFG Repo-Cleaner
+# 如果你提交了密钥：
+# 使用：git filter-branch 或 BFG Repo-Cleaner
 
-# Example with filter-branch:
+# 使用 filter-branch 的示例：
 # git filter-branch --force --index-filter \
 #   "git rm --cached --ignore-unmatch path/to/secret.key" \
 #   --prune-empty --tag-name-filter cat -- --all
 
-# Then force push:
+# 然后强制推送：
 # git push origin --force --all
 # git push origin --force --tags
 
-# Warning: Rewrites history! Coordinate with team.
+# 警告：会重写历史！与团队协调。
 ```
 
 ---
 
-## Validation
+## 验证
 
-### Verify Your Skills
+### 验证你的技能
 
 ```bash
-# Check your Git expertise
+# 检查你的 Git 专业知识
 git log --oneline --graph --all -20
 git reflog -10
 git stash list
 git worktree list
 
-# Verify hooks
+# 验证 hooks
 ls -la .git/hooks/
 
-# Test recovery skills
+# 测试恢复技能
 # git reflog
 # git fsck --lost-found
 ```
 
 ---
 
-## Challenge Tasks
+## 挑战任务
 
-### Challenge 1: Create Alias for Complex Command
+### 挑战 1：为复杂命令创建别名
 
 ```bash
 git config alias.lol "log --graph --decorate --oneline --all"
 git lol
 ```
 
-### Challenge 2: Bisect Performance Regression
+### 挑战 2：Bisect 性能退化
 
-Use bisect to find when inference latency increased.
+使用 bisect 查找推理延迟增加的时间点。
 
-### Challenge 3: Interactive Rebase Master
+### 挑战 3：交互式 Rebase 大师
 
-Rebase 20 commits into logical groups.
+将 20 个 commit 变基为逻辑组。
 
 ---
 
-## Troubleshooting
+## 故障排除
 
-**Issue**: "Rebase conflict I can't resolve"
+**问题**："无法解决的 rebase 冲突"
 ```bash
 git rebase --abort
-# Try different approach or merge instead
+# 尝试不同的方法或改为合并
 ```
 
-**Issue**: "Lost important work"
+**问题**："丢失了重要的工作"
 ```bash
 git reflog
 git fsck --lost-found
 ```
 
-**Issue**: "Committed to wrong branch"
+**问题**："提交到了错误的分支"
 ```bash
-git log --oneline -1  # Note commit hash
-git reset --hard HEAD~1  # Remove from current
+git log --oneline -1  # 记下 commit 哈希
+git reset --hard HEAD~1  # 从当前分支移除
 git checkout correct-branch
-git cherry-pick <hash>  # Add to correct branch
+git cherry-pick <hash>  # 添加到正确的分支
 ```
 
 ---
 
-## Reflection Questions
+## 反思问题
 
-1. **When should you use interactive rebase vs. merge?**
-2. **What are the dangers of rewriting history?**
-3. **How does bisect help debug complex issues?**
-4. **When would you use submodules vs. package managers?**
-5. **What's the difference between reset, revert, and checkout?**
+1. **何时应该使用交互式 rebase vs. merge？**
+2. **重写历史有什么危险？**
+3. **bisect 如何帮助调试复杂问题？**
+4. **何时使用子模块 vs. 包管理器？**
+5. **reset、revert 和 checkout 之间的区别是什么？**
 
 ---
 
-## Summary
+## 总结
 
-Congratulations! You've mastered advanced Git techniques:
+恭喜！你已经掌握了高级 Git 技术：
 
-- ✅ Interactive rebasing for clean history
-- ✅ Custom Git hooks for automation
-- ✅ Cherry-picking specific changes
-- ✅ Advanced stashing workflows
-- ✅ Bisecting to find bugs
-- ✅ Reflog for recovery
-- ✅ Git submodules
-- ✅ Advanced merge strategies
-- ✅ Worktrees for parallel work
-- ✅ Troubleshooting and recovery
+- ✅ 交互式 rebasing 用于整洁历史
+- ✅ 自定义 Git hooks 用于自动化
+- ✅ Cherry-picking 特定变更
+- ✅ 高级 stashing 工作流
+- ✅ Bisecting 查找 bug
+- ✅ Reflog 用于恢复
+- ✅ Git 子模块
+- ✅ 高级合并策略
+- ✅ Worktrees 用于并行工作
+- ✅ 故障排除与恢复
 
-### Key Commands
+### 学会的关键命令
 
 ```bash
-git rebase -i HEAD~N         # Interactive rebase
-git cherry-pick <hash>       # Apply specific commit
-git stash push -m "msg"      # Stash with message
-git bisect start             # Find bug binary search
-git reflog                   # View reference log
-git submodule add <url>      # Add submodule
-git worktree add <path>      # Create worktree
-git filter-branch            # Rewrite history
+git rebase -i HEAD~N         # 交互式 rebase
+git cherry-pick <hash>       # 应用特定 commit
+git stash push -m "msg"      # 带消息的 stash
+git bisect start             # 二分查找查找 bug
+git reflog                   # 查看引用日志
+git submodule add <url>      # 添加子模块
+git worktree add <path>      # 创建 worktree
+git filter-branch            # 重写历史
 ```
 
-### Next Steps
+### 下一步
 
-- Apply these techniques in real projects
-- Complete Module 003 quiz
-- Practice advanced workflows
+- 在真实项目中应用这些技术
+- 完成模块 003 测验
+- 练习高级工作流
 
-**Outstanding work!** You're now a Git expert ready for complex ML infrastructure projects.
+**出色的工作！** 你现在是 Git 专家，随时可以应对复杂的 ML 基础设施项目。

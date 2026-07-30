@@ -1,91 +1,91 @@
-# Project 03: ML Pipeline with Experiment Tracking
+# 项目 03：带实验追踪的 ML 管道
 
-**Role:** Junior AI Infrastructure Engineer (Level 0)
-**Duration:** 100 hours (2-3 weeks full-time, 4-5 weeks part-time)
-**Complexity:** Intermediate
-**Prerequisites:** Projects 1-2 (API Deployment, Kubernetes Serving)
-
----
-
-## Project Overview
-
-Build an end-to-end machine learning pipeline with automated experiment tracking, data versioning, model registry, and workflow orchestration. This project introduces MLOps fundamentals: managing the complete ML lifecycle from data ingestion to model deployment.
-
-### What You'll Build
-
-In this project, you will construct a production-grade ML pipeline that:
-
-- **Automates the entire ML workflow** from raw data to deployed models
-- **Tracks every experiment** with complete reproducibility using MLflow
-- **Versions all data and models** with DVC (Data Version Control)
-- **Orchestrates complex workflows** using Apache Airflow
-- **Validates data quality** with Great Expectations
-- **Manages model lifecycle** through MLflow Model Registry
-- **Provides experiment analysis** through interactive dashboards
-
-### Real-World Context
-
-After successfully deploying models (Projects 1-2), data science teams face a new challenge: managing dozens of experiments, tracking which dataset versions produce the best models, and automating retraining workflows. Without proper MLOps infrastructure, teams struggle with:
-
-- **Lost experiments** - "Which hyperparameters produced that 92% accuracy model?"
-- **Data inconsistency** - "Did we train on version 1.2 or 1.3 of the dataset?"
-- **Manual processes** - "Someone needs to retrain the model weekly"
-- **No reproducibility** - "I can't recreate last month's results"
-
-This project simulates building internal ML platform capabilities that solve these problems at scale.
-
-### Learning Objectives
-
-By completing this project, you will:
-
-1. **Design and implement ML pipelines** using workflow orchestration tools (Airflow)
-2. **Track experiments systematically** with MLflow (metrics, parameters, artifacts)
-3. **Version datasets and models** using DVC (Data Version Control)
-4. **Build a model registry** for model lifecycle management
-5. **Automate model retraining** with scheduled pipelines
-6. **Create comparison dashboards** for experiment analysis
-7. **Implement data validation** and pipeline monitoring
-8. **Apply MLOps best practices** for reproducibility and governance
+**角色：** 初级 AI 基础设施工程师（Level 0）
+**时长：** 100 小时（全职 2-3 周，兼职 4-5 周）
+**难度：** 中级
+**前置条件：** 项目 1-2（API 部署、Kubernetes 服务）
 
 ---
 
-## Technology Stack
+## 项目概述
 
-### Core Technologies
+构建一个端到端的机器学习管道，包含自动实验追踪、数据版本控制、模型注册和工作流编排。本项目介绍 MLOps 基础：管理从数据摄入到模型部署的完整 ML 生命周期。
 
-| Component | Technology | Purpose |
+### 你将构建什么
+
+在本项目中，你将构建一个生产级的 ML 管道，实现以下功能：
+
+- **自动化整个 ML 工作流**，从原始数据到部署模型
+- **追踪每一次实验**，使用 MLflow 实现完全可复现
+- **对所有数据和模型进行版本控制**，使用 DVC（数据版本控制）
+- **编排复杂工作流**，使用 Apache Airflow
+- **验证数据质量**，使用 Great Expectations
+- **管理模型生命周期**，通过 MLflow 模型注册表
+- **提供实验分析**，通过交互式仪表板
+
+### 真实世界背景
+
+在成功部署模型（项目 1-2）之后，数据科学团队面临新的挑战：管理数十次实验、追踪哪些数据集版本产生最佳模型、以及自动化重新训练工作流。如果没有合适的 MLOps 基础设施，团队会遇到以下问题：
+
+- **实验丢失**——"哪个超参数产生了那个 92% 准确率的模型？"
+- **数据不一致**——"我们是在数据集 1.2 版本还是 1.3 版本上训练的？"
+- **手动流程**——"需要有人每周重新训练模型"
+- **无法复现**——"我无法重现上个月的结果"
+
+本项目模拟构建内部 ML 平台能力，以大规模解决这些问题。
+
+### 学习目标
+
+完成本项目后，你将能够：
+
+1. **设计和实现 ML 管道**，使用工作流编排工具（Airflow）
+2. **系统性地追踪实验**，使用 MLflow（指标、参数、工件）
+3. **对数据集和模型进行版本控制**，使用 DVC（数据版本控制）
+4. **构建模型注册表**，用于模型生命周期管理
+5. **自动化模型重新训练**，使用定时管道
+6. **创建比较仪表板**，用于实验分析
+7. **实现数据验证**和管道监控
+8. **应用 MLOps 最佳实践**，确保可复现性和治理
+
+---
+
+## 技术栈
+
+### 核心技术
+
+| 组件 | 技术 | 用途 |
 |-----------|------------|---------|
-| **Orchestration** | Apache Airflow 2.7+ | Workflow management and scheduling |
-| **Experiment Tracking** | MLflow 2.8+ | Tracking runs, models, artifacts |
-| **Data Versioning** | DVC 3.30+ | Dataset version control |
-| **Data Validation** | Great Expectations 0.18+ | Data quality checks |
-| **ML Framework** | PyTorch 2.0+ | Model training |
-| **Database** | PostgreSQL 15+ | MLflow backend, feature store |
-| **Object Storage** | MinIO (local) | Artifact storage |
-| **Message Queue** | Redis 7+ | Airflow task queue |
+| **编排** | Apache Airflow 2.7+ | 工作流管理与调度 |
+| **实验追踪** | MLflow 2.8+ | 追踪运行、模型、工件 |
+| **数据版本控制** | DVC 3.30+ | 数据集版本控制 |
+| **数据验证** | Great Expectations 0.18+ | 数据质量检查 |
+| **ML 框架** | PyTorch 2.0+ | 模型训练 |
+| **数据库** | PostgreSQL 15+ | MLflow 后端、特征存储 |
+| **对象存储** | MinIO（本地） | 工件存储 |
+| **消息队列** | Redis 7+ | Airflow 任务队列 |
 
-### Why These Technologies?
+### 为什么选择这些技术？
 
-- **Apache Airflow**: Industry standard for workflow orchestration (used by Airbnb, Netflix, Adobe)
-- **MLflow**: Most popular open-source MLOps platform with 15K+ GitHub stars
-- **DVC**: Git-like versioning for data and models, integrates seamlessly with existing workflows
-- **Great Expectations**: Prevents bad data from entering pipelines with automated validation
-- **PostgreSQL**: Reliable, scalable database for metadata and features
-- **MinIO**: S3-compatible object storage for local development
+- **Apache Airflow**：工作流编排的行业标准（被 Airbnb、Netflix、Adobe 使用）
+- **MLflow**：最受欢迎的开源 MLOps 平台，拥有 15K+ GitHub 星标
+- **DVC**：类似 Git 的数据和模型版本控制，与现有工作流无缝集成
+- **Great Expectations**：通过自动验证防止错误数据进入管道
+- **PostgreSQL**：可靠、可扩展的元数据和特征数据库
+- **MinIO**：兼容 S3 的对象存储，适用于本地开发
 
 ---
 
-## System Architecture
+## 系统架构
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    ML Pipeline Architecture                 │
+│                    ML 管道架构                              │
 └─────────────────────────────────────────────────────────────┘
 
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│  Data        │     │  PostgreSQL  │     │  MinIO/S3    │
-│  Sources     │────▶│  Feature     │     │  Artifact    │
-│  (CSV/API)   │     │  Store       │     │  Storage     │
+│  数据        │     │  PostgreSQL  │     │  MinIO/S3    │
+│  源          │────▶│  特征        │     │  工件        │
+│  (CSV/API)   │     │  存储        │     │  存储        │
 └──────────────┘     └──────────────┘     └──────────────┘
        │                     │                     │
        │                     │                     │
@@ -93,248 +93,248 @@ By completing this project, you will:
 ┌─────────────────────────────────────────────────────────────┐
 │                    Airflow/Prefect                          │
 │  ┌──────────────────────────────────────────────────────┐   │
-│  │  DAG: ML Training Pipeline                           │   │
+│  │  DAG：ML 训练管道                                   │   │
 │  │                                                       │   │
-│  │  [Data Ingestion] → [Data Validation] → [Preprocessing]│
+│  │  [数据摄入] → [数据验证] → [预处理]                 │   │
 │  │         │                                             │   │
 │  │         ▼                                             │   │
-│  │  [Feature Engineering] → [Train Model] → [Evaluate]  │   │
+│  │  [特征工程] → [训练模型] → [评估]                    │   │
 │  │         │                      │              │       │   │
 │  │         ▼                      ▼              ▼       │   │
-│  │  [DVC Commit]         [MLflow Track]  [Model Register]│  │
+│  │  [DVC 提交]         [MLflow 追踪]  [模型注册]        │  │
 │  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
                             │
                             ▼
                    ┌────────────────┐
                    │  MLflow        │
-                   │  - Tracking    │
-                   │  - Registry    │
+                   │  - 追踪        │
+                   │  - 注册表      │
                    │  - UI          │
                    └────────────────┘
 ```
 
-### Data Flow
+### 数据流
 
 ```
-Raw Data (CSV/API)
+原始数据 (CSV/API)
        │
        ▼
-Data Validation (Great Expectations)
+数据验证 (Great Expectations)
        │
        ▼
-Preprocessing (Clean, Transform)
+预处理 (清洗、转换)
        │
        ▼
-Feature Store (PostgreSQL) ◄──── DVC (Versioning)
+特征存储 (PostgreSQL) ◄──── DVC (版本控制)
        │
        ▼
-Model Training (PyTorch) ◄──── MLflow (Tracking)
+模型训练 (PyTorch) ◄──── MLflow (追踪)
        │
        ▼
-Model Evaluation (Metrics)
+模型评估 (指标)
        │
        ▼
-Model Registry (Versioned) ◄──── MLflow Registry
+模型注册表 (版本化) ◄──── MLflow 注册表
 ```
 
 ---
 
-## Project Structure
+## 项目结构
 
 ```
 project-03-ml-pipeline-tracking/
-├── README.md                           # This file
-├── requirements.md                     # Detailed requirements
-├── architecture.md                     # Architecture deep dive
-├── docker-compose.yml                  # Multi-service orchestration
-├── .env.example                        # Environment configuration
+├── README.md                           # 本文件
+├── requirements.md                     # 详细需求
+├── architecture.md                     # 架构深入解析
+├── docker-compose.yml                  # 多服务编排
+├── .env.example                        # 环境配置
 ├── src/
-│   ├── data_ingestion.py              # Data ingestion module (STUB)
-│   ├── preprocessing.py               # Data preprocessing (STUB)
-│   ├── training.py                    # Model training with MLflow (STUB)
-│   └── evaluation.py                  # Model evaluation (STUB)
+│   ├── data_ingestion.py              # 数据摄入模块（存根）
+│   ├── preprocessing.py               # 数据预处理（存根）
+│   ├── training.py                    # 带 MLflow 的模型训练（存根）
+│   └── evaluation.py                  # 模型评估（存根）
 ├── dags/
-│   └── ml_pipeline_dag.py             # Airflow DAG (STUB)
+│   └── ml_pipeline_dag.py             # Airflow DAG（存根）
 ├── mlflow/
-│   └── MLproject                      # MLflow project configuration
+│   └── MLproject                      # MLflow 项目配置
 ├── dvc/
-│   ├── data.dvc                       # DVC data versioning
-│   └── .dvcignore                     # DVC ignore patterns
+│   ├── data.dvc                       # DVC 数据版本控制
+│   └── .dvcignore                     # DVC 忽略模式
 ├── tests/
-│   └── test_pipeline.py               # Pipeline tests (STUB)
+│   └── test_pipeline.py               # 管道测试（存根）
 └── docs/
-    ├── SETUP.md                        # Setup instructions
-    ├── MLFLOW_GUIDE.md                 # MLflow usage guide
-    └── DVC_WORKFLOW.md                 # DVC workflow guide
+    ├── SETUP.md                        # 设置指南
+    ├── MLFLOW_GUIDE.md                 # MLflow 使用指南
+    └── DVC_WORKFLOW.md                 # DVC 工作流指南
 ```
 
 ---
 
-## Getting Started
+## 快速开始
 
-### Prerequisites
+### 前置条件
 
-Before starting this project, ensure you have:
+开始本项目前，请确保您已具备：
 
-- Completed Projects 1 and 2 (API Deployment, Kubernetes basics)
-- Docker and Docker Compose installed
-- Python 3.11+ installed
-- Git installed
-- Basic understanding of:
-  - Machine learning concepts (training, validation, testing)
-  - SQL and databases
-  - Workflow automation concepts
+- 完成项目 1 和 2（API 部署、Kubernetes 基础）
+- 已安装 Docker 和 Docker Compose
+- 已安装 Python 3.11+
+- 已安装 Git
+- 基本了解：
+  - 机器学习概念（训练、验证、测试）
+  - SQL 和数据库
+  - 工作流自动化概念
 
-### Quick Start
+### 快速启动
 
-1. **Navigate to project directory:**
+1. **进入项目目录：**
    ```bash
    cd projects/project-03-ml-pipeline-tracking/
    ```
 
-2. **Set up environment:**
+2. **设置环境：**
    ```bash
    cp .env.example .env
-   # Edit .env with your configuration
+   # 按需编辑 .env 文件
    ```
 
-3. **Install dependencies:**
+3. **安装依赖：**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Start infrastructure with Docker Compose:**
+4. **使用 Docker Compose 启动基础设施：**
    ```bash
    docker-compose up -d
    ```
 
-5. **Verify services:**
-   - MLflow UI: http://localhost:5000
-   - Airflow UI: http://localhost:8080
-   - MinIO Console: http://localhost:9001
+5. **验证服务：**
+   - MLflow UI：http://localhost:5000
+   - Airflow UI：http://localhost:8080
+   - MinIO 控制台：http://localhost:9001
 
-6. **Read the detailed requirements:**
+6. **阅读详细需求：**
    ```bash
    cat requirements.md
    ```
 
-7. **Follow the implementation guide in architecture.md**
+7. **按照 architecture.md 中的实现指南操作**
 
 ---
 
-## Learning Path
+## 学习路径
 
-### Phase 1: Environment Setup (15 hours)
-- Set up Docker Compose infrastructure
-- Configure MLflow tracking server
-- Initialize DVC for data versioning
-- Install all dependencies
+### 阶段一：环境搭建（15 小时）
+- 设置 Docker Compose 基础设施
+- 配置 MLflow 追踪服务器
+- 初始化 DVC 用于数据版本控制
+- 安装所有依赖
 
-**Deliverable:** All services running and accessible
+**交付物：** 所有服务运行中并可访问
 
-### Phase 2: Data Pipeline (25 hours)
-- Implement data ingestion from multiple sources
-- Add data validation with Great Expectations
-- Build preprocessing pipeline
-- Version data with DVC
+### 阶段二：数据管道（25 小时）
+- 实现从多个来源的数据摄入
+- 使用 Great Expectations 添加数据验证
+- 构建预处理管道
+- 使用 DVC 进行数据版本控制
 
-**Deliverable:** Complete data pipeline with validation
+**交付物：** 包含验证的完整数据管道
 
-### Phase 3: MLflow Integration (20 hours)
-- Set up MLflow experiment tracking
-- Implement model training with tracking
-- Log parameters, metrics, and artifacts
-- Build model registry
+### 阶段三：MLflow 集成（20 小时）
+- 设置 MLflow 实验追踪
+- 实现带追踪的模型训练
+- 记录参数、指标和工件
+- 构建模型注册表
 
-**Deliverable:** Multiple tracked experiments in MLflow
+**交付物：** MLflow 中多个被追踪的实验
 
-### Phase 4: Workflow Orchestration (30 hours)
-- Design Airflow DAG structure
-- Implement pipeline tasks
-- Configure scheduling and error handling
-- Test end-to-end pipeline
+### 阶段四：工作流编排（30 小时）
+- 设计 Airflow DAG 结构
+- 实现管道任务
+- 配置调度和错误处理
+- 测试端到端管道
 
-**Deliverable:** Automated pipeline running on schedule
+**交付物：** 按计划自动运行的管道
 
-### Phase 5: Analysis & Documentation (10 hours)
-- Create experiment comparison notebooks
-- Write comprehensive documentation
-- Build experiment analysis dashboard
-- Prepare demo materials
+### 阶段五：分析与文档（10 小时）
+- 创建实验比较笔记本
+- 编写全面的文档
+- 构建实验分析仪表板
+- 准备演示材料
 
-**Deliverable:** Complete documentation and analysis tools
+**交付物：** 完整的文档和分析工具
 
 ---
 
-## Key Concepts
+## 关键概念
 
-### MLOps Fundamentals
+### MLOps 基础
 
-**What is MLOps?**
-MLOps (Machine Learning Operations) applies DevOps principles to ML workflows, ensuring models are:
-- **Reproducible** - Same code and data produces same results
-- **Automated** - Manual steps are eliminated
-- **Monitored** - Performance is continuously tracked
-- **Versioned** - All artifacts are version controlled
+**什么是 MLOps？**
+MLOps（机器学习运维）将 DevOps 原则应用于 ML 工作流，确保模型：
+- **可复现**——相同的代码和数据产生相同的结果
+- **自动化**——消除手动步骤
+- **可监控**——持续追踪性能
+- **版本化**——所有工件都有版本控制
 
-**Why MLOps Matters:**
-- **Development speed**: Experiment 10x faster with automated tracking
-- **Collaboration**: Teams can share experiments and reproduce results
-- **Production readiness**: Models transition smoothly from research to production
-- **Governance**: Complete audit trail of all experiments
+**为什么 MLOps 很重要：**
+- **开发速度**：通过自动追踪将实验速度提升 10 倍
+- **协作**：团队可以共享实验并复现结果
+- **生产就绪**：模型从研究到生产平滑过渡
+- **治理**：所有实验的完整审计跟踪
 
-### Experiment Tracking
+### 实验追踪
 
-**What to Track:**
-- **Parameters**: Hyperparameters (learning rate, batch size, model architecture)
-- **Metrics**: Performance metrics (accuracy, loss, F1 score)
-- **Artifacts**: Model files, plots, datasets, logs
-- **Code version**: Git commit hash for reproducibility
-- **Environment**: Dependencies and hardware specs
+**需要追踪什么：**
+- **参数**：超参数（学习率、批次大小、模型架构）
+- **指标**：性能指标（准确率、损失、F1 分数）
+- **工件**：模型文件、图表、数据集、日志
+- **代码版本**：用于可复现性的 Git 提交哈希
+- **环境**：依赖项和硬件规格
 
-**Benefits:**
-- Never lose a good experiment
-- Compare models systematically
-- Share results with team members
-- Reproduce results months later
+**好处：**
+- 永远不会丢失好的实验
+- 系统性地比较模型
+- 与团队成员分享结果
+- 数月后仍能复现结果
 
-### Data Versioning
+### 数据版本控制
 
-**Why Version Data:**
-- Data changes over time
-- Need to recreate old experiments
-- Track data lineage
-- Collaborate on datasets
+**为什么需要对数据进行版本控制：**
+- 数据随时间变化
+- 需要重现旧实验
+- 追踪数据血缘
+- 在数据集上协作
 
-**DVC Workflow:**
+**DVC 工作流：**
 ```bash
-# Track dataset
+# 追踪数据集
 dvc add data/raw/dataset.csv
 
-# Commit to Git
+# 提交到 Git
 git add data/raw/dataset.csv.dvc
-git commit -m "Add dataset version 1.0"
+git commit -m "添加数据集版本 1.0"
 
-# Push to remote storage
+# 推送到远程存储
 dvc push
 
-# Later: retrieve exact dataset
+# 之后：检索精确的数据集
 dvc pull
 ```
 
-### Workflow Orchestration
+### 工作流编排
 
-**Why Use Airflow:**
-- **Dependencies**: Tasks run in correct order
-- **Scheduling**: Automatic execution (daily, weekly)
-- **Monitoring**: Track task success/failure
-- **Retries**: Automatic retry on failure
-- **Scalability**: Distribute tasks across workers
+**为什么使用 Airflow：**
+- **依赖关系**：任务按正确顺序执行
+- **调度**：自动执行（每日、每周）
+- **监控**：追踪任务成功/失败
+- **重试**：失败时自动重试
+- **可扩展性**：在多个工作节点间分配任务
 
-**DAG (Directed Acyclic Graph):**
+**DAG（有向无环图）：**
 ```python
-# Define task dependencies
+# 定义任务依赖关系
 ingest_data >> validate_data >> preprocess_data
 preprocess_data >> train_model >> evaluate_model
 evaluate_model >> register_model
@@ -342,125 +342,125 @@ evaluate_model >> register_model
 
 ---
 
-## Success Criteria
+## 成功标准
 
-### Minimum Requirements
+### 最低要求
 
-- [ ] All infrastructure services running (MLflow, Airflow, PostgreSQL, MinIO)
-- [ ] Data pipeline ingests, validates, and preprocesses data
-- [ ] At least 5 experiments tracked in MLflow
-- [ ] Models logged with complete metadata (params, metrics, artifacts)
-- [ ] Airflow DAG runs successfully end-to-end
-- [ ] Data versioned with DVC
-- [ ] Model registry contains multiple versions
-- [ ] Pipeline scheduled and runs automatically
-- [ ] Documentation complete and clear
+- [ ] 所有基础服务运行中（MLflow、Airflow、PostgreSQL、MinIO）
+- [ ] 数据管道完成摄入、验证和预处理
+- [ ] MLflow 中至少追踪 5 次实验
+- [ ] 模型记录包含完整的元数据（参数、指标、工件）
+- [ ] Airflow DAG 成功端到端运行
+- [ ] 使用 DVC 进行数据版本控制
+- [ ] 模型注册表中包含多个版本
+- [ ] 管道已调度并自动运行
+- [ ] 文档完整清晰
 
-### Excellence Criteria
+### 卓越标准
 
-- [ ] 10+ experiments with systematic hyperparameter search
-- [ ] Comprehensive data validation with Great Expectations
-- [ ] Advanced experiment analysis notebooks
-- [ ] Custom MLflow visualizations
-- [ ] Pipeline monitoring and alerting
-- [ ] Production-ready error handling
-- [ ] Complete test coverage
-- [ ] Professional documentation with diagrams
-
----
-
-## Common Challenges & Solutions
-
-### Challenge 1: Service Dependencies
-**Problem:** Airflow tries to connect before PostgreSQL is ready
-**Solution:** Use Docker health checks and `depends_on` with conditions
-
-### Challenge 2: Experiment Clutter
-**Problem:** Too many experiments, hard to find relevant ones
-**Solution:** Use meaningful tags and naming conventions
-
-### Challenge 3: Data Too Large
-**Problem:** Git can't handle large datasets
-**Solution:** Always use DVC for data, never commit data to Git
-
-### Challenge 4: MLflow Artifacts Not Saving
-**Problem:** Artifacts disappear after runs
-**Solution:** Verify artifact store configuration (S3/MinIO endpoint)
-
-### Challenge 5: Airflow DAG Not Updating
-**Problem:** Code changes don't appear in Airflow UI
-**Solution:** Check DAG folder mount and Airflow refresh interval
+- [ ] 10 次以上实验，包含系统化的超参数搜索
+- [ ] 使用 Great Expectations 进行全面的数据验证
+- [ ] 高级实验分析笔记本
+- [ ] 自定义 MLflow 可视化
+- [ ] 管道监控和告警
+- [ ] 生产级错误处理
+- [ ] 完整的测试覆盖
+- [ ] 带有图表的专业文档
 
 ---
 
-## Resources
+## 常见挑战与解决方案
 
-### Official Documentation
-- [MLflow Documentation](https://mlflow.org/docs/latest/index.html)
-- [Apache Airflow Documentation](https://airflow.apache.org/docs/)
-- [DVC Documentation](https://dvc.org/doc)
-- [Great Expectations Documentation](https://docs.greatexpectations.io/)
+### 挑战一：服务依赖
+**问题：** Airflow 在 PostgreSQL 就绪前尝试连接
+**解决方案：** 使用 Docker 健康检查和带条件的 `depends_on`
 
-### Tutorials
-- [MLflow Quickstart](https://mlflow.org/docs/latest/tutorials-and-examples/tutorial.html)
-- [Airflow Tutorial](https://airflow.apache.org/docs/apache-airflow/stable/tutorial.html)
-- [DVC Get Started](https://dvc.org/doc/start)
+### 挑战二：实验杂乱
+**问题：** 实验太多，难以找到相关的
+**解决方案：** 使用有意义的标签和命名规范
 
-### Community
+### 挑战三：数据过大
+**问题：** Git 无法处理大型数据集
+**解决方案：** 始终使用 DVC 管理数据，切勿将数据提交到 Git
+
+### 挑战四：MLflow 工件未保存
+**问题：** 运行后工件丢失
+**解决方案：** 验证工件存储配置（S3/MinIO 端点）
+
+### 挑战五：Airflow DAG 未更新
+**问题：** 代码变更未在 Airflow UI 中显示
+**解决方案：** 检查 DAG 文件夹挂载和 Airflow 刷新间隔
+
+---
+
+## 资源
+
+### 官方文档
+- [MLflow 文档](https://mlflow.org/docs/latest/index.html)
+- [Apache Airflow 文档](https://airflow.apache.org/docs/)
+- [DVC 文档](https://dvc.org/doc)
+- [Great Expectations 文档](https://docs.greatexpectations.io/)
+
+### 教程
+- [MLflow 快速入门](https://mlflow.org/docs/latest/tutorials-and-examples/tutorial.html)
+- [Airflow 教程](https://airflow.apache.org/docs/apache-airflow/stable/tutorial.html)
+- [DVC 入门](https://dvc.org/doc/start)
+
+### 社区
 - [MLflow Discord](https://mlflow.org/community)
 - [Airflow Slack](https://apache-airflow-slack.herokuapp.com/)
-- [DVC Community](https://dvc.org/community)
+- [DVC 社区](https://dvc.org/community)
 
 ---
 
-## Next Steps
+## 后续步骤
 
-After completing this project:
+完成本项目后：
 
-1. **Move to Project 4**: Monitoring and Alerting System
-2. **Extend this project** with:
-   - Model drift detection
-   - A/B testing framework
-   - Feature store (Feast)
-   - AutoML integration
-3. **Portfolio**: Add this to your portfolio with demo video
-4. **Blog**: Write about building production ML pipelines
-5. **Interview prep**: Discuss MLOps architecture in interviews
-
----
-
-## Assessment
-
-Your work will be evaluated on:
-
-- **Functionality (40%)**: Does the pipeline work end-to-end?
-- **MLOps Practices (30%)**: Proper tracking, versioning, automation?
-- **Code Quality (15%)**: Clean, well-organized, tested code?
-- **Documentation (15%)**: Clear, comprehensive documentation?
-
-**Passing Score:** 70/100
-**Target for Excellence:** 85/100
+1. **进入项目 4**：监控和告警系统
+2. **扩展本项目**，添加：
+   - 模型漂移检测
+   - A/B 测试框架
+   - 特征存储（Feast）
+   - AutoML 集成
+3. **作品集**：将本项目添加到作品集并附上演示视频
+4. **博客**：撰写关于构建生产 ML 管道的文章
+5. **面试准备**：在面试中讨论 MLOps 架构
 
 ---
 
-## Support
+## 评估
 
-### Getting Help
+你的工作将按以下标准评估：
 
-1. **Check documentation** in `docs/` folder
-2. **Review code stubs** for TODO comments and guidance
-3. **Search issues** in project repository
-4. **Ask questions** in community forums
-5. **Read error logs** carefully - they often point to the solution
+- **功能（40%）**：管道是否能端到端工作？
+- **MLOps 实践（30%）**：是否正确地追踪、版本控制、自动化？
+- **代码质量（15%）**：代码是否整洁、组织良好、经过测试？
+- **文档（15%）**：文档是否清晰、全面？
 
-### Common Error Messages
-
-See `docs/TROUBLESHOOTING.md` for solutions to common issues.
+**及格分数：** 70/100
+**卓越目标：** 85/100
 
 ---
 
-**Project Version:** 1.0
-**Last Updated:** October 18, 2025
-**Maintained By:** AI Infrastructure Curriculum Team
+## 支持
 
-**Ready to start?** Open `requirements.md` for detailed specifications!
+### 获取帮助
+
+1. **查看文档**在 `docs/` 文件夹中
+2. **审查代码存根**中的 TODO 注释和指南
+3. **搜索问题**在项目仓库中
+4. **提问**在社区论坛中
+5. **仔细阅读错误日志**——它们通常会指向解决方案
+
+### 常见错误消息
+
+参见 `docs/TROUBLESHOOTING.md` 了解常见问题的解决方案。
+
+---
+
+**项目版本：** 1.0
+**最后更新：** 2025 年 10 月 18 日
+**维护者：** AI 基础设施课程团队
+
+**准备好开始了吗？** 打开 `requirements.md` 查看详细规格说明！

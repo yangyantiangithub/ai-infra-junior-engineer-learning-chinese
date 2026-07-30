@@ -1,159 +1,159 @@
-# Module 004: ML Basics for Infrastructure - Comprehensive Quiz
+# Module 004: 面向基础设施的 ML 基础 - 综合测验
 
-## Overview
+## 概述
 
-This quiz covers all four lectures in Module 004:
-- Lecture 01: Machine Learning Overview
-- Lecture 02: PyTorch Basics
-- Lecture 03: TensorFlow Basics
-- Lecture 04: Model Formats and ONNX
+本测验涵盖 Module 004 的全部四节讲座：
+- 讲座 01：机器学习概述
+- 讲座 02：PyTorch 基础
+- 讲座 03：TensorFlow 基础
+- 讲座 04：模型格式和 ONNX
 
-**Total Questions**: 28
-**Time Estimate**: 45-60 minutes
-**Passing Score**: 70% (20/28 correct)
-
----
-
-## Instructions
-
-1. Read each question carefully
-2. Select the best answer for multiple choice questions
-3. For code analysis questions, consider what the code actually does
-4. Some questions have scenario-based contexts - read them thoroughly
-5. Explanations are provided after each question for learning purposes
+**总题数**：28
+**预计时间**：45-60 分钟
+**及格分数**：70%（28 题中答对 20 题）
 
 ---
 
-## Section A: ML Overview (6 questions)
+## 说明
 
-### Question 1 (Easy)
-**What is the fundamental difference between traditional programming and machine learning?**
-
-A) Traditional programming is faster than machine learning
-B) Machine learning learns patterns from data, while traditional programming uses explicit rules
-C) Traditional programming requires more memory than machine learning
-D) Machine learning doesn't need any code, only data
-
-**Correct Answer**: B
-
-**Explanation**: The core difference is that traditional programming uses explicit, hand-written rules (if/else statements), while machine learning learns patterns from examples (data). ML doesn't replace programming but changes how we solve problems - instead of writing rules, we provide examples and let the model discover patterns.
+1. 仔细阅读每个问题
+2. 为选择题选择最佳答案
+3. 对于代码分析题，思考代码的实际行为
+4. 部分问题带有场景上下文——请仔细阅读
+5. 每个问题后附有解释，供学习参考
 
 ---
 
-### Question 2 (Medium)
-**Your ML team is deploying a new model to production. The training phase took 3 days on 8 GPUs, but the model will serve 10,000 predictions per second in production. Which infrastructure consideration is MOST critical?**
+## A 部分：ML 概述（6 题）
 
-A) Training GPU capacity for regular retraining
-B) Inference latency and throughput optimization
-C) Data storage for training datasets
-D) Model versioning for training checkpoints
+### 问题 1（简单）
+**传统编程和机器学习之间的根本区别是什么？**
 
-**Correct Answer**: B
+A) 传统编程比机器学习更快
+B) 机器学习从数据中学习模式，而传统编程使用显式规则
+C) 传统编程比机器学习需要更多内存
+D) 机器学习不需要任何代码，只需要数据
 
-**Explanation**: While training happens occasionally (days/weeks), inference happens constantly in production (thousands of times per second). The critical infrastructure need is optimizing for low latency and high throughput to handle 10,000 QPS. Training infrastructure is important but not the immediate bottleneck for production serving.
+**正确答案**：B
 
----
-
-### Question 3 (Easy)
-**True or False: In machine learning, "inference" refers to the process of training a model on data.**
-
-A) True
-B) False
-
-**Correct Answer**: B (False)
-
-**Explanation**: Inference refers to making predictions with an already-trained model on new, unseen data. Training is the process where the model learns patterns from data. This is a critical distinction for infrastructure engineers - training and inference have completely different resource requirements and optimization strategies.
+**解释**：核心区别在于传统编程使用显式的、手写的规则（if/else 语句），而机器学习从示例（数据）中学习模式。ML 并没有取代编程，而是改变了我们解决问题的方式——我们不再编写规则，而是提供示例让模型发现模式。
 
 ---
 
-### Question 4 (Medium)
-**You need to deploy a model that processes images for object detection. Based on the lecture, what are the expected infrastructure needs?**
+### 问题 2（中等）
+**你的 ML 团队正在将一个新模型部署到生产环境。训练阶段在 8 个 GPU 上耗时 3 天，但该模型将在生产中每秒服务 10,000 次预测。哪个基础设施考虑因素最为关键？**
 
-A) Training: Low compute, Inference: Very fast, Model size: Small (MB)
-B) Training: High compute (GPUs required), Inference: Moderate speed (need GPUs for real-time), Model size: Large (hundreds of MB to GB)
-C) Training: Moderate compute, Inference: Very fast (microseconds), Model size: Small (MB)
-D) Training: Very high compute, Inference: Slow, Model size: TB-scale
+A) 定期重新训练的训练 GPU 容量
+B) 推理延迟和吞吐量优化
+C) 训练数据集的数据存储
+D) 训练检查点的模型版本管理
 
-**Correct Answer**: B
+**正确答案**：B
 
-**Explanation**: Object detection is a complex computer vision task requiring: (1) High compute training with GPUs, (2) GPUs for real-time inference since object detection models are computationally intensive, (3) Large model sizes (hundreds of MB to GB) due to the complexity of detecting and locating multiple objects in images.
-
----
-
-### Question 5 (Hard)
-**A data scientist reports that their model's prediction confidence has dropped from an average of 0.92 to 0.75 over four weeks in production. What is the MOST likely issue and appropriate infrastructure response?**
-
-A) Hardware failure - replace the GPU
-B) Data drift or concept drift - trigger model retraining
-C) Memory leak - restart the serving container
-D) Network latency - add more load balancers
-
-**Correct Answer**: B
-
-**Explanation**: A gradual decline in prediction confidence over time is a classic symptom of data drift (input distribution changes) or concept drift (relationships between inputs and outputs change). The appropriate infrastructure response is to monitor for this pattern, alert the team, and trigger a retraining pipeline with more recent data. Hardware or network issues would cause sudden failures, not gradual degradation.
+**解释**：虽然训练是偶尔进行（数天/数周），但推理在生产环境中是持续进行的（每秒数千次）。关键的基础设施需求是优化低延迟和高吞吐量，以处理 10,000 QPS。训练基础设施很重要，但不是生产服务的即时瓶颈。
 
 ---
 
-### Question 6 (Medium)
-**Which type of machine learning requires labeled training data where each example has a correct answer?**
+### 问题 3（简单）
+**判断对错：在机器学习中，"推理"指的是在数据上训练模型的过程。**
 
-A) Unsupervised learning
-B) Reinforcement learning
-C) Supervised learning
-D) Self-supervised learning
+A) 正确
+B) 错误
 
-**Correct Answer**: C
+**正确答案**：B（错误）
 
-**Explanation**: Supervised learning requires labeled examples (input + correct output) for training. For example, images labeled as "cat" or "dog". This is the most common ML type in production systems. Unsupervised learning finds patterns without labels, and reinforcement learning learns from rewards. Labels can be expensive to create, which is an important infrastructure cost consideration.
+**解释**：推理是指用已训练好的模型对新的、未见过的数据进行预测。训练是模型从数据中学习模式的过程。这是基础设施工程师需要理解的关键区别——训练和推理有着完全不同的资源需求和优化策略。
 
 ---
 
-## Section B: PyTorch Basics (8 questions)
+### 问题 4（中等）
+**你需要部署一个处理图像进行目标检测的模型。根据讲座内容，预期的基础设施需求是什么？**
 
-### Question 7 (Easy)
-**What does the `.eval()` method do when called on a PyTorch model before inference?**
+A) 训练：低计算量，推理：非常快，模型大小：小（MB）
+B) 训练：高计算量（需要 GPU），推理：中等速度（实时需要 GPU），模型大小：大（数百 MB 到 GB）
+C) 训练：中等计算量，推理：非常快（微秒级），模型大小：小（MB）
+D) 训练：非常高计算量，推理：慢，模型大小：TB 级
 
-A) Evaluates the model's accuracy on a test dataset
-B) Sets the model to evaluation mode, disabling dropout and batch normalization training behavior
-C) Deletes the model from memory
-D) Exports the model to ONNX format
+**正确答案**：B
 
-**Correct Answer**: B
-
-**Explanation**: The `.eval()` method sets the model to evaluation mode, which changes the behavior of layers like dropout (disabled during inference) and batch normalization (uses running statistics instead of batch statistics). Forgetting to call `.eval()` is a common mistake that causes inconsistent predictions. This is critical for production inference.
+**解释**：目标检测是一项复杂的计算机视觉任务，需要：(1) 使用 GPU 的高计算量训练，(2) 实时推理需要 GPU，因为目标检测模型计算密集，(3) 大模型大小（数百 MB 到 GB），因为要在图像中检测和定位多个对象。
 
 ---
 
-### Question 8 (Medium)
-**You receive this error: "RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!" What is the issue?**
+### 问题 5（困难）
+**一位数据科学家报告说，他们的模型预测置信度在生产环境中四个月内从平均 0.92 下降到了 0.75。最可能的问题和适当的基础设施响应是什么？**
 
-A) PyTorch is not installed correctly
-B) The model and input tensors are on different devices (one on GPU, one on CPU)
-C) The GPU is out of memory
-D) The model architecture is incompatible with the input
+A) 硬件故障——更换 GPU
+B) 数据漂移或概念漂移——触发模型重新训练
+C) 内存泄漏——重启服务容器
+D) 网络延迟——增加更多负载均衡器
 
-**Correct Answer**: B
+**正确答案**：B
 
-**Explanation**: This error occurs when the model is on one device (e.g., GPU) and the input tensor is on another device (e.g., CPU). PyTorch requires all tensors in a computation to be on the same device. The fix is to ensure both model and inputs are moved to the same device using `.to(device)`.
+**解释**：预测置信度随时间逐渐下降是数据漂移（输入分布变化）或概念漂移（输入和输出之间的关系变化）的典型症状。适当的基础设施响应是监控这种模式，提醒团队，并使用更新的数据触发重新训练管道。硬件或网络问题会导致突然故障，而非逐渐退化。
 
 ---
 
-### Question 9 (Easy)
-**Which context manager should ALWAYS be used when running PyTorch inference in production to save memory and computation?**
+### 问题 6（中等）
+**哪种类型的机器学习需要带有正确答案的标记训练数据？**
+
+A) 无监督学习
+B) 强化学习
+C) 监督学习
+D) 自监督学习
+
+**正确答案**：C
+
+**解释**：监督学习需要标记的示例（输入 + 正确输出）进行训练。例如，标记为"猫"或"狗"的图像。这是生产系统中最常见的 ML 类型。无监督学习在没有标签的情况下发现模式，强化学习从奖励中学习。创建标签可能成本高昂，这是一个重要的基础设施成本考虑因素。
+
+---
+
+## B 部分：PyTorch 基础（8 题）
+
+### 问题 7（简单）
+**在推理前对 PyTorch 模型调用 `.eval()` 方法的作用是什么？**
+
+A) 评估模型在测试数据集上的准确率
+B) 将模型设置为评估模式，禁用 dropout 和 batch normalization 的训练行为
+C) 从内存中删除模型
+D) 将模型导出为 ONNX 格式
+
+**正确答案**：B
+
+**解释**：`.eval()` 方法将模型设置为评估模式，这会改变 dropout（推理时禁用）和 batch normalization（使用 running statistics 而非 batch statistics）等层的行为。忘记调用 `.eval()` 是一个常见错误，会导致不一致的预测结果。这对生产推理至关重要。
+
+---
+
+### 问题 8（中等）
+**你收到此错误："RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!" 问题出在哪里？**
+
+A) PyTorch 没有正确安装
+B) 模型和输入 tensor 位于不同的设备上（一个在 GPU 上，一个在 CPU 上）
+C) GPU 内存不足
+D) 模型架构与输入不兼容
+
+**正确答案**：B
+
+**解释**：当模型在一个设备上（如 GPU）而输入 tensor 在另一个设备上（如 CPU）时，会出现此错误。PyTorch 要求计算中的所有 tensor 都在同一个设备上。修复方法是使用 `.to(device)` 确保模型和输入都移动到同一设备。
+
+---
+
+### 问题 9（简单）
+**在生产环境中运行 PyTorch 推理时，为了节省内存和计算，应该始终使用哪个上下文管理器？**
 
 A) `with torch.cuda.empty_cache():`
 B) `with torch.no_grad():`
 C) `with torch.autograd.profiler():`
 D) `with torch.jit.optimize():`
 
-**Correct Answer**: B
+**正确答案**：B
 
-**Explanation**: `torch.no_grad()` disables gradient computation, which is only needed during training. Using it during inference saves significant memory (no need to store gradients) and computation time. This should always be used in production inference code. It's one of the most important optimizations for PyTorch inference.
+**解释**：`torch.no_grad()` 禁用梯度计算，这仅在训练时需要。在推理期间使用它可以节省大量内存（无需存储梯度）和计算时间。在生产推理代码中应始终使用它。这是 PyTorch 推理最重要的优化之一。
 
 ---
 
-### Question 10 (Hard)
-**Analyze this code. What is the PRIMARY performance issue?**
+### 问题 10（困难）
+**分析以下代码。主要的性能问题是什么？**
 
 ```python
 model = torch.hub.load('pytorch/vision', 'resnet50', pretrained=True)
@@ -167,133 +167,133 @@ for image in image_list:  # 1000 images
     results.append(output)
 ```
 
-A) The model is not set to eval mode
-B) Processing one image at a time instead of batching
-C) Using CUDA instead of CPU
-D) The input tensor doesn't have a batch dimension
+A) 模型未设置为 eval 模式
+B) 逐张处理图像而非批处理
+C) 使用 CUDA 而非 CPU
+D) 输入 tensor 没有 batch 维度
 
-**Correct Answer**: B (though D is also technically an issue)
+**正确答案**：B（虽然 D 在技术上也存在问题）
 
-**Explanation**: The main performance issue is processing images one at a time. Batching would significantly improve GPU utilization and throughput. While the missing batch dimension (D) would cause an immediate error, the performance issue is the lack of batching. In production, you should batch requests to maximize GPU efficiency - processing 32 images at once can be 10-20x faster than processing them individually.
-
----
-
-### Question 11 (Medium)
-**What is the difference between saving a PyTorch model with `torch.save(model.state_dict(), path)` versus `torch.save(model, path)`?**
-
-A) state_dict saves only weights, full model saves weights + architecture
-B) state_dict is larger, full model is smaller
-C) state_dict requires CUDA, full model works on CPU
-D) There is no difference
-
-**Correct Answer**: A
-
-**Explanation**: `state_dict()` saves only the model weights (parameters), requiring you to have the model architecture code separately. `torch.save(model, path)` saves the entire model including architecture. Best practice for production is to use state_dict because it's more portable and flexible - you can modify the architecture code without being locked into the saved structure.
+**解释**：主要的性能问题是逐张处理图像。批处理可以显著提高 GPU 利用率和吞吐量。虽然缺少 batch 维度（D）会导致立即报错，但性能问题在于缺少批处理。在生产环境中，你应该批量处理请求以最大限度地提高 GPU 效率——同时处理 32 张图像可能比逐张处理快 10-20 倍。
 
 ---
 
-### Question 12 (Medium)
-**Your GPU shows "CUDA out of memory" errors during inference. Which is NOT a valid solution?**
+### 问题 11（中等）
+**使用 `torch.save(model.state_dict(), path)` 与 `torch.save(model, path)` 保存 PyTorch 模型有什么区别？**
 
-A) Reduce the batch size
-B) Call torch.cuda.empty_cache() to free unused memory
-C) Use mixed precision (float16 instead of float32)
-D) Increase the learning rate
+A) state_dict 只保存权重，完整模型保存权重 + 架构
+B) state_dict 更大，完整模型更小
+C) state_dict 需要 CUDA，完整模型可在 CPU 上运行
+D) 没有区别
 
-**Correct Answer**: D
+**正确答案**：A
 
-**Explanation**: Learning rate is a training hyperparameter and has nothing to do with memory usage during inference. Valid solutions for OOM errors include: reducing batch size (less data in memory), clearing cache (free unused allocations), using mixed precision (float16 uses half the memory of float32), or ensuring torch.no_grad() is used.
-
----
-
-### Question 13 (Easy)
-**What is TorchServe?**
-
-A) A PyTorch training optimization library
-B) PyTorch's official model serving framework for production deployments
-C) A tool for converting PyTorch models to TensorFlow
-D) A cloud storage service for PyTorch models
-
-**Correct Answer**: B
-
-**Explanation**: TorchServe is PyTorch's official serving framework designed for production ML model deployment. It provides REST/gRPC APIs, model versioning, auto-scaling, metrics, and other production features. You should use TorchServe rather than building your own serving infrastructure from scratch.
+**解释**：`state_dict()` 只保存模型权重（参数），你需要单独有模型架构代码。`torch.save(model, path)` 保存整个模型包括架构。生产环境的最佳实践是使用 state_dict，因为它更具可移植性和灵活性——你可以修改架构代码而不受保存结构的限制。
 
 ---
 
-### Question 14 (Hard)
-**You're benchmarking inference speed. With batch size 1, you get 80 samples/sec. With batch size 32, you get 430 samples/sec. What is the approximate latency per sample at batch size 32?**
+### 问题 12（中等）
+**你的 GPU 在推理期间显示"CUDA out of memory"错误。哪个不是有效的解决方案？**
+
+A) 减少批大小
+B) 调用 torch.cuda.empty_cache() 释放未使用的内存
+C) 使用混合精度（float16 替代 float32）
+D) 增加学习率
+
+**正确答案**：D
+
+**解释**：学习率是一个训练超参数，与推理期间的内存使用无关。解决 OOM 错误的有效方法包括：减少批大小（减少内存中的数据）、清除缓存（释放未使用的分配）、使用混合精度（float16 使用 float32 一半的内存），或确保使用了 torch.no_grad()。
+
+---
+
+### 问题 13（简单）
+**什么是 TorchServe？**
+
+A) 一个 PyTorch 训练优化库
+B) PyTorch 官方的生产部署模型服务框架
+C) 将 PyTorch 模型转换为 TensorFlow 的工具
+D) 用于 PyTorch 模型的云存储服务
+
+**正确答案**：B
+
+**解释**：TorchServe 是 PyTorch 官方为生产 ML 模型部署设计的服务框架。它提供 REST/gRPC API、模型版本管理、自动扩展、指标和其他生产特性。你应该使用 TorchServe，而不是从头构建自己的服务基础设施。
+
+---
+
+### 问题 14（困难）
+**你正在对推理速度进行基准测试。批大小为 1 时，你得到 80 samples/sec。批大小为 32 时，你得到 430 samples/sec。批大小为 32 时每个样本的近似延迟是多少？**
 
 A) 2.3 ms
 B) 12.5 ms
 C) 74.4 ms
 D) 430 ms
 
-**Correct Answer**: A
+**正确答案**：A
 
-**Explanation**: Latency per sample = 1 / (throughput / batch_size) = 1 / (430/32) = 1 / 13.44 = 0.074 seconds = 74.4 ms total batch latency. But per sample: 74.4 ms / 32 = 2.3 ms. This demonstrates the trade-off: batching increases throughput but also increases per-request latency since requests wait for a full batch.
+**解释**：每个样本的延迟 = 1 / (吞吐量 / 批大小) = 1 / (430/32) = 1 / 13.44 = 0.074 秒 = 74.4 ms 总批处理延迟。但每个样本：74.4 ms / 32 = 2.3 ms。这展示了权衡：批处理提高了吞吐量，但也增加了每个请求的延迟，因为请求需要等待一个完整的批次。
 
 ---
 
-## Section C: TensorFlow Basics (8 questions)
+## C 部分：TensorFlow 基础（8 题）
 
-### Question 15 (Easy)
-**What is the RECOMMENDED model format for deploying TensorFlow models to TensorFlow Serving?**
+### 问题 15（简单）
+**将 TensorFlow 模型部署到 TensorFlow Serving 推荐使用哪种模型格式？**
 
 A) HDF5 (.h5)
 B) SavedModel
 C) TFLite
-D) Checkpoint files
+D) Checkpoint 文件
 
-**Correct Answer**: B
+**正确答案**：B
 
-**Explanation**: SavedModel is the recommended format for production TensorFlow deployments with TensorFlow Serving. It's a directory-based format that includes the computation graph and weights, works across languages, and is fully compatible with TF Serving. H5 is convenient but not compatible with TF Serving.
-
----
-
-### Question 16 (Medium)
-**What is the difference between TensorFlow's data format and PyTorch's for images?**
-
-A) No difference, both use the same format
-B) TensorFlow uses channels-first [N, C, H, W], PyTorch uses channels-last [N, H, W, C]
-C) TensorFlow uses channels-last [N, H, W, C], PyTorch uses channels-first [N, C, H, W]
-D) TensorFlow requires RGB, PyTorch requires BGR
-
-**Correct Answer**: C
-
-**Explanation**: TensorFlow uses channels-last format [batch, height, width, channels], while PyTorch uses channels-first [batch, channels, height, width]. This is a common source of errors when converting models or data between frameworks. A (1, 224, 224, 3) TensorFlow tensor needs to be transposed to (1, 3, 224, 224) for PyTorch.
+**解释**：SavedModel 是用于 TensorFlow Serving 生产部署的推荐格式。它是一种基于目录的格式，包含计算图和权重，跨语言兼容，且与 TF Serving 完全兼容。H5 比较方便但不兼容 TF Serving。
 
 ---
 
-### Question 17 (Easy)
-**You're running TensorFlow and getting OOM errors. Which command enables memory growth to prevent TensorFlow from allocating all GPU memory at once?**
+### 问题 16（中等）
+**TensorFlow 和 PyTorch 在图像的数据格式上有什么区别？**
+
+A) 没有区别，两者使用相同格式
+B) TensorFlow 使用 channels-first [N, C, H, W]，PyTorch 使用 channels-last [N, H, W, C]
+C) TensorFlow 使用 channels-last [N, H, W, C]，PyTorch 使用 channels-first [N, C, H, W]
+D) TensorFlow 需要 RGB，PyTorch 需要 BGR
+
+**正确答案**：C
+
+**解释**：TensorFlow 使用 channels-last 格式 [batch, height, width, channels]，而 PyTorch 使用 channels-first [batch, channels, height, width]。这是在框架之间转换模型或数据时常见的错误来源。TensorFlow 的 (1, 224, 224, 3) tensor 需要转换为 PyTorch 的 (1, 3, 224, 224)。
+
+---
+
+### 问题 17（简单）
+**你在运行 TensorFlow 时遇到 OOM 错误。哪个命令可以启用内存增长，防止 TensorFlow 一次分配所有 GPU 内存？**
 
 A) `tf.config.set_memory_limit(gpu, 4096)`
 B) `tf.config.experimental.set_memory_growth(gpu, True)`
 C) `tf.cuda.empty_cache()`
 D) `tf.config.enable_memory_saving()`
 
-**Correct Answer**: B
+**正确答案**：B
 
-**Explanation**: `tf.config.experimental.set_memory_growth(gpu, True)` tells TensorFlow to allocate GPU memory as needed rather than grabbing all available memory at startup. This is especially important when running multiple models or processes on the same GPU. This should be set early in your code, before creating any TensorFlow operations.
+**解释**：`tf.config.experimental.set_memory_growth(gpu, True)` 告诉 TensorFlow 按需分配 GPU 内存，而不是在启动时占用所有可用内存。当在同一 GPU 上运行多个模型或进程时，这尤其重要。应在代码早期、创建任何 TensorFlow 操作之前设置此项。
 
 ---
 
-### Question 18 (Medium)
-**Which TensorFlow Serving API is faster for high-throughput scenarios?**
+### 问题 18（中等）
+**对于高吞吐量场景，哪个 TensorFlow Serving API 更快？**
 
 A) REST API
 B) gRPC API
 C) HTTP/2 API
 D) WebSocket API
 
-**Correct Answer**: B
+**正确答案**：B
 
-**Explanation**: gRPC is significantly faster than REST for high-throughput scenarios because it uses binary protocol buffers instead of JSON, has lower overhead, and supports features like streaming. REST is more convenient for testing and human-readable debugging, but production systems serving millions of requests should use gRPC for better performance.
+**解释**：对于高吞吐量场景，gRPC 明显快于 REST，因为它使用二进制 protocol buffers 而不是 JSON，开销更低，并支持流式处理等功能。REST 更方便测试和人类可读的调试，但处理数百万请求的生产系统应使用 gRPC 以获得更好的性能。
 
 ---
 
-### Question 19 (Hard)
-**Analyze this TensorFlow Serving configuration. What does it enable?**
+### 问题 19（困难）
+**分析以下 TensorFlow Serving 配置。它启用了什么？**
 
 ```yaml
 model_config_list {
@@ -310,205 +310,205 @@ model_config_list {
 }
 ```
 
-A) Load balancing across multiple servers
-B) Serving two specific versions simultaneously (A/B testing)
-C) Automatic model retraining
-D) Model compression
+A) 跨多个服务器的负载均衡
+B) 同时提供两个特定版本（A/B 测试）
+C) 自动模型重新训练
+D) 模型压缩
 
-**Correct Answer**: B
+**正确答案**：B
 
-**Explanation**: This configuration tells TensorFlow Serving to serve both version 1 and version 2 of the model simultaneously. This is commonly used for A/B testing - you can route a percentage of traffic to v1 and the rest to v2 to compare performance before fully rolling out the new version. The `specific` policy explicitly lists which versions to serve.
-
----
-
-### Question 20 (Medium)
-**What is TensorFlow Lite (TFLite) optimized for?**
-
-A) Large-scale distributed training
-B) Mobile and edge device deployment
-C) Cloud-based model serving
-D) Data preprocessing pipelines
-
-**Correct Answer**: B
-
-**Explanation**: TensorFlow Lite is specifically optimized for mobile (Android, iOS) and edge devices (Raspberry Pi, microcontrollers). It creates smaller model files, has faster inference, and includes optimizations for resource-constrained devices. However, not all TensorFlow operations are supported in TFLite, so conversion may require model modifications.
+**解释**：此配置告诉 TensorFlow Serving 同时提供版本 1 和版本 2 的模型。这通常用于 A/B 测试——你可以将一定比例的流量路由到 v1，其余路由到 v2，以在完全推出新版本之前比较性能。`specific` 策略明确列出了要服务的版本。
 
 ---
 
-### Question 21 (Easy)
-**True or False: In TensorFlow, you need to explicitly call model.eval() before inference like in PyTorch.**
+### 问题 20（中等）
+**TensorFlow Lite (TFLite) 针对什么进行了优化？**
 
-A) True
-B) False
+A) 大规模分布式训练
+B) 移动和边缘设备部署
+C) 基于云的模型服务
+D) 数据预处理管道
 
-**Correct Answer**: B (False)
+**正确答案**：B
 
-**Explanation**: TensorFlow/Keras doesn't require an explicit eval() call. Training-specific behaviors (dropout, batch normalization) are automatically controlled by the `training` argument in model.predict() or model() calls. When you use model.predict(), training mode is automatically False. This is a key difference from PyTorch's explicit mode switching.
+**解释**：TensorFlow Lite 专门针对移动（Android, iOS）和边缘设备（Raspberry Pi, 微控制器）进行了优化。它生成更小的模型文件，推理速度更快，并包含针对资源受限设备的优化。然而，并非所有 TensorFlow 操作都受 TFLite 支持，因此转换可能需要修改模型。
 
 ---
 
-### Question 22 (Medium)
-**You want to enable mixed precision for 2x faster inference in TensorFlow. Which command accomplishes this?**
+### 问题 21（简单）
+**判断对错：在 TensorFlow 中，你需要像在 PyTorch 中一样在推理前显式调用 model.eval()。**
+
+A) 正确
+B) 错误
+
+**正确答案**：B（错误）
+
+**解释**：TensorFlow/Keras 不需要显式的 eval() 调用。训练特定的行为（dropout, batch normalization）由 model.predict() 或 model() 调用中的 `training` 参数自动控制。使用 model.predict() 时，training 模式自动设为 False。这是与 PyTorch 显式模式切换的关键区别。
+
+---
+
+### 问题 22（中等）
+**你想在 TensorFlow 中启用混合精度以获得 2 倍更快的推理。哪个命令可以实现？**
 
 A) `tf.config.set_precision('float16')`
 B) `tf.keras.mixed_precision.set_global_policy('mixed_float16')`
 C) `model.compile(mixed_precision=True)`
 D) `tf.experimental.enable_float16()`
 
-**Correct Answer**: B
+**正确答案**：B
 
-**Explanation**: `tf.keras.mixed_precision.set_global_policy('mixed_float16')` enables mixed precision training/inference, using float16 for computations (faster) and float32 for numerical stability where needed. This can provide ~2x speedup on modern GPUs with minimal accuracy loss. It's one of the easiest optimization techniques with significant impact.
-
----
-
-## Section D: Model Formats and ONNX (6 questions)
-
-### Question 23 (Easy)
-**What is the primary benefit of ONNX format for infrastructure teams?**
-
-A) It trains models faster than PyTorch or TensorFlow
-B) It enables framework-independent model deployment
-C) It automatically optimizes model accuracy
-D) It provides better data augmentation
-
-**Correct Answer**: B
-
-**Explanation**: ONNX (Open Neural Network Exchange) is a framework-independent format that allows you to train in any framework (PyTorch, TensorFlow, etc.) and deploy anywhere. This solves the problem of vendor lock-in and allows infrastructure teams to standardize on one serving infrastructure (ONNX Runtime) regardless of which framework data scientists use for training.
+**解释**：`tf.keras.mixed_precision.set_global_policy('mixed_float16')` 启用混合精度训练/推理，使用 float16 进行计算（更快）和 float32 在需要时保持数值稳定性。在现代 GPU 上可提供约 2 倍的加速，且精度损失极小。这是最简单且有显著影响的优化技术之一。
 
 ---
 
-### Question 24 (Medium)
-**Which parameter in PyTorch's ONNX export allows the batch size to be variable at inference time?**
+## D 部分：模型格式和 ONNX（6 题）
+
+### 问题 23（简单）
+**ONNX 格式对基础设施团队的主要好处是什么？**
+
+A) 它比 PyTorch 或 TensorFlow 训练模型更快
+B) 它实现与框架无关的模型部署
+C) 它自动优化模型准确率
+D) 它提供更好的数据增强
+
+**正确答案**：B
+
+**解释**：ONNX（Open Neural Network Exchange）是一种与框架无关的格式，允许你在任何框架（PyTorch, TensorFlow 等）中训练并在任何地方部署。这解决了供应商锁定问题，并允许基础设施团队无论数据科学家使用哪种框架进行训练，都能标准化使用一种服务基础设施（ONNX Runtime）。
+
+---
+
+### 问题 24（中等）
+**PyTorch 的 ONNX 导出中的哪个参数允许批大小在推理时可变？**
 
 A) `variable_batch=True`
 B) `dynamic_axes={'input': {0: 'batch_size'}}`
 C) `batch_size=None`
 D) `flexible_input=True`
 
-**Correct Answer**: B
+**正确答案**：B
 
-**Explanation**: The `dynamic_axes` parameter specifies which dimensions should be dynamic (variable) rather than fixed. `{'input': {0: 'batch_size'}}` means the first dimension (index 0) of the input tensor is dynamic and represents batch size. This is important for production where you might want to process different batch sizes efficiently.
-
----
-
-### Question 25 (Hard)
-**Your team wants to deploy models trained in both PyTorch and TensorFlow. What is the BEST infrastructure approach?**
-
-A) Build separate serving systems for PyTorch (TorchServe) and TensorFlow (TF Serving)
-B) Convert all models to ONNX and use ONNX Runtime for unified serving
-C) Force data scientists to only use PyTorch
-D) Manually rewrite all models in a single framework
-
-**Correct Answer**: B
-
-**Explanation**: Converting all models to ONNX and using ONNX Runtime provides a unified serving infrastructure, reducing complexity and maintenance burden. While option A works, it requires maintaining two separate systems. ONNX Runtime often performs as well or better than native frameworks, and the operational simplicity of a single serving stack is valuable for infrastructure teams.
+**解释**：`dynamic_axes` 参数指定哪些维度应该是动态的（可变的）而不是固定的。`{'input': {0: 'batch_size'}}` 表示输入 tensor 的第一个维度（索引 0）是动态的，代表批大小。这在生产中很重要，因为你可能希望高效地处理不同的批大小。
 
 ---
 
-### Question 26 (Medium)
-**Quantization reduces model size by approximately how much?**
+### 问题 25（困难）
+**你的团队想要部署在 PyTorch 和 TensorFlow 中训练的模型。最好的基础设施方法是什么？**
+
+A) 为 PyTorch（TorchServe）和 TensorFlow（TF Serving）构建独立的服务系统
+B) 将所有模型转换为 ONNX 并使用 ONNX Runtime 进行统一服务
+C) 强制数据科学家只使用 PyTorch
+D) 手动将所有模型重写为单一框架
+
+**正确答案**：B
+
+**解释**：将所有模型转换为 ONNX 并使用 ONNX Runtime 提供了一个统一的服务基础设施，减少了复杂性和维护负担。虽然选项 A 可行，但需要维护两个独立的系统。ONNX Runtime 的性能通常与原生框架相当或更好，并且单一服务栈的运维简洁性对基础设施团队非常有价值。
+
+---
+
+### 问题 26（中等）
+**量化可以将模型大小减少大约多少？**
 
 A) 10%
 B) 50%
 C) 75%
 D) 90%
 
-**Correct Answer**: C (or approximately 4x reduction)
+**正确答案**：C（约 4 倍减少）
 
-**Explanation**: Quantization typically converts float32 (32 bits) to int8 (8 bits), achieving a ~4x size reduction or about 75% smaller size. For example, a 100MB model becomes ~25MB. This also speeds up inference, especially on CPU, with minimal accuracy loss (typically <1%). It's one of the most effective optimization techniques for model deployment.
+**解释**：量化通常将 float32（32 位）转换为 int8（8 位），实现约 4 倍的大小减少或约 75% 的缩小。例如，一个 100MB 的模型变成约 25MB。这还能加速推理，尤其是在 CPU 上，且精度损失极小（通常小于 1%）。这是模型部署中最有效的优化技术之一。
 
 ---
 
-### Question 27 (Easy)
-**What tool is used to convert TensorFlow models to ONNX format?**
+### 问题 27（简单）
+**什么工具用于将 TensorFlow 模型转换为 ONNX 格式？**
 
 A) torch.onnx
 B) tf2onnx
 C) onnx-tf
 D) tensorflow-converter
 
-**Correct Answer**: B
+**正确答案**：B
 
-**Explanation**: `tf2onnx` is the official tool for converting TensorFlow models to ONNX format. You can use it as a command-line tool (`python -m tf2onnx.convert`) or as a Python library. PyTorch has built-in ONNX export (`torch.onnx.export`), but TensorFlow requires the separate tf2onnx package.
-
----
-
-### Question 28 (Hard)
-**In a production model serving system, you want to gradually roll out a new model version. Which infrastructure pattern should you implement?**
-
-A) Blue/green deployment - switch all traffic instantly
-B) A/B testing with traffic splitting (e.g., 90% old version, 10% new version)
-C) Canary deployment - deploy to one server first
-D) Rolling restart - update servers one by one
-
-**Correct Answer**: B
-
-**Explanation**: A/B testing with gradual traffic splitting is the safest approach for ML model deployment. Start by routing 5-10% of traffic to the new model version while monitoring metrics (latency, accuracy, error rate). Gradually increase traffic to the new version if metrics are good. This allows you to catch issues before they affect all users and compare model versions with real production data. This is more sophisticated than simple blue/green or canary deployments.
+**解释**：`tf2onnx` 是将 TensorFlow 模型转换为 ONNX 格式的官方工具。你可以将其作为命令行工具（`python -m tf2onnx.convert`）或 Python 库使用。PyTorch 内置了 ONNX 导出（`torch.onnx.export`），但 TensorFlow 需要单独的 tf2onnx 包。
 
 ---
 
-## Scoring Guide
+### 问题 28（困难）
+**在生产模型服务系统中，你想逐步推出新的模型版本。你应该实现哪种基础设施模式？**
 
-### Score Interpretation
+A) 蓝绿部署——瞬时切换所有流量
+B) 带流量拆分的 A/B 测试（如 90% 旧版本，10% 新版本）
+C) 金丝雀部署——先部署到一台服务器
+D) 滚动重启——逐个更新服务器
 
-- **24-28 (86-100%)**: Excellent! You have a strong understanding of ML infrastructure fundamentals. Ready for hands-on projects.
-- **20-23 (71-85%)**: Good! You understand the core concepts. Review questions you missed and try the exercises.
-- **16-19 (57-70%)**: Fair. You grasp basic concepts but need more practice. Re-read lecture sections for missed questions.
-- **Below 16 (<57%)**: Needs improvement. Review all lectures thoroughly and retake the quiz.
+**正确答案**：B
 
-### Difficulty Breakdown
-
-Your quiz contained:
-- **Easy questions (40%)**: 11 questions - Testing basic recall and understanding
-- **Medium questions (40%)**: 11 questions - Testing application and analysis
-- **Hard questions (20%)**: 6 questions - Testing synthesis and problem-solving
-
-### Topic Breakdown
-
-- **ML Overview (Section A)**: 6 questions (21%)
-- **PyTorch Basics (Section B)**: 8 questions (29%)
-- **TensorFlow Basics (Section C)**: 8 questions (29%)
-- **Model Formats/ONNX (Section D)**: 6 questions (21%)
+**解释**：带逐步流量拆分的 A/B 测试是 ML 模型部署最安全的方法。首先将 5-10% 的流量路由到新模型版本，同时监控指标（延迟、准确率、错误率）。如果指标良好，逐步增加新版本的流量。这使你能够在问题影响所有用户之前捕获问题，并使用真实生产数据比较模型版本。这比简单的蓝绿部署或金丝雀部署更为复杂。
 
 ---
 
-## Next Steps
+## 评分指南
 
-Based on your score:
+### 分数解读
 
-### If you scored 70% or higher:
-1. Move on to hands-on exercises: `exercises/exercise-01-pytorch-inference.md`
-2. Start building the module project
-3. Consider helping others who are struggling with concepts
+- **24-28（86-100%）**：优秀！你对 ML 基础设施基础有很强的理解。准备好进行动手项目。
+- **20-23（71-85%）**：良好！你理解了核心概念。复习做错的题目并尝试练习。
+- **16-19（57-70%）**：一般。你掌握了基本概念但需要更多练习。重新阅读答错题目对应的讲座部分。
+- **低于 16（<57%）**：需要改进。全面复习所有讲座并重新参加测验。
 
-### If you scored below 70%:
-1. Review the lecture notes for questions you missed
-2. Focus on the sections where you had the most errors
-3. Try the practical exercises to reinforce learning
-4. Retake the quiz after studying
+### 难度分布
 
-### Key Concepts to Master
+你的测验包含：
+- **简单题（40%）**：11 题 - 测试基本记忆和理解
+- **中等题（40%）**：11 题 - 测试应用和分析
+- **困难题（20%）**：6 题 - 测试综合和问题解决
 
-Before moving forward, ensure you understand:
-- [ ] Training vs Inference distinction
-- [ ] PyTorch device management (CPU/GPU)
-- [ ] TensorFlow model formats (SavedModel, H5, TFLite)
-- [ ] ONNX for framework interoperability
-- [ ] Model optimization techniques (quantization)
-- [ ] Production serving considerations
+### 主题分布
+
+- **ML 概述（A 部分）**：6 题（21%）
+- **PyTorch 基础（B 部分）**：8 题（29%）
+- **TensorFlow 基础（C 部分）**：8 题（29%）
+- **模型格式/ONNX（D 部分）**：6 题（21%）
 
 ---
 
-## Additional Resources
+## 下一步
 
-- PyTorch Documentation: https://pytorch.org/docs/
-- TensorFlow Guide: https://www.tensorflow.org/guide
-- ONNX Format Spec: https://onnx.ai/
-- TorchServe: https://pytorch.org/serve/
-- TensorFlow Serving: https://www.tensorflow.org/tfx/guide/serving
+根据你的分数：
+
+### 如果得分 70% 或更高：
+1. 进入动手练习：`exercises/exercise-01-pytorch-inference.md`
+2. 开始构建模块项目
+3. 考虑帮助其他在概念上有困难的人
+
+### 如果得分低于 70%：
+1. 复习做错题目对应讲座笔记
+2. 重点关注出错最多的部分
+3. 尝试实践练习以强化学习
+4. 学习后重新参加测验
+
+### 需要掌握的关键概念
+
+在继续之前，确保你理解：
+- [ ] 训练与推理的区别
+- [ ] PyTorch 设备管理（CPU/GPU）
+- [ ] TensorFlow 模型格式（SavedModel, H5, TFLite）
+- [ ] ONNX 用于框架互操作性
+- [ ] 模型优化技术（量化）
+- [ ] 生产服务注意事项
 
 ---
 
-**Quiz Version**: 1.0
-**Last Updated**: October 2025
-**Estimated Completion Time**: 45-60 minutes
+## 额外资源
+
+- PyTorch 文档：https://pytorch.org/docs/
+- TensorFlow 指南：https://www.tensorflow.org/guide
+- ONNX 格式规范：https://onnx.ai/
+- TorchServe：https://pytorch.org/serve/
+- TensorFlow Serving：https://www.tensorflow.org/tfx/guide/serving
+
+---
+
+**测验版本**：1.0
+**最后更新**：2025 年 10 月
+**预计完成时间**：45-60 分钟

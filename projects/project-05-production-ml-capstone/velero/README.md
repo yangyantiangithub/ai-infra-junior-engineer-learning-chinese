@@ -1,20 +1,20 @@
-# Velero — Cluster Backup & Restore
+# Velero — 集群备份与恢复
 
-Velero backs up Kubernetes API objects and persistent volume snapshots to S3. It is the disaster-recovery counterpart to `docs/DISASTER_RECOVERY.md` and the runtime tool that makes that document executable rather than aspirational.
+Velero 将 Kubernetes API 对象和持久化卷快照备份到 S3。它是 `docs/DISASTER_RECOVERY.md` 的灾难恢复对应工具，也是使该文档可执行而非空想的运行时工具。
 
-## What this protects against
+## 防护范围
 
-- **Accidental namespace deletion.** Restore a namespace from yesterday's backup.
-- **Cluster loss.** Restore an entire cluster's workloads into a fresh cluster (the prod-to-staging drill).
-- **Data corruption.** Restore PVCs from snapshots taken before the corruption.
-- **Region failure.** Replicate backups cross-region; spin up a new cluster in the secondary region.
+- **意外的命名空间删除。** 从昨天的备份恢复命名空间。
+- **集群丢失。** 将整个集群的工作负载恢复到新集群（生产到预发布的演练）。
+- **数据损坏。** 从损坏前的快照恢复 PVC。
+- **区域故障。** 跨区域复制备份；在辅助区域启动新集群。
 
-It does **not** protect against:
+**不**防护以下内容：
 
-- **Backups themselves being deleted.** S3 versioning + object lock are required for that.
-- **Bugs in the data.** Velero captures whatever state existed; if the data was broken at backup time, it's broken in the restore too.
+- **备份本身被删除。** 这需要 S3 版本控制 + 对象锁定。
+- **数据中的错误。** Velero 捕获的是存在的任何状态；如果备份时数据已损坏，恢复时同样损坏。
 
-## Install
+## 安装
 
 ```bash
 helm repo add vmware-tanzu https://vmware-tanzu.github.io/helm-charts
@@ -23,54 +23,54 @@ helm upgrade --install velero vmware-tanzu/velero \
   -f velero/values.yaml
 ```
 
-Prerequisites (provisioned by Terraform in `terraform/modules/iam` and an S3 bucket module not shown here):
+前置条件（由 Terraform 在 `terraform/modules/iam` 和本章未展示的 S3 存储桶模块中配置）：
 
-- S3 bucket with versioning + KMS encryption.
-- IRSA role with `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject` on the bucket and `kms:Decrypt`/`Encrypt` on the KMS key.
-- EBS CSI driver (snapshot support).
+- 启用版本控制 + KMS 加密的 S3 存储桶。
+- IRSA 角色，拥有存储桶的 `s3:GetObject`、`s3:PutObject`、`s3:DeleteObject` 权限以及 KMS 密钥的 `kms:Decrypt`/`Encrypt` 权限。
+- EBS CSI 驱动（快照支持）。
 
-## Daily operations
+## 日常操作
 
 ```bash
-# Trigger an ad-hoc backup of one namespace
+# 触发一个命名空间的临时备份
 velero backup create model-api-now --include-namespaces model-api
 
-# List recent backups
+# 列出最近的备份
 velero backup get
 
-# Inspect what's inside
+# 查看备份内容
 velero backup describe model-api-now --details
 ```
 
-## Restore
+## 恢复
 
 ```bash
-# Restore an entire namespace from the most recent matching backup
+# 从最新的匹配备份恢复整个命名空间
 velero restore create model-api-restore \
   --from-backup cluster-daily-2026-05-22 \
   --include-namespaces model-api
 
-# Watch progress
+# 查看进度
 velero restore describe model-api-restore --details
 ```
 
-## Validate quarterly
+## 每季度验证
 
-A backup you've never restored is a hope, not a recovery plan. Run a documented restore drill every quarter:
+从未恢复过的备份只是希望，而非恢复计划。每季度运行一次有文档记录的恢复演练：
 
-1. Take a backup of prod into staging-prefixed location.
-2. Restore that backup into a clean staging cluster.
-3. Run the smoke test from `loadtest/` against the restored stack.
-4. Measure: time-to-restore, data freshness, anything that didn't come back automatically (DNS, external secrets, etc.).
-5. Update `docs/DISASTER_RECOVERY.md` with what you learned.
+1. 将生产环境的备份保存到以 staging 为前缀的位置。
+2. 将该备份恢复到干净的预发布集群。
+3. 针对恢复后的堆栈运行 `loadtest/` 中的冒烟测试。
+4. 测量：恢复时间、数据新鲜度、任何未自动恢复的内容（DNS、外部密钥等）。
+5. 根据所学更新 `docs/DISASTER_RECOVERY.md`。
 
-## Schedules
+## 计划任务
 
-The two default schedules in `values.yaml`:
+`values.yaml` 中的两个默认计划：
 
-| Name | Frequency | TTL | Scope |
+| 名称 | 频率 | TTL | 范围 |
 |---|---|---|---|
-| `cluster-daily` | 01:00 UTC daily | 30 days | All namespaces except kube-system/public/velero |
-| `critical-hourly` | Hourly on the hour | 7 days | `model-api`, `mlflow`, `airflow` only |
+| `cluster-daily` | UTC 时间每天 01:00 | 30 天 | 除 kube-system/public/velero 外的所有命名空间 |
+| `critical-hourly` | 每小时整点 | 7 天 | 仅 `model-api`、`mlflow`、`airflow` |
 
-Adjust frequency and TTL to your RPO. Hourly is overkill if you can rebuild from CI; daily is too coarse if you can't.
+根据你的 RPO 调整频率和 TTL。如果可以从 CI 重建，每小时备份有些过度；如果不能，每日备份又过于粗糙。

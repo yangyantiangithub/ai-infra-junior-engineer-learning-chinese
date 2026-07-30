@@ -1,55 +1,55 @@
-# Project 05: Production-Ready ML System (Capstone)
+# 项目 05：生产级 ML 系统（结业项目）
 
-**Duration:** 120 hours (3 weeks full-time, 5-6 weeks part-time)
-**Difficulty:** Intermediate+
-**Prerequisites:** Projects 1-4 (All previous projects must be completed)
-
----
-
-## Overview
-
-Welcome to your capstone project! This is where everything comes together. You'll integrate all four previous projects into a comprehensive, production-ready ML system that demonstrates your mastery of AI infrastructure engineering.
-
-### What You've Built So Far
-
-- **Project 1**: Model serving API with Flask/FastAPI
-- **Project 2**: Kubernetes deployment and orchestration
-- **Project 3**: ML training pipeline with MLflow and Airflow
-- **Project 4**: Complete observability with Prometheus, Grafana, and ELK
-
-### What You're Building Now
-
-A **fully integrated production ML system** featuring:
-
-- **Unified Architecture**: All previous components working together seamlessly
-- **CI/CD Pipelines**: Automated testing and deployment
-- **Production Security**: Authentication, TLS, secrets management, RBAC
-- **High Availability**: Auto-scaling, zero-downtime updates, disaster recovery
-- **Automated ML Lifecycle**: From data ingestion to model deployment
-- **Complete Observability**: Metrics, logs, alerts across the entire stack
-
-This is the project that will be the centerpiece of your portfolio and demonstrate you're ready for professional ML infrastructure roles.
+**时长：** 120 小时（全日制 3 周，非全日制 5-6 周）
+**难度：** 中级+
+**前置条件：** 项目 1-4（必须完成所有前置项目）
 
 ---
 
-## Learning Objectives
+## 概述
 
-By completing this capstone project, you will:
+欢迎来到你的结业项目！这是将所有知识融会贯通的关键环节。你将把前四个项目整合成一个全面、生产级的 ML 系统，展示你对 AI 基础设施工程的掌握程度。
 
-1. ✅ **Integrate complex distributed systems** into a cohesive architecture
-2. ✅ **Implement CI/CD pipelines** for ML infrastructure
-3. ✅ **Deploy production-grade systems** with HA and security
-4. ✅ **Automate ML lifecycle** from training to deployment
-5. ✅ **Create comprehensive documentation** for production systems
-6. ✅ **Build portfolio-quality demonstrations** of your work
-7. ✅ **Master production best practices** (12-factor app, GitOps, SRE principles)
-8. ✅ **Develop operational skills** (incident response, disaster recovery)
+### 目前已构建的内容
+
+- **项目 1**：使用 Flask/FastAPI 的模型服务 API
+- **项目 2**：Kubernetes 部署与编排
+- **项目 3**：基于 MLflow 和 Airflow 的 ML 训练流水线
+- **项目 4**：使用 Prometheus、Grafana 和 ELK 的完整可观测性
+
+### 现在将要构建的内容
+
+一个**完全集成的生产级 ML 系统**，具备以下特性：
+
+- **统一架构**：所有先前组件无缝协同工作
+- **CI/CD 流水线**：自动化测试与部署
+- **生产安全**：认证、TLS、密钥管理、RBAC
+- **高可用性**：自动扩缩容、零停机更新、灾难恢复
+- **自动化 ML 生命周期**：从数据摄入到模型部署
+- **完整可观测性**：全栈指标、日志、告警
+
+这个项目将成为你作品集的核心亮点，证明你已经准备好胜任专业的 ML 基础设施岗位。
 
 ---
 
-## System Architecture
+## 学习目标
 
-### High-Level Architecture
+完成此结业项目后，你将能够：
+
+1. ✅ **将复杂的分布式系统集成**为统一的架构
+2. ✅ **为 ML 基础设施实现 CI/CD 流水线**
+3. ✅ **部署具备高可用和安全性的生产级系统**
+4. ✅ **自动化 ML 生命周期**（从训练到部署）
+5. ✅ **为生产系统创建全面的文档**
+6. ✅ **构建达到作品集水准的演示**
+7. ✅ **掌握生产最佳实践**（12-Factor 应用、GitOps、SRE 原则）
+8. ✅ **培养运维技能**（事件响应、灾难恢复）
+
+---
+
+## 系统架构
+
+### 高层架构
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -100,7 +100,7 @@ External Users/Applications
 └───────────────────────────────────────────────────────────┘
 ```
 
-### CI/CD Pipeline Flow
+### CI/CD 流水线流程
 
 ```
 Developer Push → GitHub → CI Pipeline → CD Pipeline → Production
@@ -169,178 +169,178 @@ project-05-production-ml-capstone/
 
 ---
 
-## Getting Started
+## 快速开始
 
-### Prerequisites
+### 前置条件
 
-Before starting this project, ensure you have completed:
+在开始本项目之前，请确保已完成：
 
-- ✅ **Project 1**: Model Serving API
-- ✅ **Project 2**: Kubernetes Deployment
-- ✅ **Project 3**: ML Training Pipeline
-- ✅ **Project 4**: Monitoring and Observability
+- ✅ **项目 1**：模型服务 API
+- ✅ **项目 2**：Kubernetes 部署
+- ✅ **项目 3**：ML 训练流水线
+- ✅ **项目 4**：监控与可观测性
 
-And have access to:
+并具备以下访问权限：
 
-- ✅ Kubernetes cluster (Minikube, kind, GKE, EKS, or AKS)
-- ✅ Container registry (Docker Hub, GCR, ECR)
-- ✅ GitHub account (for CI/CD)
-- ✅ Domain name (optional, for production deployment)
+- ✅ Kubernetes 集群（Minikube、kind、GKE、EKS 或 AKS）
+- ✅ 容器仓库（Docker Hub、GCR、ECR）
+- ✅ GitHub 账户（用于 CI/CD）
+- ✅ 域名（可选，用于生产部署）
 
-### Installation
+### 安装步骤
 
-1. **Review this README and all documentation files thoroughly**
-2. **Read `requirements.md`** to understand all functional and non-functional requirements
-3. **Study `architecture.md`** to understand the system design
-4. **Review code stubs** to understand what needs to be implemented
-5. **Read `docs/DEPLOYMENT.md`** for deployment instructions
-6. **Set up your environment** using `.env.example` as a template
+1. **仔细阅读本 README 及所有文档文件**
+2. **阅读 `requirements.md`** 以了解所有功能性和非功能性需求
+3. **研究 `architecture.md`** 以了解系统设计
+4. **审查代码存根** 以了解需要实现的内容
+5. **阅读 `docs/DEPLOYMENT.md`** 获取部署说明
+6. **使用 `.env.example` 作为模板设置环境**
 
-### Development Workflow
+### 开发工作流
 
-This is a large project. Here's the recommended approach:
+这是一个大型项目，以下是推荐的工作方式：
 
-#### Phase 1: System Integration (Week 1)
-- Integrate API from Project 1
-- Integrate Kubernetes configs from Project 2
-- Integrate ML pipeline from Project 3
-- Integrate monitoring from Project 4
-- Create unified configuration management
-- Test end-to-end workflow locally
+#### 阶段 1：系统集成（第 1 周）
+- 集成项目 1 的 API
+- 集成项目 2 的 Kubernetes 配置
+- 集成项目 3 的 ML 流水线
+- 集成项目 4 的监控
+- 创建统一的配置管理
+- 在本地测试端到端工作流
 
-#### Phase 2: CI/CD Implementation (Week 2)
-- Set up GitHub Actions for CI
-- Implement automated testing
-- Implement Docker build and push
-- Set up CD for staging environment
-- Set up CD for production with manual approval
-- Test deployment pipelines
+#### 阶段 2：CI/CD 实施（第 2 周）
+- 设置 GitHub Actions 用于 CI
+- 实现自动化测试
+- 实现 Docker 构建与推送
+- 设置预发布环境的 CD
+- 设置需要手动审批的生产环境 CD
+- 测试部署流水线
 
-#### Phase 3: Production Hardening (Week 3)
-- Implement security features (TLS, authentication, secrets)
-- Set up high availability (HPA, rolling updates)
-- Implement disaster recovery (backups, restore procedures)
-- Complete documentation
-- Load testing and performance tuning
-- Prepare demo and presentation
-
----
-
-## Key Challenges
-
-This project will test your ability to:
-
-1. **Integrate complex systems** - Making 4 separate projects work together seamlessly
-2. **Manage configuration** - Handling multiple environments (dev, staging, production)
-3. **Ensure reliability** - Achieving 99.9% uptime with auto-healing
-4. **Implement security** - Production-grade security without breaking usability
-5. **Automate everything** - CI/CD, ML lifecycle, monitoring, backups
-6. **Document thoroughly** - Creating documentation others can actually use
-7. **Think operationally** - Preparing for failures, not just success
+#### 阶段 3：生产加固（第 3 周）
+- 实现安全功能（TLS、认证、密钥）
+- 设置高可用性（HPA、滚动更新）
+- 实现灾难恢复（备份、恢复流程）
+- 完成文档
+- 负载测试与性能调优
+- 准备演示与汇报
 
 ---
 
-## Success Criteria
+## 关键挑战
 
-Your capstone project will be evaluated on:
+本项目将考验你的以下能力：
 
-### Technical Implementation (60%)
-- ✅ All 4 previous projects successfully integrated
-- ✅ Working CI/CD pipelines (CI + staging + production)
-- ✅ Production-grade security implemented
-- ✅ High availability demonstrated (auto-scaling, zero-downtime updates)
-- ✅ Automated ML lifecycle working end-to-end
-- ✅ Complete observability (metrics, logs, alerts)
-
-### Documentation (20%)
-- ✅ Comprehensive README
-- ✅ Architecture documentation with diagrams
-- ✅ Deployment guide
-- ✅ Disaster recovery plan
-- ✅ API documentation
-- ✅ Troubleshooting guide
-
-### Demo & Presentation (20%)
-- ✅ Live system demonstration
-- ✅ Walkthrough of key components
-- ✅ Performance metrics shown
-- ✅ Professional presentation materials
-
-**Minimum passing score: 75/100**
-**Portfolio-ready score: 90/100**
+1. **集成复杂系统** — 让 4 个独立项目无缝协同工作
+2. **管理配置** — 处理多个环境（开发、预发布、生产）
+3. **确保可靠性** — 通过自动自愈实现 99.9% 可用性
+4. **实施安全措施** — 在不影响可用性的前提下实现生产级安全
+5. **自动化一切** — CI/CD、ML 生命周期、监控、备份
+6. **全面的文档撰写** — 创建他人能实际使用的文档
+7. **从运维角度思考** — 为故障做准备，而不仅仅是成功场景
 
 ---
 
-## Learning Resources
+## 成功标准
 
-### Required Reading
+你的结业项目将从以下方面进行评估：
 
-1. **[12-Factor App Methodology](https://12factor.net/)** - Production app best practices
-2. **[Google SRE Book](https://sre.google/sre-book/table-of-contents/)** - Site Reliability Engineering principles
-3. **[Kubernetes Production Best Practices](https://learnk8s.io/production-best-practices)** - K8s production checklist
-4. **[MLOps: Continuous Delivery](https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning)** - ML deployment patterns
+### 技术实现（60%）
+- ✅ 成功集成所有前 4 个项目
+- ✅ 可工作的 CI/CD 流水线（CI + 预发布 + 生产）
+- ✅ 实现生产级安全
+- ✅ 展示高可用性（自动扩缩容、零停机更新）
+- ✅ 端到端自动化 ML 生命周期
+- ✅ 完整的可观测性（指标、日志、告警）
 
-### Recommended Tools Documentation
+### 文档（20%）
+- ✅ 全面的 README
+- ✅ 包含架构图的设计文档
+- ✅ 部署指南
+- ✅ 灾难恢复计划
+- ✅ API 文档
+- ✅ 故障排查指南
+
+### 演示与汇报（20%）
+- ✅ 系统实时演示
+- ✅ 关键组件讲解
+- ✅ 展示性能指标
+- ✅ 专业的汇报材料
+
+**最低通过分数：75/100**
+**作品集级分数：90/100**
+
+---
+
+## 学习资源
+
+### 必读资料
+
+1. **[12-Factor App 方法论](https://12factor.net/)** — 生产应用最佳实践
+2. **[Google SRE 书籍](https://sre.google/sre-book/table-of-contents/)** — 站点可靠性工程原则
+3. **[Kubernetes 生产最佳实践](https://learnk8s.io/production-best-practices)** — K8s 生产清单
+4. **[MLOps：持续交付](https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning)** — ML 部署模式
+
+### 推荐工具文档
 
 - [GitHub Actions](https://docs.github.com/en/actions)
-- [Helm Best Practices](https://helm.sh/docs/chart_best_practices/)
-- [Kustomize Documentation](https://kustomize.io/)
+- [Helm 最佳实践](https://helm.sh/docs/chart_best_practices/)
+- [Kustomize 文档](https://kustomize.io/)
 - [cert-manager](https://cert-manager.io/docs/)
 - [HashiCorp Vault](https://developer.hashicorp.com/vault/docs)
 
-### Example Projects
+### 示例项目
 
-- [Kubeflow](https://github.com/kubeflow/kubeflow) - ML platform on Kubernetes
-- [Seldon Core](https://github.com/SeldonIO/seldon-core) - ML deployment platform
-- [MLflow Examples](https://github.com/mlflow/mlflow/tree/master/examples)
-
----
-
-## Next Steps
-
-1. **Read all documentation files** in this directory
-2. **Review the code stubs** and TODOs
-3. **Set up your development environment**
-4. **Create a project plan** with milestones
-5. **Start with Phase 1: System Integration**
-6. **Ask for help** when stuck (use GitHub Discussions or Stack Overflow)
-7. **Iterate and improve** based on testing and feedback
+- [Kubeflow](https://github.com/kubeflow/kubeflow) — Kubernetes 上的 ML 平台
+- [Seldon Core](https://github.com/SeldonIO/seldon-core) — ML 部署平台
+- [MLflow 示例](https://github.com/mlflow/mlflow/tree/master/examples)
 
 ---
 
-## Support
+## 后续步骤
 
-### Getting Help
-
-- **Documentation**: Read all files in `docs/` directory
-- **Code Comments**: Review TODOs and comments in code stubs
-- **Previous Projects**: Reference your implementations from Projects 1-4
-- **Community**: MLOps community, Kubernetes forums, Stack Overflow
-
-### Common Issues
-
-See `docs/TROUBLESHOOTING.md` for solutions to common problems.
+1. **阅读该目录下的所有文档文件**
+2. **审查代码存根和 TODO**
+3. **设置开发环境**
+4. **创建包含里程碑的项目计划**
+5. **从阶段 1：系统集成开始**
+6. **遇到困难时寻求帮助**（使用 GitHub Discussions 或 Stack Overflow）
+7. **基于测试和反馈进行迭代改进**
 
 ---
 
-## Acknowledgments
+## 支持
 
-This capstone project integrates concepts from:
-- Projects 1-4 of the Junior AI Infrastructure Engineer curriculum
-- Industry best practices from Google SRE, CNCF, and MLOps community
-- Real-world production ML systems at scale
+### 获取帮助
+
+- **文档**：阅读 `docs/` 目录下的所有文件
+- **代码注释**：审查代码存根中的 TODO 和注释
+- **以往项目**：参考你在项目 1-4 中的实现
+- **社区**：MLOps 社区、Kubernetes 论坛、Stack Overflow
+
+### 常见问题
+
+参见 `docs/TROUBLESHOOTING.md` 了解常见问题的解决方案。
 
 ---
 
-## License
+## 致谢
 
-This project is part of the AI Infrastructure Curriculum.
-For educational purposes only.
+此结业项目整合了以下来源的概念：
+- AI 基础设施初级工程师课程的项目 1-4
+- 来自 Google SRE、CNCF 和 MLOps 社区的行业最佳实践
+- 真实世界的大规模生产级 ML 系统
 
 ---
 
-**Good luck with your capstone project!** 🚀
+## 许可证
 
-This is your opportunity to demonstrate everything you've learned and create a portfolio piece that will impress employers. Take your time, build something you're proud of, and most importantly - learn from the challenges you encounter.
+本项目是 AI 基础设施课程的一部分。
+仅供教育用途。
 
-**You've got this!** 💪
+---
+
+**祝你的结业项目顺利！** 🚀
+
+这是你展示所学知识、创建令雇主印象深刻的作品集项目的机会。慢慢来，做出让你自豪的东西，最重要的是 — 从遇到的挑战中学习。
+
+**你一定行！** 💪

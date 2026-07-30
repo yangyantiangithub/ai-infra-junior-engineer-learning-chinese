@@ -1,50 +1,50 @@
-# Architecture Documentation: Production ML System
+# 架构文档：生产 ML 系统
 
-**Project:** Project 05 - Production ML System (Capstone)
-**Version:** 1.0
-**Last Updated:** October 18, 2025
-
----
-
-## Table of Contents
-
-1. [Executive Summary](#executive-summary)
-2. [System Overview](#system-overview)
-3. [Architecture Diagrams](#architecture-diagrams)
-4. [Component Details](#component-details)
-5. [Data Flow](#data-flow)
-6. [Deployment Architecture](#deployment-architecture)
-7. [Security Architecture](#security-architecture)
-8. [Scalability & Performance](#scalability--performance)
-9. [Disaster Recovery](#disaster-recovery)
-10. [Technology Decisions](#technology-decisions)
+**项目：** 项目 05 - 生产 ML 系统（结业项目）
+**版本：** 1.0
+**最后更新：** 2025年10月18日
 
 ---
 
-## Executive Summary
+## 目录
 
-This document describes the architecture of a production-ready ML system that integrates model serving, orchestration, ML pipelines, and observability into a unified platform capable of:
-
-- Serving 1000+ predictions per second
-- Maintaining 99.9% uptime
-- Automatically training and deploying models
-- Scaling from 3 to 20 replicas based on demand
-- Providing complete observability across all components
-
-### Key Architectural Principles
-
-1. **Cloud-Native**: Kubernetes-based, containerized, horizontally scalable
-2. **GitOps**: Infrastructure and configuration as code
-3. **Security by Default**: Authentication, encryption, least privilege
-4. **Observability First**: Metrics, logs, and traces for all components
-5. **Automation**: CI/CD, ML lifecycle, scaling, recovery
-6. **Resilience**: High availability, fault tolerance, auto-healing
+1. [执行摘要](#executive-summary)
+2. [系统概述](#system-overview)
+3. [架构图](#architecture-diagrams)
+4. [组件详情](#component-details)
+5. [数据流](#data-flow)
+6. [部署架构](#deployment-architecture)
+7. [安全架构](#security-architecture)
+8. [可扩展性与性能](#scalability--performance)
+9. [灾难恢复](#disaster-recovery)
+10. [技术决策](#technology-decisions)
 
 ---
 
-## System Overview
+## 执行摘要
 
-### High-Level Architecture
+本文档描述了一个生产级 ML 系统的架构，该系统将模型服务、编排、ML 流水线和可观测性集成到一个统一平台中，能够：
+
+- 每秒提供 1000+ 次预测
+- 维持 99.9% 的可用性
+- 自动训练和部署模型
+- 根据需求从 3 个扩展到 20 个副本
+- 提供所有组件的完整可观测性
+
+### 关键架构原则
+
+1. **云原生**：基于 Kubernetes、容器化、水平可扩展
+2. **GitOps**：基础设施和配置即代码
+3. **默认安全**：认证、加密、最小权限
+4. **可观测性优先**：所有组件的指标、日志和追踪
+5. **自动化**：CI/CD、ML 生命周期、扩缩容、恢复
+6. **韧性**：高可用性、容错、自动自愈
+
+---
+
+## 系统概述
+
+### 高层架构
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -126,308 +126,308 @@ This document describes the architecture of a production-ready ML system that in
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Component Summary
+### 组件概要
 
-| Layer | Components | Purpose |
+| 层 | 组件 | 用途 |
 |-------|------------|---------|
-| **Ingress** | NGINX Ingress, cert-manager | TLS termination, routing, rate limiting |
-| **Application** | Flask API, Model serving | Serve predictions to clients |
-| **ML Pipeline** | Airflow, MLflow, DVC | Train, version, and deploy models |
-| **Monitoring** | Prometheus, Grafana, ELK | Observe system health and performance |
-| **Data** | PostgreSQL, S3/MinIO | Store metadata, models, and datasets |
-| **Security** | RBAC, Secrets, NetworkPolicies | Protect system and data |
+| **Ingress** | NGINX Ingress、cert-manager | TLS 终止、路由、限流 |
+| **应用** | Flask API、模型服务 | 向客户端提供预测服务 |
+| **ML 流水线** | Airflow、MLflow、DVC | 训练、版本管理和部署模型 |
+| **监控** | Prometheus、Grafana、ELK | 观察系统健康状态和性能 |
+| **数据** | PostgreSQL、S3/MinIO | 存储元数据、模型和数据集 |
+| **安全** | RBAC、Secrets、NetworkPolicy | 保护系统和数据 |
 
 ---
 
-## Architecture Diagrams
+## 架构图
 
-### Logical Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Logical Layers                           │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│  Presentation Layer                                             │
-│  - REST API (OpenAPI/Swagger)                                   │
-│  - API Gateway (NGINX Ingress)                                  │
-│  - Authentication & Authorization                               │
-└─────────────────────────────────────────────────────────────────┘
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Business Logic Layer                                           │
-│  - Model Inference (PyTorch/TensorFlow)                         │
-│  - Input Validation & Preprocessing                             │
-│  - Response Formatting                                          │
-│  - Error Handling                                               │
-└─────────────────────────────────────────────────────────────────┘
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  ML Operations Layer                                            │
-│  - Model Training (Airflow DAGs)                                │
-│  - Model Versioning (MLflow)                                    │
-│  - Model Deployment (Kubernetes Operator)                       │
-│  - A/B Testing Framework                                        │
-└─────────────────────────────────────────────────────────────────┘
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Data Layer                                                     │
-│  - Model Registry (MLflow + PostgreSQL)                         │
-│  - Artifact Storage (S3/MinIO)                                  │
-│  - Data Versioning (DVC)                                        │
-│  - Feature Store (optional)                                     │
-└─────────────────────────────────────────────────────────────────┘
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Infrastructure Layer                                           │
-│  - Container Orchestration (Kubernetes)                         │
-│  - Service Mesh (optional)                                      │
-│  - Load Balancing                                               │
-│  - Auto-scaling (HPA)                                           │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Network Architecture
+### 逻辑架构
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        Network Topology                         │
+│                        逻辑层                                    │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  表示层                                                          │
+│  - REST API（OpenAPI/Swagger）                                   │
+│  - API 网关（NGINX Ingress）                                     │
+│  - 认证与授权                                                     │
+└─────────────────────────────────────────────────────────────────┘
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  业务逻辑层                                                       │
+│  - 模型推理（PyTorch/TensorFlow）                                 │
+│  - 输入验证与预处理                                                │
+│  - 响应格式化                                                     │
+│  - 错误处理                                                       │
+└─────────────────────────────────────────────────────────────────┘
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  ML 运维层                                                        │
+│  - 模型训练（Airflow DAG）                                        │
+│  - 模型版本管理（MLflow）                                          │
+│  - 模型部署（Kubernetes Operator）                                 │
+│  - A/B 测试框架                                                   │
+└─────────────────────────────────────────────────────────────────┘
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  数据层                                                          │
+│  - 模型注册表（MLflow + PostgreSQL）                               │
+│  - 工件存储（S3/MinIO）                                          │
+│  - 数据版本控制（DVC）                                            │
+│  - 特征存储（可选）                                                │
+└─────────────────────────────────────────────────────────────────┘
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  基础设施层                                                       │
+│  - 容器编排（Kubernetes）                                         │
+│  - 服务网格（可选）                                                │
+│  - 负载均衡                                                       │
+│  - 自动扩缩容（HPA）                                              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 网络架构
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         网络拓扑                                 │
 └─────────────────────────────────────────────────────────────────┘
 
 Internet
     │
     ▼
 ┌─────────────────────────┐
-│  Cloud Load Balancer    │ (Layer 4/7)
-│  - DDoS Protection      │
-│  - SSL Offloading       │
+│  云负载均衡器            │ (第 4/7 层)
+│  - DDoS 防护            │
+│  - SSL 卸载             │
 └──────────┬──────────────┘
            │
            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Kubernetes Cluster                                             │
+│  Kubernetes 集群                                                 │
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐ │
-│  │  Ingress Namespace                                        │ │
+│  │  Ingress 命名空间                                          │ │
 │  │  ┌──────────────────────────────────────────────┐         │ │
 │  │  │  NGINX Ingress Controller                    │         │ │
-│  │  │  - External LoadBalancer IP: XXX.XXX.XXX.XXX │         │ │
-│  │  │  - Listens on ports 80 (HTTP) and 443 (HTTPS)│         │ │
+│  │  │  - 外部 LoadBalancer IP: XXX.XXX.XXX.XXX     │         │ │
+│  │  │  - 监听端口 80（HTTP）和 443（HTTPS）          │         │ │
 │  │  └──────────────────────────────────────────────┘         │ │
 │  └───────────────────────┬───────────────────────────────────┘ │
 │                          │                                     │
 │  ┌───────────────────────┼───────────────────────────────────┐ │
-│  │  ml-system Namespace  │                                   │ │
+│  │  ml-system 命名空间   │                                   │ │
 │  │                       ▼                                   │ │
 │  │  ┌──────────────────────────────────────────────┐        │ │
-│  │  │  ml-api Service (ClusterIP)                  │        │ │
+│  │  │  ml-api Service（ClusterIP）                  │        │ │
 │  │  │  IP: 10.96.0.100                             │        │ │
-│  │  │  Port: 80 → targetPort: 5000                 │        │ │
+│  │  │  端口: 80 → targetPort: 5000                 │        │ │
 │  │  └──────────┬───────────────────────────────────┘        │ │
 │  │             │                                             │ │
-│  │             ├─────► Pod 1 (10.244.1.10:5000)             │ │
-│  │             ├─────► Pod 2 (10.244.2.11:5000)             │ │
-│  │             └─────► Pod N (10.244.3.12:5000)             │ │
+│  │             ├─────► Pod 1（10.244.1.10:5000）             │ │
+│  │             ├─────► Pod 2（10.244.2.11:5000）             │ │
+│  │             └─────► Pod N（10.244.3.12:5000）             │ │
 │  │                                                           │ │
-│  │  NetworkPolicy:                                          │ │
-│  │  - Allow ingress from ingress-nginx namespace            │ │
-│  │  - Allow ingress from monitoring namespace               │ │
-│  │  - Allow egress to postgres (port 5432)                  │ │
-│  │  - Allow egress to mlflow (port 5000)                    │ │
-│  │  - Allow egress to DNS (port 53)                         │ │
-│  │  - Deny all other traffic                                │ │
+│  │  NetworkPolicy:                                           │ │
+│  │  - 允许来自 ingress-nginx 命名空间的入站流量                │ │
+│  │  - 允许来自 monitoring 命名空间的入站流量                   │ │
+│  │  - 允许出站到 postgres（端口 5432）                        │ │
+│  │  - 允许出站到 mlflow（端口 5000）                          │ │
+│  │  - 允许出站到 DNS（端口 53）                               │ │
+│  │  - 拒绝所有其他流量                                        │ │
 │  └───────────────────────────────────────────────────────────┘ │
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐ │
-│  │  monitoring Namespace                                     │ │
-│  │  - Prometheus (scrapes metrics from all namespaces)       │ │
-│  │  - Grafana (visualizes metrics)                           │ │
-│  │  - Alertmanager (sends alerts)                            │ │
+│  │  monitoring 命名空间                                       │ │
+│  │  - Prometheus（从所有命名空间采集指标）                     │ │
+│  │  - Grafana（可视化指标）                                   │ │
+│  │  - Alertmanager（发送告警）                                │ │
 │  └───────────────────────────────────────────────────────────┘ │
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐ │
-│  │  data Namespace                                           │ │
-│  │  - PostgreSQL (MLflow backend)                            │ │
-│  │  - MinIO/S3 (artifact storage)                            │ │
+│  │  data 命名空间                                             │ │
+│  │  - PostgreSQL（MLflow 后端）                               │ │
+│  │  - MinIO/S3（工件存储）                                    │ │
 │  └───────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Component Details
+## 组件详情
 
-### 1. ML API Service (Project 1 Integration)
+### 1. ML API 服务（项目 1 集成）
 
-**Purpose:** Serve ML model predictions via REST API
+**用途：** 通过 REST API 提供 ML 模型预测服务
 
-**Technology Stack:**
-- Flask or FastAPI
-- PyTorch or TensorFlow
-- Gunicorn (production WSGI server)
-- Prometheus client library
+**技术栈：**
+- Flask 或 FastAPI
+- PyTorch 或 TensorFlow
+- Gunicorn（生产 WSGI 服务器）
+- Prometheus 客户端库
 
-**Key Features:**
-- RESTful endpoints (`/predict`, `/health`, `/metrics`)
-- Model loading from MLflow registry
-- Request validation and preprocessing
-- Response formatting
-- Error handling and logging
-- Metrics instrumentation
+**关键特性：**
+- RESTful 端点（`/predict`、`/health`、`/metrics`）
+- 从 MLflow 注册表加载模型
+- 请求验证和预处理
+- 响应格式化
+- 错误处理和日志记录
+- 指标接入
 
-**Deployment:**
-- Containerized with Docker
-- Deployed as Kubernetes Deployment
-- 3-20 replicas (HPA)
-- Resource limits: CPU 1000m, Memory 2Gi
-- Health checks: liveness and readiness probes
+**部署：**
+- 使用 Docker 容器化
+- 作为 Kubernetes Deployment 部署
+- 3-20 个副本（HPA）
+- 资源限制：CPU 1000m，内存 2Gi
+- 健康检查：存活和就绪探测
 
-**Configuration:**
-- Model version from ConfigMap
-- API keys from Secrets
-- MLflow URI from environment variables
+**配置：**
+- 从 ConfigMap 获取模型版本
+- 从 Secrets 获取 API 密钥
+- 从环境变量获取 MLflow URI
 
-**Example Code Stub:**
+**示例代码存根：**
 ```python
-# TODO: Implement model loading from MLflow
-# TODO: Add request validation
-# TODO: Implement prediction endpoint
-# TODO: Add Prometheus metrics
-# TODO: Configure health checks
+# TODO: 实现从 MLflow 加载模型
+# TODO: 添加请求验证
+# TODO: 实现预测端点
+# TODO: 添加 Prometheus 指标
+# TODO: 配置健康检查
 ```
 
 ---
 
-### 2. Kubernetes Orchestration (Project 2 Integration)
+### 2. Kubernetes 编排（项目 2 集成）
 
-**Purpose:** Orchestrate, scale, and manage containerized applications
+**用途：** 编排、扩缩容和管理容器化应用
 
-**Components:**
-- **Deployment:** Manages API pods, ensures desired state
-- **Service:** Load balances traffic to pods (ClusterIP)
-- **Ingress:** External access with TLS termination
-- **HPA:** Auto-scales based on CPU/memory
-- **ConfigMap:** Stores configuration
-- **Secret:** Stores sensitive data
+**组件：**
+- **Deployment：** 管理 API Pod，确保期望状态
+- **Service：** 对 Pod 进行流量负载均衡（ClusterIP）
+- **Ingress：** 带 TLS 终止的外部访问
+- **HPA：** 基于 CPU/内存自动扩缩容
+- **ConfigMap：** 存储配置
+- **Secret：** 存储敏感数据
 
-**Deployment Strategy:**
-- Rolling update (maxSurge: 1, maxUnavailable: 0)
-- Zero-downtime deployments
-- Automatic rollback on health check failures
+**部署策略：**
+- 滚动更新（maxSurge: 1, maxUnavailable: 0）
+- 零停机部署
+- 健康检查失败时自动回滚
 
-**Auto-Scaling:**
+**自动扩缩容：**
 ```yaml
-# TODO: Configure HPA
-# Min replicas: 3
-# Max replicas: 20
-# Target CPU: 70%
-# Target Memory: 80%
+# TODO: 配置 HPA
+# 最小副本数：3
+# 最大副本数：20
+# 目标 CPU：70%
+# 目标内存：80%
 ```
 
-**High Availability:**
-- Pod anti-affinity (spread across nodes)
-- Node affinity (prefer nodes with GPUs if applicable)
-- Pod disruption budget (min available: 2)
+**高可用性：**
+- Pod 反亲和性（分布在多个节点上）
+- 节点亲和性（如果适用，优先使用 GPU 节点）
+- Pod 干扰预算（最小可用：2）
 
 ---
 
-### 3. ML Pipeline (Project 3 Integration)
+### 3. ML 流水线（项目 3 集成）
 
-**Purpose:** Automate model training, evaluation, and deployment
+**用途：** 自动化模型训练、评估和部署
 
-**Components:**
+**组件：**
 
-#### Airflow DAG: `ml_training_pipeline`
+#### Airflow DAG：`ml_training_pipeline`
 
-**Schedule:** Weekly (every Sunday at 2 AM UTC)
+**调度：** 每周（UTC 时间每周日凌晨 2 点）
 
-**Tasks:**
-1. **data_ingestion** - Fetch latest data from source
-2. **data_validation** - Run Great Expectations checks
-3. **data_preprocessing** - Clean and transform data
-4. **feature_engineering** - Extract features
-5. **model_training** - Train model with hyperparameter tuning
-6. **model_evaluation** - Evaluate on test set
-7. **model_registration** - Register in MLflow if performance > threshold
-8. **deploy_to_staging** - Deploy to staging environment
-9. **notify_team** - Send Slack notification
+**任务：**
+1. **data_ingestion** — 从数据源获取最新数据
+2. **data_validation** — 运行 Great Expectations 检查
+3. **data_preprocessing** — 清洗和转换数据
+4. **feature_engineering** — 提取特征
+5. **model_training** — 使用超参数调优训练模型
+6. **model_evaluation** — 在测试集上评估
+7. **model_registration** — 性能超过阈值时注册到 MLflow
+8. **deploy_to_staging** — 部署到预发布环境
+9. **notify_team** — 发送 Slack 通知
 
-**Data Flow:**
+**数据流：**
 ```
-Data Source → DVC → Validation → Preprocessing → Training
+数据源 → DVC → 验证 → 预处理 → 训练
     ↓
-MLflow Experiment → Model Registry → Deployment
+MLflow 实验 → 模型注册表 → 部署
 ```
 
-**Model Versioning:**
-- All models versioned in MLflow
-- Git SHA tagged for reproducibility
-- Dataset version tracked with DVC
-- Hyperparameters logged
+**模型版本管理：**
+- 所有模型在 MLflow 中版本管理
+- 标记 Git SHA 以确保可重现性
+- 使用 DVC 跟踪数据集版本
+- 记录超参数
 
-**Deployment Automation:**
+**部署自动化：**
 ```python
-# TODO: Implement automated deployment
-# TODO: Update ConfigMap with new model version
-# TODO: Trigger rolling restart of API pods
-# TODO: Monitor deployment health
+# TODO: 实现自动化部署
+# TODO: 使用新模型版本更新 ConfigMap
+# TODO: 触发 API Pod 的滚动重启
+# TODO: 监控部署健康状态
 ```
 
 ---
 
-### 4. Monitoring & Observability (Project 4 Integration)
+### 4. 监控与可观测性（项目 4 集成）
 
-**Purpose:** Provide visibility into system health and performance
+**用途：** 提供系统健康状态和性能的可视性
 
-#### Prometheus (Metrics)
+#### Prometheus（指标）
 
-**Metrics Collected:**
+**采集的指标：**
 
-| Metric | Type | Description |
+| 指标 | 类型 | 描述 |
 |--------|------|-------------|
-| `http_requests_total` | Counter | Total HTTP requests |
-| `http_request_duration_seconds` | Histogram | Request latency |
-| `http_request_errors_total` | Counter | Failed requests |
-| `model_prediction_duration_seconds` | Histogram | Inference latency |
-| `model_predictions_total` | Counter | Total predictions |
-| `model_version` | Gauge | Current model version |
-| `pod_cpu_usage` | Gauge | CPU usage per pod |
-| `pod_memory_usage` | Gauge | Memory usage per pod |
+| `http_requests_total` | Counter | HTTP 请求总数 |
+| `http_request_duration_seconds` | Histogram | 请求延迟 |
+| `http_request_errors_total` | Counter | 失败的请求数 |
+| `model_prediction_duration_seconds` | Histogram | 推理延迟 |
+| `model_predictions_total` | Counter | 预测总数 |
+| `model_version` | Gauge | 当前模型版本 |
+| `pod_cpu_usage` | Gauge | 每个 Pod 的 CPU 使用率 |
+| `pod_memory_usage` | Gauge | 每个 Pod 的内存使用率 |
 
-**Scrape Configuration:**
+**采集配置：**
 ```yaml
-# TODO: Configure Prometheus to scrape ml-api pods
-# TODO: Set up ServiceMonitor for auto-discovery
-# TODO: Configure retention (30 days)
+# TODO: 配置 Prometheus 采集 ml-api Pod
+# TODO: 设置 ServiceMonitor 实现自动发现
+# TODO: 配置保留期（30 天）
 ```
 
-#### Grafana (Dashboards)
+#### Grafana（仪表盘）
 
-**Dashboards:**
-1. **API Overview** - Request rate, latency, errors
-2. **Infrastructure** - CPU, memory, disk, network
-3. **ML Metrics** - Predictions/sec, inference latency, model version
-4. **SLO Dashboard** - Uptime, error budget, SLI tracking
+**仪表盘：**
+1. **API 概览** — 请求率、延迟、错误
+2. **基础设施** — CPU、内存、磁盘、网络
+3. **ML 指标** — 预测数/秒、推理延迟、模型版本
+4. **SLO 仪表盘** — 可用性、错误预算、SLI 跟踪
 
-**Alerting:**
+**告警：**
 ```yaml
-# TODO: Configure alerts for:
-# - High error rate (>1%)
-# - High latency (P95 >500ms)
-# - Low replica count (<3)
-# - Disk space low (<10%)
+# TODO: 配置如下告警：
+# - 高错误率（>1%）
+# - 高延迟（P95 >500ms）
+# - 副本数过低（<3）
+# - 磁盘空间不足（<10%）
 ```
 
-#### ELK Stack (Logging)
+#### ELK Stack（日志）
 
-**Log Collection:**
-- Filebeat: Collects logs from pods
-- Logstash: Parses and transforms logs
-- Elasticsearch: Stores logs (30-day retention)
-- Kibana: Visualizes and searches logs
+**日志收集：**
+- Filebeat：从 Pod 收集日志
+- Logstash：解析和转换日志
+- Elasticsearch：存储日志（30 天保留期）
+- Kibana：可视化和搜索日志
 
-**Log Format (Structured JSON):**
+**日志格式（结构化 JSON）：**
 ```json
 {
   "timestamp": "2025-10-18T12:34:56Z",
@@ -443,543 +443,543 @@ MLflow Experiment → Model Registry → Deployment
 
 ---
 
-### 5. Data & Storage Layer
+### 5. 数据与存储层
 
-#### PostgreSQL (MLflow Backend)
+#### PostgreSQL（MLflow 后端）
 
-**Purpose:** Store MLflow experiment metadata and model registry
+**用途：** 存储 MLflow 实验元数据和模型注册表
 
-**Configuration:**
-- Replicated (primary + 2 replicas)
-- Automatic failover
-- Daily backups to S3/GCS
-- Encrypted at rest
+**配置：**
+- 复制（主节点 + 2 个副本）
+- 自动故障转移
+- 每日备份到 S3/GCS
+- 静态加密
 
-**Schema:**
+**模式：**
 ```sql
--- TODO: MLflow database schema
--- Tables: experiments, runs, metrics, params, tags, models
+-- TODO: MLflow 数据库模式
+-- 表：experiments, runs, metrics, params, tags, models
 ```
 
-#### MinIO/S3 (Artifact Storage)
+#### MinIO/S3（工件存储）
 
-**Purpose:** Store model artifacts, datasets, logs
+**用途：** 存储模型工件、数据集、日志
 
-**Buckets:**
-- `ml-models-production` - Production model artifacts
-- `ml-models-staging` - Staging model artifacts
-- `ml-datasets` - Training datasets
-- `ml-backups` - System backups
+**存储桶：**
+- `ml-models-production` — 生产模型工件
+- `ml-models-staging` — 预发布模型工件
+- `ml-datasets` — 训练数据集
+- `ml-backups` — 系统备份
 
-**Lifecycle Policies:**
-- Staging models: Delete after 30 days
-- Production models: Keep indefinitely
-- Datasets: Transition to cold storage after 90 days
-- Backups: Keep for 30 days
+**生命周期策略：**
+- 预发布模型：30 天后删除
+- 生产模型：永久保留
+- 数据集：90 天后转为冷存储
+- 备份：保留 30 天
 
-#### DVC (Data Version Control)
+#### DVC（数据版本控制）
 
-**Purpose:** Version datasets and track lineage
+**用途：** 对数据集进行版本管理并跟踪血缘关系
 
-**Configuration:**
+**配置：**
 ```yaml
-# TODO: Configure DVC remote storage
-# TODO: Set up data versioning workflow
-# TODO: Document dataset versions
+# TODO: 配置 DVC 远端存储
+# TODO: 设置数据版本管理工作流
+# TODO: 记录数据集版本
 ```
 
 ---
 
-## Data Flow
+## 数据流
 
-### Prediction Request Flow
+### 预测请求流
 
 ```
-1. Client → HTTPS Request → NGINX Ingress
-   ├─ TLS Termination
-   ├─ Rate Limiting Check
-   ├─ API Key Validation
-   └─ Route to Service
+1. 客户端 → HTTPS 请求 → NGINX Ingress
+   ├─ TLS 终止
+   ├─ 限流检查
+   ├─ API 密钥验证
+   └─ 路由到 Service
        ▼
-2. Service → Load Balance → API Pod
-   ├─ Readiness Check
-   └─ Forward Request
+2. Service → 负载均衡 → API Pod
+   ├─ 就绪检查
+   └─ 转发请求
        ▼
-3. API Pod → Process Request
-   ├─ Validate Input (file type, size)
-   ├─ Preprocess (resize, normalize)
-   ├─ Load Model (from cache or MLflow)
-   ├─ Run Inference
-   ├─ Format Response
-   └─ Log Metrics
+3. API Pod → 处理请求
+   ├─ 验证输入（文件类型、大小）
+   ├─ 预处理（调整大小、归一化）
+   ├─ 加载模型（从缓存或 MLflow）
+   ├─ 执行推理
+   ├─ 格式化响应
+   └─ 记录指标
        ▼
-4. Response → Service → Ingress → Client
-   └─ Include headers: X-Model-Version, X-Request-ID
+4. 响应 → Service → Ingress → 客户端
+   └─ 包含请求头：X-Model-Version、X-Request-ID
 ```
 
-**Latency Breakdown (Target):**
-- Ingress: <10ms
-- Preprocessing: <20ms
-- Model inference: <100ms
-- Postprocessing: <10ms
-- **Total (P95): <500ms**
+**延迟分解（目标）：**
+- Ingress：<10ms
+- 预处理：<20ms
+- 模型推理：<100ms
+- 后处理：<10ms
+- **总计（P95）：<500ms**
 
-### Model Training & Deployment Flow
+### 模型训练与部署流
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  Weekly Schedule (Sunday 2 AM UTC) or Manual Trigger         │
+│  每周计划（UTC 时间周日凌晨 2 点）或手动触发                   │
 └────────────────────────┬─────────────────────────────────────┘
                          ▼
 ┌──────────────────────────────────────────────────────────────┐
-│  Airflow DAG: ml_training_pipeline                           │
+│  Airflow DAG：ml_training_pipeline                           │
 ├──────────────────────────────────────────────────────────────┤
-│  Task 1: data_ingestion                                      │
-│    - Fetch latest data from source                           │
-│    - Store in DVC-tracked directory                          │
-│    - Tag with version: YYYY-MM-DD-HHMMSS                     │
+│  任务 1：data_ingestion                                      │
+│    - 从数据源获取最新数据                                     │
+│    - 存储到 DVC 跟踪的目录中                                  │
+│    - 使用版本号标记：YYYY-MM-DD-HHMMSS                        │
 │                                                               │
-│  Task 2: data_validation                                     │
-│    - Run Great Expectations checks                           │
-│    - Validate schema, distributions, ranges                  │
-│    - If validation fails → Alert team, stop pipeline         │
+│  任务 2：data_validation                                     │
+│    - 运行 Great Expectations 检查                             │
+│    - 验证模式、分布、范围                                     │
+│    - 如果验证失败 → 告警团队，停止流水线                      │
 │                                                               │
-│  Task 3: data_preprocessing                                  │
-│    - Clean data (remove nulls, outliers)                     │
-│    - Split: train (70%), val (15%), test (15%)               │
-│    - Save splits with DVC                                    │
+│  任务 3：data_preprocessing                                  │
+│    - 清洗数据（去除空值、异常值）                             │
+│    - 拆分：训练集（70%）、验证集（15%）、测试集（15%）        │
+│    - 使用 DVC 保存拆分结果                                   │
 │                                                               │
-│  Task 4: feature_engineering                                 │
-│    - Extract features                                        │
-│    - Normalize/scale                                         │
-│    - Save feature transformers                               │
+│  任务 4：feature_engineering                                 │
+│    - 提取特征                                                │
+│    - 归一化/缩放                                             │
+│    - 保存特征转换器                                          │
 │                                                               │
-│  Task 5: model_training                                      │
-│    - Train model with hyperparameter tuning                  │
-│    - Log metrics, params, artifacts to MLflow                │
-│    - Save best model checkpoint                              │
+│  任务 5：model_training                                      │
+│    - 使用超参数调优训练模型                                   │
+│    - 将指标、参数、工件记录到 MLflow                          │
+│    - 保存最佳模型检查点                                      │
 │                                                               │
-│  Task 6: model_evaluation                                    │
-│    - Evaluate on test set                                    │
-│    - Metrics: accuracy, precision, recall, F1                │
-│    - Compare to current production model                     │
-│    - If accuracy < threshold (85%) → Alert, stop             │
+│  任务 6：model_evaluation                                    │
+│    - 在测试集上评估                                          │
+│    - 指标：准确率、精确率、召回率、F1                         │
+│    - 与当前生产模型比较                                      │
+│    - 如果准确率 < 阈值（85%）→ 告警，停止                     │
 │                                                               │
-│  Task 7: model_registration                                  │
-│    - Register model in MLflow Model Registry                 │
-│    - Tag: "Staging"                                          │
-│    - Metadata: dataset version, hyperparameters, metrics     │
+│  任务 7：model_registration                                  │
+│    - 在 MLflow Model Registry 中注册模型                     │
+│    - 标记："Staging"                                         │
+│    - 元数据：数据集版本、超参数、指标                         │
 │                                                               │
-│  Task 8: deploy_to_staging                                   │
-│    - Update staging ConfigMap with new model version         │
-│    - Trigger rolling restart of staging pods                 │
-│    - Wait for pods to be ready                               │
-│    - Run smoke tests                                         │
-│    - If tests fail → Alert, rollback                         │
+│  任务 8：deploy_to_staging                                   │
+│    - 使用新模型版本更新预发布 ConfigMap                       │
+│    - 触发预发布 Pod 的滚动重启                                │
+│    - 等待 Pod 就绪                                           │
+│    - 运行冒烟测试                                            │
+│    - 如果测试失败 → 告警，回滚                                │
 │                                                               │
-│  Task 9: notify_team                                         │
-│    - Send Slack notification with results                    │
-│    - Include: model version, metrics, staging URL            │
-│    - Request manual approval for production                  │
+│  任务 9：notify_team                                         │
+│    - 发送包含结果的 Slack 通知                                │
+│    - 包含：模型版本、指标、预发布 URL                         │
+│    - 请求生产环境的手动审批                                   │
 └──────────────────────────────────────────────────────────────┘
                          ▼
 ┌──────────────────────────────────────────────────────────────┐
-│  Manual Approval (via Slack, UI, or CLI)                     │
-│    - Team lead reviews metrics                               │
-│    - Approves or rejects production deployment               │
+│  手动审批（通过 Slack、UI 或 CLI）                            │
+│    - 团队负责人审查指标                                      │
+│    - 批准或拒绝生产部署                                      │
 └────────────────────────┬─────────────────────────────────────┘
-                         ▼ (if approved)
+                         ▼（如果批准）
 ┌──────────────────────────────────────────────────────────────┐
-│  Production Deployment (Canary Strategy)                     │
+│  生产部署（金丝雀策略）                                      │
 ├──────────────────────────────────────────────────────────────┤
-│  1. Update production ConfigMap (new model version)          │
-│  2. Deploy canary pods (10% of traffic)                      │
-│  3. Monitor metrics for 10 minutes:                          │
-│     - Error rate < 0.1%                                      │
-│     - Latency P95 < 500ms                                    │
-│     - No crashes                                             │
-│  4. If metrics healthy:                                      │
-│     - Gradually shift traffic: 10% → 50% → 100%             │
-│     - Tag model "Production" in MLflow                       │
-│     - Notify team of successful deployment                   │
-│  5. If metrics unhealthy:                                    │
-│     - Rollback to previous version                           │
-│     - Alert team of failure                                  │
-│     - Keep model in "Staging"                                │
+│  1. 更新生产 ConfigMap（新模型版本）                          │
+│  2. 部署金丝雀 Pod（10% 流量）                                │
+│  3. 监控指标 10 分钟：                                        │
+│     - 错误率 < 0.1%                                          │
+│     - 延迟 P95 < 500ms                                       │
+│     - 无崩溃                                                 │
+│  4. 如果指标健康：                                            │
+│     - 逐步切换流量：10% → 50% → 100%                         │
+│     - 在 MLflow 中将模型标记为"Production"                    │
+│     - 通知团队部署成功                                       │
+│  5. 如果指标不健康：                                         │
+│     - 回滚到之前版本                                         │
+│     - 告警团队部署失败                                       │
+│     - 将模型保留在"Staging"状态                               │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Deployment Architecture
+## 部署架构
 
-### Multi-Environment Strategy
+### 多环境策略
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                      Environments                               │
+│                        环境                                      │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────────┐
-│   Development        │  │   Staging            │  │   Production         │
+│  开发                │  │  预发布              │  │  生产                │
 ├──────────────────────┤  ├──────────────────────┤  ├──────────────────────┤
-│ - Local (Minikube)   │  │ - Cloud (GKE/EKS)    │  │ - Cloud (GKE/EKS)    │
-│ - 1 node             │  │ - 3 nodes            │  │ - 5+ nodes           │
-│ - No HA              │  │ - HA enabled         │  │ - Multi-zone HA      │
-│ - No TLS             │  │ - TLS (staging cert) │  │ - TLS (prod cert)    │
-│ - Test data          │  │ - Anonymized data    │  │ - Real data          │
-│ - Debug logging      │  │ - Info logging       │  │ - Warn logging       │
-│ - No monitoring      │  │ - Basic monitoring   │  │ - Full monitoring    │
-│ - Manual deploy      │  │ - Auto deploy        │  │ - Manual approval    │
+│ - 本地（Minikube）   │  │ - 云端（GKE/EKS）    │  │ - 云端（GKE/EKS）    │
+│ - 1 个节点           │  │ - 3 个节点           │  │ - 5 个以上节点       │
+│ - 无高可用           │  │ - 启用高可用         │  │ - 多可用区高可用     │
+│ - 无 TLS             │  │ - TLS（预发布证书）   │  │ - TLS（生产证书）     │
+│ - 测试数据           │  │ - 匿名化数据         │  │ - 真实数据           │
+│ - Debug 日志         │  │ - Info 日志          │  │ - Warn 日志          │
+│ - 无监控             │  │ - 基础监控           │  │ - 完整监控           │
+│ - 手动部署           │  │ - 自动部署           │  │ - 手动审批           │
 └──────────────────────┘  └──────────────────────┘  └──────────────────────┘
 ```
 
-### Deployment Workflow (GitOps)
+### 部署工作流（GitOps）
 
 ```
-Developer → git commit → git push
+开发者 → git commit → git push
     ▼
-GitHub Repository
+GitHub 仓库
     ▼
 ┌──────────────────────────────────────────┐
-│  CI Pipeline (GitHub Actions)            │
-│  1. Code quality checks                  │
-│  2. Unit tests                           │
-│  3. Security scanning                    │
-│  4. Docker build                         │
-│  5. Image push (tag: git SHA)            │
+│  CI 流水线（GitHub Actions）             │
+│  1. 代码质量检查                          │
+│  2. 单元测试                              │
+│  3. 安全扫描                              │
+│  4. Docker 构建                           │
+│  5. 镜像推送（标记：git SHA）              │
 └──────────────┬───────────────────────────┘
                ▼
-    ┌──────────────────┐
-    │ Pull Request?    │
-    └────┬─────────┬───┘
-         │ Yes     │ No (merged)
-         │         ▼
-         │    ┌────────────────────────────┐
-         │    │  CD Pipeline (Staging)     │
-         │    │  1. Deploy to staging      │
-         │    │  2. Run smoke tests        │
-         │    │  3. Run integration tests  │
-         │    │  4. Notify team            │
-         │    └────────────────────────────┘
-         │         │
-         │         ▼
-         │    ┌────────────────────────────┐
-         │    │  Manual Approval Required  │
-         │    │  (via GitHub UI)           │
-         │    └──────────┬─────────────────┘
-         │               ▼
-         │    ┌────────────────────────────┐
-         │    │  CD Pipeline (Production)  │
-         │    │  1. Canary deployment      │
-         │    │  2. Monitor metrics        │
-         │    │  3. Gradual rollout        │
-         │    │  4. Notify team            │
-         │    └────────────────────────────┘
-         ▼
-   Preview deployment (ephemeral)
+     ┌──────────────────┐
+     │ 是否为 Pull Request？│
+     └────┬─────────┬───┘
+          │ 是      │ 否（已合并）
+          │         ▼
+          │    ┌────────────────────────────┐
+          │    │  CD 流水线（预发布）        │
+          │    │  1. 部署到预发布             │
+          │    │  2. 运行冒烟测试             │
+          │    │  3. 运行集成测试             │
+          │    │  4. 通知团队                 │
+          │    └────────────────────────────┘
+          │         │
+          │         ▼
+          │    ┌────────────────────────────┐
+          │    │  需要手动审批               │
+          │    │  （通过 GitHub UI）         │
+          │    └──────────┬─────────────────┘
+          │               ▼
+          │    ┌────────────────────────────┐
+          │    │  CD 流水线（生产）          │
+          │    │  1. 金丝雀部署              │
+          │    │  2. 监控指标                │
+          │    │  3. 逐步推出                │
+          │    │  4. 通知团队                │
+          │    └────────────────────────────┘
+          ▼
+    预览部署（临时环境）
 ```
 
 ---
 
-## Security Architecture
+## 安全架构
 
-### Defense in Depth
+### 纵深防御
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Layer 1: Network Security                                      │
-│  - Cloud firewall rules (whitelist IPs)                         │
-│  - DDoS protection                                              │
-│  - Rate limiting (100 req/min global)                           │
+│  第 1 层：网络安全                                               │
+│  - 云防火墙规则（IP 白名单）                                     │
+│  - DDoS 防护                                                    │
+│  - 限流（全局 100 req/min）                                     │
 └─────────────────────────────────────────────────────────────────┘
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Layer 2: Transport Security                                    │
-│  - TLS 1.2+ (cert-manager + Let's Encrypt)                      │
-│  - Strong ciphers only                                          │
-│  - HSTS headers                                                 │
+│  第 2 层：传输安全                                               │
+│  - TLS 1.2+（cert-manager + Let's Encrypt）                      │
+│  - 仅使用强加密套件                                              │
+│  - HSTS 头                                                      │
 └─────────────────────────────────────────────────────────────────┘
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Layer 3: Application Security                                  │
-│  - API key authentication                                       │
-│  - Input validation (file type, size, content)                  │
-│  - Output encoding                                              │
-│  - Error handling (no info disclosure)                          │
+│  第 3 层：应用安全                                               │
+│  - API 密钥认证                                                 │
+│  - 输入验证（文件类型、大小、内容）                               │
+│  - 输出编码                                                     │
+│  - 错误处理（不泄露信息）                                         │
 └─────────────────────────────────────────────────────────────────┘
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Layer 4: Container Security                                    │
-│  - Non-root user                                                │
-│  - Read-only root filesystem                                    │
-│  - No privileged containers                                     │
-│  - Image scanning (Trivy)                                       │
-│  - Pod Security Standards (restricted)                          │
+│  第 4 层：容器安全                                               │
+│  - 非 root 用户                                                 │
+│  - 只读根文件系统                                                │
+│  - 无特权容器                                                   │
+│  - 镜像扫描（Trivy）                                            │
+│  - Pod 安全标准（restricted）                                    │
 └─────────────────────────────────────────────────────────────────┘
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Layer 5: Network Policies                                      │
-│  - Default deny ingress/egress                                  │
-│  - Explicit allow rules only                                    │
-│  - Namespace isolation                                          │
+│  第 5 层：网络策略                                               │
+│  - 默认拒绝入站/出站                                             │
+│  - 仅显式允许规则                                                │
+│  - 命名空间隔离                                                  │
 └─────────────────────────────────────────────────────────────────┘
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Layer 6: Secrets Management                                    │
-│  - Kubernetes Secrets (encrypted at rest)                       │
-│  - HashiCorp Vault (optional)                                   │
-│  - No secrets in code or Git                                    │
-│  - Least privilege access                                       │
+│  第 6 层：密钥管理                                               │
+│  - Kubernetes Secrets（静态加密）                                 │
+│  - HashiCorp Vault（可选）                                       │
+│  - 代码或 Git 中无密钥                                           │
+│  - 最小权限访问                                                  │
 └─────────────────────────────────────────────────────────────────┘
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Layer 7: Access Control (RBAC)                                 │
-│  - ServiceAccount per application                               │
-│  - Minimal permissions (get, list only)                         │
-│  - No cluster-admin usage                                       │
-│  - Audit logging enabled                                        │
+│  第 7 层：访问控制（RBAC）                                       │
+│  - 每个应用使用 ServiceAccount                                   │
+│  - 最小权限（仅 get、list）                                      │
+│  - 不使用 cluster-admin                                         │
+│  - 启用审计日志                                                  │
 └─────────────────────────────────────────────────────────────────┘
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Layer 8: Data Security                                         │
-│  - Encryption at rest (cloud provider managed keys)             │
-│  - Encryption in transit (TLS)                                  │
-│  - Data retention policies                                      │
-│  - No PII in logs                                               │
+│  第 8 层：数据安全                                               │
+│  - 静态加密（云提供商管理的密钥）                                 │
+│  - 传输加密（TLS）                                              │
+│  - 数据保留策略                                                  │
+│  - 日志中无 PII                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Security Controls Checklist
+### 安全控制清单
 
-- [ ] TODO: Implement API key authentication
-- [ ] TODO: Configure cert-manager for TLS
-- [ ] TODO: Create NetworkPolicies for all namespaces
-- [ ] TODO: Set up RBAC with least privilege
-- [ ] TODO: Enable Pod Security Standards
-- [ ] TODO: Configure secrets management (Kubernetes Secrets or Vault)
-- [ ] TODO: Implement input validation
-- [ ] TODO: Set up rate limiting
-- [ ] TODO: Enable audit logging
-- [ ] TODO: Run security scanning in CI (Trivy, Bandit)
+- [ ] TODO: 实现 API 密钥认证
+- [ ] TODO: 配置 cert-manager 实现 TLS
+- [ ] TODO: 为所有命名空间创建 NetworkPolicy
+- [ ] TODO: 设置最小权限的 RBAC
+- [ ] TODO: 启用 Pod 安全标准
+- [ ] TODO: 配置密钥管理（Kubernetes Secrets 或 Vault）
+- [ ] TODO: 实现输入验证
+- [ ] TODO: 设置限流
+- [ ] TODO: 启用审计日志
+- [ ] TODO: 在 CI 中运行安全扫描（Trivy、Bandit）
 
 ---
 
-## Scalability & Performance
+## 可扩展性与性能
 
-### Horizontal Scaling
+### 水平扩展
 
-**Auto-Scaling Configuration:**
+**自动扩缩容配置：**
 ```yaml
-# TODO: HPA configuration
-# Scale based on:
-# - CPU utilization > 70%
-# - Memory utilization > 80%
-# - Custom metric: requests_per_second > 100
+# TODO: HPA 配置
+# 基于以下条件扩缩容：
+# - CPU 使用率 > 70%
+# - 内存使用率 > 80%
+# - 自定义指标：requests_per_second > 100
 #
-# Scaling behavior:
-# - Scale up: +1 pod every 30 seconds (max)
-# - Scale down: -1 pod every 5 minutes (avoid flapping)
+# 扩缩容行为：
+# - 扩容：最多每 30 秒增加 1 个 Pod
+# - 缩容：每 5 分钟减少 1 个 Pod（避免频繁波动）
 ```
 
-**Load Testing:**
+**负载测试：**
 ```bash
-# TODO: Run load tests with k6
-# Target: 1000 requests/second
-# Duration: 10 minutes
-# Success criteria:
-# - P95 latency < 500ms
-# - P99 latency < 1s
-# - Error rate < 0.1%
+# TODO: 使用 k6 运行负载测试
+# 目标：1000 请求/秒
+# 时长：10 分钟
+# 成功标准：
+# - P95 延迟 < 500ms
+# - P99 延迟 < 1s
+# - 错误率 < 0.1%
 ```
 
-### Performance Optimization
+### 性能优化
 
-**Model Optimization:**
-- [ ] TODO: Quantize model (FP32 → FP16 or INT8)
-- [ ] TODO: Batch predictions when possible
-- [ ] TODO: Cache models in memory
-- [ ] TODO: Use model serving framework (TorchServe, TF Serving)
+**模型优化：**
+- [ ] TODO: 量化模型（FP32 → FP16 或 INT8）
+- [ ] TODO: 尽可能进行批量预测
+- [ ] TODO: 在内存中缓存模型
+- [ ] TODO: 使用模型服务框架（TorchServe、TF Serving）
 
-**Infrastructure Optimization:**
-- [ ] TODO: Use GPU nodes for inference (if cost-effective)
-- [ ] TODO: Configure resource requests/limits correctly
-- [ ] TODO: Use local SSD for model caching
-- [ ] TODO: Enable HTTP/2 for connection multiplexing
-
----
-
-## Disaster Recovery
-
-### Backup Strategy
-
-**What to Backup:**
-1. **Database (PostgreSQL)** - MLflow metadata
-2. **Object Storage (S3/MinIO)** - Model artifacts
-3. **Kubernetes Resources** - Deployments, ConfigMaps, Secrets
-4. **Git Repositories** - Code and configurations (already versioned)
-
-**Backup Schedule:**
-- Daily automated backups (2 AM UTC)
-- Weekly full backups (Sunday 1 AM UTC)
-- Monthly snapshots (1st of month)
-
-**Backup Retention:**
-- Daily: 7 days
-- Weekly: 4 weeks
-- Monthly: 12 months
-
-**Backup Storage:**
-- Primary: S3/GCS in same region
-- Secondary: S3/GCS in different region (disaster recovery)
-
-### Recovery Procedures
-
-**RTO (Recovery Time Objective):** <1 hour
-**RPO (Recovery Point Objective):** <24 hours
-
-**Recovery Scenarios:**
-
-1. **Pod Failure** (automatic, <30 seconds)
-   - Kubernetes restarts pod automatically
-   - No manual intervention required
-
-2. **Node Failure** (automatic, <2 minutes)
-   - Kubernetes reschedules pods to healthy nodes
-   - No manual intervention required
-
-3. **Database Failure** (<10 minutes)
-   - Promote replica to primary
-   - Update connection strings
-   - Restart dependent services
-
-4. **Complete Cluster Failure** (<1 hour)
-   - Provision new cluster
-   - Restore from backups (database, configs)
-   - Deploy applications
-   - Verify functionality
-
-**Disaster Recovery Checklist:**
-- [ ] TODO: Document backup procedures
-- [ ] TODO: Document restore procedures
-- [ ] TODO: Test restore quarterly
-- [ ] TODO: Set up automated backups
-- [ ] TODO: Configure cross-region replication
-- [ ] TODO: Create runbooks for common failure scenarios
+**基础设施优化：**
+- [ ] TODO: 使用 GPU 节点进行推理（如果成本合理）
+- [ ] TODO: 正确配置资源请求/限制
+- [ ] TODO: 使用本地 SSD 进行模型缓存
+- [ ] TODO: 启用 HTTP/2 实现连接多路复用
 
 ---
 
-## Technology Decisions
+## 灾难恢复
 
-### Architecture Decision Records (ADRs)
+### 备份策略
 
-#### ADR-001: Use Kubernetes for Orchestration
+**需要备份的内容：**
+1. **数据库（PostgreSQL）** — MLflow 元数据
+2. **对象存储（S3/MinIO）** — 模型工件
+3. **Kubernetes 资源** — Deployment、ConfigMap、Secret
+4. **Git 仓库** — 代码和配置（已版本管理）
 
-**Decision:** Use Kubernetes as the container orchestration platform
+**备份计划：**
+- 每日自动备份（UTC 时间凌晨 2 点）
+- 每周完整备份（周日 UTC 时间凌晨 1 点）
+- 每月快照（每月 1 日）
 
-**Rationale:**
-- Industry standard for container orchestration
-- Excellent auto-scaling, self-healing capabilities
-- Rich ecosystem (Helm, Operators, monitoring tools)
-- Cloud-agnostic (can run on GKE, EKS, AKS, or on-prem)
-- Strong community support
+**备份保留期：**
+- 每日备份：7 天
+- 每周备份：4 周
+- 每月备份：12 个月
 
-**Alternatives Considered:**
-- Docker Swarm: Simpler but less feature-rich
-- Nomad: Good but smaller ecosystem
-- ECS/Fargate: Cloud-specific, vendor lock-in
+**备份存储：**
+- 主备份：同区域的 S3/GCS
+- 辅助备份：不同区域的 S3/GCS（灾难恢复）
 
----
+### 恢复流程
 
-#### ADR-002: Use MLflow for Model Registry
+**RTO（恢复时间目标）：** <1 小时
+**RPO（恢复点目标）：** <24 小时
 
-**Decision:** Use MLflow for experiment tracking and model registry
+**恢复场景：**
 
-**Rationale:**
-- Open-source, vendor-neutral
-- Supports multiple ML frameworks (PyTorch, TF, sklearn)
-- Good UI for experiment comparison
-- REST API for programmatic access
-- Model versioning and metadata tracking
+1. **Pod 故障**（自动，<30 秒）
+   - Kubernetes 自动重启 Pod
+   - 无需手动干预
 
-**Alternatives Considered:**
-- Weights & Biases: Great but proprietary/expensive
-- Neptune.ai: Proprietary
-- Custom solution: Too much maintenance
+2. **节点故障**（自动，<2 分钟）
+   - Kubernetes 将 Pod 重新调度到健康节点
+   - 无需手动干预
 
----
+3. **数据库故障**（<10 分钟）
+   - 将副本提升为主节点
+   - 更新连接字符串
+   - 重启依赖服务
 
-#### ADR-003: Use Prometheus + Grafana for Monitoring
+4. **完整集群故障**（<1 小时）
+   - 部署新集群
+   - 从备份恢复（数据库、配置）
+   - 部署应用
+   - 验证功能
 
-**Decision:** Use Prometheus for metrics and Grafana for visualization
-
-**Rationale:**
-- CNCF graduated projects (production-ready)
-- Pull-based metrics (no client-side config needed)
-- PromQL powerful for queries
-- Grafana excellent for dashboards
-- Well-integrated with Kubernetes
-
-**Alternatives Considered:**
-- Datadog: Expensive, vendor lock-in
-- New Relic: Expensive
-- Custom solution: Reinventing the wheel
-
----
-
-#### ADR-004: Use GitHub Actions for CI/CD
-
-**Decision:** Use GitHub Actions for CI/CD pipelines
-
-**Rationale:**
-- Integrated with GitHub (where code lives)
-- Free for public repos, affordable for private
-- Good marketplace of actions
-- YAML-based, easy to version control
-- Built-in secrets management
-
-**Alternatives Considered:**
-- GitLab CI: Good but requires GitLab
-- Jenkins: Powerful but complex, self-hosted
-- CircleCI: Good but expensive for large teams
+**灾难恢复清单：**
+- [ ] TODO: 记录备份流程
+- [ ] TODO: 记录恢复流程
+- [ ] TODO: 每季度测试恢复
+- [ ] TODO: 设置自动备份
+- [ ] TODO: 配置跨区域复制
+- [ ] TODO: 为常见故障场景创建 Runbook
 
 ---
 
-#### ADR-005: Use Kustomize for Multi-Environment Configs
+## 技术决策
 
-**Decision:** Use Kustomize for managing environment-specific configurations
+### 架构决策记录（ADR）
 
-**Rationale:**
-- Built into kubectl (no separate tool)
-- Overlay pattern keeps configs DRY
-- No templating language (pure YAML)
-- Good for GitOps workflows
+#### ADR-001：使用 Kubernetes 进行编排
 
-**Alternatives Considered:**
-- Helm: More complex, templating can be error-prone
-- Custom scripts: Not maintainable
-- Environment variables: Not sufficient for all configs
+**决策：** 使用 Kubernetes 作为容器编排平台
 
----
+**理由：**
+- 容器编排的行业标准
+- 出色的自动扩缩容和自愈能力
+- 丰富的生态系统（Helm、Operator、监控工具）
+- 云无关（可在 GKE、EKS、AKS 或本地运行）
+- 强大的社区支持
 
-## Summary
-
-This architecture provides a production-ready ML system with:
-- ✅ **High availability** - Multi-replica, auto-healing, zero-downtime updates
-- ✅ **Scalability** - Auto-scaling from 3-20 replicas, handles 1000+ req/sec
-- ✅ **Security** - Multiple layers of defense, encrypted, authenticated
-- ✅ **Observability** - Metrics, logs, alerts, dashboards
-- ✅ **Automation** - CI/CD, ML lifecycle, scaling, recovery
-- ✅ **Maintainability** - Infrastructure as code, GitOps, comprehensive docs
-
-**Next Steps:**
-1. Review this architecture document thoroughly
-2. Understand how components interact
-3. Begin implementation starting with system integration
-4. Refer back to this document as the "source of truth"
+**考量过的替代方案：**
+- Docker Swarm：更简单但功能较少
+- Nomad：不错但生态系统较小
+- ECS/Fargate：特定云厂商，供应商锁定
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** October 18, 2025
-**Maintained By:** AI Infrastructure Curriculum Team
+#### ADR-002：使用 MLflow 作为模型注册表
+
+**决策：** 使用 MLflow 进行实验跟踪和模型注册
+
+**理由：**
+- 开源，供应商中立
+- 支持多种 ML 框架（PyTorch、TF、sklearn）
+- 良好的实验比较 UI
+- REST API 提供编程访问
+- 模型版本管理和元数据跟踪
+
+**考量过的替代方案：**
+- Weights & Biases：很好但专有/昂贵
+- Neptune.ai：专有
+- 自建方案：维护成本过高
+
+---
+
+#### ADR-003：使用 Prometheus + Grafana 进行监控
+
+**决策：** 使用 Prometheus 采集指标，Grafana 进行可视化
+
+**理由：**
+- CNCF 毕业项目（生产就绪）
+- 拉取式指标（无需客户端配置）
+- PromQL 查询功能强大
+- Grafana 仪表盘表现优异
+- 与 Kubernetes 良好集成
+
+**考量过的替代方案：**
+- Datadog：昂贵，供应商锁定
+- New Relic：昂贵
+- 自建方案：重复造轮子
+
+---
+
+#### ADR-004：使用 GitHub Actions 实现 CI/CD
+
+**决策：** 使用 GitHub Actions 作为 CI/CD 流水线
+
+**理由：**
+- 与 GitHub 集成（代码所在之处）
+- 公共仓库免费，私有仓库价格合理
+- 丰富的 Action 市场
+- 基于 YAML，易于版本控制
+- 内置密钥管理
+
+**考量过的替代方案：**
+- GitLab CI：不错但需要 GitLab
+- Jenkins：功能强大但复杂，需自托管
+- CircleCI：不错但对大团队来说昂贵
+
+---
+
+#### ADR-005：使用 Kustomize 管理多环境配置
+
+**决策：** 使用 Kustomize 管理环境特定配置
+
+**理由：**
+- 内置于 kubectl（无需单独工具）
+- 覆盖模式保持配置 DRY
+- 无模板语言（纯 YAML）
+- 适合 GitOps 工作流
+
+**考量过的替代方案：**
+- Helm：更复杂，模板容易出错
+- 自定义脚本：难以维护
+- 环境变量：不足以满足所有配置
+
+---
+
+## 总结
+
+该架构提供了一个生产级 ML 系统，具备：
+- ✅ **高可用性** — 多副本、自动自愈、零停机更新
+- ✅ **可扩展性** — 从 3 到 20 个副本自动扩缩容，处理 1000+ req/sec
+- ✅ **安全性** — 多层防御、加密、认证
+- ✅ **可观测性** — 指标、日志、告警、仪表盘
+- ✅ **自动化** — CI/CD、ML 生命周期、扩缩容、恢复
+- ✅ **可维护性** — 基础设施即代码、GitOps、全面文档
+
+**后续步骤：**
+1. 仔细审阅本架构文档
+2. 理解组件之间的交互方式
+3. 从系统集成开始实施
+4. 随时参考本文档作为"唯一真实来源"
+
+---
+
+**文档版本：** 1.0
+**最后更新：** 2025年10月18日
+**维护者：** AI 基础设施课程团队

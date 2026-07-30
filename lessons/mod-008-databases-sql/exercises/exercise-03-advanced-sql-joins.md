@@ -1,53 +1,53 @@
-# Exercise 03: Advanced SQL Joins & Analytical Queries
+# Exercise 03: 高级 SQL 连接与分析查询
 
-## Exercise Overview
+## 练习概述
 
-**Objective**: Master advanced SQL query patterns including all join types, window functions, CTEs, and complex aggregations. Write production-ready analytical queries for ML infrastructure dashboards and reports.
+**目标**：掌握所有连接类型的高级 SQL 查询模式，包括窗口函数、CTE 和复杂聚合。为 ML 基础设施仪表盘和报告编写生产级分析查询。
 
-**Difficulty**: Intermediate → Advanced
-**Estimated Time**: 3-4 hours
-**Prerequisites**:
-- Exercise 01 (SQL Basics & CRUD) completed
-- Exercise 02 (Database Design) completed with schema loaded
-- Lecture 03 (Advanced SQL & Query Optimization)
-- Understanding of set theory (INNER vs OUTER joins)
+**难度**：中级 → 高级
+**预计时间**：3-4 小时
+**前置条件**：
+- 已完成练习 01（SQL 基础与 CRUD）
+- 已完成练习 02（数据库设计）并加载 schema
+- 讲座 03（高级 SQL 与查询优化）
+- 理解集合论（INNER vs OUTER join）
 
-**What You'll Learn**:
-- All JOIN types (INNER, LEFT, RIGHT, FULL OUTER, CROSS, SELF)
-- Window functions (ROW_NUMBER, RANK, LAG, LEAD, SUM OVER)
-- Common Table Expressions (CTEs) with multiple steps
-- Subqueries (correlated and non-correlated)
-- Conditional aggregations (FILTER, CASE WHEN)
-- LATERAL joins for complex scenarios
-- Query performance analysis with EXPLAIN
-- Materialized views for caching expensive queries
-
----
-
-## Real-World Scenario
-
-You're the **Senior ML Infrastructure Engineer** tasked with building analytics that power:
-
-1. **Executive Dashboard**: Model deployment health, success rates, costs
-2. **Compliance Reports**: Approval workflows, audit trails, SLA tracking
-3. **Operations Metrics**: Resource utilization, failure analysis, performance trends
-4. **Data Science Insights**: Model performance comparisons, dataset usage patterns
-
-These queries will be used by:
-- **Executives**: Monthly business reviews
-- **Compliance Team**: Regulatory audits
-- **MLOps Team**: Daily standups and incident response
-- **Data Scientists**: Model selection and optimization
+**你将学到**：
+- 所有 JOIN 类型（INNER、LEFT、RIGHT、FULL OUTER、CROSS、SELF）
+- 窗口函数（ROW_NUMBER、RANK、LAG、LEAD、SUM OVER）
+- 公用表表达式（CTE）多步骤使用
+- 子查询（相关和非相关）
+- 条件聚合（FILTER、CASE WHEN）
+- 用于复杂场景的 LATERAL 连接
+- 使用 EXPLAIN 进行查询性能分析
+- 用于缓存昂贵查询的物化视图
 
 ---
 
-## Part 1: Understanding JOINs
+## 真实场景
 
-### Step 1.1: JOIN Types Overview
+你是**高级 ML 基础设施工程师**，负责构建支撑以下功能的分析：
 
-**Visual Reference**:
+1. **高管仪表盘**：模型部署健康度、成功率、成本
+2. **合规报告**：审批工作流、审计追踪、SLA 跟踪
+3. **运维指标**：资源利用率、故障分析、性能趋势
+4. **数据科学洞察**：模型性能比较、数据集使用模式
+
+这些查询将由以下人员使用：
+- **高管**：月度业务评审
+- **合规团队**：监管审计
+- **MLOps 团队**：每日站会和事件响应
+- **数据科学家**：模型选择与优化
+
+---
+
+## 第 1 部分：理解 JOIN
+
+### 步骤 1.1：JOIN 类型概览
+
+**可视化参考**：
 ```
-Table A (models)     Table B (model_versions)
+表 A (models)        表 B (model_versions)
 ┌─────────┐         ┌─────────┐
 │ A only  │         │ B only  │
 │    ┌────┼─────────┼────┐    │
@@ -55,29 +55,27 @@ Table A (models)     Table B (model_versions)
 │    └────┼─────────┼────┘    │
 └─────────┘         └─────────┘
 
-INNER JOIN:  A ∩ B  (intersection only)
-LEFT JOIN:   A       (all A + matching B)
-RIGHT JOIN:       B  (all B + matching A)
-FULL OUTER:  A ∪ B  (everything from both)
-CROSS JOIN:  A × B  (cartesian product)
+INNER JOIN:  A ∩ B  (仅交集)
+LEFT JOIN:   A       (所有 A + 匹配的 B)
+RIGHT JOIN:       B  (所有 B + 匹配的 A)
+FULL OUTER:  A ∪ B  (两者中的所有内容)
+CROSS JOIN:  A × B  (笛卡尔积)
 ```
 
-### Step 1.2: Setup Sample Data
-
-Let's ensure we have comprehensive test data:
+### 步骤 1.2：设置示例数据
 
 ```sql
 -- ============================================
--- Additional Sample Data for Exercise 03
+-- Exercise 03 的额外示例数据
 -- ============================================
 -- File: sql/20_sample_data_advanced.sql
 
--- Add more model versions
+-- 添加更多模型版本
 DO $$
 DECLARE
     model_id_var UUID;
 BEGIN
-    -- Get sentiment classifier model ID
+    -- 获取情感分类器模型 ID
     SELECT model_id INTO model_id_var
     FROM models WHERE model_name = 'sentiment-classifier';
 
@@ -87,7 +85,7 @@ BEGIN
         (model_id_var, '2.0.0', 's3://ml-artifacts/sentiment-classifier/2.0.0/', 'pytorch', 'bob@example.com', 'deployed');
 END $$;
 
--- Add training runs
+-- 添加训练运行
 INSERT INTO training_runs (version_id, run_name, status, accuracy, precision_score, recall_score, f1_score, gpu_hours, created_at)
 SELECT
     mv.version_id,
@@ -103,7 +101,7 @@ FROM model_versions mv
 WHERE mv.framework = 'pytorch'
 LIMIT 10;
 
--- Add deployments
+-- 添加部署
 INSERT INTO deployments (version_id, environment_id, deployed_by, status, deployed_at)
 SELECT
     mv.version_id,
@@ -117,7 +115,7 @@ WHERE e.environment_name IN ('staging', 'prod')
   AND mv.status = 'deployed'
 LIMIT 5;
 
--- Verify data
+-- 验证数据
 SELECT 'Data loaded' AS status;
 SELECT COUNT(*) AS total_models FROM models;
 SELECT COUNT(*) AS total_versions FROM model_versions;
@@ -125,21 +123,21 @@ SELECT COUNT(*) AS total_runs FROM training_runs;
 SELECT COUNT(*) AS total_deployments FROM deployments;
 ```
 
-✅ **Checkpoint**: Sample data loaded with models, versions, runs, and deployments.
+✅ **检查点**：包含模型、版本、训练运行和部署的示例数据已加载。
 
 ---
 
-## Part 2: INNER JOIN - The Foundation
+## 第 2 部分：INNER JOIN - 基础
 
-### Step 2.1: Basic INNER JOIN
+### 步骤 2.1：基本 INNER JOIN
 
 ```sql
 -- ==========================================
--- INNER JOIN EXAMPLES
+-- INNER JOIN 示例
 -- ==========================================
 
--- Query 1: Models with their versions (INNER JOIN)
--- Returns only models that HAVE versions
+-- 查询 1：包含版本的模型（INNER JOIN）
+-- 仅返回有版本的模型
 SELECT
     m.model_name,
     m.display_name,
@@ -149,21 +147,14 @@ SELECT
 FROM models m
 INNER JOIN model_versions mv ON m.model_id = mv.model_id
 ORDER BY m.model_name, mv.semver DESC;
-
--- Output:
--- model_name            | display_name          | semver | version_status | registered_at
--- fraud-detector        | Fraud Detection Model | 2.0.0  | validated      | 2025-10-20
--- sentiment-classifier  | Sentiment Classifier  | 2.0.0  | deployed       | 2025-10-22
--- sentiment-classifier  | Sentiment Classifier  | 1.3.0  | validated      | 2025-10-21
--- ... (only models WITH versions appear)
 ```
 
-**Key Point**: INNER JOIN excludes models without versions!
+**关键点**：INNER JOIN 排除了没有版本的模型！
 
-### Step 2.2: Multi-Table INNER JOIN
+### 步骤 2.2：多表 INNER JOIN
 
 ```sql
--- Query 2: Complete model lineage (models → versions → training runs)
+-- 查询 2：完整模型谱系（models → versions → training runs）
 SELECT
     m.model_name,
     mv.semver,
@@ -177,14 +168,12 @@ INNER JOIN model_versions mv ON m.model_id = mv.model_id
 INNER JOIN training_runs tr ON mv.version_id = tr.version_id
 WHERE tr.status = 'succeeded'
 ORDER BY m.model_name, mv.semver DESC, tr.accuracy DESC;
-
--- This shows: Only models that have versions that have training runs
 ```
 
-### Step 2.3: INNER JOIN with Aggregation
+### 步骤 2.3：带聚合的 INNER JOIN
 
 ```sql
--- Query 3: Count training runs per model
+-- 查询 3：统计每个模型的训练运行数
 SELECT
     m.model_name,
     m.display_name,
@@ -200,21 +189,21 @@ HAVING COUNT(tr.run_id) > 0
 ORDER BY total_gpu_hours DESC;
 ```
 
-✅ **Checkpoint**: You understand INNER JOIN returns only matching rows from both tables.
+✅ **检查点**：你理解 INNER JOIN 仅返回两个表中都匹配的行。
 
 ---
 
-## Part 3: LEFT JOIN - Include All from Left Table
+## 第 3 部分：LEFT JOIN - 包含左表所有内容
 
-### Step 3.1: Basic LEFT JOIN
+### 步骤 3.1：基本 LEFT JOIN
 
 ```sql
 -- ==========================================
--- LEFT JOIN (LEFT OUTER JOIN) EXAMPLES
+-- LEFT JOIN（LEFT OUTER JOIN）示例
 -- ==========================================
 
--- Query 4: ALL models with their versions (if any)
--- Returns models even if they have NO versions
+-- 查询 4：所有模型及其版本（如果有）
+-- 即使没有版本也返回模型
 SELECT
     m.model_name,
     m.display_name,
@@ -224,21 +213,14 @@ SELECT
 FROM models m
 LEFT JOIN model_versions mv ON m.model_id = mv.model_id
 ORDER BY m.model_name, mv.semver DESC NULLS LAST;
-
--- Output includes:
--- model_name          | display_name        | semver | version_status
--- fraud-detector      | Fraud Detection     | 2.0.0  | validated
--- new-model-no-vers   | New Model           | NULL   | NULL
--- sentiment-class...  | Sentiment Class...  | 2.0.0  | deployed
--- ... (ALL models appear, even those without versions)
 ```
 
-**Key Point**: LEFT JOIN keeps ALL rows from left table (models), adding NULL for missing matches!
+**关键点**：LEFT JOIN 保留左表（models）的所有行，为缺失的匹配添加 NULL！
 
-### Step 3.2: Finding Missing Relationships
+### 步骤 3.2：查找缺失关系
 
 ```sql
--- Query 5: Find models WITHOUT any versions (quality check)
+-- 查询 5：查找没有任何版本的模型（质量检查）
 SELECT
     m.model_name,
     m.display_name,
@@ -250,17 +232,12 @@ LEFT JOIN model_versions mv ON m.model_id = mv.model_id
 GROUP BY m.model_id, m.model_name, m.display_name, m.created_at, m.created_by
 HAVING COUNT(mv.version_id) = 0
 ORDER BY m.created_at DESC;
-
--- Useful for finding:
--- - Abandoned models
--- - Models in registration process
--- - Data quality issues
 ```
 
-### Step 3.3: LEFT JOIN with COALESCE
+### 步骤 3.3：带 COALESCE 的 LEFT JOIN
 
 ```sql
--- Query 6: All models with version count (0 if none)
+-- 查询 6：所有模型及其版本数（无则为 0）
 SELECT
     m.model_name,
     m.display_name,
@@ -273,10 +250,10 @@ GROUP BY m.model_id, m.model_name, m.display_name, m.risk_level, m.created_at
 ORDER BY version_count DESC, last_activity DESC;
 ```
 
-### Step 3.4: Multi-Level LEFT JOINs
+### 步骤 3.4：多级 LEFT JOIN
 
 ```sql
--- Query 7: Complete model info even if versions/runs don't exist
+-- 查询 7：即使版本/训练运行不存在也显示完整模型信息
 SELECT
     m.model_name,
     m.display_name,
@@ -293,25 +270,23 @@ LEFT JOIN run_datasets rd ON tr.run_id = rd.run_id
 LEFT JOIN datasets d ON rd.dataset_id = d.dataset_id
 WHERE m.model_name = 'sentiment-classifier'
 ORDER BY mv.semver DESC NULLS LAST, tr.created_at DESC NULLS LAST;
-
--- Shows complete lineage even if some parts are missing
 ```
 
-✅ **Checkpoint**: You understand LEFT JOIN preserves all left table rows with NULL for missing matches.
+✅ **检查点**：你理解 LEFT JOIN 保留所有左表行，缺失匹配处为 NULL。
 
 ---
 
-## Part 4: RIGHT JOIN and FULL OUTER JOIN
+## 第 4 部分：RIGHT JOIN 和 FULL OUTER JOIN
 
-### Step 4.1: RIGHT JOIN (Rarely Used)
+### 步骤 4.1：RIGHT JOIN（不常用）
 
 ```sql
 -- ==========================================
--- RIGHT JOIN EXAMPLES
+-- RIGHT JOIN 示例
 -- ==========================================
 
--- Query 8: All versions with their models (if model exists)
--- RIGHT JOIN is the opposite of LEFT JOIN
+-- 查询 8：所有版本及其模型（如果模型存在）
+-- RIGHT JOIN 是 LEFT JOIN 的反向
 SELECT
     m.model_name,
     m.display_name,
@@ -321,53 +296,37 @@ SELECT
 FROM models m
 RIGHT JOIN model_versions mv ON m.model_id = mv.model_id
 ORDER BY mv.registered_at DESC;
-
--- Equivalent to:
-SELECT
-    m.model_name,
-    m.display_name,
-    mv.semver,
-    mv.status,
-    mv.registered_at
-FROM model_versions mv
-LEFT JOIN models m ON mv.model_id = m.model_id
-ORDER BY mv.registered_at DESC;
 ```
 
-**Best Practice**: Most developers prefer LEFT JOIN and reorder tables instead of using RIGHT JOIN.
+**最佳实践**：大多数开发者偏好 LEFT JOIN 并重新排列表，而非使用 RIGHT JOIN。
 
-### Step 4.2: FULL OUTER JOIN
+### 步骤 4.2：FULL OUTER JOIN
 
 ```sql
 -- ==========================================
--- FULL OUTER JOIN EXAMPLES
+-- FULL OUTER JOIN 示例
 -- ==========================================
 
--- Query 9: All models AND all tags (whether linked or not)
+-- 查询 9：所有模型和所有标签（无论是否链接）
 SELECT
     m.model_name,
     t.tag_category,
     t.tag_value,
     CASE
-        WHEN m.model_id IS NULL THEN 'Unused tag'
-        WHEN t.tag_id IS NULL THEN 'Untagged model'
-        ELSE 'Tagged'
+        WHEN m.model_id IS NULL THEN '未使用的标签'
+        WHEN t.tag_id IS NULL THEN '未标记的模型'
+        ELSE '已标记'
     END AS relationship_status
 FROM models m
 FULL OUTER JOIN model_tags mt ON m.model_id = mt.model_id
 FULL OUTER JOIN tags t ON mt.tag_id = t.tag_id
 ORDER BY relationship_status, m.model_name NULLS LAST;
-
--- Useful for finding:
--- - Unused tags (no models)
--- - Untagged models
--- - Complete inventory
 ```
 
-### Step 4.3: Practical FULL OUTER JOIN
+### 步骤 4.3：实用的 FULL OUTER JOIN
 
 ```sql
--- Query 10: Reconcile expected vs actual deployments
+-- 查询 10：协调预期与实际部署
 WITH expected_deployments AS (
     SELECT
         mv.version_id,
@@ -392,9 +351,9 @@ SELECT
     ex.semver,
     ex.environment_name,
     CASE
-        WHEN act.version_id IS NULL THEN 'MISSING - Expected but not deployed'
-        WHEN ex.version_id IS NULL THEN 'EXTRA - Deployed but not expected'
-        ELSE 'OK - Deployed as expected'
+        WHEN act.version_id IS NULL THEN '缺失 - 预期部署但未执行'
+        WHEN ex.version_id IS NULL THEN '额外 - 已部署但未预期'
+        ELSE '正常 - 按预期部署'
     END AS deployment_status,
     act.deployed_at,
     act.status
@@ -405,20 +364,20 @@ FULL OUTER JOIN actual_deployments act
 ORDER BY deployment_status, ex.semver;
 ```
 
-✅ **Checkpoint**: You understand FULL OUTER JOIN returns all rows from both tables.
+✅ **检查点**：你理解 FULL OUTER JOIN 返回两个表中的所有行。
 
 ---
 
-## Part 5: CROSS JOIN and SELF JOIN
+## 第 5 部分：CROSS JOIN 和 SELF JOIN
 
-### Step 5.1: CROSS JOIN (Cartesian Product)
+### 步骤 5.1：CROSS JOIN（笛卡尔积）
 
 ```sql
 -- ==========================================
--- CROSS JOIN EXAMPLES
+-- CROSS JOIN 示例
 -- ==========================================
 
--- Query 11: All possible model-environment combinations
+-- 查询 11：所有可能的模型-环境组合
 SELECT
     m.model_name,
     e.environment_name,
@@ -427,22 +386,17 @@ FROM models m
 CROSS JOIN environments e
 WHERE e.environment_type IN ('staging', 'production')
 ORDER BY m.model_name, e.priority;
-
--- Useful for:
--- - Generating all possible combinations
--- - Creating deployment matrices
--- - Test case generation
 ```
 
-### Step 5.2: CROSS JOIN with Filter
+### 步骤 5.2：带条件的 CROSS JOIN
 
 ```sql
--- Query 12: Identify missing deployments
+-- 查询 12：识别缺失的部署
 SELECT
     m.model_name,
     mv.semver,
     e.environment_name,
-    'Missing deployment' AS status
+    '缺失部署' AS status
 FROM models m
 CROSS JOIN model_versions mv
 CROSS JOIN environments e
@@ -459,14 +413,14 @@ WHERE mv.model_id = m.model_id
 ORDER BY m.model_name, mv.semver;
 ```
 
-### Step 5.3: SELF JOIN
+### 步骤 5.3：SELF JOIN
 
 ```sql
 -- ==========================================
--- SELF JOIN EXAMPLES
+-- SELF JOIN 示例
 -- ==========================================
 
--- Query 13: Compare model versions (current vs previous)
+-- 查询 13：比较模型版本（当前 vs 前一个）
 SELECT
     m.model_name,
     curr.semver AS current_version,
@@ -486,44 +440,37 @@ LEFT JOIN model_versions prev ON m.model_id = prev.model_id
     )
 WHERE m.model_name = 'sentiment-classifier'
 ORDER BY curr.registered_at DESC;
-
--- Shows: Each version with its immediate predecessor
 ```
 
-### Step 5.4: Find Duplicates with SELF JOIN
+### 步骤 5.4：使用 SELF JOIN 查找重复项
 
 ```sql
--- Query 14: Find potential duplicate models (similar names)
+-- 查询 14：查找潜在的重复模型（相似名称）
 SELECT DISTINCT
     m1.model_name AS model_1,
     m2.model_name AS model_2,
     m1.objective AS objective_1,
     m2.objective AS objective_2
 FROM models m1
-INNER JOIN models m2 ON m1.model_id < m2.model_id  -- Avoid duplicate pairs
-WHERE SIMILARITY(m1.model_name, m2.model_name) > 0.6  -- PostgreSQL pg_trgm extension
+INNER JOIN models m2 ON m1.model_id < m2.model_id  -- 避免重复对
+WHERE SIMILARITY(m1.model_name, m2.model_name) > 0.6  -- PostgreSQL pg_trgm 扩展
    OR m1.objective = m2.objective;
-
--- Helps identify:
--- - Duplicate registrations
--- - Similar models that should be merged
--- - Naming convention violations
 ```
 
-✅ **Checkpoint**: You understand CROSS JOIN (all combinations) and SELF JOIN (table joins itself).
+✅ **检查点**：你理解 CROSS JOIN（所有组合）和 SELF JOIN（表与自身连接）。
 
 ---
 
-## Part 6: Window Functions
+## 第 6 部分：窗口函数
 
-### Step 6.1: ROW_NUMBER and RANK
+### 步骤 6.1：ROW_NUMBER 和 RANK
 
 ```sql
 -- ==========================================
--- WINDOW FUNCTIONS
+-- 窗口函数
 -- ==========================================
 
--- Query 15: Rank models by accuracy within each framework
+-- 查询 15：按框架内准确率排名模型
 SELECT
     m.model_name,
     mv.framework,
@@ -537,16 +484,12 @@ INNER JOIN training_runs tr ON mv.version_id = tr.version_id
 WHERE tr.status = 'succeeded'
   AND tr.accuracy IS NOT NULL
 ORDER BY mv.framework, tr.accuracy DESC;
-
--- ROW_NUMBER: 1, 2, 3, 4 (always unique)
--- RANK:       1, 2, 2, 4 (ties share rank, skip next)
--- DENSE_RANK: 1, 2, 2, 3 (ties share rank, don't skip)
 ```
 
-### Step 6.2: Get Latest Record per Group
+### 步骤 6.2：获取每组最新记录
 
 ```sql
--- Query 16: Latest deployment per model (most common pattern!)
+-- 查询 16：每个模型的最新部署（最常见模式！）
 SELECT
     model_name,
     semver,
@@ -573,14 +516,12 @@ FROM (
 ) ranked
 WHERE rn = 1
 ORDER BY model_name, environment_name;
-
--- Gets most recent deployment for each model in each environment
 ```
 
-### Step 6.3: LAG and LEAD
+### 步骤 6.3：LAG 和 LEAD
 
 ```sql
--- Query 17: Compare accuracy with previous training run
+-- 查询 17：比较与前一次训练运行的准确率
 SELECT
     m.model_name,
     mv.semver,
@@ -596,10 +537,10 @@ SELECT
     ) AS accuracy_delta,
     CASE
         WHEN tr.accuracy > LAG(tr.accuracy) OVER (PARTITION BY m.model_id ORDER BY tr.created_at)
-        THEN '↑ Improved'
+        THEN '↑ 提升'
         WHEN tr.accuracy < LAG(tr.accuracy) OVER (PARTITION BY m.model_id ORDER BY tr.created_at)
-        THEN '↓ Degraded'
-        ELSE '→ Same'
+        THEN '↓ 下降'
+        ELSE '→ 持平'
     END AS trend
 FROM models m
 INNER JOIN model_versions mv ON m.model_id = mv.model_id
@@ -607,15 +548,12 @@ INNER JOIN training_runs tr ON mv.version_id = tr.version_id
 WHERE tr.status = 'succeeded'
   AND tr.accuracy IS NOT NULL
 ORDER BY m.model_name, tr.created_at;
-
--- LAG: Access previous row in window
--- LEAD: Access next row in window
 ```
 
-### Step 6.4: Running Totals and Moving Averages
+### 步骤 6.4：运行总计和移动平均
 
 ```sql
--- Query 18: Running total of GPU hours per model
+-- 查询 18：每个模型的 GPU 小时运行总计
 SELECT
     m.model_name,
     tr.created_at::DATE AS run_date,
@@ -635,27 +573,22 @@ INNER JOIN model_versions mv ON m.model_id = mv.model_id
 INNER JOIN training_runs tr ON mv.version_id = tr.version_id
 WHERE tr.status = 'succeeded'
 ORDER BY m.model_name, tr.created_at;
-
--- ROWS BETWEEN: Define the window frame
--- UNBOUNDED PRECEDING: From start
--- N PRECEDING: Last N rows
--- CURRENT ROW: Up to current
 ```
 
-### Step 6.5: NTILE for Percentiles
+### 步骤 6.5：NTILE 用于百分位
 
 ```sql
--- Query 19: Quartile analysis of model accuracy
+-- 查询 19：模型准确率的四分位数分析
 SELECT
     m.model_name,
     tr.accuracy,
     NTILE(4) OVER (ORDER BY tr.accuracy) AS accuracy_quartile,
     PERCENT_RANK() OVER (ORDER BY tr.accuracy) AS percentile_rank,
     CASE
-        WHEN NTILE(4) OVER (ORDER BY tr.accuracy) = 4 THEN 'Top 25%'
-        WHEN NTILE(4) OVER (ORDER BY tr.accuracy) = 3 THEN 'Above Average'
-        WHEN NTILE(4) OVER (ORDER BY tr.accuracy) = 2 THEN 'Below Average'
-        ELSE 'Bottom 25%'
+        WHEN NTILE(4) OVER (ORDER BY tr.accuracy) = 4 THEN '前 25%'
+        WHEN NTILE(4) OVER (ORDER BY tr.accuracy) = 3 THEN '高于平均'
+        WHEN NTILE(4) OVER (ORDER BY tr.accuracy) = 2 THEN '低于平均'
+        ELSE '后 25%'
     END AS performance_category
 FROM models m
 INNER JOIN model_versions mv ON m.model_id = mv.model_id
@@ -663,27 +596,24 @@ INNER JOIN training_runs tr ON mv.version_id = tr.version_id
 WHERE tr.status = 'succeeded'
   AND tr.accuracy IS NOT NULL
 ORDER BY tr.accuracy DESC;
-
--- NTILE(N): Divide into N equal buckets
--- PERCENT_RANK(): Percentile (0.0 to 1.0)
 ```
 
-✅ **Checkpoint**: You can use window functions for ranking, comparisons, and running calculations.
+✅ **检查点**：你可以使用窗口函数进行排名、比较和运行计算。
 
 ---
 
-## Part 7: Common Table Expressions (CTEs)
+## 第 7 部分：公用表表达式（CTE）
 
-### Step 7.1: Simple CTE
+### 步骤 7.1：简单 CTE
 
 ```sql
 -- ==========================================
--- COMMON TABLE EXPRESSIONS (WITH clause)
+-- 公用表表达式（WITH 子句）
 -- ==========================================
 
--- Query 20: Multi-step analysis with CTEs
+-- 查询 20：使用 CTE 进行多步骤分析
 WITH production_models AS (
-    -- Step 1: Find models in production
+    -- 步骤 1：查找生产中的模型
     SELECT DISTINCT
         m.model_id,
         m.model_name,
@@ -696,7 +626,7 @@ WITH production_models AS (
       AND d.status = 'active'
 ),
 model_metrics AS (
-    -- Step 2: Calculate metrics for those models
+    -- 步骤 2：计算这些模型的指标
     SELECT
         pm.model_id,
         pm.model_name,
@@ -710,7 +640,7 @@ model_metrics AS (
     WHERE tr.status = 'succeeded'
     GROUP BY pm.model_id, pm.model_name
 )
--- Step 3: Final output with derived fields
+-- 步骤 3：带衍生字段的最终输出
 SELECT
     mm.model_name,
     mm.total_runs,
@@ -718,20 +648,18 @@ SELECT
     ROUND(mm.best_accuracy::numeric, 4) AS best_accuracy,
     mm.total_gpu_cost,
     CASE
-        WHEN mm.total_runs < 10 THEN 'Undertested'
-        WHEN mm.avg_accuracy < 0.85 THEN 'Needs improvement'
-        ELSE 'Healthy'
+        WHEN mm.total_runs < 10 THEN '测试不足'
+        WHEN mm.avg_accuracy < 0.85 THEN '需要改进'
+        ELSE '健康'
     END AS health_status
 FROM model_metrics mm
 ORDER BY mm.total_gpu_cost DESC;
-
--- CTEs make complex queries readable!
 ```
 
-### Step 7.2: Multiple CTEs with JOINs
+### 步骤 7.2：多个 CTE 与 JOIN
 
 ```sql
--- Query 21: Deployment readiness report
+-- 查询 21：部署就绪报告
 WITH latest_versions AS (
     SELECT DISTINCT ON (m.model_id)
         m.model_id,
@@ -774,14 +702,14 @@ SELECT
     COALESCE(dst.prod_deployments, 0) AS prod_deployments,
     CASE
         WHEN lv.compliance_required AND COALESCE(ast.approvals_granted, 0) = 0
-            THEN '⚠️ Blocked - Needs approval'
+            THEN '⚠️ 阻塞 - 需要审批'
         WHEN COALESCE(ast.approvals_rejected, 0) > 0
-            THEN '❌ Blocked - Approval rejected'
+            THEN '❌ 阻塞 - 审批被拒'
         WHEN lv.status != 'validated'
-            THEN '⏳ Not ready - Needs validation'
+            THEN '⏳ 未就绪 - 需要验证'
         WHEN COALESCE(dst.prod_deployments, 0) > 0
-            THEN '✅ Deployed to production'
-        ELSE '✅ Ready for deployment'
+            THEN '✅ 已部署到生产'
+        ELSE '✅ 可部署'
     END AS readiness_status
 FROM latest_versions lv
 LEFT JOIN approval_status ast ON lv.model_id = ast.model_id
@@ -789,18 +717,15 @@ LEFT JOIN deployment_status dst ON lv.model_id = dst.model_id
 ORDER BY readiness_status, lv.model_name;
 ```
 
-### Step 7.3: Recursive CTE (Advanced)
+### 步骤 7.3：递归 CTE（高级）
 
 ```sql
--- Query 22: Model version history tree (if versions reference parent versions)
--- Note: This requires a parent_version_id column in model_versions
+-- 查询 22：模型版本历史树（如果版本引用父版本）
+-- 注意：这需要在 model_versions 中有 parent_version_id 列
 
--- First, let's imagine we have version lineage
--- ALTER TABLE model_versions ADD COLUMN parent_version_id UUID REFERENCES model_versions(version_id);
-
--- Recursive CTE example:
+-- 递归 CTE 示例：
 WITH RECURSIVE version_lineage AS (
-    -- Base case: root versions (no parent)
+    -- 基础情况：根版本（无父版本）
     SELECT
         version_id,
         model_id,
@@ -813,7 +738,7 @@ WITH RECURSIVE version_lineage AS (
 
     UNION ALL
 
-    -- Recursive case: child versions
+    -- 递归情况：子版本
     SELECT
         mv.version_id,
         mv.model_id,
@@ -823,7 +748,7 @@ WITH RECURSIVE version_lineage AS (
         vl.lineage_path || ' → ' || mv.semver
     FROM model_versions mv
     INNER JOIN version_lineage vl ON mv.parent_version_id = vl.version_id
-    WHERE vl.depth < 10  -- Prevent infinite recursion
+    WHERE vl.depth < 10  -- 防止无限递归
 )
 SELECT
     m.model_name,
@@ -833,24 +758,22 @@ SELECT
 FROM version_lineage vl
 INNER JOIN models m ON vl.model_id = m.model_id
 ORDER BY m.model_name, vl.depth, vl.semver;
-
--- Recursive CTEs are powerful for hierarchical data!
 ```
 
-✅ **Checkpoint**: You can use CTEs to break complex queries into readable steps.
+✅ **检查点**：你可以使用 CTE 将复杂查询分解为可读的步骤。
 
 ---
 
-## Part 8: Subqueries
+## 第 8 部分：子查询
 
-### Step 8.1: Subquery in WHERE Clause
+### 步骤 8.1：WHERE 子句中的子查询
 
 ```sql
 -- ==========================================
--- SUBQUERIES
+-- 子查询
 -- ==========================================
 
--- Query 23: Models with above-average accuracy
+-- 查询 23：准确率高于平均的模型
 SELECT
     m.model_name,
     AVG(tr.accuracy) AS avg_accuracy
@@ -861,7 +784,7 @@ WHERE tr.status = 'succeeded'
   AND tr.accuracy IS NOT NULL
 GROUP BY m.model_id, m.model_name
 HAVING AVG(tr.accuracy) > (
-    -- Subquery: calculate global average
+    -- 子查询：计算全局平均值
     SELECT AVG(accuracy)
     FROM training_runs
     WHERE status = 'succeeded'
@@ -870,10 +793,10 @@ HAVING AVG(tr.accuracy) > (
 ORDER BY avg_accuracy DESC;
 ```
 
-### Step 8.2: Correlated Subquery
+### 步骤 8.2：相关子查询
 
 ```sql
--- Query 24: Models with their best training run
+-- 查询 24：模型及其最佳训练运行
 SELECT
     m.model_name,
     m.display_name,
@@ -891,14 +814,12 @@ SELECT
     ) AS version_count
 FROM models m
 ORDER BY best_accuracy DESC NULLS LAST;
-
--- Correlated: subquery references outer query (m.model_id)
 ```
 
-### Step 8.3: EXISTS and NOT EXISTS
+### 步骤 8.3：EXISTS 和 NOT EXISTS
 
 ```sql
--- Query 25: Models with at least one failed training run
+-- 查询 25：至少有一个失败训练运行的模型
 SELECT
     m.model_name,
     m.display_name,
@@ -913,7 +834,7 @@ WHERE EXISTS (
 )
 ORDER BY m.risk_level DESC, m.model_name;
 
--- Query 26: Models with NO successful deployments
+-- 查询 26：没有成功部署的模型
 SELECT
     m.model_name,
     m.display_name,
@@ -927,14 +848,12 @@ WHERE NOT EXISTS (
       AND d.status = 'active'
 )
 ORDER BY m.created_at;
-
--- EXISTS is more efficient than COUNT(*) > 0
 ```
 
-### Step 8.4: Subquery in FROM (Derived Table)
+### 步骤 8.4：FROM 中的子查询（派生表）
 
 ```sql
--- Query 27: Ranking models by multiple metrics
+-- 查询 27：按多项指标排名模型
 SELECT
     metrics.model_name,
     metrics.avg_accuracy,
@@ -947,7 +866,7 @@ FROM (
         m.model_name,
         AVG(tr.accuracy) AS avg_accuracy,
         COUNT(tr.run_id) AS total_runs,
-        SUM(tr.gpu_hours) * 2.5 AS total_cost  -- $2.50/GPU hour
+        SUM(tr.gpu_hours) * 2.5 AS total_cost  -- $2.50/GPU 小时
     FROM models m
     INNER JOIN model_versions mv ON m.model_id = mv.model_id
     INNER JOIN training_runs tr ON mv.version_id = tr.version_id
@@ -958,20 +877,20 @@ FROM (
 ORDER BY metrics.avg_accuracy DESC;
 ```
 
-✅ **Checkpoint**: You can use subqueries in WHERE, SELECT, FROM, and with EXISTS.
+✅ **检查点**：你可以在 WHERE、SELECT、FROM 以及使用 EXISTS 的子查询中使用子查询。
 
 ---
 
-## Part 9: LATERAL Joins (Advanced)
+## 第 9 部分：LATERAL 连接（高级）
 
-### Step 9.1: LATERAL with Function Call
+### 步骤 9.1：带函数调用的 LATERAL
 
 ```sql
 -- ==========================================
--- LATERAL JOINS
+-- LATERAL 连接
 -- ==========================================
 
--- Query 28: Top 3 training runs per model
+-- 查询 28：每个模型的前 3 次训练运行
 SELECT
     m.model_name,
     top_runs.run_name,
@@ -992,15 +911,12 @@ CROSS JOIN LATERAL (
     LIMIT 3
 ) AS top_runs
 ORDER BY m.model_name, top_runs.accuracy DESC;
-
--- LATERAL allows subquery to reference outer query
--- Similar to correlated subquery but returns multiple rows
 ```
 
-### Step 9.2: LATERAL for Latest Record Pattern
+### 步骤 9.2：用于最新记录模式的 LATERAL
 
 ```sql
--- Query 29: Models with their latest deployment (using LATERAL)
+-- 查询 29：模型及其最新部署（使用 LATERAL）
 SELECT
     m.model_name,
     m.display_name,
@@ -1024,40 +940,31 @@ CROSS JOIN LATERAL (
 ORDER BY m.model_name;
 ```
 
-✅ **Checkpoint**: You understand LATERAL joins for row-level subqueries.
+✅ **检查点**：你理解用于行级子查询的 LATERAL 连接。
 
 ---
 
-## Part 10: Performance Analysis with EXPLAIN
+## 第 10 部分：使用 EXPLAIN 进行性能分析
 
-### Step 10.1: Understanding EXPLAIN
+### 步骤 10.1：理解 EXPLAIN
 
 ```sql
 -- ==========================================
--- QUERY PERFORMANCE ANALYSIS
+-- 查询性能分析
 -- ==========================================
 
--- Query 30: Basic EXPLAIN
+-- 查询 30：基本 EXPLAIN
 EXPLAIN
 SELECT m.model_name, COUNT(mv.version_id)
 FROM models m
 LEFT JOIN model_versions mv ON m.model_id = mv.model_id
 GROUP BY m.model_id, m.model_name;
-
--- Output shows:
--- HashAggregate  (cost=X..Y rows=Z width=W)
---   Group Key: m.model_id, m.model_name
---   ->  Hash Left Join  (cost=X..Y rows=Z width=W)
---         Hash Cond: (mv.model_id = m.model_id)
---         ->  Seq Scan on model_versions mv  (cost=X..Y rows=Z width=W)
---         ->  Hash  (cost=X..Y rows=Z width=W)
---               ->  Seq Scan on models m  (cost=X..Y rows=Z width=W)
 ```
 
-### Step 10.2: EXPLAIN ANALYZE (Actual Execution)
+### 步骤 10.2：EXPLAIN ANALYZE（实际执行）
 
 ```sql
--- Query 31: EXPLAIN ANALYZE for actual runtime
+-- 查询 31：EXPLAIN ANALYZE 用于实际运行时间
 EXPLAIN ANALYZE
 SELECT
     m.model_name,
@@ -1069,63 +976,43 @@ INNER JOIN training_runs tr ON mv.version_id = tr.version_id
 WHERE tr.status = 'succeeded'
 GROUP BY m.model_id, m.model_name
 ORDER BY avg_accuracy DESC;
-
--- Output includes:
--- Actual time: X..Y ms
--- Rows: Z (actual) vs Z (estimated)
--- Loops: N
-
--- Look for:
--- - Seq Scan (table scan) - might need index
--- - Index Scan - using index
--- - Hash Join - good for large datasets
--- - Nested Loop - good for small datasets
--- - Sort - might be expensive
 ```
 
-### Step 10.3: Performance Comparison
+### 步骤 10.3：性能比较
 
 ```sql
--- Query 32: Compare indexed vs non-indexed query
+-- 查询 32：比较有索引和无索引的查询
 
--- Without index on training_runs.status
+-- 无 training_runs.status 索引
 EXPLAIN ANALYZE
 SELECT * FROM training_runs WHERE status = 'failed';
--- Shows: Seq Scan on training_runs
 
--- Create index
+-- 创建索引
 CREATE INDEX idx_training_runs_status_temp ON training_runs(status);
 
--- With index
+-- 有索引
 EXPLAIN ANALYZE
 SELECT * FROM training_runs WHERE status = 'failed';
--- Shows: Index Scan using idx_training_runs_status_temp
 
--- Check performance difference
+-- 检查性能差异
 \timing on
 SELECT COUNT(*) FROM training_runs WHERE status = 'failed';
--- Time: X ms (with index)
-
--- Drop temporary index
-DROP INDEX idx_training_runs_status_temp;
-
--- Time: Y ms (without index)
 ```
 
-✅ **Checkpoint**: You can use EXPLAIN ANALYZE to understand query performance.
+✅ **检查点**：你可以使用 EXPLAIN ANALYZE 理解查询性能。
 
 ---
 
-## Part 11: Materialized Views
+## 第 11 部分：物化视图
 
-### Step 11.1: Create Materialized View
+### 步骤 11.1：创建物化视图
 
 ```sql
 -- ==========================================
--- MATERIALIZED VIEWS
+-- 物化视图
 -- ==========================================
 
--- Query 33: Create materialized view for expensive query
+-- 查询 33：为昂贵查询创建物化视图
 CREATE MATERIALIZED VIEW mv_model_health_summary AS
 SELECT
     m.model_id,
@@ -1147,73 +1034,56 @@ LEFT JOIN training_runs tr ON mv.version_id = tr.version_id
 LEFT JOIN deployments d ON mv.version_id = d.version_id
 GROUP BY m.model_id, m.model_name, m.display_name, m.risk_level;
 
--- Create index on materialized view
+-- 在物化视图上创建索引
 CREATE INDEX idx_mv_model_health_model_name ON mv_model_health_summary(model_name);
 
--- Query the materialized view (fast!)
+-- 查询物化视图（快速！）
 SELECT * FROM mv_model_health_summary
 WHERE risk_level = 'critical'
 ORDER BY avg_accuracy DESC NULLS LAST;
 ```
 
-### Step 11.2: Refresh Materialized View
+### 步骤 11.2：刷新物化视图
 
 ```sql
--- Refresh materialized view (updates data)
+-- 刷新物化视图（更新数据）
 REFRESH MATERIALIZED VIEW mv_model_health_summary;
 
--- Refresh without blocking reads (PostgreSQL 9.4+)
+-- 不阻塞读取的刷新（PostgreSQL 9.4+）
 REFRESH MATERIALIZED VIEW CONCURRENTLY mv_model_health_summary;
-
--- Check when last refreshed
-SELECT
-    schemaname,
-    matviewname,
-    matviewowner,
-    ispopulated,
-    pg_size_pretty(pg_total_relation_size(schemaname||'.'||matviewname)) AS size
-FROM pg_matviews
-WHERE matviewname = 'mv_model_health_summary';
 ```
 
-### Step 11.3: Automatic Refresh Strategy
+### 步骤 11.3：自动刷新策略
 
 ```sql
--- Create function to refresh materialized views
+-- 创建刷新物化视图的函数
 CREATE OR REPLACE FUNCTION refresh_model_health_summary()
 RETURNS void AS $$
 BEGIN
     REFRESH MATERIALIZED VIEW CONCURRENTLY mv_model_health_summary;
 END;
 $$ LANGUAGE plpgsql;
-
--- Schedule with pg_cron (requires pg_cron extension)
--- SELECT cron.schedule('refresh-model-health', '0 */6 * * *', 'SELECT refresh_model_health_summary()');
--- Runs every 6 hours
-
--- Or call manually from application
--- SELECT refresh_model_health_summary();
 ```
 
-✅ **Checkpoint**: You can create materialized views to cache expensive queries.
+✅ **检查点**：你可以创建物化视图来缓存昂贵查询。
 
 ---
 
-## Part 12: Hands-On Challenges
+## 第 12 部分：动手挑战
 
-### Challenge 1: Executive Dashboard Query
+### 挑战 1：高管仪表盘查询
 
-Write a query that provides:
-- Model name
-- Total versions
-- Latest version
-- Production deployment status (Yes/No)
-- Average accuracy of all successful runs
-- Total GPU cost (hours * $2.50)
-- Health status (Healthy/Warning/Critical based on accuracy and deployment)
+编写一个提供以下信息的查询：
+- 模型名称
+- 总版本数
+- 最新版本
+- 生产部署状态（是/否）
+- 所有成功运行的平均准确率
+- GPU 总成本（小时数 × $2.50）
+- 健康状态（基于准确率/部署的正常/警告/严重）
 
 <details>
-<summary>Solution</summary>
+<summary>解决方案</summary>
 
 ```sql
 WITH latest_versions AS (
@@ -1240,9 +1110,9 @@ SELECT
     ROUND(AVG(tr.accuracy) FILTER (WHERE tr.status = 'succeeded')::numeric, 4) AS avg_accuracy,
     ROUND((SUM(tr.gpu_hours) * 2.50)::numeric, 2) AS total_cost_usd,
     CASE
-        WHEN AVG(tr.accuracy) FILTER (WHERE tr.status = 'succeeded') >= 0.90 AND ps.has_prod_deployment THEN 'Healthy'
-        WHEN AVG(tr.accuracy) FILTER (WHERE tr.status = 'succeeded') >= 0.80 THEN 'Warning'
-        ELSE 'Critical'
+        WHEN AVG(tr.accuracy) FILTER (WHERE tr.status = 'succeeded') >= 0.90 AND ps.has_prod_deployment THEN '健康'
+        WHEN AVG(tr.accuracy) FILTER (WHERE tr.status = 'succeeded') >= 0.80 THEN '警告'
+        ELSE '严重'
     END AS health_status
 FROM models m
 LEFT JOIN model_versions mv ON m.model_id = mv.model_id
@@ -1254,79 +1124,79 @@ ORDER BY health_status DESC, avg_accuracy DESC NULLS LAST;
 ```
 </details>
 
-### Challenge 2: Compliance Audit Report
+### 挑战 2：合规审计报告
 
-Write a query showing:
-- All production deployments
-- Associated approvals (approval type, approver, date)
-- Models missing required approvals
-- SLA compliance (deployment within 5 days of approval)
+编写一个显示以下信息的查询：
+- 所有生产部署
+- 关联的审批（审批类型、审批人、日期）
+- 缺少所需审批的模型
+- SLA 合规性（审批后 5 天内部署）
 
-### Challenge 3: Resource Optimization Query
+### 挑战 3：资源优化查询
 
-Identify:
-- Models with low utilization (< 5 runs in last 30 days)
-- Models with high cost but low accuracy (GPU hours > 50, accuracy < 0.80)
-- Recommended actions (deprecate, optimize, retrain)
-
----
-
-## Part 13: Summary and Deliverables
-
-### What You Learned
-
-✅ **JOIN Types**:
-- INNER JOIN (intersection)
-- LEFT/RIGHT JOIN (preserve one side)
-- FULL OUTER JOIN (union)
-- CROSS JOIN (cartesian product)
-- SELF JOIN (compare rows in same table)
-
-✅ **Window Functions**:
-- ROW_NUMBER, RANK, DENSE_RANK
-- LAG, LEAD (compare with previous/next)
-- Running totals with SUM OVER
-- Moving averages with window frames
-- NTILE for percentiles
-
-✅ **Advanced Patterns**:
-- CTEs for readable multi-step queries
-- Subqueries (correlated and non-correlated)
-- EXISTS for efficient existence checks
-- LATERAL joins for row-level subqueries
-
-✅ **Performance**:
-- EXPLAIN and EXPLAIN ANALYZE
-- Index usage analysis
-- Materialized views for caching
-
-### Deliverables Checklist
-
-- [ ] `sql/30_advanced_queries.sql` - All example queries
-- [ ] At least 3 complex analytical queries for dashboards
-- [ ] EXPLAIN ANALYZE output for 3+ queries
-- [ ] 1 materialized view created
-- [ ] Documentation of performance findings
-- [ ] Reflection written (300-500 words)
-
-### Reflection Questions
-
-1. **Complexity**: Which join type was most challenging and why?
-2. **Window Functions**: How do they simplify problems vs subqueries?
-3. **Performance**: What was your biggest performance insight?
-4. **Production**: How would you monitor these queries in production?
-5. **Testing**: How would you test these queries in CI/CD?
+识别：
+- 利用率低的模型（过去 30 天内运行次数 < 5）
+- 高成本低准确率的模型（GPU 小时 > 50，准确率 < 0.80）
+- 推荐操作（弃用、优化、重新训练）
 
 ---
 
-## Next Steps
+## 第 13 部分：总结与交付物
 
-- **Exercise 04**: SQLAlchemy ORM Integration - Connect Python applications to this schema
-- **Exercise 05**: Optimization & Indexing - Deep dive into query performance
+### 学到的内容
+
+✅ **JOIN 类型**：
+- INNER JOIN（交集）
+- LEFT/RIGHT JOIN（保留一侧）
+- FULL OUTER JOIN（并集）
+- CROSS JOIN（笛卡尔积）
+- SELF JOIN（比较同一表中的行）
+
+✅ **窗口函数**：
+- ROW_NUMBER、RANK、DENSE_RANK
+- LAG、LEAD（与前后行比较）
+- 使用 SUM OVER 的运行总计
+- 使用窗口帧的移动平均
+- NTILE 用于百分位数
+
+✅ **高级模式**：
+- 用于可读多步骤查询的 CTE
+- 子查询（相关和非相关）
+- 用于高效存在性检查的 EXISTS
+- 用于行级子查询的 LATERAL 连接
+
+✅ **性能**：
+- EXPLAIN 和 EXPLAIN ANALYZE
+- 索引使用分析
+- 用于缓存的物化视图
+
+### 交付物清单
+
+- [ ] `sql/30_advanced_queries.sql` - 所有示例查询
+- [ ] 至少 3 个用于仪表盘的复杂分析查询
+- [ ] 3 个以上查询的 EXPLAIN ANALYZE 输出
+- [ ] 已创建 1 个物化视图
+- [ ] 性能发现文档
+- [ ] 反思总结（300-500 字）
+
+### 反思问题
+
+1. **复杂性**：哪种连接类型最具挑战性，为什么？
+2. **窗口函数**：与子查询相比，它们如何简化问题？
+3. **性能**：你最大的性能洞察是什么？
+4. **生产环境**：你如何在生产中监控这些查询？
+5. **测试**：你如何在 CI/CD 中测试这些查询？
 
 ---
 
-## Additional Resources
+## 后续步骤
+
+- **练习 04**：SQLAlchemy ORM 集成 - 将 Python 应用程序连接到该 schema
+- **练习 05**：优化与索引 - 深入查询性能
+
+---
+
+## 额外资源
 
 - [PostgreSQL Window Functions](https://www.postgresql.org/docs/current/tutorial-window.html)
 - [Understanding EXPLAIN](https://www.postgresql.org/docs/current/using-explain.html)
@@ -1335,12 +1205,12 @@ Identify:
 
 ---
 
-**Exercise Complete!** 🎉
+**练习完成！** 🎉
 
-You've mastered advanced SQL joins and analytical queries. You can now write complex production queries for ML infrastructure dashboards and reports.
+你已经掌握了高级 SQL 连接和分析查询。现在可以为 ML 基础设施仪表盘和报告编写复杂的生产级查询。
 
-**Estimated Time**: 3-4 hours
-**Difficulty**: Intermediate → Advanced
-**Lines of Code**: ~200 SQL queries
-**Learning Objectives**: ✅ All achieved
-**Ready for**: Exercise 04 - SQLAlchemy ORM Integration
+**预计时间**：3-4 小时
+**难度**：中级 → 高级
+**代码行数**：约 200 个 SQL 查询
+**学习目标**：✅ 全部达成
+**进阶准备**：练习 04 - SQLAlchemy ORM 集成

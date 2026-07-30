@@ -1,97 +1,97 @@
-# Exercise 05: GPU Basics - Accelerating ML Inference
+# 练习 05：GPU 基础 - 加速 ML 推理
 
-**Difficulty**: Beginner-Intermediate
-**Duration**: 2-3 hours
-**Prerequisites**: Python fundamentals, Exercise 01-04 completed
+**难度**: 初级-中级
+**时长**: 2-3 小时
+**前置要求**: Python 基础，已完成练习 01-04
 
-**Note**: This exercise can be completed without a physical GPU using cloud resources or CPU-only mode for learning concepts.
+**注意**：本练习可以在没有物理 GPU 的情况下使用云资源或仅 CPU 模式完成，以学习概念。
 
-## Learning Objectives
+## 学习目标
 
-By the end of this exercise, you will:
+到本练习结束时，你将：
 
-1. Understand why GPUs accelerate ML workloads
-2. Check for GPU availability and capabilities
-3. Move models and data between CPU and GPU
-4. Compare CPU vs GPU inference performance
-5. Understand GPU memory management basics
-6. Troubleshoot common GPU-related issues
+1. 理解为什么 GPU 能加速 ML 工作负载
+2. 检查 GPU 可用性和能力
+3. 在 CPU 和 GPU 之间移动模型和数据
+4. 比较 CPU vs GPU 推理性能
+5. 理解 GPU 内存管理基础
+6. 排查常见的 GPU 相关问题
 
-## What You'll Build
+## 你将构建什么
 
-A performance comparison tool that:
-- Detects available hardware (CPU/GPU)
-- Runs the same model on both CPU and GPU
-- Measures and compares performance
-- Generates a performance report
+一个性能比较工具：
+- 检测可用硬件（CPU/GPU）
+- 在 CPU 和 GPU 上运行同一模型
+- 测量和比较性能
+- 生成性能报告
 
-## Background: Why GPUs for ML?
+## 背景：为什么 ML 使用 GPU？
 
-### CPU vs GPU Architecture
+### CPU vs GPU 架构
 
-**CPU (Central Processing Unit)**:
-- Few cores (4-64 typically)
-- High clock speed
-- Complex instruction sets
-- Good for sequential tasks
+**CPU（中央处理器）**：
+- 核心少（通常 4-64 个）
+- 高时钟速度
+- 复杂指令集
+- 适合顺序任务
 
-**GPU (Graphics Processing Unit)**:
-- Thousands of cores (2000-10000+)
-- Lower clock speed per core
-- Optimized for parallel operations
-- Excellent for matrix math (ML's foundation)
+**GPU（图形处理器）**：
+- 数千个核心（2000-10000+ 个）
+- 每个核心较低的时钟速度
+- 针对并行操作优化
+- 非常适合矩阵运算（ML 的基础）
 
-### Why ML Benefits from GPUs
+### 为什么 ML 受益于 GPU
 
-Machine learning is fundamentally about matrix multiplications:
+机器学习本质上是矩阵乘法：
 
 ```
-Input (1000 values) × Weights (1000×1000 matrix) = Output (1000 values)
+输入（1000 个值）× 权重（1000×1000 矩阵）= 输出（1000 个值）
 ```
 
-**On CPU**: Multiply row by column sequentially
-**On GPU**: Multiply thousands of elements simultaneously
+**在 CPU 上**：逐行乘以列，顺序执行
+**在 GPU 上**：同时执行数千个元素的乘法
 
-**Speedup Example**:
-- Training ResNet-50: CPU ~2 weeks, GPU ~1 day
-- LLM inference: CPU ~1 token/s, GPU ~50 tokens/s
+**加速示例**：
+- 训练 ResNet-50：CPU ~2 周，GPU ~1 天
+- LLM 推理：CPU ~1 token/s，GPU ~50 tokens/s
 
-## Part 1: GPU Detection and Setup
+## 第 1 部分：GPU 检测和设置
 
-### Step 1: Install CUDA-Enabled PyTorch
+### 步骤 1：安装支持 CUDA 的 PyTorch
 
-First, check if you have NVIDIA GPU:
+首先，检查是否有 NVIDIA GPU：
 
 ```bash
 # Linux/Mac
 nvidia-smi
 
-# If command not found, you don't have NVIDIA GPU or drivers
+# 如果命令未找到，则没有 NVIDIA GPU 或驱动
 ```
 
-**If you have NVIDIA GPU**:
+**如果有 NVIDIA GPU**：
 
 ```bash
-# Install PyTorch with CUDA support
+# 安装支持 CUDA 的 PyTorch
 pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 ```
 
-**If you DON'T have GPU** (we can still learn concepts):
+**如果没有 GPU**（我们仍然可以学习概念）：
 
 ```bash
-# Install CPU-only PyTorch
+# 安装仅 CPU 的 PyTorch
 pip3 install torch torchvision
 ```
 
-Install other dependencies:
+安装其他依赖：
 
 ```bash
 pip install transformers psutil
 ```
 
-### Step 2: Check GPU Availability
+### 步骤 2：检查 GPU 可用性
 
-Create `check_gpu.py`:
+创建 `check_gpu.py`：
 
 ```python
 import torch
@@ -101,12 +101,12 @@ print("=" * 60)
 print("GPU Detection and Information")
 print("=" * 60)
 
-# Check CUDA availability
+# 检查 CUDA 可用性
 cuda_available = torch.cuda.is_available()
 print(f"\nCUDA Available: {cuda_available}")
 
 if cuda_available:
-    # GPU information
+    # GPU 信息
     gpu_count = torch.cuda.device_count()
     print(f"Number of GPUs: {gpu_count}")
 
@@ -115,17 +115,17 @@ if cuda_available:
         print(f"Name: {torch.cuda.get_device_name(i)}")
         print(f"Compute Capability: {torch.cuda.get_device_capability(i)}")
 
-        # Memory information
+        # 内存信息
         total_memory = torch.cuda.get_device_properties(i).total_memory
         print(f"Total Memory: {total_memory / 1024**3:.2f} GB")
 
-        # Current memory usage
+        # 当前内存使用
         allocated = torch.cuda.memory_allocated(i) / 1024**3
         reserved = torch.cuda.memory_reserved(i) / 1024**3
         print(f"Currently Allocated: {allocated:.2f} GB")
         print(f"Currently Reserved: {reserved:.2f} GB")
 
-    # CUDA version
+    # CUDA 版本
     print(f"\nCUDA Version: {torch.version.cuda}")
     print(f"cuDNN Version: {torch.backends.cudnn.version()}")
     print(f"cuDNN Enabled: {torch.backends.cudnn.enabled}")
@@ -139,14 +139,14 @@ else:
     print("3. Install CUDA toolkit")
     print("4. Install PyTorch with CUDA support")
 
-# PyTorch configuration
+# PyTorch 配置
 print("\n" + "=" * 60)
 print("PyTorch Configuration")
 print("=" * 60)
 print(f"PyTorch Version: {torch.__version__}")
 print(f"Python Version: {sys.version.split()[0]}")
 
-# Test tensor creation on different devices
+# 在不同设备上测试 tensor 创建
 print("\n" + "=" * 60)
 print("Device Testing")
 print("=" * 60)
@@ -156,7 +156,7 @@ cpu_tensor = torch.randn(1000, 1000)
 print(f"✓ CPU tensor created: {cpu_tensor.shape}")
 print(f"  Device: {cpu_tensor.device}")
 
-# GPU tensor (if available)
+# GPU tensor（如果可用）
 if cuda_available:
     gpu_tensor = torch.randn(1000, 1000, device='cuda')
     print(f"✓ GPU tensor created: {gpu_tensor.shape}")
@@ -165,13 +165,13 @@ else:
     print("⚠ GPU tensors not available (CPU only mode)")
 ```
 
-Run it:
+运行它：
 
 ```bash
 python check_gpu.py
 ```
 
-**Example output with GPU**:
+**有 GPU 的示例输出**：
 ```
 ============================================================
 GPU Detection and Information
@@ -206,11 +206,11 @@ Device Testing
   Device: cuda:0
 ```
 
-## Part 2: Moving Data Between CPU and GPU
+## 第 2 部分：在 CPU 和 GPU 之间移动数据
 
-### Step 3: Device Management Basics
+### 步骤 3：设备管理基础
 
-Create `device_management.py`:
+创建 `device_management.py`：
 
 ```python
 import torch
@@ -219,11 +219,11 @@ import time
 print("Device Management Basics")
 print("=" * 60)
 
-# Determine device
+# 确定设备
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}\n")
 
-# Create tensor on CPU
+# 在 CPU 上创建 tensor
 print("1. Creating tensor on CPU")
 cpu_tensor = torch.randn(1000, 1000)
 print(f"   Shape: {cpu_tensor.shape}")
@@ -247,14 +247,14 @@ if torch.cuda.is_available():
     print(f"   Device: {cpu_tensor_back.device}")
     print(f"   Transfer time: {transfer_time*1000:.2f} ms")
 
-    # Check memory usage
+    # 检查内存使用
     print("\n4. GPU Memory Usage")
     allocated = torch.cuda.memory_allocated() / 1024**2
     reserved = torch.cuda.memory_reserved() / 1024**2
     print(f"   Allocated: {allocated:.2f} MB")
     print(f"   Reserved: {reserved:.2f} MB")
 
-    # Clean up GPU memory
+    # 清理 GPU 内存
     print("\n5. Cleaning up GPU memory")
     del gpu_tensor
     torch.cuda.empty_cache()
@@ -274,45 +274,45 @@ print("3. Move output back to CPU if needed for further processing")
 print("4. Clean up GPU memory when done with large tensors")
 ```
 
-## Part 3: CPU vs GPU Performance Comparison
+## 第 3 部分：CPU vs GPU 性能对比
 
-### Step 4: Benchmark Matrix Operations
+### 步骤 4：矩阵运算基准测试
 
-Create `benchmark_operations.py`:
+创建 `benchmark_operations.py`：
 
 ```python
 import torch
 import time
 
 def benchmark_matmul(size, device, iterations=100):
-    """Benchmark matrix multiplication on device"""
-    # Create random matrices
+    """在指定设备上对矩阵乘法进行基准测试"""
+    # 创建随机矩阵
     a = torch.randn(size, size, device=device)
     b = torch.randn(size, size, device=device)
 
-    # Warmup (important for GPU!)
+    # 预热（GPU 很重要！）
     for _ in range(10):
         _ = torch.matmul(a, b)
 
-    # Synchronize GPU before timing
+    # 在计时前同步 GPU
     if device.type == 'cuda':
         torch.cuda.synchronize()
 
-    # Benchmark
+    # 基准测试
     start = time.time()
     for _ in range(iterations):
         c = torch.matmul(a, b)
 
-    # Synchronize again (GPU operations are async)
+    # 再次同步（GPU 操作是异步的）
     if device.type == 'cuda':
         torch.cuda.synchronize()
 
     elapsed = time.time() - start
     avg_time = elapsed / iterations
 
-    return avg_time * 1000  # Convert to milliseconds
+    return avg_time * 1000  # 转换为毫秒
 
-# Run benchmarks
+# 运行基准测试
 print("=" * 60)
 print("Matrix Multiplication Benchmark")
 print("=" * 60)
@@ -322,11 +322,11 @@ sizes = [100, 500, 1000, 2000]
 for size in sizes:
     print(f"\nMatrix size: {size}x{size}")
 
-    # CPU benchmark
+    # CPU 基准测试
     cpu_time = benchmark_matmul(size, torch.device('cpu'))
     print(f"  CPU: {cpu_time:.2f} ms")
 
-    # GPU benchmark (if available)
+    # GPU 基准测试（如果可用）
     if torch.cuda.is_available():
         gpu_time = benchmark_matmul(size, torch.device('cuda'))
         speedup = cpu_time / gpu_time
@@ -335,7 +335,7 @@ for size in sizes:
     else:
         print("  GPU: Not available")
 
-# Summary
+# 总结
 print("\n" + "=" * 60)
 print("Key Observations:")
 print("=" * 60)
@@ -344,7 +344,7 @@ print("2. GPU advantage grows with matrix size")
 print("3. For ML, most operations are large enough to benefit from GPU")
 ```
 
-**Expected output**:
+**预期输出**：
 ```
 Matrix Multiplication Benchmark
 ============================================================
@@ -352,7 +352,7 @@ Matrix Multiplication Benchmark
 Matrix size: 100x100
   CPU: 0.12 ms
   GPU: 0.25 ms
-  Speedup: 0.5x faster  ← GPU slower for tiny matrices!
+  Speedup: 0.5x faster  ← GPU 对小矩阵更慢！
 
 Matrix size: 500x500
   CPU: 8.45 ms
@@ -367,12 +367,12 @@ Matrix size: 1000x1000
 Matrix size: 2000x2000
   CPU: 421.56 ms
   GPU: 5.34 ms
-  Speedup: 78.9x faster  ← Massive speedup!
+  Speedup: 78.9x faster  ← 巨大加速！
 ```
 
-### Step 5: Model Inference Comparison
+### 步骤 5：模型推理对比
 
-Create `inference_benchmark.py`:
+创建 `inference_benchmark.py`：
 
 ```python
 import torch
@@ -381,20 +381,20 @@ import time
 import psutil
 
 def get_memory_usage():
-    """Get current process memory in MB"""
+    """获取当前进程内存（MB）"""
     process = psutil.Process()
     return process.memory_info().rss / 1024 / 1024
 
 def benchmark_model(model_name, device, num_runs=10):
-    """Benchmark model inference on specified device"""
+    """在指定设备上对模型推理进行基准测试"""
     print(f"\n{'=' * 60}")
     print(f"Testing on {device}")
     print(f"{'=' * 60}")
 
-    # Memory before loading
+    # 加载前内存
     mem_before = get_memory_usage()
 
-    # Load model and tokenizer
+    # 加载模型和 tokenizer
     print("Loading model...")
     start = time.time()
 
@@ -404,35 +404,35 @@ def benchmark_model(model_name, device, num_runs=10):
 
     load_time = time.time() - start
 
-    # Memory after loading
+    # 加载后内存
     mem_after = get_memory_usage()
     model_memory = mem_after - mem_before
 
     print(f"✓ Model loaded in {load_time:.2f}s")
     print(f"  Memory usage: {model_memory:.2f} MB")
 
-    # GPU memory if applicable
+    # GPU 内存（如适用）
     if device.type == 'cuda':
         gpu_memory = torch.cuda.memory_allocated() / 1024 / 1024
         print(f"  GPU memory: {gpu_memory:.2f} MB")
 
-    # Prepare input
+    # 准备输入
     prompt = "Machine learning infrastructure requires"
     inputs = tokenizer(prompt, return_tensors="pt")
     inputs = {k: v.to(device) for k, v in inputs.items()}
 
-    # Warmup
+    # 预热
     print("Warming up...")
     with torch.no_grad():
         for _ in range(3):
             _ = model.generate(**inputs, max_length=50)
 
-    # Benchmark
+    # 基准测试
     print(f"Running {num_runs} inference iterations...")
     inference_times = []
 
     for i in range(num_runs):
-        # Synchronize if GPU
+        # 如果是 GPU，同步
         if device.type == 'cuda':
             torch.cuda.synchronize()
 
@@ -441,18 +441,18 @@ def benchmark_model(model_name, device, num_runs=10):
         with torch.no_grad():
             outputs = model.generate(**inputs, max_length=50)
 
-        # Synchronize if GPU
+        # 如果是 GPU，同步
         if device.type == 'cuda':
             torch.cuda.synchronize()
 
         elapsed = time.time() - start
         inference_times.append(elapsed)
 
-        if i == 0:  # Show first output
+        if i == 0:  # 显示第一个输出
             generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
             print(f"\nSample output:\n{generated_text}\n")
 
-    # Statistics
+    # 统计
     avg_time = sum(inference_times) / len(inference_times)
     min_time = min(inference_times)
     max_time = max(inference_times)
@@ -463,7 +463,7 @@ def benchmark_model(model_name, device, num_runs=10):
     print(f"  Max: {max_time:.3f}s")
     print(f"  Tokens/second: ~{50/avg_time:.1f}")
 
-    # Cleanup
+    # 清理
     del model
     if device.type == 'cuda':
         torch.cuda.empty_cache()
@@ -476,8 +476,8 @@ def benchmark_model(model_name, device, num_runs=10):
         'tokens_per_sec': 50/avg_time
     }
 
-# Main benchmark
-model_name = "gpt2"  # Small model for testing
+# 主要基准测试
+model_name = "gpt2"  # 用于测试的小模型
 
 print("=" * 60)
 print(f"Model Inference Benchmark: {model_name}")
@@ -485,16 +485,16 @@ print("=" * 60)
 
 results = []
 
-# CPU benchmark
+# CPU 基准测试
 cpu_result = benchmark_model(model_name, torch.device('cpu'))
 results.append(cpu_result)
 
-# GPU benchmark (if available)
+# GPU 基准测试（如果可用）
 if torch.cuda.is_available():
     gpu_result = benchmark_model(model_name, torch.device('cuda'))
     results.append(gpu_result)
 
-    # Comparison
+    # 比较
     print(f"\n{'=' * 60}")
     print("Comparison Summary")
     print(f"{'=' * 60}")
@@ -512,11 +512,11 @@ else:
     print("\n⚠ No GPU available for comparison")
 ```
 
-## Part 4: GPU Memory Management
+## 第 4 部分：GPU 内存管理
 
-### Step 6: Understanding GPU Memory
+### 步骤 6：理解 GPU 内存
 
-Create `gpu_memory_management.py`:
+创建 `gpu_memory_management.py`：
 
 ```python
 import torch
@@ -526,7 +526,7 @@ if not torch.cuda.is_available():
     exit(0)
 
 def print_gpu_memory(label=""):
-    """Print current GPU memory usage"""
+    """打印当前 GPU 内存使用"""
     allocated = torch.cuda.memory_allocated() / 1024**2
     reserved = torch.cuda.memory_reserved() / 1024**2
     total = torch.cuda.get_device_properties(0).total_memory / 1024**2
@@ -541,36 +541,36 @@ def print_gpu_memory(label=""):
 print("GPU Memory Management")
 print("=" * 60)
 
-# Initial state
+# 初始状态
 print_gpu_memory("Initial state:")
 
-# Allocate tensor
+# 分配 tensor
 print("\nAllocating 1000x1000 tensor...")
 tensor1 = torch.randn(1000, 1000, device='cuda')
 print_gpu_memory("After allocation:")
 
-# Allocate more
+# 分配更多
 print("\nAllocating another 2000x2000 tensor...")
 tensor2 = torch.randn(2000, 2000, device='cuda')
 print_gpu_memory("After second allocation:")
 
-# Delete tensor
+# 删除 tensor
 print("\nDeleting first tensor...")
 del tensor1
 print_gpu_memory("After deletion (memory still reserved):")
 
-# Empty cache
+# 清空缓存
 print("\nEmptying cache...")
 torch.cuda.empty_cache()
 print_gpu_memory("After emptying cache:")
 
-# Out of memory example (be careful!)
+# 内存不足示例（小心！）
 print("\n" + "=" * 60)
 print("Handling Out of Memory")
 print("=" * 60)
 
 try:
-    # Try to allocate huge tensor
+    # 尝试分配巨大的 tensor
     print("\nTrying to allocate massive tensor...")
     huge_tensor = torch.randn(50000, 50000, device='cuda')
 except RuntimeError as e:
@@ -583,17 +583,17 @@ except RuntimeError as e:
     print("  - Use model parallelism")
     print("  - Use mixed precision (FP16)")
 
-# Cleanup
+# 清理
 del tensor2
 torch.cuda.empty_cache()
 print_gpu_memory("\nAfter cleanup:")
 ```
 
-## Part 5: Building a Device-Agnostic API
+## 第 5 部分：构建设备无关的 API
 
-### Step 7: Smart Device Selection
+### 步骤 7：智能设备选择
 
-Create `smart_device_api.py`:
+创建 `smart_device_api.py`：
 
 ```python
 from flask import Flask, request, jsonify
@@ -603,7 +603,7 @@ import time
 
 app = Flask(__name__)
 
-# Smart device selection
+# 智能设备选择
 device = 0 if torch.cuda.is_available() else -1  # 0 = GPU, -1 = CPU
 device_name = "GPU" if device == 0 else "CPU"
 
@@ -613,7 +613,7 @@ print(f"✓ Model ready on {device_name}!")
 
 @app.route('/info', methods=['GET'])
 def info():
-    """Get system information"""
+    """获取系统信息"""
     info_data = {
         "device": device_name,
         "cuda_available": torch.cuda.is_available(),
@@ -631,14 +631,14 @@ def info():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    """Generate text with performance metrics"""
+    """生成文本并附带性能指标"""
     data = request.get_json()
     prompt = data.get('prompt', '')
 
     if not prompt:
         return jsonify({"error": "Prompt required"}), 400
 
-    # Measure inference time
+    # 测量推理时间
     start = time.time()
 
     result = generator(
@@ -650,7 +650,7 @@ def generate():
 
     inference_time = time.time() - start
 
-    # Calculate tokens/second (approximate)
+    # 计算 tokens/秒（近似值）
     tokens_generated = len(result[0]['generated_text'].split())
     tokens_per_sec = tokens_generated / inference_time
 
@@ -671,12 +671,12 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
 ```
 
-Test it:
+测试它：
 
 ```bash
 python smart_device_api.py
 
-# In another terminal:
+# 在另一个终端：
 curl http://localhost:5000/info
 
 curl -X POST http://localhost:5000/generate \
@@ -684,103 +684,103 @@ curl -X POST http://localhost:5000/generate \
   -d '{"prompt": "GPUs accelerate machine learning by", "max_length": 60}'
 ```
 
-## Challenges
+## 挑战
 
-### Challenge 1: Mixed Precision Training
+### 挑战 1：混合精度训练
 
-Research and implement FP16 (half precision) inference. Compare performance and memory usage to FP32.
+研究并实现 FP16（半精度）推理。将性能和内存使用与 FP32 进行比较。
 
-### Challenge 2: Batch Processing
+### 挑战 2：批处理
 
-Modify the API to:
-- Accept multiple prompts in one request
-- Process them as a batch on GPU
-- Compare batched vs individual inference performance
+修改 API：
+- 在单个请求中接受多个 prompts
+- 在 GPU 上作为批次处理
+- 比较批处理与单独推理的性能
 
-### Challenge 3: GPU Utilization Monitoring
+### 挑战 3：GPU 利用率监控
 
-Add real-time GPU utilization tracking:
-- Use `nvidia-smi` or `py3nvml` library
-- Log GPU temperature, utilization %
-- Alert if utilization drops below threshold
+添加实时 GPU 利用率跟踪：
+- 使用 `nvidia-smi` 或 `py3nvml` 库
+- 记录 GPU 温度、利用率百分比
+- 如果利用率低于阈值则告警
 
-### Challenge 4: Multi-GPU Support
+### 挑战 4：多 GPU 支持
 
-If you have access to multi-GPU system:
-- Implement model parallelism
-- Or data parallelism
-- Compare performance
+如果你有多 GPU 系统：
+- 实现模型并行
+- 或数据并行
+- 比较性能
 
-## Key Takeaways
+## 关键要点
 
-1. **GPUs massively accelerate ML**: 10-100x speedup common
-2. **Not all operations benefit equally**: Small operations have overhead
-3. **Memory is limited**: GPU memory is precious, manage carefully
-4. **Device placement matters**: Keep model and data on same device
-5. **Synchronization is critical**: GPU operations are async
-6. **Warmup is important**: First run is always slower
-7. **Batch size affects utilization**: Larger batches use GPU better
+1. **GPU 大幅加速 ML**：通常实现 10-100 倍加速
+2. **并非所有操作都同等受益**：小操作有开销
+3. **内存有限**：GPU 内存很宝贵，需谨慎管理
+4. **设备放置很重要**：保持模型和数据在同一设备上
+5. **同步至关重要**：GPU 操作是异步的
+6. **预热很重要**：首次运行总是较慢
+7. **批大小影响利用率**：更大的批次更好地利用 GPU
 
-## Infrastructure Considerations
+## 基础设施注意事项
 
-### When to Use GPU vs CPU
+### 何时使用 GPU vs CPU
 
-**Use GPU for**:
-- Training (almost always)
-- Real-time inference with latency requirements
-- High-throughput inference
-- Large batch processing
-- Large models (> 100M parameters)
+**对以下情况使用 GPU**：
+- 训练（几乎总是）
+- 有延迟要求的实时推理
+- 高吞吐量推理
+- 大批量处理
+- 大模型（> 1 亿参数）
 
-**CPU is fine for**:
-- Small models
-- Low request volume
-- Cost-sensitive deployments
-- Development/testing
-- Batch inference where latency doesn't matter
+**CPU 适用于**：
+- 小模型
+- 低请求量
+- 成本敏感型部署
+- 开发/测试
+- 延迟无关的批量推理
 
-### GPU Cost Optimization
+### GPU 成本优化
 
-Cloud GPU pricing (approximate):
-- **T4** (16GB): $0.35/hour
-- **A10G** (24GB): $1.00/hour
-- **A100** (40GB): $3.00-4.00/hour
+云 GPU 定价（近似值）：
+- **T4**（16GB）：$0.35/小时
+- **A10G**（24GB）：$1.00/小时
+- **A100**（40GB）：$3.00-4.00/小时
 
-**Optimization strategies**:
-1. Use spot instances for training (60-90% discount)
-2. Batch requests for inference
-3. Use smaller/quantized models
-4. Auto-scale based on demand
-5. Use CPU for dev/test, GPU for production
+**优化策略**：
+1. 使用 spot 实例进行训练（60-90% 折扣）
+2. 批量处理推理请求
+3. 使用更小/量化模型
+4. 根据需求自动扩展
+5. 开发/测试用 CPU，生产用 GPU
 
-## Next Steps
+## 下一步
 
-1. **Learn GPU optimization**:
-   - Model quantization (INT8, INT4)
+1. **学习 GPU 优化**：
+   - 模型量化（INT8, INT4）
    - Flash Attention
    - Kernel fusion
 
-2. **Explore distributed training**:
+2. **探索分布式训练**：
    - DataParallel
    - DistributedDataParallel
    - DeepSpeed, FSDP
 
-3. **Study inference optimization**:
+3. **研究推理优化**：
    - TensorRT
    - ONNX Runtime
    - vLLM, TGI
 
-4. **Monitor production GPUs**:
+4. **监控生产 GPU**：
    - NVML/nvidia-smi
-   - DCGM (Data Center GPU Manager)
-   - Grafana dashboards
+   - DCGM（Data Center GPU Manager）
+   - Grafana 仪表板
 
-## Resources
+## 资源
 
-- [PyTorch CUDA Semantics](https://pytorch.org/docs/stable/notes/cuda.html)
-- [NVIDIA Developer Resources](https://developer.nvidia.com/)
-- [GPU Performance Guide](https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html)
+- [PyTorch CUDA 语义](https://pytorch.org/docs/stable/notes/cuda.html)
+- [NVIDIA 开发者资源](https://developer.nvidia.com/)
+- [GPU 性能指南](https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html)
 
 ---
 
-**Congratulations!** You now understand GPU fundamentals for ML infrastructure. You can make informed decisions about when and how to use GPUs in production systems.
+**恭喜！** 你现在理解了 ML 基础设施的 GPU 基础知识。你能就何时以及如何在生产系统中使用 GPU 做出明智的决策。

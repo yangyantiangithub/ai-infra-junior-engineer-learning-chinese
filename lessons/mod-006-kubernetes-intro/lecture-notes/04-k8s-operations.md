@@ -1,65 +1,65 @@
-# Lecture 04: Kubernetes Operations
+# Lecture 04: Kubernetes 运维
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [kubectl Essentials](#kubectl-essentials)
-3. [Debugging Pods and Deployments](#debugging-pods-and-deployments)
-4. [Logs and Events](#logs-and-events)
-5. [Executing Commands in Containers](#executing-commands-in-containers)
-6. [Resource Monitoring](#resource-monitoring)
-7. [Troubleshooting Common Issues](#troubleshooting-common-issues)
-8. [kubectl Productivity Tips](#kubectl-productivity-tips)
-9. [Cluster Maintenance](#cluster-maintenance)
-10. [Security Operations](#security-operations)
-11. [Summary and Key Takeaways](#summary-and-key-takeaways)
+## 目录
+1. [引言](#引言)
+2. [kubectl 基础](#kubectl-基础)
+3. [调试 Pod 和 Deployment](#调试-pod-和-deployment)
+4. [日志和事件](#日志和事件)
+5. [在容器中执行命令](#在容器中执行命令)
+6. [资源监控](#资源监控)
+7. [常见问题排查](#常见问题排查)
+8. [kubectl 效率技巧](#kubectl-效率技巧)
+9. [集群维护](#集群维护)
+10. [安全运维](#安全运维)
+11. [总结和关键要点](#总结和关键要点)
 
-## Introduction
+## 引言
 
-Understanding Kubernetes architecture and how to deploy applications is essential, but day-to-day operations require a different set of skills. This lecture covers the practical operations tasks you'll perform regularly as an AI infrastructure engineer: debugging failing Pods, viewing logs, monitoring resources, and troubleshooting issues.
+理解 Kubernetes 架构和如何部署应用至关重要，但日常运维需要一套不同的技能。本讲座涵盖了你作为 AI 基础设施工程师将定期执行的实际运维任务：调试失败的 Pod、查看日志、监控资源和排查问题。
 
-### Learning Objectives
+### 学习目标
 
-By the end of this lecture, you will:
-- Master essential kubectl commands for daily operations
-- Debug failing Pods and Deployments effectively
-- View and analyze logs and events
-- Execute commands in running containers
-- Monitor resource usage across the cluster
-- Troubleshoot common Kubernetes issues
-- Use kubectl efficiently with aliases and shortcuts
-- Perform basic cluster maintenance tasks
-- Apply security best practices in operations
+完成本讲座后，你将：
+- 掌握日常运维的基本 kubectl 命令
+- 有效调试失败的 Pod 和 Deployment
+- 查看和分析日志与事件
+- 在运行中的容器内执行命令
+- 监控跨集群的资源使用情况
+- 排查常见的 Kubernetes 问题
+- 使用别名和快捷键高效使用 kubectl
+- 执行基本的集群维护任务
+- 在运维中应用安全最佳实践
 
-### Prerequisites
-- Lecture 01-03 (Architecture, Deployments, Helm)
-- kubectl installed and configured
-- Access to a Kubernetes cluster
-- Basic Linux command-line skills
+### 前置要求
+- Lecture 01-03（架构、部署、Helm）
+- kubectl 已安装和配置
+- 可访问 Kubernetes 集群
+- 基本的 Linux 命令行能力
 
-## kubectl Essentials
+## kubectl 基础
 
-### kubectl Context and Configuration
+### kubectl 上下文和配置
 
-kubectl uses kubeconfig files to connect to clusters.
+kubectl 使用 kubeconfig 文件连接到集群。
 
 ```bash
-# View current context
+# 查看当前上下文
 kubectl config current-context
 
-# List all contexts
+# 列出所有上下文
 kubectl config get-contexts
 
-# Switch context
+# 切换上下文
 kubectl config use-context production-cluster
 
-# View kubeconfig
+# 查看 kubeconfig
 kubectl config view
 
-# Set default namespace
+# 设置默认 namespace
 kubectl config set-context --current --namespace=production
 ```
 
-**Kubeconfig Structure**:
+**Kubeconfig 结构**：
 ```yaml
 # ~/.kube/config
 apiVersion: v1
@@ -83,106 +83,106 @@ users:
     client-key-data: <base64-key>
 ```
 
-### Basic kubectl Commands
+### 基本 kubectl 命令
 
-**Get Resources**:
+**获取资源**：
 ```bash
-# List resources
+# 列出资源
 kubectl get pods
 kubectl get deployments
 kubectl get services
 kubectl get nodes
 
-# All resources
+# 所有资源
 kubectl get all
 
-# All resources in all namespaces
+# 所有 namespace 中的所有资源
 kubectl get all --all-namespaces
-kubectl get all -A  # shorthand
+kubectl get all -A  # 简写
 
-# Wide output (more info)
+# 宽输出（更多信息）
 kubectl get pods -o wide
 
-# JSON output
+# JSON 输出
 kubectl get pod nginx -o json
 
-# YAML output
+# YAML 输出
 kubectl get pod nginx -o yaml
 
-# Custom columns
+# 自定义列
 kubectl get pods -o custom-columns=NAME:.metadata.name,STATUS:.status.phase,NODE:.spec.nodeName
 
-# JSONPath queries
+# JSONPath 查询
 kubectl get pods -o jsonpath='{.items[*].metadata.name}'
 
-# Watch for changes
+# 监控变化
 kubectl get pods -w
 ```
 
-**Describe Resources**:
+**描述资源**：
 ```bash
-# Detailed information including events
+# 包括事件的详细信息
 kubectl describe pod nginx-pod
 kubectl describe deployment nginx-deployment
 kubectl describe node worker-1
 
-# Multiple resources
+# 多个资源
 kubectl describe pods
 ```
 
-**Create/Apply Resources**:
+**创建/应用资源**：
 ```bash
-# Create from file
+# 从文件创建
 kubectl create -f manifest.yaml
 
-# Apply (create or update)
+# 应用（创建或更新）
 kubectl apply -f manifest.yaml
 
-# Apply directory
+# 应用目录
 kubectl apply -f ./manifests/
 
-# Apply URL
+# 应用 URL
 kubectl apply -f https://example.com/manifest.yaml
 
-# Create from command line
+# 从命令行创建
 kubectl create deployment nginx --image=nginx
 kubectl create service clusterip nginx --tcp=80:80
 ```
 
-**Delete Resources**:
+**删除资源**：
 ```bash
-# Delete by name
+# 按名称删除
 kubectl delete pod nginx-pod
 
-# Delete from file
+# 从文件删除
 kubectl delete -f manifest.yaml
 
-# Delete all pods with label
+# 删除所有带有标签的 pod
 kubectl delete pods -l app=nginx
 
-# Delete all resources in namespace
+# 删除 namespace 中的所有资源
 kubectl delete all --all -n my-namespace
 
-# Force delete (skip graceful termination)
+# 强制删除（跳过优雅终止）
 kubectl delete pod nginx-pod --force --grace-period=0
 ```
 
-**Edit Resources**:
+**编辑资源**：
 ```bash
-# Edit in-place (opens editor)
+# 原地编辑（打开编辑器）
 kubectl edit deployment nginx-deployment
 
-# Edit with specific editor
+# 使用特定编辑器编辑
 KUBE_EDITOR="nano" kubectl edit pod nginx-pod
 
-# Patch resource
+# 修补资源
 kubectl patch deployment nginx -p '{"spec":{"replicas":5}}'
 ```
 
-### Resource Shortcuts
+### 资源快捷键
 
 ```bash
-# Common shortcuts
+# 常用快捷键
 po    # pods
 deploy # deployments
 svc   # services
@@ -193,103 +193,103 @@ pvc   # persistentvolumeclaims
 cm    # configmaps
 sa    # serviceaccounts
 
-# Examples
+# 示例
 kubectl get po
 kubectl describe deploy nginx
 kubectl delete svc nginx
 ```
 
-### Namespace Operations
+### Namespace 操作
 
 ```bash
-# Create namespace
+# 创建 namespace
 kubectl create namespace development
 
-# List namespaces
+# 列出 namespaces
 kubectl get namespaces
 kubectl get ns
 
-# Set default namespace
+# 设置默认 namespace
 kubectl config set-context --current --namespace=development
 
-# Get resources from specific namespace
+# 从特定 namespace 获取资源
 kubectl get pods -n production
 
-# Get resources from all namespaces
+# 从所有 namespaces 获取资源
 kubectl get pods --all-namespaces
 kubectl get pods -A
 ```
 
-## Debugging Pods and Deployments
+## 调试 Pod 和 Deployment
 
-### Pod Status and Phases
+### Pod 状态和阶段
 
-**Pod Phases**:
-- **Pending**: Pod accepted but not yet scheduled or containers not created
-- **Running**: Pod bound to node, containers created
-- **Succeeded**: All containers terminated successfully
-- **Failed**: All containers terminated, at least one failed
-- **Unknown**: Pod state cannot be determined
+**Pod 阶段**：
+- **Pending**：Pod 已接受但尚未调度或容器未创建
+- **Running**：Pod 已绑定到节点，容器已创建
+- **Succeeded**：所有容器成功终止
+- **Failed**：所有容器已终止，至少一个失败
+- **Unknown**：无法确定 Pod 状态
 
-**Container States**:
-- **Waiting**: Container not yet running (pulling image, etc.)
-- **Running**: Container is executing
-- **Terminated**: Container finished execution
+**容器状态**：
+- **Waiting**：容器尚未运行（拉取镜像等）
+- **Running**：容器正在执行
+- **Terminated**：容器执行结束
 
-### Debugging Workflow
+### 调试工作流
 
 ```
-1. Check Pod status
+1. 检查 Pod 状态
    ↓
-2. Describe Pod (view events)
+2. 描述 Pod（查看事件）
    ↓
-3. Check logs
+3. 检查日志
    ↓
-4. Check resource constraints
+4. 检查资源约束
    ↓
-5. Check node health
+5. 检查节点健康
    ↓
-6. Exec into container (if running)
+6. 进入容器（如果正在运行）
 ```
 
-### Step 1: Check Pod Status
+### 第 1 步：检查 Pod 状态
 
 ```bash
-# View Pod status
+# 查看 Pod 状态
 kubectl get pods
 
-# Common statuses and meanings:
-# Running: Pod is running normally
-# Pending: Waiting to be scheduled
-# ContainerCreating: Pulling images/creating containers
-# CrashLoopBackOff: Container repeatedly crashing
-# ImagePullBackOff: Cannot pull container image
-# Error: Container exited with error
-# Completed: Job/batch Pod finished successfully
-# Terminating: Pod is being deleted
-# Unknown: Node lost contact
+# 常见状态及其含义：
+# Running：Pod 正常运行
+# Pending：等待调度
+# ContainerCreating：拉取镜像/创建容器
+# CrashLoopBackOff：容器反复崩溃
+# ImagePullBackOff：无法拉取容器镜像
+# Error：容器以错误退出
+# Completed：Job/batch Pod 成功完成
+# Terminating：Pod 正在被删除
+# Unknown：节点失去联系
 
-# Check status with wide output
+# 使用宽输出检查状态
 kubectl get pods -o wide
 
-# Check specific Pod
+# 检查特定 Pod
 kubectl get pod nginx-pod
 ```
 
-### Step 2: Describe Pod
+### 第 2 步：描述 Pod
 
 ```bash
-# Describe Pod to see events
+# 描述 Pod 以查看事件
 kubectl describe pod nginx-pod
 
-# Key sections to check:
-# - Status: Current phase
-# - Conditions: Ready, ContainersReady, PodScheduled
-# - Containers: Container statuses
-# - Events: What happened (crucial for debugging!)
+# 要检查的关键部分：
+# - Status：当前阶段
+# - Conditions：Ready， ContainersReady， PodScheduled
+# - Containers：容器状态
+# - Events：发生了什么（对调试至关重要！）
 ```
 
-**Example Events**:
+**示例事件**：
 ```
 Events:
   Type     Reason            Message
@@ -300,434 +300,434 @@ Events:
   Normal   Created           Created container nginx
   Normal   Started           Started container nginx
 
-  # Or error events:
+  # 或者错误事件：
   Warning  Failed            Failed to pull image "nginx:invalid-tag"
   Warning  BackOff           Back-off restarting failed container
 ```
 
-### Step 3: Common Pod Issues and Solutions
+### 第 3 步：常见 Pod 问题和解决方案
 
-**Issue: ImagePullBackOff**
+**问题：ImagePullBackOff**
 
 ```bash
-# Symptom
+# 症状
 NAME        READY   STATUS             RESTARTS   AGE
 my-pod      0/1     ImagePullBackOff   0          2m
 
-# Check events
+# 检查事件
 kubectl describe pod my-pod
 
-# Common causes:
-# 1. Image doesn't exist
-# 2. Image tag is wrong
-# 3. Private registry requires authentication
-# 4. Image pull rate limit exceeded
+# 常见原因：
+# 1. 镜像不存在
+# 2. 镜像标签错误
+# 3. 私有仓库需要认证
+# 4. 镜像拉取频率限制已超
 
-# Solutions:
-# 1. Fix image name/tag
-# 2. Create imagePullSecret
+# 解决方案：
+# 1. 修复镜像名称/标签
+# 2. 创建 imagePullSecret
 kubectl create secret docker-registry regcred \
   --docker-server=https://index.docker.io/v1/ \
   --docker-username=myuser \
   --docker-password=mypass
 
-# Add to Pod spec
+# 添加到 Pod spec
 imagePullSecrets:
 - name: regcred
 ```
 
-**Issue: CrashLoopBackOff**
+**问题：CrashLoopBackOff**
 
 ```bash
-# Symptom
+# 症状
 NAME        READY   STATUS             RESTARTS   AGE
 my-pod      0/1     CrashLoopBackOff   5          5m
 
-# Container is starting then crashing repeatedly
-# Check logs to see why
+# 容器启动后反复崩溃
+# 检查日志以了解原因
 kubectl logs my-pod
 
-# Check previous container logs (after crash)
+# 检查崩溃前的容器日志
 kubectl logs my-pod --previous
 
-# Common causes:
-# 1. Application error on startup
-# 2. Missing environment variables
-# 3. Configuration error
-# 4. Insufficient resources
-# 5. Liveness probe failing too early
+# 常见原因：
+# 1. 应用启动时出错
+# 2. 缺少环境变量
+# 3. 配置错误
+# 4. 资源不足
+# 5. Liveness probe 过早失败
 
-# Solutions depend on logs, but common fixes:
-# - Fix application code
-# - Add required env vars/config
-# - Increase resources
-# - Adjust liveness probe initialDelaySeconds
+# 解决方案取决于日志，但常见修复：
+# - 修复应用代码
+# - 添加所需的环境变量/配置
+# - 增加资源
+# - 调整 liveness probe 的 initialDelaySeconds
 ```
 
-**Issue: Pending (Not Scheduled)**
+**问题：Pending（未调度）**
 
 ```bash
-# Symptom
+# 症状
 NAME        READY   STATUS    RESTARTS   AGE
 my-pod      0/1     Pending   0          5m
 
-# Check why not scheduled
+# 检查为什么未调度
 kubectl describe pod my-pod
 
-# Common causes shown in events:
-# 1. Insufficient CPU/memory on nodes
-# 2. No nodes match nodeSelector/affinity
-# 3. Taints preventing scheduling
-# 4. PVC not available
+# 事件中显示的常见原因：
+# 1. 节点 CPU/内存不足
+# 2. 没有节点匹配 nodeSelector/affinity
+# 3. Taint 阻止调度
+# 4. PVC 不可用
 
-# Example events:
+# 示例事件：
 Events:
   Warning  FailedScheduling  0/3 nodes are available: 3 Insufficient memory.
 
-# Solutions:
-# 1. Add more nodes or resize existing
-# 2. Reduce resource requests
-# 3. Fix nodeSelector/affinity
-# 4. Remove taints or add tolerations
-# 5. Create/fix PVC
+# 解决方案：
+# 1. 添加更多节点或调整现有节点
+# 2. 减少资源请求
+# 3. 修复 nodeSelector/affinity
+# 4. 移除 taint 或添加 toleration
+# 5. 创建/修复 PVC
 ```
 
-**Issue: ContainerCreating (Stuck)**
+**问题：ContainerCreating（卡住）**
 
 ```bash
-# Symptom
+# 症状
 NAME        READY   STATUS              RESTARTS   AGE
 my-pod      0/1     ContainerCreating   0          5m
 
-# Check events
+# 检查事件
 kubectl describe pod my-pod
 
-# Common causes:
-# 1. Volume mount issues
-# 2. Image pull is slow
-# 3. CNI plugin issue
+# 常见原因：
+# 1. 卷挂载问题
+# 2. 镜像拉取慢
+# 3. CNI 插件问题
 
-# Example:
+# 示例：
 Events:
   Warning  FailedMount  Unable to mount volumes: timeout expired waiting for volumes to attach
 
-# Solutions:
-# - Check PVC status
-# - Verify StorageClass exists
-# - Check node kubelet logs
+# 解决方案：
+# - 检查 PVC 状态
+# - 验证 StorageClass 是否存在
+# - 检查节点的 kubelet 日志
 ```
 
-**Issue: Pod Ready But Not Receiving Traffic**
+**问题：Pod 就绪但未接收流量**
 
 ```bash
-# Symptom
-# Pod is Running but Service not routing traffic
+# 症状
+# Pod 处于 Running 状态但 Service 未路由流量
 
-# Check Pod readiness
+# 检查 Pod readiness
 kubectl get pod my-pod -o json | jq '.status.conditions'
 
-# Check if Pod has readiness probe
+# 检查 Pod 是否有 readiness probe
 kubectl get pod my-pod -o yaml | grep -A5 readinessProbe
 
-# Check if Pod matches Service selector
+# 检查 Pod 是否匹配 Service selector
 kubectl describe service my-service
 
-# Check endpoints
+# 检查 endpoints
 kubectl get endpoints my-service
 
-# If endpoints empty, labels don't match
-# Fix: Update Pod labels or Service selector
+# 如果 endpoints 为空，说明标签不匹配
+# 修复：更新 Pod 标签或 Service selector
 ```
 
-### Debugging Deployments
+### 调试 Deployment
 
 ```bash
-# Check Deployment status
+# 检查 Deployment 状态
 kubectl get deployment nginx-deployment
 
-# Detailed status
+# 详细状态
 kubectl describe deployment nginx-deployment
 
-# Check rollout status
+# 检查 rollout 状态
 kubectl rollout status deployment/nginx-deployment
 
-# Check rollout history
+# 检查 rollout 历史
 kubectl rollout history deployment/nginx-deployment
 
-# Check ReplicaSet
+# 检查 ReplicaSet
 kubectl get replicaset
 kubectl describe replicaset <replicaset-name>
 
-# Common Deployment issues:
-# 1. Image pull errors
-# 2. Resource constraints
-# 3. Liveness probe failures
-# 4. Config errors
+# 常见 Deployment 问题：
+# 1. 镜像拉取错误
+# 2. 资源约束
+# 3. Liveness probe 失败
+# 4. 配置错误
 
-# Debug by checking Pods created by Deployment
+# 通过检查 Deployment 创建的 Pod 进行调试
 kubectl get pods -l app=nginx
 
-# Then debug individual Pods as shown above
+# 然后按上述方法调试单个 Pod
 ```
 
-## Logs and Events
+## 日志和事件
 
-### Viewing Logs
+### 查看日志
 
-**Basic Log Commands**:
+**基本日志命令**：
 ```bash
-# View Pod logs
+# 查看 Pod 日志
 kubectl logs nginx-pod
 
-# Follow logs (stream)
+# 持续跟踪日志（流式）
 kubectl logs -f nginx-pod
 
-# Logs from specific container (multi-container Pod)
+# 特定容器的日志（多容器 Pod）
 kubectl logs nginx-pod -c sidecar-container
 
-# Previous container logs (after crash)
+# 崩溃前的容器日志
 kubectl logs nginx-pod --previous
 
-# Logs since timestamp
+# 从某个时间点开始的日志
 kubectl logs nginx-pod --since=1h
 kubectl logs nginx-pod --since-time=2023-01-01T00:00:00Z
 
-# Last N lines
+# 最后 N 行
 kubectl logs nginx-pod --tail=100
 
-# Logs with timestamps
+# 带时间戳的日志
 kubectl logs nginx-pod --timestamps
 
-# All logs from Pods matching label
+# 匹配标签的所有 Pod 的日志
 kubectl logs -l app=nginx
 
-# Logs from all containers in Pod
+# Pod 中所有容器的日志
 kubectl logs nginx-pod --all-containers=true
 ```
 
-**ML Training Job Logs Example**:
+**ML 训练 Job 日志示例**：
 ```bash
-# Stream training logs
+# 流式传输训练日志
 kubectl logs -f training-job-xyz --tail=50
 
-# Save logs to file
+# 将日志保存到文件
 kubectl logs training-job-xyz > training-logs.txt
 
-# Monitor multiple Pods
+# 监控多个 Pod
 kubectl logs -l job-name=training-job -f --max-log-requests=10
 ```
 
-### Viewing Events
+### 查看事件
 
 ```bash
-# Cluster-wide events
+# 集群范围的事件
 kubectl get events
 
-# Events in specific namespace
+# 特定 namespace 中的事件
 kubectl get events -n production
 
-# Events sorted by timestamp
+# 按时间戳排序的事件
 kubectl get events --sort-by='.lastTimestamp'
 
-# Watch events
+# 监控事件
 kubectl get events -w
 
-# Events for specific resource
-kubectl describe pod nginx-pod  # includes events
+# 特定资源的事件
+kubectl describe pod nginx-pod  # 包含事件
 
-# Filter events
+# 过滤事件
 kubectl get events --field-selector involvedObject.kind=Pod
 kubectl get events --field-selector type=Warning
 kubectl get events --field-selector reason=Failed
 
-# Human-readable timestamps
+# 人类可读的时间戳
 kubectl get events --sort-by='.lastTimestamp' -o custom-columns=LAST:.lastTimestamp,TYPE:.type,REASON:.reason,MESSAGE:.message
 ```
 
-**Event Types**:
-- **Normal**: Regular operations (Created, Started, Pulled, etc.)
-- **Warning**: Issues that need attention (Failed, BackOff, Unhealthy, etc.)
+**事件类型**：
+- **Normal**：常规操作（Created， Started， Pulled 等）
+- **Warning**：需要注意的问题（Failed， BackOff， Unhealthy 等）
 
-### Log Aggregation
+### 日志聚合
 
-For production, use centralized logging:
+对于生产环境，使用集中式日志：
 
-**EFK Stack** (Elasticsearch, Fluentd, Kibana):
+**EFK Stack** (Elasticsearch, Fluentd, Kibana)：
 ```bash
-# Fluentd runs as DaemonSet
+# Fluentd 作为 DaemonSet 运行
 kubectl get daemonset fluentd -n kube-system
 
-# Logs sent to Elasticsearch
-# View in Kibana web UI
+# 日志发送到 Elasticsearch
+# 在 Kibana Web UI 中查看
 ```
 
-**PLG Stack** (Promtail, Loki, Grafana):
+**PLG Stack** (Promtail, Loki, Grafana)：
 ```bash
-# Promtail collects logs
-# Loki stores logs
-# Grafana visualizes
+# Promtail 收集日志
+# Loki 存储日志
+# Grafana 可视化
 
-# Query logs in Grafana with LogQL
+# 在 Grafana 中使用 LogQL 查询日志
 {namespace="production", app="ml-model"} |= "error"
 ```
 
-**ELK Stack** (Elasticsearch, Logstash, Kibana):
+**ELK Stack** (Elasticsearch, Logstash, Kibana)：
 ```bash
-# Similar to EFK but uses Logstash
-# Better for complex log processing
+# 类似于 EFK 但使用 Logstash
+# 更适合复杂的日志处理
 ```
 
-## Executing Commands in Containers
+## 在容器中执行命令
 
 ### kubectl exec
 
 ```bash
-# Execute command in Pod
+# 在 Pod 中执行命令
 kubectl exec nginx-pod -- ls /usr/share/nginx/html
 
-# Interactive shell
+# 交互式 shell
 kubectl exec -it nginx-pod -- /bin/bash
-kubectl exec -it nginx-pod -- /bin/sh  # if bash not available
+kubectl exec -it nginx-pod -- /bin/sh  # 如果没有 bash
 
-# Specific container (multi-container Pod)
+# 特定容器（多容器 Pod）
 kubectl exec -it nginx-pod -c sidecar -- /bin/sh
 
-# Execute as specific user
+# 以特定用户执行
 kubectl exec nginx-pod -- su - appuser -c "whoami"
 
-# Set environment variables
+# 设置环境变量
 kubectl exec nginx-pod -- env DEBUG=true /app/script.sh
 ```
 
-### Common Debugging Commands Inside Containers
+### 容器内常用调试命令
 
 ```bash
-# Interactive shell
+# 交互式 shell
 kubectl exec -it nginx-pod -- /bin/bash
 
-# Inside container:
+# 在容器内：
 
-# Check processes
+# 检查进程
 ps aux
 
-# Check network
+# 检查网络
 netstat -tlnp
 ss -tlnp
 
-# Check files
+# 检查文件
 ls -la /app
 cat /etc/config/app.properties
 
-# Check environment
+# 检查环境
 env | grep -i db
 
-# Check disk space
+# 检查磁盘空间
 df -h
 
-# Check memory
+# 检查内存
 free -h
 
-# Test connectivity
+# 测试连接
 curl localhost:8080/health
 wget -qO- http://api-service:8080/
 
-# DNS resolution
+# DNS 解析
 nslookup redis-service
 dig redis-service.default.svc.cluster.local
 
-# Check mounted volumes
+# 检查挂载的卷
 mount | grep /data
 
-# Check logs (if app writes to file)
+# 检查日志（如果应用写入文件）
 tail -f /var/log/app.log
 
-# Install debugging tools (if needed, temporary)
+# 安装调试工具（如果需要，临时）
 apt-get update && apt-get install -y curl
-apk add curl  # for alpine-based images
+apk add curl  # 针对基于 alpine 的镜像
 ```
 
-### Debug Container (Ephemeral Containers)
+### 调试容器（临时容器）
 
-For containers without shell or debugging tools:
+对于没有 shell 或调试工具的容器：
 
 ```bash
-# Add ephemeral debug container to running Pod
+# 向运行中的 Pod 添加临时调试容器
 kubectl debug -it nginx-pod --image=busybox --target=nginx
 
-# Debug with different image
+# 使用不同的镜像调试
 kubectl debug nginx-pod --image=ubuntu --target=nginx
 
-# Create copy of Pod with debugging tools
+# 创建带有调试工具的 Pod 副本
 kubectl debug nginx-pod -it --copy-to=nginx-debug --container=debug --image=busybox
 ```
 
-### kubectl run for Quick Tests
+### kubectl run 用于快速测试
 
 ```bash
-# Create temporary test Pod
+# 创建临时测试 Pod
 kubectl run test-pod --rm -it --image=busybox -- /bin/sh
 
-# Test network connectivity
+# 测试网络连接
 kubectl run test-curl --rm -it --image=curlimages/curl -- curl http://nginx-service
 
-# Test DNS
+# 测试 DNS
 kubectl run test-dns --rm -it --image=busybox -- nslookup kubernetes.default
 
-# Test PostgreSQL connection
+# 测试 PostgreSQL 连接
 kubectl run test-pg --rm -it --image=postgres:14 -- psql -h postgres-service -U admin
 ```
 
-## Resource Monitoring
+## 资源监控
 
 ### kubectl top
 
-Requires Metrics Server to be installed.
+需要安装 Metrics Server。
 
 ```bash
-# Node resource usage
+# 节点资源使用
 kubectl top nodes
 
-# Output:
+# 输出：
 # NAME       CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
 # master     250m         12%    1024Mi          51%
 # worker-1   1200m        30%    4096Mi          68%
 # worker-2   800m         20%    3072Mi          51%
 
-# Pod resource usage
+# Pod 资源使用
 kubectl top pods
 
-# All namespaces
+# 所有 namespaces
 kubectl top pods -A
 
-# Specific namespace
+# 特定 namespace
 kubectl top pods -n production
 
-# Sort by memory
+# 按内存排序
 kubectl top pods --sort-by=memory
 
-# Sort by CPU
+# 按 CPU 排序
 kubectl top pods --sort-by=cpu
 
-# Containers in Pod
+# Pod 中的容器
 kubectl top pod nginx-pod --containers
 ```
 
-### Resource Quotas and Limits
+### 资源配额和限制
 
 ```bash
-# View resource quotas
+# 查看资源配额
 kubectl get resourcequota
 
-# Describe quota
+# 描述配额
 kubectl describe resourcequota compute-quota
 
-# View limit ranges
+# 查看限制范围
 kubectl get limitrange
 
-# Check actual vs requested resources
+# 检查实际与请求的资源
 kubectl describe node worker-1
 
-# Section "Allocated resources" shows:
+# "Allocated resources" 部分显示：
 # Resource           Requests      Limits
 # --------           --------      ------
 # cpu                2500m (62%)   5000m (125%)
@@ -735,276 +735,276 @@ kubectl describe node worker-1
 # nvidia.com/gpu     2             2
 ```
 
-### Monitoring ML Workloads
+### 监控 ML 工作负载
 
 ```bash
-# Monitor GPU usage (requires nvidia-smi in container)
+# 监控 GPU 使用（需要容器中有 nvidia-smi）
 kubectl exec -it ml-training-pod -- nvidia-smi
 
-# Monitor GPU Pods
+# 监控 GPU Pod
 kubectl top pods -l gpu=true --sort-by=memory
 
-# Check GPU allocation
+# 检查 GPU 分配
 kubectl describe node gpu-node-1 | grep -A5 "Allocated resources"
 
-# Output:
+# 输出：
 # nvidia.com/gpu: 2 (of 4 available)
 ```
 
-### Monitoring Tools
+### 监控工具
 
-**Prometheus + Grafana**:
+**Prometheus + Grafana**：
 ```bash
-# Deploy Prometheus Operator
+# 部署 Prometheus Operator
 helm install prometheus prometheus-community/kube-prometheus-stack
 
-# Access Grafana
+# 访问 Grafana
 kubectl port-forward svc/prometheus-grafana 3000:80
 
-# View pre-built dashboards:
-# - Kubernetes cluster monitoring
-# - Node exporter metrics
-# - Pod resource usage
+# 查看预构建的仪表盘：
+# - Kubernetes 集群监控
+# - Node exporter 指标
+# - Pod 资源使用
 ```
 
-**Kubernetes Dashboard**:
+**Kubernetes Dashboard**：
 ```bash
-# Deploy dashboard
+# 部署 dashboard
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
 
-# Create admin user and get token
+# 创建 admin 用户并获取 token
 kubectl -n kubernetes-dashboard create token admin-user
 
-# Access dashboard
+# 访问 dashboard
 kubectl proxy
-# Visit: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+# 访问：http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 ```
 
-## Troubleshooting Common Issues
+## 常见问题排查
 
-### Node Issues
+### 节点问题
 
-**Node NotReady**:
+**Node NotReady**：
 ```bash
-# Check node status
+# 检查节点状态
 kubectl get nodes
 
 # NAME       STATUS     ROLES    AGE   VERSION
 # worker-1   NotReady   <none>   5d    v1.25.0
 
-# Describe node
+# 描述节点
 kubectl describe node worker-1
 
-# Check conditions
+# 检查条件
 kubectl get node worker-1 -o json | jq '.status.conditions'
 
-# Common causes:
-# 1. kubelet not running
-# 2. Network plugin issue
-# 3. Disk pressure
-# 4. Memory pressure
+# 常见原因：
+# 1. kubelet 未运行
+# 2. 网络插件问题
+# 3. 磁盘压力
+# 4. 内存压力
 
-# SSH to node and check:
-# kubelet status
+# SSH 到节点并检查：
+# kubelet 状态
 systemctl status kubelet
 
-# kubelet logs
+# kubelet 日志
 journalctl -u kubelet -f
 
-# Restart kubelet
+# 重启 kubelet
 systemctl restart kubelet
 ```
 
-**Node Disk Pressure**:
+**节点磁盘压力**：
 ```bash
-# Symptom
+# 症状
 kubectl describe node worker-1
 # Conditions:
 #   DiskPressure    True
 
-# Solution: Clean up disk
-# SSH to node
+# 解决方案：清理磁盘
+# SSH 到节点
 docker system prune -a
-# Or
+# 或
 crictl rmi --prune
 
-# Remove old container logs
+# 删除旧的容器日志
 find /var/log/pods -type f -mtime +7 -delete
 ```
 
-### Network Issues
+### 网络问题
 
-**Pod Cannot Reach Service**:
+**Pod 无法访问 Service**：
 ```bash
-# Test from Pod
+# 从 Pod 测试
 kubectl run test --rm -it --image=busybox -- wget -qO- http://nginx-service
 
-# If fails, check:
+# 如果失败，检查：
 
-# 1. Service exists
+# 1. Service 是否存在
 kubectl get service nginx-service
 
-# 2. Endpoints populated
+# 2. Endpoints 是否已填充
 kubectl get endpoints nginx-service
 
-# 3. Pod labels match service selector
+# 3. Pod 标签是否匹配 service selector
 kubectl get pods --show-labels
 kubectl describe service nginx-service
 
-# 4. Network policies blocking traffic
+# 4. Network policy 是否阻止流量
 kubectl get networkpolicy
 
-# 5. CoreDNS working
+# 5. CoreDNS 是否正常工作
 kubectl run test --rm -it --image=busybox -- nslookup nginx-service
 ```
 
-**DNS Resolution Issues**:
+**DNS 解析问题**：
 ```bash
-# Check CoreDNS Pods
+# 检查 CoreDNS Pod
 kubectl get pods -n kube-system -l k8s-app=kube-dns
 
-# Check CoreDNS logs
+# 检查 CoreDNS 日志
 kubectl logs -n kube-system -l k8s-app=kube-dns
 
-# Test DNS from Pod
+# 从 Pod 测试 DNS
 kubectl run test --rm -it --image=busybox -- nslookup kubernetes.default
 
-# Check DNS configuration in Pod
+# 检查 Pod 中的 DNS 配置
 kubectl exec test-pod -- cat /etc/resolv.conf
 
-# Should show:
+# 应显示：
 # nameserver 10.96.0.10
 # search default.svc.cluster.local svc.cluster.local cluster.local
 ```
 
-### Storage Issues
+### 存储问题
 
-**PVC Stuck in Pending**:
+**PVC 卡在 Pending**：
 ```bash
-# Check PVC status
+# 检查 PVC 状态
 kubectl get pvc
 
-# Describe PVC
+# 描述 PVC
 kubectl describe pvc my-pvc
 
-# Common causes in events:
-# 1. No PV available
-# 2. StorageClass doesn't exist
-# 3. Access mode mismatch
-# 4. Insufficient storage
+# 事件中的常见原因：
+# 1. 没有可用的 PV
+# 2. StorageClass 不存在
+# 3. 访问模式不匹配
+# 4. 存储空间不足
 
-# Check PVs
+# 检查 PV
 kubectl get pv
 
-# Check StorageClass
+# 检查 StorageClass
 kubectl get storageclass
 
-# Solution: Create PV or fix StorageClass
+# 解决方案：创建 PV 或修复 StorageClass
 ```
 
-**Pod Cannot Mount Volume**:
+**Pod 无法挂载卷**：
 ```bash
-# Symptom
+# 症状
 kubectl describe pod my-pod
 # Events:
 #   Warning  FailedMount  MountVolume.SetUp failed
 
-# Common causes:
-# 1. PVC doesn't exist
-# 2. PVC not bound
-# 3. Volume already mounted on different node (RWO)
-# 4. NFS server unreachable
+# 常见原因：
+# 1. PVC 不存在
+# 2. PVC 未绑定
+# 3. 卷已挂载到不同节点（RWO）
+# 4. NFS 服务器不可达
 
-# Check PVC status
+# 检查 PVC 状态
 kubectl get pvc
 
-# Check if volume mounted elsewhere
+# 检查卷是否挂载到别处
 kubectl get pods -o json | jq '.items[] | select(.spec.volumes[]?.persistentVolumeClaim.claimName=="my-pvc") | .metadata.name'
 
-# Solution: Fix PVC or ensure RWX access mode for multi-pod access
+# 解决方案：修复 PVC 或确保多 Pod 访问使用 RWX 访问模式
 ```
 
-### Configuration Issues
+### 配置问题
 
-**ConfigMap/Secret Not Found**:
+**ConfigMap/Secret 未找到**：
 ```bash
-# Symptom
+# 症状
 kubectl describe pod my-pod
 # Events:
 #   Warning  Failed  Error: configmap "app-config" not found
 
-# Check if exists
+# 检查是否存在
 kubectl get configmap app-config
 kubectl get secret app-secret
 
-# Check namespace
+# 检查 namespace
 kubectl get configmap app-config -n correct-namespace
 
-# Solution: Create ConfigMap/Secret or fix reference
+# 解决方案：创建 ConfigMap/Secret 或修复引用
 ```
 
-**Wrong Environment Variables**:
+**环境变量错误**：
 ```bash
-# Check actual env vars in Pod
+# 检查 Pod 中的实际环境变量
 kubectl exec my-pod -- env
 
-# Compare with expected
+# 与预期比较
 kubectl get pod my-pod -o yaml | grep -A10 env:
 
-# Check ConfigMap/Secret contents
+# 检查 ConfigMap/Secret 内容
 kubectl get configmap app-config -o yaml
 kubectl get secret app-secret -o jsonpath='{.data.password}' | base64 -d
 ```
 
-### Performance Issues
+### 性能问题
 
-**High CPU Usage**:
+**高 CPU 使用**：
 ```bash
-# Identify high CPU Pods
+# 识别高 CPU Pod
 kubectl top pods --sort-by=cpu
 
-# Check for CPU throttling
+# 检查 CPU 节流
 kubectl describe pod high-cpu-pod
 
-# Check container limits
+# 检查容器限制
 kubectl get pod high-cpu-pod -o jsonpath='{.spec.containers[].resources}'
 
-# Solutions:
-# 1. Increase CPU limits
-# 2. Optimize application code
-# 3. Scale horizontally (more replicas)
+# 解决方案：
+# 1. 增加 CPU 限制
+# 2. 优化应用代码
+# 3. 水平扩展（更多副本）
 ```
 
-**High Memory Usage / OOMKilled**:
+**高内存使用 / OOMKilled**：
 ```bash
-# Check Pod status
+# 检查 Pod 状态
 kubectl get pods
 
 # NAME      READY   STATUS      RESTARTS   AGE
 # my-pod    0/1     OOMKilled   5          10m
 
-# Check events
+# 检查事件
 kubectl describe pod my-pod
 # Events:
 #   Warning  OOMKilling  Memory cgroup out of memory: Kill process
 
-# Check memory limits
+# 检查内存限制
 kubectl get pod my-pod -o jsonpath='{.spec.containers[].resources.limits.memory}'
 
-# Solutions:
-# 1. Increase memory limits
-# 2. Fix memory leaks in application
-# 3. Use more memory-efficient algorithms
+# 解决方案：
+# 1. 增加内存限制
+# 2. 修复应用中的内存泄漏
+# 3. 使用更节省内存的算法
 ```
 
-## kubectl Productivity Tips
+## kubectl 效率技巧
 
-### Aliases and Shortcuts
+### 别名和快捷键
 
 ```bash
-# Add to ~/.bashrc or ~/.zshrc
+# 添加到 ~/.bashrc 或 ~/.zshrc
 
-# Basic aliases
+# 基本别名
 alias k='kubectl'
 alias kg='kubectl get'
 alias kd='kubectl describe'
@@ -1013,13 +1013,13 @@ alias kl='kubectl logs'
 alias kex='kubectl exec -it'
 alias kap='kubectl apply -f'
 
-# Namespace shortcuts
+# Namespace 快捷键
 alias kgp='kubectl get pods'
 alias kgd='kubectl get deployments'
 alias kgs='kubectl get services'
 alias kgn='kubectl get nodes'
 
-# Advanced aliases
+# 高级别名
 alias kgpa='kubectl get pods --all-namespaces'
 alias kgpw='kubectl get pods -o wide'
 alias kgpwa='kubectl get pods -o wide --all-namespaces'
@@ -1027,55 +1027,55 @@ alias kdp='kubectl describe pod'
 alias kdd='kubectl describe deployment'
 alias kds='kubectl describe service'
 
-# Watch
+# 监控
 alias kgpw='watch kubectl get pods'
 
-# Logs
+# 日志
 alias klf='kubectl logs -f'
 alias klp='kubectl logs -f --previous'
 
-# Shell into pod
+# 进入 Pod shell
 alias ksh='kubectl exec -it $1 -- /bin/sh'
 alias kbash='kubectl exec -it $1 -- /bin/bash'
 
-# Usage:
+# 使用示例：
 # k get pods
 # kg deploy
 # kl my-pod
 # kex my-pod -- /bin/bash
 ```
 
-### kubectl Plugins
+### kubectl 插件
 
-**krew** (kubectl plugin manager):
+**krew** (kubectl 插件管理器)：
 ```bash
-# Install krew
+# 安装 krew
 # https://krew.sigs.k8s.io/docs/user-guide/setup/install/
 
-# Popular plugins
-kubectl krew install ctx      # Switch contexts
-kubectl krew install ns       # Switch namespaces
-kubectl krew install tree     # Show resource hierarchy
-kubectl krew install tail     # Tail logs from multiple pods
-kubectl krew install neat     # Clean up kubectl output
-kubectl krew install whoami   # Show current user info
+# 流行插件
+kubectl krew install ctx      # 切换上下文
+kubectl krew install ns       # 切换 namespace
+kubectl krew install tree     # 显示资源层级
+kubectl krew install tail     # 跟踪多个 Pod 的日志
+kubectl krew install neat     # 清理 kubectl 输出
+kubectl krew install whoami   # 显示当前用户信息
 
-# Usage
-kubectl ctx                   # List contexts
-kubectl ctx production        # Switch to production
-kubectl ns production         # Switch namespace
-kubectl tree deployment nginx # Show deployment hierarchy
-kubectl tail -l app=nginx     # Tail logs from all nginx pods
+# 使用
+kubectl ctx                   # 列出上下文
+kubectl ctx production        # 切换到生产环境
+kubectl ns production         # 切换 namespace
+kubectl tree deployment nginx # 显示 deployment 层级
+kubectl tail -l app=nginx     # 跟踪所有 nginx pod 的日志
 ```
 
-**Useful Plugins**:
-- **kubectl-tree**: Show resource hierarchy
-- **kubectl-tail**: Multi-pod log tailing
-- **kubectl-neat**: Remove clutter from kubectl output
-- **kubectl-images**: Show images used in cluster
-- **kubectl-resource-capacity**: Show resource capacity
+**有用的插件**：
+- **kubectl-tree**：显示资源层级
+- **kubectl-tail**：多 Pod 日志跟踪
+- **kubectl-neat**：去除 kubectl 输出中的杂乱内容
+- **kubectl-images**：显示集群中使用的镜像
+- **kubectl-resource-capacity**：显示资源容量
 
-### Shell Completion
+### Shell 补全
 
 ```bash
 # Bash
@@ -1088,262 +1088,262 @@ echo 'source <(kubectl completion zsh)' >>~/.zshrc
 echo 'alias k=kubectl' >>~/.zshrc
 echo 'complete -F __start_kubectl k' >>~/.zshrc
 
-# Test
-k get po<TAB>  # Should autocomplete to 'pods'
+# 测试
+k get po<TAB>  # 应自动补全为 'pods'
 ```
 
-### Advanced kubectl Techniques
+### 高级 kubectl 技巧
 
-**JSONPath Queries**:
+**JSONPath 查询**：
 ```bash
-# Get Pod IPs
+# 获取 Pod IP
 kubectl get pods -o jsonpath='{.items[*].status.podIP}'
 
-# Get container images
+# 获取容器镜像
 kubectl get pods -o jsonpath='{.items[*].spec.containers[*].image}' | tr -s ' ' '\n'
 
-# Get Pod and Node
+# 获取 Pod 和节点
 kubectl get pods -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.nodeName}{"\n"}{end}'
 
-# Get failing Pods
+# 获取失败的 Pod
 kubectl get pods --field-selector=status.phase!=Running
 
-# Get resource limits
+# 获取资源限制
 kubectl get pods -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[*].resources.limits}{"\n"}{end}'
 ```
 
-**Field Selectors**:
+**Field Selectors**：
 ```bash
-# By status
+# 按状态
 kubectl get pods --field-selector status.phase=Running
 kubectl get pods --field-selector status.phase!=Running
 
-# By node
+# 按节点
 kubectl get pods --field-selector spec.nodeName=worker-1
 
-# By namespace
+# 按 namespace
 kubectl get pods --all-namespaces --field-selector metadata.namespace!=kube-system
 
-# Multiple conditions
+# 多个条件
 kubectl get pods --field-selector status.phase=Running,spec.nodeName=worker-1
 ```
 
-**Label Selectors**:
+**Label Selectors**：
 ```bash
-# Equality-based
+# 基于等值
 kubectl get pods -l app=nginx
 kubectl get pods -l app=nginx,tier=frontend
 
-# Set-based
+# 基于集合
 kubectl get pods -l 'environment in (production, staging)'
 kubectl get pods -l 'tier notin (frontend)'
-kubectl get pods -l 'app,environment'  # Has both labels
-kubectl get pods -l '!app'  # Doesn't have app label
+kubectl get pods -l 'app,environment'  # 同时具有两个标签
+kubectl get pods -l '!app'  # 没有 app 标签
 ```
 
-## Cluster Maintenance
+## 集群维护
 
-### Draining Nodes
+### 节点排空
 
 ```bash
-# Drain node (evict all pods for maintenance)
+# 排空节点（驱逐所有 pod 以进行维护）
 kubectl drain worker-1 --ignore-daemonsets --delete-emptydir-data
 
-# Cordon node (prevent scheduling but don't evict)
+# 封锁节点（阻止调度但不驱逐）
 kubectl cordon worker-1
 
-# Uncordon node (allow scheduling again)
+# 取消封锁节点（允许再次调度）
 kubectl uncordon worker-1
 
-# Workflow:
-# 1. Drain node
-# 2. Perform maintenance (upgrade, reboot, etc.)
-# 3. Uncordon node
+# 工作流：
+# 1. 排空节点
+# 2. 执行维护（升级、重启等）
+# 3. 取消封锁节点
 ```
 
-### Backing Up Resources
+### 备份资源
 
 ```bash
-# Backup all resources
+# 备份所有资源
 kubectl get all --all-namespaces -o yaml > cluster-backup.yaml
 
-# Backup specific namespace
+# 备份特定 namespace
 kubectl get all -n production -o yaml > production-backup.yaml
 
-# Backup specific resource types
+# 备份特定资源类型
 kubectl get configmap,secret,pvc --all-namespaces -o yaml > configs-backup.yaml
 
-# Backup with velero (recommended)
+# 使用 velero 备份（推荐）
 velero backup create my-backup --include-namespaces production
 
-# Restore
+# 恢复
 velero restore create --from-backup my-backup
 ```
 
-### Resource Cleanup
+### 资源清理
 
 ```bash
-# Delete completed Jobs
+# 删除已完成的 Job
 kubectl delete jobs --field-selector status.successful=1
 
-# Delete evicted Pods
+# 删除被驱逐的 Pod
 kubectl get pods --all-namespaces --field-selector status.phase=Failed -o json | kubectl delete -f -
 
-# Delete old ReplicaSets
+# 删除旧的 ReplicaSet
 kubectl delete replicaset --all-namespaces --field-selector status.replicas=0
 
-# Clean up unused PVs
+# 清理未使用的 PV
 kubectl get pv --field-selector status.phase=Released
 
-# Find and delete unused ConfigMaps/Secrets (manual check)
-# This requires analysis to ensure they're not referenced
+# 查找并删除未使用的 ConfigMap/Secret（手动检查）
+# 这需要分析以确保它们未被引用
 ```
 
-## Security Operations
+## 安全运维
 
-### RBAC Debugging
+### RBAC 调试
 
 ```bash
-# Check current user permissions
+# 检查当前用户权限
 kubectl auth can-i list pods
 kubectl auth can-i delete deployments --namespace production
 
-# Check permissions for service account
+# 检查 service account 的权限
 kubectl auth can-i list pods --as=system:serviceaccount:default:my-sa
 
-# Check what resources user can access
+# 检查用户可以访问哪些资源
 kubectl auth can-i --list
 
-# Describe role/rolebinding
+# 描述 role/rolebinding
 kubectl describe role developer
 kubectl describe rolebinding developer-binding
 
-# Get all roles/rolebindings
+# 获取所有 roles/rolebindings
 kubectl get roles --all-namespaces
 kubectl get rolebindings --all-namespaces
 kubectl get clusterroles
 kubectl get clusterrolebindings
 ```
 
-### Security Scanning
+### 安全扫描
 
 ```bash
-# Scan images for vulnerabilities (trivy)
+# 扫描镜像漏洞（trivy）
 trivy image nginx:1.21
 
-# Scan cluster configuration (kubesec)
+# 扫描集群配置（kubesec）
 kubectl get deploy nginx -o yaml | kubesec scan -
 
-# Check Pod Security Standards
+# 检查 Pod Security Standards
 kubectl label namespace production pod-security.kubernetes.io/enforce=restricted
 ```
 
-### Audit Logs
+### 审计日志
 
 ```bash
-# View audit logs (on control plane node)
+# 查看审计日志（在控制平面节点上）
 cat /var/log/kubernetes/audit.log | grep "user.username"
 
-# Filter by user
+# 按用户过滤
 cat /var/log/kubernetes/audit.log | jq 'select(.user.username=="admin")'
 
-# Filter by namespace
+# 按 namespace 过滤
 cat /var/log/kubernetes/audit.log | jq 'select(.objectRef.namespace=="production")'
 
-# Filter by verb
+# 按操作过滤
 cat /var/log/kubernetes/audit.log | jq 'select(.verb=="delete")'
 ```
 
-## Summary and Key Takeaways
+## 总结和关键要点
 
-### Essential kubectl Commands
+### 基本 kubectl 命令
 
 ```bash
-# Get information
+# 获取信息
 kubectl get pods/deployments/services
 kubectl describe pod <name>
 kubectl logs <pod>
 kubectl top pods/nodes
 
-# Debugging
+# 调试
 kubectl exec -it <pod> -- /bin/bash
 kubectl debug <pod>
 kubectl get events
 
-# Operations
+# 运维操作
 kubectl apply -f manifest.yaml
 kubectl delete pod <name>
 kubectl scale deployment <name> --replicas=5
 kubectl rollout status/history/undo
 
-# Context management
+# 上下文管理
 kubectl config use-context <context>
 kubectl config set-context --current --namespace=<ns>
 ```
 
-### Debugging Checklist
+### 调试清单
 
-1. **Check Pod status**: `kubectl get pods`
-2. **Describe Pod**: `kubectl describe pod <name>`
-3. **View events**: Check Events section in describe output
-4. **Check logs**: `kubectl logs <pod>`
-5. **Previous logs** (if crashed): `kubectl logs <pod> --previous`
-6. **Exec into Pod**: `kubectl exec -it <pod> -- /bin/bash`
-7. **Check Service/Endpoints**: `kubectl get endpoints <service>`
-8. **Check resources**: `kubectl top pods`
-9. **Check node**: `kubectl describe node <node>`
+1. **检查 Pod 状态**：`kubectl get pods`
+2. **描述 Pod**：`kubectl describe pod <name>`
+3. **查看事件**：在 describe 输出中检查 Events 部分
+4. **检查日志**：`kubectl logs <pod>`
+5. **崩溃前日志**（如果崩溃了）：`kubectl logs <pod> --previous`
+6. **进入 Pod**：`kubectl exec -it <pod> -- /bin/bash`
+7. **检查 Service/Endpoints**：`kubectl get endpoints <service>`
+8. **检查资源**：`kubectl top pods`
+9. **检查节点**：`kubectl describe node <node>`
 
-### Common Issues Quick Reference
+### 常见问题快速参考
 
-| Issue | Check | Solution |
+| 问题 | 检查内容 | 解决方案 |
 |-------|-------|----------|
-| ImagePullBackOff | Image name, registry auth | Fix image, add imagePullSecret |
-| CrashLoopBackOff | Logs, resource limits | Fix app, adjust resources |
-| Pending | Node resources, PVC | Add nodes, fix PVC |
-| Not receiving traffic | Service selector, readiness probe | Fix labels, adjust probe |
-| OOMKilled | Memory limits | Increase limits |
-| Node NotReady | kubelet, disk space | Restart kubelet, clean disk |
+| ImagePullBackOff | 镜像名称、仓库认证 | 修复镜像，添加 imagePullSecret |
+| CrashLoopBackOff | 日志、资源限制 | 修复应用，调整资源 |
+| Pending | 节点资源、PVC | 添加节点，修复 PVC |
+| 未接收流量 | Service selector、readiness probe | 修复标签，调整探针 |
+| OOMKilled | 内存限制 | 增加限制 |
+| Node NotReady | kubelet、磁盘空间 | 重启 kubelet，清理磁盘 |
 
-### Best Practices
+### 最佳实践
 
-1. **Use namespaces** to organize resources
-2. **Label everything** for easy filtering
-3. **Set resource requests/limits** always
-4. **Use readiness probes** for traffic routing
-5. **Use liveness probes** for auto-restart
-6. **Centralize logs** (EFK, PLG, ELK)
-7. **Monitor resources** (Prometheus, Grafana)
-8. **Regular backups** (Velero)
-9. **Practice RBAC** principle of least privilege
-10. **Automate** with scripts and CI/CD
+1. **使用 namespaces** 组织资源
+2. **为所有资源添加标签** 便于过滤
+3. **始终设置资源 requests/limits**
+4. **使用 readiness probes** 进行流量路由
+5. **使用 liveness probes** 实现自动重启
+6. **集中日志**（EFK、PLG、ELK）
+7. **监控资源**（Prometheus、Grafana）
+8. **定期备份**（Velero）
+9. **实践 RBAC** 最小权限原则
+10. **实现自动化** 使用脚本和 CI/CD
 
-### Productivity Tips
+### 效率技巧
 
-- Use **aliases** for common commands
-- Install **kubectl plugins** (krew)
-- Enable **shell completion**
-- Use **kubectl explain** for resource documentation
-- Master **JSONPath** and **field/label selectors**
-- Keep **kubeconfig organized**
-- Use **contexts** for multiple clusters
+- 为常用命令使用**别名**
+- 安装 **kubectl 插件**（krew）
+- 启用 **shell 补全**
+- 使用 **kubectl explain** 查看资源文档
+- 掌握 **JSONPath** 和 **field/label selectors**
+- 保持 **kubeconfig 整洁**
+- 对多集群使用 **contexts**
 
-### Next Steps
+### 后续步骤
 
-- Practice debugging scenarios in Exercise 03
-- Set up monitoring with Prometheus
-- Configure centralized logging
-- Automate operations with scripts
-- Learn about GitOps (ArgoCD, Flux)
-- Study Kubernetes operators
-- Explore service meshes (Istio, Linkerd)
+- 在 Exercise 03 中练习调试场景
+- 使用 Prometheus 设置监控
+- 配置集中式日志
+- 用脚本自动化运维
+- 了解 GitOps（ArgoCD、Flux）
+- 学习 Kubernetes operator
+- 探索服务网格（Istio、Linkerd）
 
-### Further Reading
+### 延伸阅读
 
-- kubectl Cheat Sheet: https://kubernetes.io/docs/reference/kubectl/cheatsheet/
-- Debugging Guide: https://kubernetes.io/docs/tasks/debug/
-- Best Practices: https://kubernetes.io/docs/concepts/configuration/overview/
-- Monitoring: https://kubernetes.io/docs/tasks/debug/debug-cluster/resource-metrics-pipeline/
+- kubectl 速查表：https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+- 调试指南：https://kubernetes.io/docs/tasks/debug/
+- 最佳实践：https://kubernetes.io/docs/concepts/configuration/overview/
+- 监控：https://kubernetes.io/docs/tasks/debug/debug-cluster/resource-metrics-pipeline/
 
 ---
 
-**Congratulations!** You now have the operational skills to manage Kubernetes clusters effectively. Practice these skills regularly to build muscle memory and troubleshooting intuition.
+**恭喜！** 你现在拥有有效管理 Kubernetes 集群的运维技能。定期练习这些技能，以建立肌肉记忆和排障直觉。

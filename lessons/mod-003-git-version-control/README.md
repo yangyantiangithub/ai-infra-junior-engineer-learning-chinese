@@ -1,851 +1,851 @@
-# Module 003: Git and Version Control
+# 模块 003：Git 与版本控制
 
-## Module Overview
+## 模块概述
 
-Version control is the cornerstone of modern software development and infrastructure engineering. This module provides comprehensive training in Git, the industry-standard distributed version control system, and GitHub, the leading platform for collaboration and code hosting.
+版本控制是现代软件开发和基础设施工程的基石。本模块提供关于 Git（业界标准的分布式版本控制系统）和 GitHub（领先的协作与代码托管平台）的全面培训。
 
-You'll learn not just how to use Git commands, but understand the underlying concepts that make Git powerful. You'll practice collaborative workflows, learn best practices for commit management, branching strategies, and how to handle complex scenarios that arise in real-world projects. These skills are essential for managing infrastructure as code, collaborating with teams, and maintaining professional development standards.
+你将学习的不仅仅是 Git 命令的使用，还包括理解使 Git 强大的底层概念。你将练习协作工作流，学习 commit 管理的最佳实践、分支策略，以及如何处理真实项目中出现的复杂场景。这些技能对于管理基础设施即代码、与团队协作以及维持专业开发标准至关重要。
 
-By the end of this module, you'll be confident using Git for daily work, contributing to team projects, and managing code effectively throughout its lifecycle.
+完成本模块后，你将能够自信地使用 Git 进行日常工作、参与团队项目，并在整个生命周期中有效管理代码。
 
-## Learning Objectives
+## 学习目标
 
-By completing this module, you will be able to:
+完成本模块后，你将能够：
 
-1. **Understand version control concepts** and why they matter for infrastructure engineering
-2. **Use fundamental Git commands** for tracking changes and managing repositories
-3. **Create effective commits** with clear messages following industry standards
-4. **Work with branches** to develop features and fix bugs in isolation
-5. **Collaborate using GitHub** including pull requests, code reviews, and issues
-6. **Resolve merge conflicts** confidently and understand their causes
-7. **Use advanced Git features** like rebasing, stashing, and cherry-picking
-8. **Follow Git workflows** appropriate for team collaboration (Git Flow, GitHub Flow)
-9. **Manage repositories** including remotes, tags, and releases
-10. **Apply Git best practices** for infrastructure as code projects
+1. **理解版本控制概念**及其对基础设施工程的重要性
+2. **使用基础 Git 命令**来跟踪变更和管理仓库
+3. **创建有效的 commit**，遵循行业标准的清晰消息
+4. **使用分支**来在隔离环境中开发功能和修复 bug
+5. **使用 GitHub 进行协作**，包括 pull request、代码审查和 issue
+6. **自信地解决合并冲突**并理解其产生原因
+7. **使用高级 Git 功能**，如 rebasing、stashing 和 cherry-picking
+8. **遵循适合团队协作的 Git 工作流**（Git Flow、GitHub Flow）
+9. **管理仓库**，包括 remote、tag 和 release
+10. **对基础设施即代码项目应用 Git 最佳实践**
 
-## Prerequisites
+## 预备知识
 
-- Completion of Module 002 (Linux Essentials) recommended
-- Comfort with command-line interfaces
-- Basic understanding of file systems and text files
-- GitHub account (free tier is sufficient)
+- 建议先完成模块 002（Linux 基础）
+- 熟悉命令行界面
+- 基本了解文件系统和文本文件
+- GitHub 账号（免费版即可）
 
-**Recommended Setup:**
-- Git 2.30+ installed on your system
-- Text editor or IDE with Git integration (VS Code recommended)
-- GitHub account with SSH keys configured
-- Terminal access (native Linux, macOS, WSL2, or Git Bash on Windows)
+**推荐配置：**
+- 系统已安装 Git 2.30+
+- 支持 Git 集成的文本编辑器或 IDE（推荐 VS Code）
+- 已配置 SSH 密钥的 GitHub 账号
+- 终端访问（原生 Linux、macOS、WSL2 或 Windows 上的 Git Bash）
 
-## Time Commitment
+## 时间投入
 
-- **Total Estimated Time:** 28-35 hours
-- **Lectures & Reading:** 9-11 hours (5 comprehensive lectures)
-- **Hands-on Exercises:** 15-19 hours
-- **Projects & Collaboration:** 4-5 hours
+- **总预计时间：** 28-35 小时
+- **讲座与阅读：** 9-11 小时（5 场综合讲座）
+- **动手练习：** 15-19 小时
+- **项目与协作：** 4-5 小时
 
-**Recommended Pace:**
-- Part-time (5-10 hrs/week): 3-4 weeks
-- Full-time (20-30 hrs/week): 1-2 weeks
+**推荐节奏：**
+- 兼职（5-10 小时/周）：3-4 周
+- 全职（20-30 小时/周）：1-2 周
 
-Git mastery comes from practice. Expect to spend time experimenting, making mistakes safely, and building muscle memory for common workflows.
+Git 的精通来自实践。请预留时间进行实验、安全地犯错，并为常用工作流建立肌肉记忆。
 
-## Module Structure
+## 模块结构
 
-This module is organized into 5 comprehensive lectures over 3-4 weeks:
+本模块包含 5 场综合讲座，为期 3-4 周：
 
-### Week 1: Git Fundamentals & Branching
-- **Lecture 1:** Git Fundamentals (120 min)
-- **Lecture 2:** Branching and Merging (120 min)
-- **Topics:** Version control concepts, basic commands, commit workflow, branches, conflicts
-- **Key Skills:** init, clone, add, commit, status, log, diff, branch, merge, conflict resolution
-- **Practice:** Creating repositories, making commits, feature branches, resolving conflicts
+### 第 1 周：Git 基础与分支
+- **讲座 1：** Git 基础（120 分钟）
+- **讲座 2：** 分支与合并（120 分钟）
+- **主题：** 版本控制概念、基本命令、commit 工作流、分支、冲突
+- **关键技能：** init、clone、add、commit、status、log、diff、branch、merge、冲突解决
+- **练习：** 创建仓库、制作 commit、功能分支、解决冲突
 
-### Week 2: Collaboration with GitHub
-- **Lecture 3:** Collaboration with Git and GitHub (120 min)
-- **Topics:** Remote repositories, pull requests, code review, collaboration workflows
-- **Key Skills:** push, pull, fetch, pull requests, forking, code review
-- **Practice:** Contributing to projects, PR workflow, team collaboration
+### 第 2 周：使用 GitHub 进行协作
+- **讲座 3：** 使用 Git 和 GitHub 协作（120 分钟）
+- **主题：** 远程仓库、pull request、代码审查、协作工作流
+- **关键技能：** push、pull、fetch、pull request、fork、代码审查
+- **练习：** 贡献项目、PR 工作流、团队协作
 
-### Week 3: Advanced Techniques & Best Practices
-- **Lecture 4:** Advanced Git Techniques (120 min)
-- **Lecture 5:** Git for ML and Infrastructure Projects (90 min)
-- **Topics:** Advanced commands, workflows, troubleshooting, ML/IaC patterns
-- **Key Skills:** stash, rebase, cherry-pick, hooks, Git LFS, CI/CD integration
-- **Practice:** Complex scenarios, recovery techniques, infrastructure repositories
+### 第 3 周：高级技术与最佳实践
+- **讲座 4：** 高级 Git 技术（120 分钟）
+- **讲座 5：** 用于 ML 和基础设施项目的 Git（90 分钟）
+- **主题：** 高级命令、工作流、故障排除、ML/IaC 模式
+- **关键技能：** stash、rebase、cherry-pick、hook、Git LFS、CI/CD 集成
+- **练习：** 复杂场景、恢复技术、基础设施仓库
 
-## Detailed Topic Breakdown
+## 详细主题分解
 
-### 1. Introduction to Version Control (4-5 hours)
+### 1. 版本控制简介（4-5 小时）
 
-#### 1.1 Why Version Control Matters
-- History of version control systems
-- Benefits of version control for infrastructure
-- Distributed vs centralized version control
-- Git vs other VCS (SVN, Mercurial)
-- Use cases in AI/ML infrastructure
+#### 1.1 为什么版本控制很重要
+- 版本控制系统的历史
+- 版本控制对基础设施的好处
+- 分布式与集中式版本控制
+- Git 与其他 VCS 对比（SVN、Mercurial）
+- 在 AI/ML 基础设施中的使用场景
 
-#### 1.2 Git Fundamentals
-- Git architecture and object model
-- The three states: working directory, staging area, repository
-- Understanding commits and the commit graph
-- SHA-1 hashes and object storage
-- Understanding HEAD and references
+#### 1.2 Git 基础
+- Git 架构与对象模型
+- 三种状态：工作目录、暂存区、仓库
+- 理解 commit 和 commit 图
+- SHA-1 哈希与对象存储
+- 理解 HEAD 和引用
 
-#### 1.3 Installing and Configuring Git
-- Installation across platforms
-- Initial configuration (user.name, user.email)
-- Git configuration levels (system, global, local)
-- Useful configuration options
-- Setting up SSH keys for GitHub
-- Credential management
+#### 1.3 安装与配置 Git
+- 跨平台安装
+- 初始配置（user.name、user.email）
+- Git 配置级别（system、global、local）
+- 有用的配置选项
+- 为 GitHub 设置 SSH 密钥
+- 凭据管理
 
-#### 1.4 Getting Help
-- Git documentation structure
-- Using `git help` command
-- Understanding man pages
-- Online resources and communities
-- Reading Git documentation effectively
+#### 1.4 获取帮助
+- Git 文档结构
+- 使用 `git help` 命令
+- 理解 man 手册
+- 在线资源与社区
+- 有效阅读 Git 文档
 
-### 2. Basic Git Operations (6-8 hours)
+### 2. 基本 Git 操作（6-8 小时）
 
-#### 2.1 Creating and Cloning Repositories
-- Initializing new repositories (`git init`)
-- Cloning existing repositories (`git clone`)
-- Understanding .git directory structure
-- Repository structure and conventions
-- README, .gitignore, and LICENSE files
+#### 2.1 创建与克隆仓库
+- 初始化新仓库（`git init`）
+- 克隆已有仓库（`git clone`）
+- 理解 .git 目录结构
+- 仓库结构与约定
+- README、.gitignore 和 LICENSE 文件
 
-#### 2.2 Tracking Changes
-- Checking repository status (`git status`)
-- Adding files to staging area (`git add`)
-- Understanding staging strategies
-- Removing and moving files
-- Viewing differences (`git diff`)
-- Ignoring files with .gitignore
-- Global and local ignore patterns
+#### 2.2 跟踪变更
+- 检查仓库状态（`git status`）
+- 添加文件到暂存区（`git add`）
+- 理解暂存策略
+- 删除和移动文件
+- 查看差异（`git diff`）
+- 使用 .gitignore 忽略文件
+- 全局和本地忽略模式
 
-#### 2.3 Committing Changes
-- Creating commits (`git commit`)
-- Writing effective commit messages
-- Commit message conventions
-- Amending commits
-- Understanding commit best practices
-- Atomic commits
-- When to commit and how often
+#### 2.3 提交变更
+- 创建 commit（`git commit`）
+- 编写有效的 commit 消息
+- Commit 消息约定
+- 修改 commit
+- 理解 commit 最佳实践
+- 原子性 commit
+- 何时提交以及提交频率
 
-#### 2.4 Viewing History
-- Viewing commit history (`git log`)
-- Formatting log output
-- Filtering history
-- Viewing specific commits (`git show`)
-- Searching commit history
-- Understanding ancestry references (HEAD^, HEAD~2)
-- Graphical log visualization
+#### 2.4 查看历史
+- 查看 commit 历史（`git log`）
+- 格式化 log 输出
+- 过滤历史
+- 查看特定 commit（`git show`）
+- 搜索 commit 历史
+- 理解祖先引用（HEAD^、HEAD~2）
+- 图形化 log 展示
 
-#### 2.5 Undoing Changes
-- Discarding working directory changes
-- Unstaging files
-- Modifying commits
-- Understanding destructive vs non-destructive operations
-- Reverting commits (`git revert`)
-- Resetting commits (`git reset`)
-- Safety considerations
+#### 2.5 撤销变更
+- 丢弃工作目录变更
+- 取消暂存文件
+- 修改 commit
+- 理解破坏性与非破坏性操作
+- 还原 commit（`git revert`）
+- 重置 commit（`git reset`）
+- 安全注意事项
 
-### 3. Branching and Merging (8-10 hours)
+### 3. 分支与合并（8-10 小时）
 
-#### 3.1 Understanding Branches
-- What branches are and why they matter
-- Branch as a pointer to commits
-- Creating branches (`git branch`)
-- Switching branches (`git checkout`, `git switch`)
-- Listing and managing branches
-- Branch naming conventions
-- Remote tracking branches
+#### 3.1 理解分支
+- 什么是分支以及为什么重要
+- 分支作为指向 commit 的指针
+- 创建分支（`git branch`）
+- 切换分支（`git checkout`、`git switch`）
+- 列出和管理分支
+- 分支命名约定
+- 远程跟踪分支
 
-#### 3.2 Branching Strategies
-- Feature branches
-- Release branches
-- Hotfix branches
-- Git Flow workflow
-- GitHub Flow workflow
-- Trunk-based development
-- Choosing the right strategy
+#### 3.2 分支策略
+- 功能分支
+- 发布分支
+- 热修复分支
+- Git Flow 工作流
+- GitHub Flow 工作流
+- 主干开发
+- 选择正确的策略
 
-#### 3.3 Merging Branches
-- Fast-forward merges
-- Three-way merges
-- Merge commits
-- Merge strategies and options
-- Understanding merge parents
-- When to merge vs rebase
-- Merge best practices
+#### 3.3 合并分支
+- 快进合并
+- 三方合并
+- 合并 commit
+- 合并策略与选项
+- 理解合并父提交
+- 何时使用 merge 与 rebase
+- 合并最佳实践
 
-#### 3.4 Resolving Conflicts
-- Understanding why conflicts occur
-- Conflict markers and structure
-- Manual conflict resolution
-- Using merge tools
-- Aborting and restarting merges
-- Preventing conflicts
-- Testing after resolution
+#### 3.4 解决冲突
+- 理解冲突产生的原因
+- 冲突标记与结构
+- 手动解决冲突
+- 使用合并工具
+- 中止和重启合并
+- 预防冲突
+- 解决后的测试
 
-#### 3.5 Rebasing
-- What is rebasing?
-- Interactive rebase
-- Rebase vs merge comparison
-- When to use rebase
-- Dangers of rebasing published history
-- Rebase best practices
-- Resolving rebase conflicts
+#### 3.5 变基
+- 什么是 rebasing？
+- 交互式 rebase
+- Rebase 与 merge 对比
+- 何时使用 rebase
+- 变基已发布历史的危险
+- Rebase 最佳实践
+- 解决 rebase 冲突
 
-### 4. Remote Repositories and GitHub (8-10 hours)
+### 4. 远程仓库与 GitHub（8-10 小时）
 
-#### 4.1 Understanding Remotes
-- What are remote repositories?
-- Adding remotes (`git remote`)
-- Viewing remote information
-- Multiple remotes
-- Remote naming conventions (origin, upstream)
-- Remote URLs (HTTPS vs SSH)
+#### 4.1 理解远程仓库
+- 什么是远程仓库？
+- 添加 remote（`git remote`）
+- 查看远程信息
+- 多个 remote
+- 远程命名约定（origin、upstream）
+- 远程 URL（HTTPS vs SSH）
 
-#### 4.2 Pushing and Pulling
-- Pushing changes (`git push`)
-- Fetching changes (`git fetch`)
-- Pulling changes (`git pull`)
-- Understanding fetch vs pull
-- Tracking branches
-- Push and pull options
-- Force pushing (when and why not to)
+#### 4.2 推送与拉取
+- 推送变更（`git push`）
+- 获取变更（`git fetch`）
+- 拉取变更（`git pull`）
+- 理解 fetch 与 pull 的区别
+- 跟踪分支
+- Push 和 pull 选项
+- 强制推送（何时以及为何不应该）
 
-#### 4.3 GitHub Fundamentals
-- Creating GitHub repositories
-- Repository settings and options
-- README and repository documentation
-- GitHub UI navigation
-- Repository visibility (public vs private)
-- GitHub pricing and plans
-- GitHub features overview
+#### 4.3 GitHub 基础
+- 创建 GitHub 仓库
+- 仓库设置与选项
+- README 与仓库文档
+- GitHub UI 导航
+- 仓库可见性（公开 vs 私有）
+- GitHub 定价与方案
+- GitHub 功能概览
 
-#### 4.4 Collaboration Workflows
-- Forking repositories
-- Cloning vs forking
-- Upstream and origin conventions
-- Keeping forks synchronized
-- Direct collaboration
-- Organization repositories
-- Access control and permissions
+#### 4.4 协作工作流
+- Fork 仓库
+- Clone 与 fork 的区别
+- Upstream 和 origin 约定
+- 保持 fork 同步
+- 直接协作
+- 组织仓库
+- 访问控制与权限
 
-#### 4.5 Pull Requests
-- Creating pull requests
-- Pull request descriptions
-- Linking issues
-- Requesting reviews
-- Pull request workflow
-- Draft pull requests
-- Pull request templates
-- Converting issues to PRs
+#### 4.5 Pull Request
+- 创建 pull request
+- Pull request 描述
+- 关联 issue
+- 请求审查
+- Pull request 工作流
+- Draft pull request
+- Pull request 模板
+- 将 issue 转换为 PR
 
-#### 4.6 Code Review
-- Code review best practices
-- Commenting on code
-- Suggesting changes
-- Approving and requesting changes
-- Review etiquette
-- Responding to feedback
-- Iterating on pull requests
+#### 4.6 代码审查
+- 代码审查最佳实践
+- 对代码进行评论
+- 建议修改
+- 批准和请求更改
+- 审查礼仪
+- 回应反馈
+- 迭代 pull request
 
-#### 4.7 Issues and Project Management
-- Creating and managing issues
-- Issue templates
-- Labels and milestones
-- Assigning issues
-- Issue references and linking
-- Projects and boards
-- GitHub Actions introduction
+#### 4.7 Issue 与项目管理
+- 创建和管理 issue
+- Issue 模板
+- 标签和里程碑
+- 分配 issue
+- Issue 引用和链接
+- 项目与看板
+- GitHub Actions 简介
 
-### 5. Advanced Git Techniques (6-8 hours)
+### 5. 高级 Git 技术（6-8 小时）
 
-#### 5.1 Stashing Changes
-- What is the stash?
-- Stashing uncommitted changes
-- Applying stashed changes
-- Managing multiple stashes
-- Stash options and variations
-- When to use stash
-- Stash vs commit
+#### 5.1 Stashing 变更
+- 什么是 stash？
+- 暂存未提交的变更
+- 应用暂存的变更
+- 管理多个 stash
+- Stash 选项与变体
+- 何时使用 stash
+- Stash 与 commit 对比
 
-#### 5.2 Tagging and Releases
-- Annotated vs lightweight tags
-- Creating tags
-- Pushing tags
-- Semantic versioning
+#### 5.2 标签与发布
+- 注释标签与轻量标签
+- 创建标签
+- 推送标签
+- 语义化版本
 - GitHub releases
-- Release notes
-- Versioning strategies
+- 发布说明
+- 版本策略
 
 #### 5.3 Cherry-Picking
-- What is cherry-picking?
-- Selecting specific commits
-- Cherry-pick use cases
-- Potential issues
-- Cherry-pick vs merge
-- When to cherry-pick
-- Maintaining commit history
+- 什么是 cherry-picking？
+- 选择特定 commit
+- Cherry-pick 使用场景
+- 潜在问题
+- Cherry-pick 与 merge 对比
+- 何时使用 cherry-pick
+- 维护 commit 历史
 
-#### 5.4 Advanced History Manipulation
-- Interactive rebase workflows
-- Squashing commits
-- Splitting commits
-- Reordering commits
-- Editing commit messages
-- Fixing old commits
-- History rewriting considerations
+#### 5.4 高级历史操作
+- 交互式 rebase 工作流
+- 压缩 commit
+- 拆分 commit
+- 重新排序 commit
+- 编辑 commit 消息
+- 修复旧的 commit
+- 历史重写注意事项
 
 #### 5.5 Git Hooks
-- Client-side hooks
-- Server-side hooks
-- Pre-commit hooks
-- Pre-push hooks
-- Commit message hooks
-- Hook use cases
-- Sharing hooks with team
+- 客户端 hook
+- 服务端 hook
+- Pre-commit hook
+- Pre-push hook
+- Commit 消息 hook
+- Hook 使用场景
+- 与团队共享 hook
 
-#### 5.6 Submodules and Subtrees
-- Managing dependencies with submodules
-- Working with submodules
-- Submodule pitfalls
-- Git subtrees as alternative
-- Monorepo vs multirepo
-- Best practices for dependencies
+#### 5.6 子模块与子树
+- 使用子模块管理依赖
+- 使用子模块
+- 子模块陷阱
+- Git 子树作为替代方案
+- 单仓库 vs 多仓库
+- 依赖管理最佳实践
 
-#### 5.7 Advanced Troubleshooting
-- Finding bugs with git bisect
-- Recovering lost commits with reflog
-- Finding who changed what with blame
-- Searching code history
-- Recovering deleted branches
-- Dealing with detached HEAD
-- Common problems and solutions
+#### 5.7 高级故障排除
+- 使用 git bisect 查找 bug
+- 使用 reflog 恢复丢失的 commit
+- 使用 blame 查找谁修改了什么
+- 搜索代码历史
+- 恢复已删除的分支
+- 处理 detached HEAD
+- 常见问题与解决方案
 
-### 6. Git Best Practices for Infrastructure (4-5 hours)
+### 6. Git 在基础设施中的最佳实践（4-5 小时）
 
-#### 6.1 Infrastructure as Code with Git
-- Why IaC belongs in version control
-- Repository structure for infrastructure
-- Branching strategies for infrastructure
-- Environment-specific branches
-- Terraform/CloudFormation in Git
-- Secrets management considerations
-- Configuration management
+#### 6.1 基础设施即代码与 Git
+- 为什么 IaC 应该在版本控制中
+- 基础设施的仓库结构
+- 基础设施的分支策略
+- 环境特定分支
+- Git 中的 Terraform/CloudFormation
+- 密钥管理注意事项
+- 配置管理
 
-#### 6.2 Commit Hygiene
-- Atomic commits principle
-- Commit message standards (Conventional Commits)
-- What to include in commits
-- What not to commit (secrets, binaries, dependencies)
-- Commit frequency
-- Keeping commits focused
-- Pre-commit validation
+#### 6.2 Commit 卫生
+- 原子性 commit 原则
+- Commit 消息标准（Conventional Commits）
+- 应在 commit 中包含什么
+- 不应提交的内容（密钥、二进制文件、依赖）
+- Commit 频率
+- 保持 commit 聚焦
+- Pre-commit 验证
 
-#### 6.3 Branch Management
-- Long-lived vs short-lived branches
-- Branch cleanup strategies
-- Protected branches
-- Branch policies
-- Naming conventions
-- When to delete branches
-- Branch lifecycle
+#### 6.3 分支管理
+- 长寿分支与短寿分支
+- 分支清理策略
+- 保护分支
+- 分支策略
+- 命名约定
+- 何时删除分支
+- 分支生命周期
 
-#### 6.4 Collaboration Best Practices
-- Pull request guidelines
-- Code review standards
-- Handling feedback professionally
-- Documentation in PRs
-- Testing requirements
-- Continuous integration integration
-- Team agreements
+#### 6.4 协作最佳实践
+- Pull request 指南
+- 代码审查标准
+- 专业地处理反馈
+- PR 中的文档
+- 测试要求
+- 持续集成集成
+- 团队约定
 
-#### 6.5 Security Considerations
-- Avoiding committed secrets
-- Using .gitignore effectively
-- Removing sensitive data from history
-- GitHub security features
-- Dependency scanning
-- Code scanning
-- Secret scanning
+#### 6.5 安全注意事项
+- 避免提交密钥
+- 有效使用 .gitignore
+- 从历史中移除敏感数据
+- GitHub 安全功能
+- 依赖扫描
+- 代码扫描
+- 密钥扫描
 
-#### 6.6 Performance and Maintenance
-- Repository size management
-- Large file handling (Git LFS)
-- Keeping clean history
-- Garbage collection
-- Shallow clones
-- Partial clones
-- Archive strategies
+#### 6.6 性能与维护
+- 仓库大小管理
+- 大文件处理（Git LFS）
+- 保持历史整洁
+- 垃圾回收
+- 浅克隆
+- 部分克隆
+- 归档策略
 
-## Lecture Outline
+## 讲座大纲
 
-> **Status Update (2025-10-28):** All 5 comprehensive lectures are now complete! Each lecture combines related topics for efficient learning and includes hands-on labs with AI Infrastructure examples.
+> **状态更新（2025-10-28）：** 所有 5 场综合讲座现已完成！每场讲座将相关主题结合以实现高效学习，并包含 AI 基础设施示例的动手实验。
 
-### Lecture 1: Git Fundamentals (120 min)
-**File**: `lecture-notes/01-git-fundamentals.md`
-- Introduction to version control systems
-- Why version control matters for AI Infrastructure
-- Git architecture and object model (commits, trees, blobs)
-- Installation and configuration across platforms
-- Setting up SSH keys for GitHub
-- Basic Git workflow: init, clone, add, commit, status
-- Understanding the three states (working, staging, repository)
-- Viewing history with git log
-- Understanding diffs
-- Undoing changes (checkout, restore, reset)
-- **Lab:** Complete Git setup and basic workflow practice
+### 讲座 1：Git 基础（120 分钟）
+**文件：** `lecture-notes/01-git-fundamentals.md`
+- 版本控制系统简介
+- 为什么版本控制对 AI 基础设施很重要
+- Git 架构与对象模型（commit、tree、blob）
+- 跨平台安装与配置
+- 为 GitHub 设置 SSH 密钥
+- 基本 Git 工作流：init、clone、add、commit、status
+- 理解三种状态（工作区、暂存区、仓库）
+- 使用 git log 查看历史
+- 理解 diff
+- 撤销变更（checkout、restore、reset）
+- **实验：** 完成 Git 设置和基本工作流练习
 
-### Lecture 2: Branching and Merging (120 min)
-**File**: `lecture-notes/02-branching-merging.md`
-- Branch concepts and theory
-- Creating and switching branches (branch, checkout, switch)
-- Merging strategies (fast-forward, three-way merge)
-- Understanding merge commits
-- Branch visualization and history
-- **Merge conflicts**: why they happen
-- Conflict markers and structure
-- Resolution strategies and tools
-- Testing after conflict resolution
-- Prevention strategies
-- Best practices for branching
-- **Lab:** Feature branch workflow with conflict resolution
+### 讲座 2：分支与合并（120 分钟）
+**文件：** `lecture-notes/02-branching-merging.md`
+- 分支概念与理论
+- 创建和切换分支（branch、checkout、switch）
+- 合并策略（快进、三方合并）
+- 理解合并 commit
+- 分支可视化与历史
+- **合并冲突：** 为什么会发生
+- 冲突标记与结构
+- 解决策略与工具
+- 冲突解决后的测试
+- 预防策略
+- 分支最佳实践
+- **实验：** 功能分支工作流与冲突解决
 
-### Lecture 3: Collaboration with Git and GitHub (120 min)
-**File**: `lecture-notes/03-collaboration.md`
-- Remote repository concepts
-- Pushing and pulling changes
-- Fetch vs pull differences
-- GitHub fundamentals and account setup
-- Forking vs cloning workflows
-- Contributing to open source projects
-- **Pull request workflow**: creating, updating, merging
-- Writing effective PR descriptions
-- Code review best practices
-- Iteration and feedback loops
-- Collaboration models (fork-and-PR, shared repo)
-- GitHub issues and project management
-- **Lab:** Complete collaborative workflow with PRs
+### 讲座 3：使用 Git 和 GitHub 协作（120 分钟）
+**文件：** `lecture-notes/03-collaboration.md`
+- 远程仓库概念
+- 推送和拉取变更
+- Fetch 与 pull 的区别
+- GitHub 基础与账号设置
+- Fork 与 clone 工作流
+- 为开源项目做贡献
+- **Pull request 工作流：** 创建、更新、合并
+- 编写有效的 PR 描述
+- 代码审查最佳实践
+- 迭代与反馈循环
+- 协作模式（fork-and-PR、共享仓库）
+- GitHub issue 与项目管理
+- **实验：** 使用 PR 完成协作工作流
 
-### Lecture 4: Advanced Git Techniques (120 min)
-**File**: `lecture-notes/04-advanced-git.md`
-- Rebasing fundamentals and use cases
-- Interactive rebase for commit cleanup
-- Rebase vs merge: when to use each
-- Stashing changes (save, apply, pop, list)
-- Cherry-picking commits
-- Reflog for recovery
-- Git bisect for debugging
-- Submodules introduction
-- Git hooks (pre-commit, pre-push)
-- Advanced troubleshooting
-- Recovery techniques (lost commits, mistakes)
-- **Lab:** Advanced workflow scenarios and recovery
+### 讲座 4：高级 Git 技术（120 分钟）
+**文件：** `lecture-notes/04-advanced-git.md`
+- Rebasing 基础与使用场景
+- 交互式 rebase 进行 commit 清理
+- Rebase vs merge：何时使用哪种
+- Stashing 变更（save、apply、pop、list）
+- Cherry-picking commit
+- 使用 reflog 进行恢复
+- 使用 git bisect 调试
+- 子模块简介
+- Git hooks（pre-commit、pre-push）
+- 高级故障排除
+- 恢复技术（丢失的 commit、错误操作）
+- **实验：** 高级工作流场景与恢复
 
-### Lecture 5: Git for ML and Infrastructure Projects (90 min)
-**File**: `lecture-notes/05-git-for-ml-projects.md`
-- Version control for large-scale ML projects
-- Handling large files (Git LFS)
-- Jupyter notebook version control strategies
-- Infrastructure as Code (IaC) patterns
-- Repository organization for ML/infrastructure
-- Branch strategies for production systems
-- Secrets management (git-secret, encrypted configs)
-- CI/CD integration basics
-- Git workflows for teams (Git Flow, GitHub Flow, trunk-based)
-- Best practices for AI Infrastructure
-- Code review for infrastructure code
-- **Lab:** Setting up ML/Infrastructure repository
+### 讲座 5：用于 ML 和基础设施项目的 Git（90 分钟）
+**文件：** `lecture-notes/05-git-for-ml-projects.md`
+- 大规模 ML 项目的版本控制
+- 处理大文件（Git LFS）
+- Jupyter notebook 版本控制策略
+- 基础设施即代码（IaC）模式
+- ML/基础设施的仓库组织
+- 生产系统的分支策略
+- 密钥管理（git-secret、加密配置）
+- CI/CD 集成基础
+- 团队 Git 工作流（Git Flow、GitHub Flow、主干开发）
+- AI 基础设施最佳实践
+- 基础设施代码审查
+- **实验：** 设置 ML/基础设施仓库
 
-## Hands-On Exercises
+## 动手练习
 
-> **Status Update (2025-10-28):** All 8 comprehensive exercises are now complete! Each exercise includes detailed step-by-step instructions, ML infrastructure examples, and validation checkpoints.
+> **状态更新（2025-10-28）：** 所有 8 个综合练习现已完成！每个练习包含详细的分步说明、ML 基础设施示例和验证检查点。
 
-**Total Time**: 10-14 hours of hands-on practice
+**总时间：** 10-14 小时动手实践
 
-The module includes 8 progressive exercises that build practical Git skills for AI Infrastructure:
-
----
-
-### Exercise 01: Creating Your First ML Project Repository
-**Time**: 60-90 minutes | **Difficulty**: Beginner | **Prerequisites**: Lecture 01
-
-Initialize and configure Git repositories with ML-specific considerations.
-
-**Skills Practiced**:
-- `git init`, `git config`, `git status`, `git add`, `git commit`
-- Creating comprehensive `.gitignore` for ML projects
-- ML project directory structure
-- Writing professional commit messages
-- Three-state Git workflow (working → staging → committed)
+本模块包含 8 个渐进式练习，旨在为 AI 基础设施建立实用的 Git 技能：
 
 ---
 
-### Exercise 02: Working with Commits and History
-**Time**: 75-90 minutes | **Difficulty**: Beginner | **Prerequisites**: Lecture 01, Exercise 01
+### 练习 01：创建你的第一个 ML 项目仓库
+**时间：** 60-90 分钟 | **难度：** 入门 | **前置条件：** 讲座 01
 
-Master commit techniques and history navigation.
+初始化并配置 Git 仓库，考虑 ML 特定因素。
 
-**Skills Practiced**:
-- Conventional commit messages (feat:, fix:, docs:)
-- `git log` variations (--oneline, --stat, --grep, -S)
-- `git commit --amend` for fixing mistakes
-- `git revert` vs `git reset` for undoing changes
-- Searching commit history
-- Commit inspection with `git show`
-
----
-
-### Exercise 03: Branching for Feature Development
-**Time**: 75-90 minutes | **Difficulty**: Beginner-Intermediate | **Prerequisites**: Lecture 02, Exercise 02
-
-Implement parallel development with branches.
-
-**Skills Practiced**:
-- Creating and switching branches (`git branch`, `git switch`)
-- Branch naming conventions (feature/, fix/, hotfix/)
-- Working on multiple features simultaneously
-- Viewing and comparing branches
-- Deleting branches safely
-- `git stash` for context switching
+**练习的技能：**
+- `git init`、`git config`、`git status`、`git add`、`git commit`
+- 为 ML 项目创建全面的 `.gitignore`
+- ML 项目目录结构
+- 编写专业的 commit 消息
+- Git 三态工作流（工作区 → 暂存区 → 已提交）
 
 ---
 
-### Exercise 04: Merging and Conflict Resolution
-**Time**: 90-120 minutes | **Difficulty**: Intermediate | **Prerequisites**: Lecture 02, Exercise 03
+### 练习 02：处理 Commit 与历史
+**时间：** 75-90 分钟 | **难度：** 入门 | **前置条件：** 讲座 01、练习 01
 
-Master branch integration and conflict resolution.
+掌握 commit 技术与历史导航。
 
-**Skills Practiced**:
-- Fast-forward vs three-way merges
-- `git merge --no-ff`, `git merge --squash`
-- Identifying and resolving merge conflicts
-- Conflict markers in Python code and YAML configs
-- Using merge tools
-- `git merge --abort` for canceling merges
-- Post-merge validation
-
----
-
-### Exercise 05: Collaboration and Pull Requests
-**Time**: 90-120 minutes | **Difficulty**: Intermediate | **Prerequisites**: Lecture 03, Exercise 04
-
-Implement team collaboration workflows with GitHub.
-
-**Skills Practiced**:
-- Fork and clone workflows
-- Managing remotes (origin vs upstream)
-- Creating and managing pull requests
-- Code review best practices
-- Addressing feedback professionally
-- GitHub CLI (`gh pr create`, `gh pr checkout`)
-- `git push --force-with-lease` (safe force push)
+**练习的技能：**
+- Conventional commit 消息（feat:、fix:、docs:）
+- `git log` 变体（--oneline、--stat、--grep、-S）
+- `git commit --amend` 用于修复错误
+- `git revert` vs `git reset` 用于撤销变更
+- 搜索 commit 历史
+- 使用 `git show` 检查 commit
 
 ---
 
-### Exercise 06: Git for ML Workflows - DVC and Model Versioning
-**Time**: 90-120 minutes | **Difficulty**: Intermediate-Advanced | **Prerequisites**: Lectures 03-04, Exercise 05
+### 练习 03：功能开发的分支
+**时间：** 75-90 分钟 | **难度：** 入门到中级 | **前置条件：** 讲座 02、练习 02
 
-Version control for data, models, and experiments with DVC.
+使用分支实现并行开发。
 
-**Skills Practiced**:
-- DVC setup and configuration (`dvc init`, `dvc add`)
-- Tracking datasets with DVC
-- Model artifact versioning
-- DVC pipelines for reproducibility
-- DVC remote storage (S3, GCS, local)
-- Experiment tracking with YAML configs
-- Pre-commit hooks for ML validation
-
----
-
-### Exercise 07: Advanced Git Techniques
-**Time**: 120-150 minutes | **Difficulty**: Advanced | **Prerequisites**: Lecture 04, Exercises 01-06
-
-Master expert-level Git operations.
-
-**Skills Practiced**:
-- Interactive rebase (`git rebase -i`) for history cleanup
-- Custom Git hooks (pre-commit, pre-push)
-- Cherry-picking commits across branches
-- Advanced stashing workflows
-- `git bisect` for bug hunting
-- Recovery with `git reflog`
-- Git submodules for dependencies
-- `git worktree` for parallel development
+**练习的技能：**
+- 创建和切换分支（`git branch`、`git switch`）
+- 分支命名约定（feature/、fix/、hotfix/）
+- 同时在多个功能上工作
+- 查看和比较分支
+- 安全地删除分支
+- `git stash` 用于上下文切换
 
 ---
 
-### Exercise 08: Git LFS and Managing Large ML Projects
-**Time**: 90-120 minutes | **Difficulty**: Intermediate | **Prerequisites**: Lecture 05, All prior exercises
+### 练习 04：合并与冲突解决
+**时间：** 90-120 分钟 | **难度：** 中级 | **前置条件：** 讲座 02、练习 03
 
-Handle large files for ML projects with Git LFS.
+掌握分支集成与冲突解决。
 
-**Skills Practiced**:
-- Installing and configuring Git LFS
-- Tracking models and datasets with LFS
-- `.gitattributes` configuration
-- Semantic versioning for models (X.Y.Z)
-- DVC + LFS integration
-- Efficient cloning (`GIT_LFS_SKIP_SMUDGE=1`)
-- Storage optimization with `git lfs prune`
-- Migrating existing projects to LFS
+**练习的技能：**
+- 快进合并 vs 三方合并
+- `git merge --no-ff`、`git merge --squash`
+- 识别和解决合并冲突
+- Python 代码和 YAML 配置中的冲突标记
+- 使用合并工具
+- `git merge --abort` 取消合并
+- 合并后验证
 
 ---
 
-### Skills Progression
+### 练习 05：协作与 Pull Request
+**时间：** 90-120 分钟 | **难度：** 中级 | **前置条件：** 讲座 03、练习 04
 
-**Foundation (Exercises 01-02)**: Repository management, commits, history
-**Branching (Exercises 03-04)**: Branches, merging, conflicts
-**Collaboration (Exercise 05)**: Remotes, PRs, code review
-**ML Workflows (Exercises 06-08)**: DVC, Git LFS, advanced techniques
+使用 GitHub 实现团队协作工作流。
 
-## Assessment and Evaluation
+**练习的技能：**
+- Fork 与 clone 工作流
+- 管理 remote（origin vs upstream）
+- 创建和管理 pull request
+- 代码审查最佳实践
+- 专业地回应反馈
+- GitHub CLI（`gh pr create`、`gh pr checkout`）
+- `git push --force-with-lease`（安全强制推送）
 
-### Knowledge Checks
-- Quiz after each major section (6 quizzes total)
-- Command understanding questions
-- Workflow scenario analysis
-- Best practices evaluation
-- Troubleshooting scenarios
+---
 
-### Practical Assessments
-- **Command Proficiency:** Demonstrate Git commands without reference
-- **Workflow Completion:** Execute complete feature development workflow
-- **Conflict Resolution:** Resolve 10 different conflict scenarios
-- **Collaboration:** Complete full PR cycle as author and reviewer
-- **Repository Management:** Set up and maintain a project repository
+### 练习 06：用于 ML 工作流的 Git - DVC 与模型版本控制
+**时间：** 90-120 分钟 | **难度：** 中级到高级 | **前置条件：** 讲座 03-04、练习 05
 
-### Competency Criteria
-To complete this module successfully, you should be able to:
-- Create and manage Git repositories confidently
-- Make atomic commits with clear messages
-- Use branches effectively for feature development
-- Merge branches and resolve conflicts independently
-- Collaborate using pull requests and code review
-- Use advanced Git features when needed
-- Follow best practices for infrastructure as code
-- Troubleshoot common Git issues
-- Explain Git concepts to others
+使用 DVC 进行数据、模型和实验的版本控制。
 
-### Portfolio Project
-**Infrastructure Repository Setup:**
-Create a complete infrastructure repository demonstrating:
-- Proper repository structure
-- Terraform or similar IaC code
-- Effective branching strategy
-- Pull request workflow
-- Documentation standards
-- CI/CD integration
-- Security best practices
+**练习的技能：**
+- DVC 设置与配置（`dvc init`、`dvc add`）
+- 使用 DVC 跟踪数据集
+- 模型制品版本控制
+- 用于可重现性的 DVC 流水线
+- DVC 远程存储（S3、GCS、本地）
+- 使用 YAML 配置进行实验跟踪
+- 用于 ML 验证的 Pre-commit hook
 
-This project showcases your Git and IaC knowledge combined.
+---
 
-## Resources and References
+### 练习 07：高级 Git 技术
+**时间：** 120-150 分钟 | **难度：** 高级 | **前置条件：** 讲座 04、练习 01-06
 
-> **Note:** See `resources/recommended-reading.md` for a comprehensive list of learning materials, books, and online resources.
+掌握专家级 Git 操作。
 
-### Essential Resources
-- Official Git documentation (git-scm.com)
-- GitHub Guides (guides.github.com)
-- Pro Git Book (free online)
-- Git reference manual (`man git`)
+**练习的技能：**
+- 交互式 rebase（`git rebase -i`）用于历史清理
+- 自定义 Git hooks（pre-commit、pre-push）
+- 跨分支 cherry-picking commit
+- 高级 stashing 工作流
+- `git bisect` 用于 bug 查找
+- 使用 `git reflog` 恢复
+- Git 子模块用于依赖管理
+- `git worktree` 用于并行开发
 
-### Recommended Books
-- "Pro Git" by Scott Chacon and Ben Straub (free online)
+---
+
+### 练习 08：Git LFS 与管理大型 ML 项目
+**时间：** 90-120 分钟 | **难度：** 中级 | **前置条件：** 讲座 05、所有之前的练习
+
+使用 Git LFS 处理 ML 项目的大文件。
+
+**练习的技能：**
+- 安装和配置 Git LFS
+- 使用 LFS 跟踪模型和数据集
+- `.gitattributes` 配置
+- 模型的语义化版本控制（X.Y.Z）
+- DVC + LFS 集成
+- 高效克隆（`GIT_LFS_SKIP_SMUDGE=1`）
+- 使用 `git lfs prune` 优化存储
+- 将现有项目迁移到 LFS
+
+---
+
+### 技能进阶
+
+**基础（练习 01-02）：** 仓库管理、commit、历史
+**分支（练习 03-04）：** 分支、合并、冲突
+**协作（练习 05）：** 远程仓库、PR、代码审查
+**ML 工作流（练习 06-08）：** DVC、Git LFS、高级技术
+
+## 评估与考核
+
+### 知识检查
+- 每个主要部分后的测验（共 6 个测验）
+- 命令理解问题
+- 工作流程场景分析
+- 最佳实践评估
+- 故障排除场景
+
+### 实践评估
+- **命令熟练度：** 在不参考文档的情况下演示 Git 命令
+- **工作流完成：** 执行完整的功能开发工作流
+- **冲突解决：** 解决 10 个不同的冲突场景
+- **协作：** 以作者和审查者身份完成完整的 PR 周期
+- **仓库管理：** 设置和维护项目仓库
+
+### 能力标准
+要成功完成本模块，你应该能够：
+- 自信地创建和管理 Git 仓库
+- 制作带有清晰消息的原子性 commit
+- 有效使用分支进行功能开发
+- 合并分支并独立解决冲突
+- 使用 pull request 和代码审查进行协作
+- 在需要时使用高级 Git 功能
+- 遵循基础设施即代码的最佳实践
+- 排查常见的 Git 问题
+- 向他人解释 Git 概念
+
+### 作品集项目
+**基础设施仓库设置：**
+创建一个完整的基础设施仓库，展示：
+- 合理的仓库结构
+- Terraform 或类似 IaC 代码
+- 有效的分支策略
+- Pull request 工作流
+- 文档标准
+- CI/CD 集成
+- 安全最佳实践
+
+该项目展示你结合 Git 和 IaC 的知识。
+
+## 资源与参考
+
+> **注意：** 请参阅 `resources/recommended-reading.md` 获取学习材料、书籍和在线资源的完整列表。
+
+### 基础资源
+- 官方 Git 文档（git-scm.com）
+- GitHub 指南（guides.github.com）
+- Pro Git 书籍（免费在线）
+- Git 参考手册（`man git`）
+
+### 推荐书籍
+- "Pro Git" by Scott Chacon and Ben Straub（免费在线）
 - "Git Pocket Guide" by Richard E. Silverman
 - "Version Control with Git" by Jon Loeliger and Matthew McCullough
 
-### Online Learning
+### 在线学习
 - GitHub Learning Lab
-- Learn Git Branching (interactive visualizations)
-- Git Immersion (hands-on tutorial)
-- Atlassian Git Tutorials
-- Oh Shit, Git!?! (common problems and solutions)
+- Learn Git Branching（交互式可视化）
+- Git Immersion（动手教程）
+- Atlassian Git 教程
+- Oh Shit, Git!?!（常见问题与解决方案）
 
-### Tools and Extensions
-- GitKraken (graphical Git client)
-- Git Graph (VS Code extension)
-- Hub CLI (GitHub command-line interface)
-- GitHub CLI (`gh` command)
-- tig (text-mode Git interface)
+### 工具与扩展
+- GitKraken（图形化 Git 客户端）
+- Git Graph（VS Code 扩展）
+- Hub CLI（GitHub 命令行界面）
+- GitHub CLI（`gh` 命令）
+- tig（文本模式 Git 界面）
 
-### Practice Platforms
-- GitHub (free public repositories)
-- GitLab (alternative platform)
-- Bitbucket (alternative platform)
-- Learn Git Branching (browser-based practice)
+### 练习平台
+- GitHub（免费公开仓库）
+- GitLab（替代平台）
+- Bitbucket（替代平台）
+- Learn Git Branching（浏览器练习）
 
-## Getting Started
+## 开始入门
 
-### Step 1: Install and Configure Git
-1. Install Git for your platform
-2. Configure user name and email
-3. Set up SSH keys for GitHub
-4. Test GitHub connection
-5. Configure useful aliases
+### 步骤 1：安装与配置 Git
+1. 为你的平台安装 Git
+2. 配置用户名和邮箱
+3. 为 GitHub 设置 SSH 密钥
+4. 测试 GitHub 连接
+5. 配置有用的别名
 
-### Step 2: Create GitHub Account
-1. Sign up for free GitHub account
-2. Complete profile
-3. Add SSH keys
-4. Enable two-factor authentication
-5. Explore GitHub interface
+### 步骤 2：创建 GitHub 账号
+1. 注册免费 GitHub 账号
+2. 完善个人资料
+3. 添加 SSH 密钥
+4. 启用双因素认证
+5. 探索 GitHub 界面
 
-### Step 3: Begin with Lecture 1
-- Read introduction to version control
-- Understand Git architecture
-- Complete setup lab
-- Create your first repository
+### 步骤 3：从讲座 1 开始
+- 阅读版本控制简介
+- 理解 Git 架构
+- 完成设置实验
+- 创建你的第一个仓库
 
-### Step 4: Practice Regularly
-- Work through exercises sequentially
-- Experiment with commands
-- Make mistakes safely
-- Build muscle memory
-- Use Git for personal projects
+### 步骤 4：定期练习
+- 按顺序完成练习
+- 尝试各种命令
+- 安全地犯错
+- 建立肌肉记忆
+- 在个人项目中使用 Git
 
-### Step 5: Collaborate
-- Find open-source projects
-- Contribute small fixes
-- Practice pull request workflow
-- Engage in code review
-- Build collaboration skills
+### 步骤 5：协作
+- 寻找开源项目
+- 贡献小修复
+- 练习 pull request 工作流
+- 参与代码审查
+- 培养协作技能
 
-## Tips for Success
+## 成功技巧
 
-1. **Practice Daily:** Use Git for all your code, even personal projects
-2. **Visualize:** Use graphical tools to understand commit graphs
-3. **Experiment Safely:** Create practice repositories to try new commands
-4. **Read Commit Messages:** Study good commit messages in popular projects
-5. **Use Aliases:** Create shortcuts for frequently used commands
-6. **Learn from Mistakes:** Git makes it hard to lose data permanently
-7. **Follow Conventions:** Adopt standard commit message formats early
-8. **Collaborate:** Working with others accelerates learning
-9. **Read Documentation:** Git documentation is comprehensive and well-written
-10. **Build a Workflow:** Develop consistent personal workflows
+1. **每日练习：** 在所有代码中使用 Git，包括个人项目
+2. **可视化：** 使用图形化工具理解 commit 图
+3. **安全实验：** 创建练习仓库来尝试新命令
+4. **阅读 commit 消息：** 在流行项目中研究好的 commit 消息
+5. **使用别名：** 为常用命令创建快捷方式
+6. **从错误中学习：** Git 让你很难永久丢失数据
+7. **遵循约定：** 尽早采用标准的 commit 消息格式
+8. **协作：** 与他人合作加速学习
+9. **阅读文档：** Git 文档全面且编写良好
+10. **建立工作流：** 开发一致的个人工作流
 
-## Common Pitfalls and Solutions
+## 常见陷阱与解决方案
 
-### Pitfall 1: Committing Too Much/Too Little
-**Solution:** Practice atomic commits; each commit should represent one logical change
+### 陷阱 1：提交太多或太少
+**解决方案：** 练习原子性 commit；每个 commit 应代表一个逻辑变更
 
-### Pitfall 2: Vague Commit Messages
-**Solution:** Use Conventional Commits format; explain "why" not just "what"
+### 陷阱 2：含糊的 commit 消息
+**解决方案：** 使用 Conventional Commits 格式；解释"为什么"而不仅仅是"是什么"
 
-### Pitfall 3: Working on Wrong Branch
-**Solution:** Check branch before starting work; use `git status` frequently
+### 陷阱 3：在错误的分支上工作
+**解决方案：** 开始工作前检查分支；经常使用 `git status`
 
-### Pitfall 4: Fear of Merge Conflicts
-**Solution:** Conflicts are normal; practice resolving them in safe environment
+### 陷阱 4：害怕合并冲突
+**解决方案：** 冲突是正常的；在安全环境中练习解决冲突
 
-### Pitfall 5: Force Pushing to Shared Branches
-**Solution:** Never force push to main/master; understand rebase implications
+### 陷阱 5：对共享分支强制推送
+**解决方案：** 永远不要对 main/master 强制推送；理解 rebase 的影响
 
-### Pitfall 6: Committing Secrets
-**Solution:** Use .gitignore properly; scan before committing; use pre-commit hooks
+### 陷阱 6：提交密钥
+**解决方案：** 正确使用 .gitignore；提交前扫描；使用 pre-commit hooks
 
-### Pitfall 7: Large Binary Files
-**Solution:** Use Git LFS; keep binaries out when possible; use .gitignore
+### 陷阱 7：大型二进制文件
+**解决方案：** 使用 Git LFS；尽可能不包含二进制文件；使用 .gitignore
 
-### Pitfall 8: Detached HEAD State
-**Solution:** Understand what HEAD means; create branch if making changes
+### 陷阱 8：Detached HEAD 状态
+**解决方案：** 理解 HEAD 的含义；如果要更改，创建分支
 
-## Troubleshooting Guide
+## 故障排除指南
 
-### Problem: Merge Conflict
+### 问题：合并冲突
 ```bash
-# Steps to resolve
-git status  # Identify conflicted files
-# Edit files to resolve conflicts
+# 解决步骤
+git status  # 识别冲突文件
+# 编辑文件解决冲突
 git add <resolved-files>
-git commit  # Complete the merge
+git commit  # 完成合并
 ```
 
-### Problem: Committed to Wrong Branch
+### 问题：提交到了错误的分支
 ```bash
-# Solution using cherry-pick
+# 使用 cherry-pick 解决
 git checkout correct-branch
 git cherry-pick <commit-hash>
 git checkout wrong-branch
-git reset --hard HEAD~1  # Remove from wrong branch
+git reset --hard HEAD~1  # 从错误分支移除
 ```
 
-### Problem: Need to Undo Last Commit
+### 问题：需要撤销上次 commit
 ```bash
-# Keep changes
+# 保留变更
 git reset --soft HEAD~1
 
-# Discard changes
+# 丢弃变更
 git reset --hard HEAD~1
 ```
 
-### Problem: Lost Commits
+### 问题：丢失 commit
 ```bash
-# Find lost commits
+# 查找丢失的 commit
 git reflog
 
-# Recover specific commit
+# 恢复特定 commit
 git checkout <commit-hash>
 git checkout -b recovery-branch
 ```
 
-## Next Steps
+## 下一步
 
-After completing this module, you'll be ready to:
-- **Module 004:** Python for Infrastructure (use Git for all code)
-- **Module 005:** Docker and Containers (version control for Dockerfiles)
-- **All Future Modules:** Git is used throughout the curriculum
+完成本模块后，你将准备好：
+- **模块 004：** Python 用于基础设施（在所有代码中使用 Git）
+- **模块 005：** Docker 与容器（Dockerfile 的版本控制）
+- **所有未来模块：** Git 在整个课程中都会使用
 
-You'll also be prepared to:
-- Contribute to open-source projects
-- Collaborate professionally on team projects
-- Manage infrastructure as code effectively
-- Build a portfolio of public repositories
+你还将准备好：
+- 为开源项目做贡献
+- 在团队项目中进行专业协作
+- 有效管理基础设施即代码
+- 建立公开仓库作品集
 
-## Development Status
+## 开发状态
 
-**Current Status:** Template phase - comprehensive structure in place
+**当前状态：** 模板阶段 - 全面的结构已就位
 
-**Available Now:**
-- Complete module structure
-- Detailed topic breakdown
-- Lecture outline
-- Exercise framework
-- Assessment criteria
+**现已可用：**
+- 完整的模块结构
+- 详细的主题分解
+- 讲座大纲
+- 练习框架
+- 评估标准
 
-**In Development:**
-- Full lecture notes with diagrams
-- Step-by-step exercise instructions
-- Interactive tutorials
-- Video demonstrations
-- Practice repositories
-- Solution guides
+**正在开发中：**
+- 包含图表的完整讲座笔记
+- 分步练习说明
+- 交互式教程
+- 视频演示
+- 练习仓库
+- 解决方案指南
 
-**Planned Updates:**
-- GitHub Actions integration
-- Advanced workflow patterns
-- Team collaboration scenarios
-- Git at scale techniques
-- Troubleshooting cookbook
+**计划更新：**
+- GitHub Actions 集成
+- 高级工作流模式
+- 团队协作场景
+- 大规模 Git 技术
+- 故障排除手册
 
-## Feedback and Contributions
+## 反馈与贡献
 
-This module is continuously being improved. Contributions welcome:
-- Report issues or suggest improvements
-- Share your learning experience
-- Contribute example repositories
-- Suggest additional resources
-- Help improve documentation
+本模块持续改进中。欢迎贡献：
+- 报告问题或建议改进
+- 分享你的学习经验
+- 贡献示例仓库
+- 建议更多资源
+- 帮助改进文档
 
 ---
 
-**Module Maintainer:** AI Infrastructure Curriculum Team
-**Contact:** ai-infra-curriculum@joshua-ferguson.com
-**Last Updated:** 2025-10-18
-**Version:** 1.0.0-template
+**模块维护者：** AI 基础设施课程团队
+**联系方式：** ai-infra-curriculum@joshua-ferguson.com
+**最后更新：** 2025-10-18
+**版本：** 1.0.0-template

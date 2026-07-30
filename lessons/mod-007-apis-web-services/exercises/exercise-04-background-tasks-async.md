@@ -1,48 +1,48 @@
-# Exercise 04: Background Tasks and Async Operations
+# 练习 04：后台任务和异步操作
 
-## Overview
+## 概述
 
-Learn to implement asynchronous operations and background tasks in FastAPI to handle long-running ML operations efficiently. Understand how to process tasks without blocking API responses and implement job queues for model training and batch processing.
+学习在 FastAPI 中实现异步操作和后台任务，以高效处理长时间运行的 ML 操作。理解如何在不阻塞 API 响应的情况下处理任务，以及为模型训练和批量处理实现任务队列。
 
-**Difficulty:** Intermediate-Advanced
-**Estimated Time:** 2-3 hours
-**Prerequisites:**
-- Exercise 01-03 completed
-- Lecture 02: FastAPI Framework
-- Basic understanding of async/await in Python
+**难度：** 中级-高级
+**预计时间：** 2-3 小时
+**先决条件：**
+- 已完成练习 01-03
+- 讲座 02：FastAPI 框架
+- 对 Python 中 async/await 的基本理解
 
-## Learning Objectives
+## 学习目标
 
-By completing this exercise, you will:
-- Implement FastAPI BackgroundTasks for simple async operations
-- Create long-running job tracking system
-- Use async/await for I/O-bound operations
-- Implement task queues for ML operations
-- Handle job status polling
-- Stream results with Server-Sent Events (SSE)
+完成此练习后，你将：
+- 实现 FastAPI BackgroundTasks 用于简单的异步操作
+- 创建长时间运行的任务跟踪系统
+- 使用 async/await 处理 I/O 密集型操作
+- 为 ML 操作实现任务队列
+- 处理任务状态轮询
+- 使用服务器推送事件（SSE）流式传输结果
 
-## Scenario
+## 场景
 
-Your ML API needs to handle operations that take time:
-- Model training (minutes to hours)
-- Large batch predictions
-- Data preprocessing pipelines
-- Model evaluation
+你的 ML API 需要处理需要时间的操作：
+- 模型训练（几分钟到几小时）
+- 大型批量预测
+- 数据预处理管道
+- 模型评估
 
-Users shouldn't wait for responses. Instead, submit jobs and poll for status.
+用户不应等待响应。相反，提交任务并轮询状态。
 
-## Project Setup
+## 项目设置
 
-### Install Dependencies
+### 安装依赖
 
 ```bash
 pip install aiofiles
-pip install sse-starlette  # For Server-Sent Events
+pip install sse-starlette  # 用于服务器推送事件
 ```
 
-## Part 1: Simple Background Tasks
+## 第一部分：简单后台任务
 
-**File: app/background.py**
+**文件：app/background.py**
 
 ```python
 from fastapi import BackgroundTasks
@@ -52,27 +52,27 @@ import logging
 logger = logging.getLogger(__name__)
 
 def log_prediction(user_id: str, text: str, prediction: str):
-    """Log prediction to file (runs in background)"""
-    # TODO: Open log file in append mode
-    # TODO: Write log entry with timestamp, user, input, prediction
-    # TODO: Simulate some processing time
+    """将预测记录到文件（在后台运行）"""
+    # TODO: 以追加模式打开日志文件
+    # TODO: 写入包含时间戳、用户、输入、预测的日志条目
+    # TODO: 模拟一些处理时间
     pass
 
 def send_notification(email: str, message: str):
-    """Send email notification (simulated)"""
-    # TODO: Simulate sending email
-    # TODO: Log notification sent
-    # time.sleep(1)  # Simulate email sending
+    """发送邮件通知（模拟）"""
+    # TODO: 模拟发送邮件
+    # TODO: 记录通知已发送
+    # time.sleep(1)  # 模拟邮件发送
     pass
 
 def update_user_stats(user_id: str):
-    """Update user request statistics"""
-    # TODO: Increment user's request count
-    # TODO: Update last_request_time
+    """更新用户请求统计信息"""
+    # TODO: 增加用户的请求计数
+    # TODO: 更新 last_request_time
     pass
 ```
 
-**File: app/main.py** (update)
+**文件：app/main.py**（更新）
 
 ```python
 from fastapi import BackgroundTasks
@@ -83,22 +83,22 @@ async def predict(
     background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_active_user)
 ):
-    """Prediction with background logging"""
+    """带后台日志记录的预测"""
 
-    # Make prediction (fast)
+    # 进行预测（快速）
     result = ml_service.predict(input_data.text)
 
-    # TODO: Add background tasks (don't block response)
+    # TODO: 添加后台任务（不阻塞响应）
     # background_tasks.add_task(log_prediction, current_user.username, input_data.text, result["prediction"])
     # background_tasks.add_task(update_user_stats, current_user.username)
 
-    # Return immediately
+    # 立即返回
     return result
 ```
 
-## Part 2: Job Queue System
+## 第二部分：任务队列系统
 
-**File: app/jobs.py**
+**文件：app/jobs.py**
 
 ```python
 from enum import Enum
@@ -128,68 +128,68 @@ class Job(BaseModel):
     user_id: str
 
 class JobQueue:
-    """Simple in-memory job queue"""
+    """简单的内存任务队列"""
 
     def __init__(self):
         self.jobs: Dict[str, Job] = {}
         self.active_jobs = set()
 
     def create_job(self, job_type: str, user_id: str) -> str:
-        """Create a new job"""
-        # TODO: Generate job_id using uuid
-        # TODO: Create Job object with status=PENDING
-        # TODO: Store in self.jobs
-        # TODO: Return job_id
+        """创建新任务"""
+        # TODO: 使用 uuid 生成 job_id
+        # TODO: 创建状态为 PENDING 的 Job 对象
+        # TODO: 存储在 self.jobs 中
+        # TODO: 返回 job_id
         pass
 
     def get_job(self, job_id: str) -> Optional[Job]:
-        """Get job by ID"""
-        # TODO: Return job from self.jobs if exists
+        """按 ID 获取任务"""
+        # TODO: 如果存在则从 self.jobs 返回任务
         pass
 
     def update_job_status(self, job_id: str, status: JobStatus, **kwargs):
-        """Update job status and other fields"""
-        # TODO: Get job
-        # TODO: Update status
-        # TODO: Update other fields (started_at, completed_at, etc.)
-        # TODO: If completed/failed, remove from active_jobs
+        """更新任务状态和其他字段"""
+        # TODO: 获取任务
+        # TODO: 更新状态
+        # TODO: 更新其他字段（started_at、completed_at 等）
+        # TODO: 如果完成/失败，从 active_jobs 中移除
         pass
 
     def update_progress(self, job_id: str, progress: float):
-        """Update job progress"""
-        # TODO: Get job
-        # TODO: Update progress (clamp to 0-100)
+        """更新任务进度"""
+        # TODO: 获取任务
+        # TODO: 更新进度（限制在 0-100 范围内）
         pass
 
     def set_result(self, job_id: str, result: Dict[str, Any]):
-        """Set job result"""
-        # TODO: Get job
-        # TODO: Set result
-        # TODO: Set status to COMPLETED
-        # TODO: Set completed_at
+        """设置任务结果"""
+        # TODO: 获取任务
+        # TODO: 设置结果
+        # TODO: 设置状态为 COMPLETED
+        # TODO: 设置 completed_at
         pass
 
     def set_error(self, job_id: str, error: str):
-        """Set job error"""
-        # TODO: Get job
-        # TODO: Set error
-        # TODO: Set status to FAILED
-        # TODO: Set completed_at
+        """设置任务错误"""
+        # TODO: 获取任务
+        # TODO: 设置错误
+        # TODO: 设置状态为 FAILED
+        # TODO: 设置 completed_at
         pass
 
     def get_user_jobs(self, user_id: str) -> list[Job]:
-        """Get all jobs for a user"""
-        # TODO: Filter jobs by user_id
-        # TODO: Return sorted by created_at (newest first)
+        """获取用户的所有任务"""
+        # TODO: 按 user_id 过滤任务
+        # TODO: 按 created_at 排序返回（最新的在前）
         pass
 
-# Global job queue
+# 全局任务队列
 job_queue = JobQueue()
 ```
 
-## Part 3: Long-Running Task: Batch Prediction
+## 第三部分：长时间运行的任务：批量预测
 
-**File: app/tasks.py**
+**文件：app/tasks.py**
 
 ```python
 import asyncio
@@ -204,29 +204,29 @@ async def process_batch_prediction(
     texts: list[str],
     user_id: str
 ):
-    """Process batch prediction as background job"""
+    """以后台任务方式处理批量预测"""
     try:
-        # TODO: Update job status to RUNNING
+        # TODO: 更新任务状态为 RUNNING
         # job_queue.update_job_status(job_id, JobStatus.RUNNING, started_at=datetime.utcnow())
 
-        # TODO: Process in batches of 10
+        # TODO: 按 10 个一批进行处理
         batch_size = 10
         results = []
 
         for i in range(0, len(texts), batch_size):
-            # TODO: Get batch
+            # TODO: 获取批次
             batch = texts[i:i+batch_size]
 
-            # TODO: Process batch (simulate with sleep)
-            # await asyncio.sleep(1)  # Simulate processing
+            # TODO: 处理批次（用 sleep 模拟）
+            # await asyncio.sleep(1)  # 模拟处理
             batch_results = [ml_service.predict(text) for text in batch]
             results.extend(batch_results)
 
-            # TODO: Update progress
+            # TODO: 更新进度
             progress = ((i + len(batch)) / len(texts)) * 100
             job_queue.update_progress(job_id, progress)
 
-        # TODO: Set result
+        # TODO: 设置结果
         job_queue.set_result(job_id, {
             "predictions": results,
             "total": len(results)
@@ -235,7 +235,7 @@ async def process_batch_prediction(
         logger.info(f"Batch job {job_id} completed successfully")
 
     except Exception as e:
-        # TODO: Set error
+        # TODO: 设置错误
         logger.error(f"Batch job {job_id} failed: {e}")
         job_queue.set_error(job_id, str(e))
 
@@ -244,22 +244,22 @@ async def process_model_training(
     training_data: dict,
     user_id: str
 ):
-    """Simulate model training as background job"""
+    """以后台任务方式模拟模型训练"""
     try:
-        # TODO: Update status to RUNNING
+        # TODO: 更新状态为 RUNNING
         job_queue.update_job_status(job_id, JobStatus.RUNNING, started_at=datetime.utcnow())
 
-        # TODO: Simulate training epochs
+        # TODO: 模拟训练轮次
         epochs = 10
         for epoch in range(epochs):
-            # Simulate epoch processing
+            # 模拟轮次处理
             await asyncio.sleep(2)
 
-            # Update progress
+            # 更新进度
             progress = ((epoch + 1) / epochs) * 100
             job_queue.update_progress(job_id, progress)
 
-        # TODO: Set result
+        # TODO: 设置结果
         job_queue.set_result(job_id, {
             "model_id": f"model_{job_id[:8]}",
             "accuracy": 0.95,
@@ -270,9 +270,9 @@ async def process_model_training(
         job_queue.set_error(job_id, str(e))
 ```
 
-## Part 4: Job API Endpoints
+## 第四部分：任务 API Endpoint
 
-**File: app/main.py** (update)
+**文件：app/main.py**（更新）
 
 ```python
 from app.jobs import job_queue, Job, JobStatus
@@ -284,19 +284,19 @@ async def create_batch_prediction_job(
     texts: list[str],
     current_user: User = Depends(get_current_active_user)
 ):
-    """Create a batch prediction job"""
+    """创建批量预测任务"""
 
-    # TODO: Validate input (max 1000 texts)
+    # TODO: 验证输入（最多 1000 条文本）
     if len(texts) > 1000:
         raise HTTPException(status_code=400, detail="Maximum 1000 texts allowed")
 
-    # TODO: Create job
+    # TODO: 创建任务
     job_id = job_queue.create_job("batch_predict", current_user.username)
 
-    # TODO: Start background task
+    # TODO: 启动后台任务
     asyncio.create_task(process_batch_prediction(job_id, texts, current_user.username))
 
-    # TODO: Return job info
+    # TODO: 返回任务信息
     return {
         "job_id": job_id,
         "status": "pending",
@@ -309,15 +309,15 @@ async def create_training_job(
     training_data: dict,
     current_user: User = Depends(get_current_active_user)
 ):
-    """Create a model training job"""
+    """创建模型训练任务"""
 
-    # TODO: Create job
+    # TODO: 创建任务
     job_id = job_queue.create_job("train_model", current_user.username)
 
-    # TODO: Start background task
+    # TODO: 启动后台任务
     asyncio.create_task(process_model_training(job_id, training_data, current_user.username))
 
-    # TODO: Return job info
+    # TODO: 返回任务信息
     return {
         "job_id": job_id,
         "status": "pending",
@@ -330,15 +330,15 @@ async def get_job_status(
     job_id: str,
     current_user: User = Depends(get_current_active_user)
 ):
-    """Get job status"""
+    """获取任务状态"""
 
-    # TODO: Get job from queue
+    # TODO: 从队列获取任务
     job = job_queue.get_job(job_id)
 
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
 
-    # TODO: Verify job belongs to user
+    # TODO: 验证任务属于用户
     if job.user_id != current_user.username:
         raise HTTPException(status_code=403, detail="Not authorized")
 
@@ -348,8 +348,8 @@ async def get_job_status(
 async def list_user_jobs(
     current_user: User = Depends(get_current_active_user)
 ):
-    """List all jobs for current user"""
-    # TODO: Get user's jobs
+    """列出当前用户的所有任务"""
+    # TODO: 获取用户的任务
     jobs = job_queue.get_user_jobs(current_user.username)
     return jobs
 
@@ -358,7 +358,7 @@ async def cancel_job(
     job_id: str,
     current_user: User = Depends(get_current_active_user)
 ):
-    """Cancel a job"""
+    """取消任务"""
 
     job = job_queue.get_job(job_id)
     if not job:
@@ -367,7 +367,7 @@ async def cancel_job(
     if job.user_id != current_user.username:
         raise HTTPException(status_code=403, detail="Not authorized")
 
-    # TODO: Only allow cancelling pending/running jobs
+    # TODO: 只允许取消待处理/运行中的任务
     if job.status in [JobStatus.PENDING, JobStatus.RUNNING]:
         job_queue.update_job_status(job_id, JobStatus.CANCELLED)
         return {"message": "Job cancelled"}
@@ -375,9 +375,9 @@ async def cancel_job(
         raise HTTPException(status_code=400, detail="Cannot cancel completed job")
 ```
 
-## Part 5: Server-Sent Events for Real-Time Updates
+## 第五部分：用于实时更新的服务器推送事件
 
-**File: app/streaming.py**
+**文件：app/streaming.py**
 
 ```python
 from sse_starlette.sse import EventSourceResponse
@@ -386,18 +386,18 @@ import asyncio
 import json
 
 async def job_status_stream(job_id: str, request: Request):
-    """Stream job status updates using SSE"""
+    """使用 SSE 流式传输任务状态更新"""
 
     async def event_generator():
         last_status = None
         last_progress = None
 
         while True:
-            # Check if client disconnected
+            # 检查客户端是否断开连接
             if await request.is_disconnected():
                 break
 
-            # Get current job status
+            # 获取当前任务状态
             job = job_queue.get_job(job_id)
             if not job:
                 yield {
@@ -406,7 +406,7 @@ async def job_status_stream(job_id: str, request: Request):
                 }
                 break
 
-            # Send update if status or progress changed
+            # 如果状态或进度发生变化则发送更新
             if job.status != last_status or job.progress != last_progress:
                 yield {
                     "event": "update",
@@ -419,7 +419,7 @@ async def job_status_stream(job_id: str, request: Request):
                 last_status = job.status
                 last_progress = job.progress
 
-            # Stop streaming if job is finished
+            # 如果任务完成则停止流式传输
             if job.status in [JobStatus.COMPLETED, JobStatus.FAILED, JobStatus.CANCELLED]:
                 yield {
                     "event": "complete",
@@ -431,13 +431,13 @@ async def job_status_stream(job_id: str, request: Request):
                 }
                 break
 
-            # Wait before next update
+            # 等待下一次更新
             await asyncio.sleep(1)
 
     return EventSourceResponse(event_generator())
 ```
 
-**Add endpoint in main.py:**
+**在 main.py 中添加 endpoint：**
 
 ```python
 from app.streaming import job_status_stream
@@ -448,7 +448,7 @@ async def stream_job_status(
     request: Request,
     current_user: User = Depends(get_current_active_user)
 ):
-    """Stream job status updates via SSE"""
+    """通过 SSE 流式传输任务状态更新"""
 
     job = job_queue.get_job(job_id)
     if not job:
@@ -460,9 +460,9 @@ async def stream_job_status(
     return await job_status_stream(job_id, request)
 ```
 
-## Part 6: Async File Operations
+## 第六部分：异步文件操作
 
-**File: app/file_ops.py**
+**文件：app/file_ops.py**
 
 ```python
 import aiofiles
@@ -470,35 +470,35 @@ import asyncio
 from typing import List
 
 async def save_results_async(filename: str, data: dict):
-    """Save results to file asynchronously"""
-    # TODO: Use aiofiles to write JSON
+    """异步将结果保存到文件"""
+    # TODO: 使用 aiofiles 写入 JSON
     # async with aiofiles.open(filename, 'w') as f:
     #     await f.write(json.dumps(data, indent=2))
     pass
 
 async def read_large_file_async(filename: str) -> List[str]:
-    """Read large file line by line asynchronously"""
+    """异步逐行读取大文件"""
     lines = []
-    # TODO: Use aiofiles to read file
+    # TODO: 使用 aiofiles 读取文件
     # async with aiofiles.open(filename, 'r') as f:
     #     async for line in f:
     #         lines.append(line.strip())
     return lines
 
 async def process_file_batch(filenames: List[str]) -> List[dict]:
-    """Process multiple files concurrently"""
-    # TODO: Create tasks for each file
+    """并发处理多个文件"""
+    # TODO: 为每个文件创建任务
     # tasks = [read_large_file_async(f) for f in filenames]
 
-    # TODO: Gather results
+    # TODO: 收集结果
     # results = await asyncio.gather(*tasks)
 
     return results
 ```
 
-## Part 7: Testing Async Operations
+## 第七部分：测试异步操作
 
-**File: tests/test_jobs.py**
+**文件：tests/test_jobs.py**
 
 ```python
 from fastapi.testclient import TestClient
@@ -508,33 +508,33 @@ import time
 client = TestClient(app)
 
 def get_token():
-    """Helper to get auth token"""
+    """辅助函数获取认证令牌"""
     response = client.post("/token", data={"username": "alice", "password": "secret123"})
     return response.json()["access_token"]
 
 def test_create_batch_job():
-    """Test creating batch prediction job"""
+    """测试创建批量预测任务"""
     token = get_token()
     headers = {"Authorization": f"Bearer {token}"}
 
-    # TODO: Create batch job
+    # TODO: 创建批量任务
     response = client.post(
         "/api/v1/jobs/batch-predict",
         json={"texts": ["test1", "test2", "test3"]},
         headers=headers
     )
 
-    # TODO: Assert status 200
-    # TODO: Assert job_id in response
-    # TODO: Assert poll_url in response
+    # TODO: 断言状态 200
+    # TODO: 断言 job_id 在响应中
+    # TODO: 断言 poll_url 在响应中
     pass
 
 def test_get_job_status():
-    """Test getting job status"""
+    """测试获取任务状态"""
     token = get_token()
     headers = {"Authorization": f"Bearer {token}"}
 
-    # TODO: Create job
+    # TODO: 创建任务
     create_response = client.post(
         "/api/v1/jobs/batch-predict",
         json={"texts": ["test"]},
@@ -542,20 +542,20 @@ def test_get_job_status():
     )
     job_id = create_response.json()["job_id"]
 
-    # TODO: Get job status
+    # TODO: 获取任务状态
     response = client.get(f"/api/v1/jobs/{job_id}", headers=headers)
 
-    # TODO: Assert status 200
-    # TODO: Assert job_id matches
-    # TODO: Assert status is pending or running
+    # TODO: 断言状态 200
+    # TODO: 断言 job_id 匹配
+    # TODO: 断言状态为 pending 或 running
     pass
 
 def test_job_completion():
-    """Test job completes successfully"""
+    """测试任务成功完成"""
     token = get_token()
     headers = {"Authorization": f"Bearer {token}"}
 
-    # TODO: Create job with small batch
+    # TODO: 创建小批量任务
     response = client.post(
         "/api/v1/jobs/batch-predict",
         json={"texts": ["test1", "test2"]},
@@ -563,15 +563,15 @@ def test_job_completion():
     )
     job_id = response.json()["job_id"]
 
-    # TODO: Poll until completion (max 30 seconds)
+    # TODO: 轮询直到完成（最多 30 秒）
     max_attempts = 30
     for _ in range(max_attempts):
         status_response = client.get(f"/api/v1/jobs/{job_id}", headers=headers)
         job = status_response.json()
 
         if job["status"] == "completed":
-            # TODO: Assert result is present
-            # TODO: Assert predictions array has 2 items
+            # TODO: 断言结果存在
+            # TODO: 断言 predictions 数组有 2 项
             break
 
         time.sleep(1)
@@ -579,11 +579,11 @@ def test_job_completion():
         assert False, "Job did not complete in time"
 
 def test_list_user_jobs():
-    """Test listing user's jobs"""
+    """测试列出用户的任务"""
     token = get_token()
     headers = {"Authorization": f"Bearer {token}"}
 
-    # TODO: Create 2 jobs
+    # TODO: 创建 2 个任务
     for i in range(2):
         client.post(
             "/api/v1/jobs/batch-predict",
@@ -591,19 +591,19 @@ def test_list_user_jobs():
             headers=headers
         )
 
-    # TODO: List jobs
+    # TODO: 列出任务
     response = client.get("/api/v1/jobs", headers=headers)
 
-    # TODO: Assert status 200
-    # TODO: Assert at least 2 jobs returned
+    # TODO: 断言状态 200
+    # TODO: 断言至少返回 2 个任务
     pass
 
 def test_cancel_job():
-    """Test cancelling a job"""
+    """测试取消任务"""
     token = get_token()
     headers = {"Authorization": f"Bearer {token}"}
 
-    # TODO: Create long-running job
+    # TODO: 创建长时间运行的任务
     response = client.post(
         "/api/v1/jobs/train-model",
         json={"data": "test"},
@@ -611,31 +611,31 @@ def test_cancel_job():
     )
     job_id = response.json()["job_id"]
 
-    # TODO: Cancel job
+    # TODO: 取消任务
     cancel_response = client.delete(f"/api/v1/jobs/{job_id}", headers=headers)
 
-    # TODO: Assert status 200
-    # TODO: Verify job status is cancelled
+    # TODO: 断言状态 200
+    # TODO: 验证任务状态为 cancelled
     pass
 ```
 
-## Challenges and Extensions
+## 挑战和扩展
 
-### Challenge 1: Job Persistence
+### 挑战 1：任务持久化
 
-Store jobs in database instead of memory:
+将任务存储在数据库中而不是内存中：
 
 ```python
-# Use SQLAlchemy or MongoDB
+# 使用 SQLAlchemy 或 MongoDB
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# Store jobs in database for persistence across restarts
+# 将任务存储在数据库中，以便重启后持续存在
 ```
 
-### Challenge 2: Job Priority Queue
+### 挑战 2：任务优先级队列
 
-Implement priority-based job processing:
+实现基于优先级的任务处理：
 
 ```python
 import heapq
@@ -653,9 +653,9 @@ class PriorityJobQueue:
         return None
 ```
 
-### Challenge 3: Celery Integration
+### 挑战 3：Celery 集成
 
-Use Celery for production job queues:
+使用 Celery 作为生产任务队列：
 
 ```bash
 pip install celery redis
@@ -668,13 +668,13 @@ celery_app = Celery('tasks', broker='redis://localhost:6379')
 
 @celery_app.task
 def process_batch(texts: list):
-    # Process batch
+    # 处理批量
     return results
 ```
 
-### Challenge 4: WebSocket Updates
+### 挑战 4：WebSocket 更新
 
-Use WebSockets instead of SSE for bidirectional communication:
+使用 WebSocket 替代 SSE 进行双向通信：
 
 ```python
 from fastapi import WebSocket
@@ -682,25 +682,25 @@ from fastapi import WebSocket
 @app.websocket("/ws/jobs/{job_id}")
 async def websocket_job_updates(websocket: WebSocket, job_id: str):
     await websocket.accept()
-    # Send updates via WebSocket
+    # 通过 WebSocket 发送更新
 ```
 
-## Key Takeaways
+## 关键要点
 
-1. **BackgroundTasks:** Simple async operations that don't block responses
-2. **Job Queues:** Track long-running operations with status polling
-3. **Async/Await:** Efficient handling of I/O-bound operations
-4. **SSE:** Real-time updates without polling overhead
-5. **Progress Tracking:** Keep users informed of job status
+1. **BackgroundTasks：** 不阻塞响应的简单异步操作
+2. **任务队列：** 通过状态轮询跟踪长时间运行的操作
+3. **Async/Await：** 高效处理 I/O 密集型操作
+4. **SSE：** 无需轮询开销的实时更新
+5. **进度跟踪：** 让用户了解任务状态
 
-## Next Steps
+## 下一步
 
-- Exercise 05: Deploy API with Docker
-- Learn about Celery and RabbitMQ for production queues
-- Implement WebSocket for real-time bidirectional communication
+- 练习 05：使用 Docker 部署 API
+- 学习 Celery 和 RabbitMQ 用于生产队列
+- 实现 WebSocket 用于实时双向通信
 
 ---
 
-**Estimated Time:** 2-3 hours
-**Difficulty:** Intermediate-Advanced
-**Focus:** Async operations, background tasks, job queues, streaming
+**预计时间：** 2-3 小时
+**难度：** 中级-高级
+**重点：** 异步操作、后台任务、任务队列、流式传输

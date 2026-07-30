@@ -1,45 +1,45 @@
-# Runbook: SlowResponse
+# 手册：SlowResponse
 
-**Alert:** `SlowResponse`
-**Severity:** warning
-**Pages:** no (Slack `#alerts-warnings`)
+**告警：** `SlowResponse`
+**严重级别：** warning
+**是否呼叫：** 否（Slack `#alerts-warnings`）
 
-## What it means
+## 含义
 
-p95 request latency on the Model API has exceeded the SLO (typically 800ms) for 10 minutes.
+模型 API 的 p95 请求延迟已超过 SLO（通常为 800ms）持续 10 分钟。
 
-## How bad is it?
+## 有多严重？
 
-Users perceive slowness. No outright failures, but conversion / engagement metrics likely impacted.
+用户感知到速度变慢。没有直接的故障，但转化/参与度指标可能受到影响。
 
-## First checks
+## 首先检查
 
-1. **Confirm scope.** Is p95 elevated for all endpoints or just one?
+1. **确认范围。** p95 是针对所有端点还是仅一个端点升高？
    ```promql
    histogram_quantile(0.95,
      sum(rate(http_request_duration_seconds_bucket{job="model-api"}[5m]))
        by (le, path))
    ```
-2. **Check inference latency separately.** If inference is fine but HTTP latency is high, the slowness is in middleware or networking. If inference is slow, the model itself is the bottleneck.
-3. **Check CPU saturation.** Pods near their CPU limit can't scale up beyond the limit even if HPA hasn't reacted yet.
-4. **Check HPA state.** Is it at max replicas?
-5. **Check recent deploy.** A new model version might be slower than the previous.
+2. **分别检查推理延迟。** 如果推理正常但 HTTP 延迟高，则慢在中间件或网络。如果推理慢，则模型本身是瓶颈。
+3. **检查 CPU 饱和度。** 接近 CPU 限制的 Pod 即使 HPA 尚未响应也无法扩容超过限制。
+4. **检查 HPA 状态。** 是否已达到最大副本数？
+5. **检查最近的部署。** 新模型版本可能比之前的慢。
 
-## Likely causes
+## 可能的原因
 
-1. **HPA lag during traffic ramp.** Real fix: lower HPA scale-up stabilization window.
-2. **Slower model version.** Compare inference duration histogram between versions.
-3. **Cold cache.** After a deploy, hot caches are empty. Latency returns to normal in ~5–10 minutes.
-4. **Slow downstream call.** Database or feature store latency.
-5. **GC / memory pressure.** Pods near memory limit GC frequently.
+1. **流量增加时 HPA 滞后。** 真正修复：降低 HPA 扩容稳定窗口。
+2. **模型版本较慢。** 比较版本之间的推理时长直方图。
+3. **缓存冷启动。** 部署后，热缓存为空。延迟约 5-10 分钟后恢复正常。
+4. **下游调用慢。** 数据库或特征存储延迟。
+5. **GC/内存压力。** 接近内存限制的 Pod 频繁 GC。
 
-## Mitigation
+## 缓解措施
 
-- Manually scale up while HPA catches up: `kubectl -n model-api scale deployment/model-api --replicas=N`.
-- Roll back model version if a new deploy correlates with the regression.
-- If a downstream is slow, escalate to that team — do not "fix" upstream by adding more replicas.
+- 在 HPA 赶上之前手动扩容：`kubectl -n model-api scale deployment/model-api --replicas=N`。
+- 如果新部署与回归相关，回滚模型版本。
+- 如果下游慢，升级给该团队处理——不要通过增加更多副本来"修复"上游。
 
-## When this requires a postmortem
+## 何时需要进行事后审查
 
-- Persistent > 2 hours with no clear cause.
-- Recurring weekly at the same time (capacity planning gap).
+- 持续超过 2 小时且无明显原因。
+- 每周同一时间重复发生（容量规划缺口）。

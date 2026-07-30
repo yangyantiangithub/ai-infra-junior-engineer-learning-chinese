@@ -1,48 +1,48 @@
-# Lecture 02: AWS Core Services for AI Infrastructure
+# Lecture 02：用于 AI 基础设施的 AWS 核心服务
 
-## Lecture Overview
+## 讲座概述
 
-Amazon Web Services offers 200+ services, but mastering a core set of foundational services enables you to build robust AI/ML infrastructure. This lecture provides hands-on coverage of the essential AWS services you'll use daily: EC2 for compute, S3 for storage, RDS for databases, and IAM for security and access management.
+Amazon Web Services 提供 200+ 服务，但掌握一套核心基础服务就能让你构建健壮的 AI/ML 基础设施。本讲座提供你日常使用的 AWS 基本服务的动手实践：EC2 用于计算、S3 用于存储、RDS 用于数据库、IAM 用于安全和访问管理。
 
-You'll learn through practical AWS CLI examples how to provision virtual machines, manage object storage, deploy managed databases, and implement least-privilege security policies. By the end, you'll be confident navigating the AWS console, automating tasks via CLI, and architecting basic cloud infrastructure for ML workloads.
+你将通过实际的 AWS CLI 示例学习如何配置虚拟机、管理对象存储、部署托管数据库以及实施最小权限安全策略。到本讲座结束时，你将能够自信地使用 AWS 控制台、通过 CLI 自动化任务，并为 ML 工作负载设计基本的云基础设施。
 
-**Estimated Reading Time:** 75-90 minutes
-**Hands-on Companion Lab:** Exercise 02 – Compute & Storage Foundations
-**Prerequisites:** AWS account with free tier, AWS CLI installed and configured, basic Linux command line skills
+**预计阅读时间：** 75-90 分钟
+**动手实验：** 练习 02 – 计算与存储基础
+**前置要求：** 带免费套餐的 AWS 账户、已安装并配置 AWS CLI、基础 Linux 命令行技能
 
 ---
 
-## 1. AWS Account Setup and Configuration
+## 1. AWS 账户设置与配置
 
-### 1.1 AWS Free Tier Overview
+### 1.1 AWS 免费套餐概览
 
-AWS offers a **12-month free tier** for new accounts, plus always-free services:
+AWS 为新账户提供 **12 个月免费套餐**，加上始终免费的服务：
 
-**12-Month Free Tier:**
-- **EC2**: 750 hours/month of t2.micro or t3.micro instances
-- **S3**: 5GB standard storage, 20,000 GET requests, 2,000 PUT requests
-- **RDS**: 750 hours/month of db.t2.micro, 20GB storage
-- **Lambda**: 1M requests/month, 400,000 GB-seconds of compute
-- **CloudWatch**: 10 custom metrics, 10 alarms
+**12 个月免费套餐：**
+- **EC2**：每月 750 小时 t2.micro 或 t3.micro 实例
+- **S3**：5GB 标准存储、20000 次 GET 请求、2000 次 PUT 请求
+- **RDS**：每月 750 小时 db.t2.micro、20GB 存储
+- **Lambda**：每月 100 万次请求、400000 GB-秒计算
+- **CloudWatch**：10 个自定义指标、10 个告警
 
-**Always Free:**
-- **DynamoDB**: 25GB storage, 25 read/write capacity units
-- **Lambda**: 1M requests/month (ongoing)
-- **SNS**: 1M publishes/month
+**始终免费：**
+- **DynamoDB**：25GB 存储、25 个读/写容量单位
+- **Lambda**：每月 100 万次请求（持续）
+- **SNS**：每月 100 万次发布
 
-**Trial Offers (Limited Time):**
-- **SageMaker**: 250 hours/month of notebook instances (2 months)
-- **Rekognition**: 5,000 images/month (12 months)
+**试用优惠（限时）：**
+- **SageMaker**：每月 250 小时 notebook 实例（2 个月）
+- **Rekognition**：每月 5000 张图片（12 个月）
 
-**Cost Management Tips:**
-- **Set billing alerts**: Alert when charges exceed $10, $50, $100
-- **Use Cost Explorer**: Track spending by service
-- **Tag resources**: `Environment=dev`, `Owner=your-name`
-- **Stop instances when not in use**: t2.micro costs $0.0116/hour = $8.40/month if left running
+**成本管理提示：**
+- **设置账单告警**：当费用超过 $10、$50、$100 时告警
+- **使用 Cost Explorer**：按服务跟踪支出
+- **给资源打标签**：`Environment=dev`、`Owner=your-name`
+- **不使用时停止实例**：t2.micro 每小时 $0.0116 = 如果保持运行每月 $8.40
 
-### 1.2 AWS CLI Installation and Configuration
+### 1.2 AWS CLI 安装与配置
 
-**Install AWS CLI v2:**
+**安装 AWS CLI v2：**
 
 ```bash
 # Linux/macOS
@@ -50,53 +50,53 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 unzip awscliv2.zip
 sudo ./aws/install
 
-# Verify
+# 验证
 aws --version
-# Output: aws-cli/2.15.0 Python/3.11.6 Linux/5.10.0 exe/x86_64.ubuntu.22
+# 输出：aws-cli/2.15.0 Python/3.11.6 Linux/5.10.0 exe/x86_64.ubuntu.22
 ```
 
-**Configure AWS CLI:**
+**配置 AWS CLI：**
 
 ```bash
-# Interactive configuration
+# 交互式配置
 aws configure
 
-# Prompts:
+# 提示：
 AWS Access Key ID [None]: AKIAIOSFODNN7EXAMPLE
 AWS Secret Access Key [None]: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 Default region name [None]: us-east-1
 Default output format [None]: json
 
-# Configuration stored in:
-~/.aws/credentials  # Access keys
-~/.aws/config       # Default region and output format
+# 配置存储在：
+~/.aws/credentials  # 访问密钥
+~/.aws/config       # 默认区域和输出格式
 ```
 
-**Create IAM User for CLI (Best Practice):**
+**为 CLI 创建 IAM 用户（最佳实践）：**
 
 ```bash
-# DON'T use root account access keys!
-# Create IAM user via console:
-# IAM → Users → Add User → Programmatic Access → Attach AdministratorAccess policy
+# 不要使用根账户访问密钥！
+# 通过控制台创建 IAM 用户：
+# IAM → 用户 → 添加用户 → 编程访问 → 附加 AdministratorAccess 策略
 
-# Configure named profile for different accounts/roles
+# 为不同账户/角色配置命名配置文件
 aws configure --profile ml-dev
 AWS Access Key ID: AKIAIOSFODNN7DEVEXAMPLE
 AWS Secret Access Key: ...
 Default region name: us-west-2
 Default output format: json
 
-# Use profile:
+# 使用配置文件：
 aws s3 ls --profile ml-dev
 ```
 
-**Test Configuration:**
+**测试配置：**
 
 ```bash
-# List S3 buckets (should return empty list for new account)
+# 列出 S3 存储桶（新账户应返回空列表）
 aws s3 ls
 
-# Get caller identity (verify which account/user you're authenticated as)
+# 获取调用者身份（验证你认证的是哪个账户/用户）
 aws sts get-caller-identity
 {
   "UserId": "AIDACKCEVSQ6C2EXAMPLE",
@@ -105,29 +105,29 @@ aws sts get-caller-identity
 }
 ```
 
-### 1.3 AWS Regions and Availability Zones
+### 1.3 AWS 区域与可用区
 
-**Regions:** Geographic locations where AWS has data centers (us-east-1, eu-west-1, ap-southeast-1, etc.)
+**区域：** AWS 拥有数据 centers 的地理位置（us-east-1、eu-west-1、ap-southeast-1 等）
 
-**Choosing a Region:**
-- **Latency**: Pick region closest to users (us-east-1 for US East Coast, eu-west-1 for Europe)
-- **Compliance**: Data residency requirements (GDPR, HIPAA)
-- **Service Availability**: Not all services available in all regions (check AWS Regional Services list)
-- **Cost**: Pricing varies by region (us-east-1 is often cheapest)
+**选择区域：**
+- **延迟**：选择离用户最近的区域（美东用户选择 us-east-1，欧洲选择 eu-west-1）
+- **合规**：数据驻留要求（GDPR、HIPAA）
+- **服务可用性**：并非所有服务在所有区域都可用（查看 AWS 区域服务列表）
+- **成本**：不同区域定价不同（us-east-1 通常最便宜）
 
-**Availability Zones (AZs):** Isolated data centers within a region (us-east-1a, us-east-1b, us-east-1c)
+**可用区（AZ）：** 区域内隔离的数据中心（us-east-1a、us-east-1b、us-east-1c）
 
-**Why AZs Matter:**
-- **Fault Isolation**: Each AZ has independent power, cooling, networking
-- **High Availability**: Deploy across multiple AZs; if one fails, others continue
-- **Low Latency**: AZs in same region connected by high-speed, low-latency network
+**为什么 AZ 很重要：**
+- **故障隔离**：每个 AZ 有独立的电源、制冷、网络
+- **高可用性**：跨多个 AZ 部署；一个故障，其他继续运行
+- **低延迟**：同一区域内的 AZ 通过高速、低延迟网络连接
 
-**Example:**
+**示例：**
 ```bash
-# List availability zones in your region
+# 列出你区域中的可用区
 aws ec2 describe-availability-zones --region us-east-1
 
-# Output:
+# 输出：
 {
   "AvailabilityZones": [
     {
@@ -147,70 +147,70 @@ aws ec2 describe-availability-zones --region us-east-1
 
 ---
 
-## 2. EC2 (Elastic Compute Cloud) - Virtual Machines
+## 2. EC2（Elastic Compute Cloud）- 虚拟机
 
-### 2.1 EC2 Fundamentals
+### 2.1 EC2 基础
 
-**EC2 = Virtual Machines in the Cloud**
+**EC2 = 云中的虚拟机**
 
-**Instance Types:**
-- **General Purpose**: t3, m5 (balanced CPU, memory, network)
-- **Compute Optimized**: c5, c6i (high CPU, for compute-bound workloads)
-- **Memory Optimized**: r5, x1 (high RAM, for large datasets in memory)
-- **Storage Optimized**: i3, d2 (high disk throughput, for databases)
-- **Accelerated Computing**: p3, p4 (GPU instances for ML training/inference), inf1 (AWS Inferentia for inference)
+**实例类型：**
+- **通用型**：t3、m5（CPU、内存、网络均衡）
+- **计算优化型**：c5、c6i（高 CPU，用于计算密集型工作负载）
+- **内存优化型**：r5、x1（高 RAM，用于内存中的大数据集）
+- **存储优化型**：i3、d2（高磁盘吞吐量，用于数据库）
+- **加速计算型**：p3、p4（用于 ML 训练/推理的 GPU 实例）、inf1（用于推理的 AWS Inferentia）
 
-**Instance Naming Convention:**
+**实例命名规则：**
 ```
 p3.2xlarge
 │ │  │
-│ │  └─ Size (nano, micro, small, medium, large, xlarge, 2xlarge, ...)
-│ └──── Generation (3 = 3rd generation)
-└────── Family (p = GPU optimized)
+│ │  └─ 大小（nano、micro、small、medium、large、xlarge、2xlarge...）
+│ └──── 代次（3 = 第 3 代）
+└────── 系列（p = GPU 优化）
 ```
 
-**Free Tier Instance:** `t2.micro` or `t3.micro` (1 vCPU, 1GB RAM, 750 hours/month free)
+**免费套餐实例：** `t2.micro` 或 `t3.micro`（1 vCPU、1GB RAM、每月 750 小时免费）
 
-**GPU Instances for ML:**
-- **p3.2xlarge**: 1 NVIDIA V100 GPU, 8 vCPUs, 61GB RAM (~$3/hour)
-- **p3.8xlarge**: 4 V100 GPUs, 32 vCPUs, 244GB RAM (~$12/hour)
-- **p4d.24xlarge**: 8 A100 GPUs, 96 vCPUs, 1.1TB RAM (~$32/hour)
-- **g4dn.xlarge**: 1 NVIDIA T4 GPU, 4 vCPUs, 16GB RAM (~$0.50/hour, cost-effective inference)
+**用于 ML 的 GPU 实例：**
+- **p3.2xlarge**：1 个 NVIDIA V100 GPU、8 vCPU、61GB RAM（~$3/小时）
+- **p3.8xlarge**：4 个 V100 GPU、32 vCPU、244GB RAM（~$12/小时）
+- **p4d.24xlarge**：8 个 A100 GPU、96 vCPU、1.1TB RAM（~$32/小时）
+- **g4dn.xlarge**：1 个 NVIDIA T4 GPU、4 vCPU、16GB RAM（~$0.50/小时，经济高效的推理）
 
-### 2.2 Launching an EC2 Instance (CLI)
+### 2.2 启动 EC2 实例（CLI）
 
-**Step 1: Create a Key Pair (for SSH access):**
+**第 1 步：创建密钥对（用于 SSH 访问）：**
 
 ```bash
-# Create SSH key pair
+# 创建 SSH 密钥对
 aws ec2 create-key-pair \
   --key-name my-ml-keypair \
   --query 'KeyMaterial' \
   --output text > my-ml-keypair.pem
 
-# Set correct permissions
+# 设置正确权限
 chmod 400 my-ml-keypair.pem
 
-# Key pair stored in AWS; private key saved locally
+# 密钥对存储在 AWS 中；私钥保存在本地
 ```
 
-**Step 2: Find an Amazon Machine Image (AMI):**
+**第 2 步：查找 Amazon Machine Image（AMI）：**
 
 ```bash
-# Find Ubuntu 22.04 LTS AMI in us-east-1
+# 在 us-east-1 中查找 Ubuntu 22.04 LTS AMI
 aws ec2 describe-images \
   --owners 099720109477 \
   --filters "Name=name,Values=ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*" \
   --query 'Images[*].[ImageId,Name,CreationDate]' \
   --output table | head -20
 
-# Note the latest ImageId (e.g., ami-0c55b159cbfafe1f0)
+# 记下最新的 ImageId（例如 ami-0c55b159cbfafe1f0）
 ```
 
-**Step 3: Launch Instance:**
+**第 3 步：启动实例：**
 
 ```bash
-# Launch t2.micro instance (free tier)
+# 启动 t2.micro 实例（免费套餐）
 aws ec2 run-instances \
   --image-id ami-0c55b159cbfafe1f0 \
   --instance-type t2.micro \
@@ -219,104 +219,104 @@ aws ec2 run-instances \
   --subnet-id subnet-0abcdef1234567890 \
   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=ml-dev-server},{Key=Environment,Value=dev},{Key=Owner,Value=your-name}]'
 
-# Output includes InstanceId (e.g., i-0abcdef1234567890)
+# 输出包含 InstanceId（例如 i-0abcdef1234567890）
 ```
 
-**Step 4: Wait for Instance to Start:**
+**第 4 步：等待实例启动：**
 
 ```bash
-# Check instance status
+# 检查实例状态
 aws ec2 describe-instances \
   --instance-ids i-0abcdef1234567890 \
   --query 'Reservations[0].Instances[0].[State.Name,PublicIpAddress]' \
   --output table
 
-# Wait for "running" status and note PublicIpAddress
+# 等待 "running" 状态并记下 PublicIpAddress
 ```
 
-**Step 5: SSH into Instance:**
+**第 5 步：SSH 连接到实例：**
 
 ```bash
-# SSH using key pair
+# 使用密钥对 SSH
 ssh -i my-ml-keypair.pem ubuntu@<PUBLIC_IP>
 
-# Once connected:
+# 连接后：
 ubuntu@ip-172-31-0-123:~$ python3 --version
 Python 3.10.6
 
-# Install ML libraries
+# 安装 ML 库
 sudo apt update
 sudo apt install -y python3-pip
 pip3 install torch torchvision numpy pandas
 ```
 
-### 2.3 EC2 Instance Lifecycle Management
+### 2.3 EC2 实例生命周期管理
 
-**Stop Instance (preserves data, no compute charges):**
+**停止实例（保留数据、无计算费用）：**
 
 ```bash
-# Stop instance
+# 停止实例
 aws ec2 stop-instances --instance-ids i-0abcdef1234567890
 
-# Instance state: running → stopping → stopped
-# You still pay for EBS storage, but not compute
+# 实例状态：running → stopping → stopped
+# 你仍需为 EBS 存储付费，但不为计算付费
 ```
 
-**Start Instance:**
+**启动实例：**
 
 ```bash
-# Start stopped instance
+# 启动已停止的实例
 aws ec2 start-instances --instance-ids i-0abcdef1234567890
 
-# Instance gets NEW public IP (unless using Elastic IP)
+# 实例获得新的公有 IP（除非使用弹性 IP）
 ```
 
-**Terminate Instance (delete permanently):**
+**终止实例（永久删除）：**
 
 ```bash
-# Terminate instance
+# 终止实例
 aws ec2 terminate-instances --instance-ids i-0abcdef1234567890
 
-# Instance state: running → shutting-down → terminated
-# EBS volumes deleted (unless set to persist)
+# 实例状态：running → shutting-down → terminated
+# EBS 卷被删除（除非设置为保留）
 ```
 
-**Reboot Instance:**
+**重启实例：**
 
 ```bash
-# Reboot (graceful restart, keeps same IPs)
+# 重启（优雅重启、保持相同 IP）
 aws ec2 reboot-instances --instance-ids i-0abcdef1234567890
 ```
 
-**Best Practices:**
-- **Tag everything**: Name, Environment, Owner, Project, CostCenter
-- **Stop instances** when not in use (dev/test environments)
-- **Use CloudWatch alarms** to auto-stop idle instances
-- **Enable termination protection** for production instances
+**最佳实践：**
+- **给所有资源打标签**：Name、Environment、Owner、Project、CostCenter
+- **不使用时停止实例**（开发/测试环境）
+- **使用 CloudWatch 告警**自动停止闲置实例
+- **为生产实例启用终止保护**
 
-### 2.4 EC2 User Data (Bootstrap Scripts)
+### 2.4 EC2 User Data（引导脚本）
 
-**User Data** = Script that runs on instance launch (automate setup)
+**User Data** = 在实例启动时运行的脚本（自动化设置）
 
-**Example: Launch EC2 with PyTorch Pre-installed:**
+**示例：启动预装 PyTorch 的 EC2：**
 
 ```bash
-# Create user data script
+# 创建 user data 脚本
 cat > user-data.sh <<'EOF'
 #!/bin/bash
-# This script runs at instance launch
+# 该脚本在实例启动时运行
 
-# Update system
+# 更新系统
 apt-get update -y
 
-# Install Python and pip
+# 安装 Python 和 pip
 apt-get install -y python3-pip
 
-# Install ML libraries
+# 安装 ML 库
 pip3 install torch torchvision torchaudio \
   pandas numpy scikit-learn jupyter matplotlib
 
-# Create Jupyter config
+# 创建 Jupyter 配置
 mkdir -p /home/ubuntu/.jupyter
 cat > /home/ubuntu/.jupyter/jupyter_notebook_config.py <<EOL
 c.NotebookApp.ip = '0.0.0.0'
@@ -324,13 +324,13 @@ c.NotebookApp.open_browser = False
 c.NotebookApp.port = 8888
 EOL
 
-# Start Jupyter in background
+# 在后台启动 Jupyter
 su - ubuntu -c "nohup jupyter notebook --no-browser --port=8888 > /home/ubuntu/jupyter.log 2>&1 &"
 
 echo "Setup complete! Jupyter running on port 8888"
 EOF
 
-# Launch instance with user data
+# 使用 user data 启动实例
 aws ec2 run-instances \
   --image-id ami-0c55b159cbfafe1f0 \
   --instance-type t2.micro \
@@ -338,96 +338,96 @@ aws ec2 run-instances \
   --user-data file://user-data.sh \
   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=ml-jupyter-server}]'
 
-# After instance starts, Jupyter is running
-# Access: http://<PUBLIC_IP>:8888
+# 实例启动后，Jupyter 正在运行
+# 访问：http://<PUBLIC_IP>:8888
 ```
 
-**User Data Logs:**
+**User Data 日志：**
 ```bash
-# SSH to instance and check user data execution
+# SSH 到实例并检查 user data 执行
 sudo cat /var/log/cloud-init-output.log
 ```
 
-### 2.5 EC2 Storage Options
+### 2.5 EC2 存储选项
 
-**1. Instance Store (Ephemeral)**
-- **Physically attached** to host machine
-- **Temporary**: Lost when instance stops/terminates
-- **High performance**: NVMe SSDs, low latency
-- **Use case**: Temporary processing, caches, scratch space
+**1. 实例存储（临时）**
+- **物理附加**到宿主机
+- **临时**：实例停止/终止时丢失
+- **高性能**：NVMe SSD，低延迟
+- **用例**：临时处理、缓存、临时空间
 
-**2. EBS (Elastic Block Store)**
-- **Network-attached** block storage (like a hard drive)
-- **Persistent**: Data survives instance stop/start
-- **Types**:
-  - **gp3**: General purpose SSD (3,000-16,000 IOPS, $0.08/GB/month)
-  - **io2**: Provisioned IOPS SSD (up to 64,000 IOPS, low latency databases)
-  - **st1**: Throughput-optimized HDD (big data, log processing)
-  - **sc1**: Cold HDD (archival, infrequent access)
+**2. EBS（Elastic Block Store）**
+- **网络附加**的块存储（像硬盘）
+- **持久**：数据在实例停止/启动后保留
+- **类型**：
+  - **gp3**：通用型 SSD（3000-16000 IOPS，$0.08/GB/月）
+  - **io2**：预置 IOPS SSD（最高 64000 IOPS，低延迟数据库）
+  - **st1**：吞吐优化 HDD（大数据、日志处理）
+  - **sc1**：冷 HDD（归档、不频繁访问）
 
-**Create and Attach EBS Volume:**
+**创建并挂载 EBS 卷：**
 
 ```bash
-# Create 100GB EBS volume in same AZ as instance
+# 在与实例相同的可用区创建 100GB EBS 卷
 aws ec2 create-volume \
   --availability-zone us-east-1a \
   --size 100 \
   --volume-type gp3 \
   --tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=ml-data-volume}]'
 
-# Note VolumeId (e.g., vol-0abcdef1234567890)
+# 记下 VolumeId（例如 vol-0abcdef1234567890）
 
-# Attach to instance
+# 挂载到实例
 aws ec2 attach-volume \
   --volume-id vol-0abcdef1234567890 \
   --instance-id i-0abcdef1234567890 \
   --device /dev/sdf
 
-# SSH to instance and format/mount
+# SSH 到实例并格式化/挂载
 sudo mkfs -t ext4 /dev/sdf
 sudo mkdir /mnt/ml-data
 sudo mount /dev/sdf /mnt/ml-data
 
-# Persist mount across reboots
+# 使挂载在重启后持久
 echo '/dev/sdf /mnt/ml-data ext4 defaults,nofail 0 2' | sudo tee -a /etc/fstab
 ```
 
-**EBS Snapshots (Backups):**
+**EBS 快照（备份）：**
 
 ```bash
-# Create snapshot of EBS volume
+# 创建 EBS 卷的快照
 aws ec2 create-snapshot \
   --volume-id vol-0abcdef1234567890 \
   --description "ML data backup before experiment"
 
-# Restore from snapshot (create new volume)
+# 从快照恢复（创建新卷）
 aws ec2 create-volume \
   --snapshot-id snap-0123456789abcdef0 \
   --availability-zone us-east-1a
 ```
 
-### 2.6 EC2 Pricing Strategies
+### 2.6 EC2 定价策略
 
-**1. On-Demand (Default)**
-- **Price**: $0.0116/hour for t2.micro
-- **Use**: Development, unpredictable workloads
-- **Billing**: Per second (1-hour minimum for some instances)
+**1. 按需（默认）**
+- **价格**：t2.micro 每小时 $0.0116
+- **用途**：开发、不可预测的工作负载
+- **计费**：按秒（某些实例最少 1 小时）
 
-**2. Reserved Instances**
-- **Commitment**: 1 or 3 years
-- **Discount**: Up to 72% vs on-demand
-- **Payment**: All upfront, partial upfront, no upfront
-- **Use**: Steady-state production workloads
+**2. 预留实例**
+- **承诺**：1 或 3 年
+- **折扣**：相比按需最高 72%
+- **付款**：全预付、部分预付、无预付
+- **用途**：稳态生产工作负载
 
-**3. Spot Instances**
-- **Price**: Up to 90% discount (market-based pricing)
-- **Risk**: Can be terminated with 2-minute warning
-- **Use**: Fault-tolerant workloads (batch processing, ML training with checkpointing)
+**3. Spot 实例**
+- **价格**：最高 90% 折扣（基于市场定价）
+- **风险**：可能被终止（提前 2 分钟警告）
+- **用途**：容错工作负载（批处理、带 checkpointing 的 ML 训练）
 
-**Example Spot Request:**
+**示例 Spot 请求：**
 
 ```bash
-# Request spot instance
+# 请求 spot 实例
 aws ec2 request-spot-instances \
   --spot-price "0.05" \
   --instance-count 1 \
@@ -438,131 +438,131 @@ aws ec2 request-spot-instances \
     "KeyName": "my-ml-keypair"
   }'
 
-# Monitor spot instance
+# 监控 spot 实例
 aws ec2 describe-spot-instance-requests
 ```
 
 **4. Savings Plans**
-- **Commitment**: $/hour for 1-3 years
-- **Flexibility**: Can change instance types/regions
-- **Discount**: Up to 72%
-- **Use**: Flexible compute commitment
+- **承诺**：$/小时 持续 1-3 年
+- **灵活性**：可以更改实例类型/区域
+- **折扣**：最高 72%
+- **用途**：灵活的计算承诺
 
-**Cost Comparison (p3.2xlarge, 1 GPU):**
-- **On-Demand**: $3.06/hour = $2,203/month (24/7)
-- **1-Year Reserved**: $1.84/hour = $1,325/month (40% savings)
-- **3-Year Reserved**: $1.23/hour = $886/month (60% savings)
-- **Spot**: $0.92/hour = $662/month (70% savings, interruptible)
+**成本对比（p3.2xlarge，1 GPU）：**
+- **按需**：$3.06/小时 = 每月 $2,203（24/7）
+- **1 年预留**：$1.84/小时 = 每月 $1,325（节省 40%）
+- **3 年预留**：$1.23/小时 = 每月 $886（节省 60%）
+- **Spot**：$0.92/小时 = 每月 $662（节省 70%、可中断）
 
 ---
 
-## 3. S3 (Simple Storage Service) - Object Storage
+## 3. S3（Simple Storage Service）- 对象存储
 
-### 3.1 S3 Fundamentals
+### 3.1 S3 基础
 
-**S3 = Object Storage** (files + metadata, accessible via HTTP/HTTPS)
+**S3 = 对象存储**（文件 + 元数据，通过 HTTP/HTTPS 访问）
 
-**Key Concepts:**
-- **Bucket**: Container for objects (globally unique name)
-- **Object**: File + metadata (max 5TB)
-- **Key**: Unique identifier for object (like a file path)
+**关键概念：**
+- **存储桶（Bucket）**：对象的容器（全局唯一名称）
+- **对象（Object）**：文件 + 元数据（最大 5TB）
+- **键（Key）**：对象的唯一标识符（类似文件路径）
 
-**Use Cases for AI/ML:**
-- **Data Lake**: Store raw training data (images, text, logs)
-- **Model Artifacts**: Store trained models (.pt, .h5, .pkl files)
-- **Feature Store**: Store precomputed features (Parquet files)
-- **Results**: Store prediction outputs, experiment results
+**AI/ML 的用例：**
+- **数据湖**：存储原始训练数据（图片、文本、日志）
+- **模型产物**：存储训练好的模型（.pt、.h5、.pkl 文件）
+- **特征存储**：存储预计算的特征（Parquet 文件）
+- **结果**：存储预测输出、实验记录
 
-**Bucket Naming Rules:**
-- Globally unique across all AWS accounts
-- 3-63 characters, lowercase, no underscores
-- Example: `my-ml-training-data-123456789`
+**存储桶命名规则：**
+- 在所有 AWS 账户中全局唯一
+- 3-63 个字符，小写，无下划线
+- 示例：`my-ml-training-data-123456789`
 
-### 3.2 S3 Bucket Operations (CLI)
+### 3.2 S3 存储桶操作（CLI）
 
-**Create Bucket:**
+**创建存储桶：**
 
 ```bash
-# Create bucket in us-east-1
+# 在 us-east-1 创建存储桶
 aws s3 mb s3://my-ml-training-data-123456789 --region us-east-1
 
-# Verify bucket created
+# 验证存储桶已创建
 aws s3 ls
-# Output: 2025-10-23 12:00:00 my-ml-training-data-123456789
+# 输出：2025-10-23 12:00:00 my-ml-training-data-123456789
 ```
 
-**Upload Files:**
+**上传文件：**
 
 ```bash
-# Upload single file
+# 上传单个文件
 aws s3 cp model.pth s3://my-ml-training-data-123456789/models/
 
-# Upload directory (recursive)
+# 上传目录（递归）
 aws s3 cp ./training-data/ s3://my-ml-training-data-123456789/data/ --recursive
 
-# Sync directory (only uploads changed files)
+# 同步目录（仅上传更改的文件）
 aws s3 sync ./training-data/ s3://my-ml-training-data-123456789/data/
 ```
 
-**Download Files:**
+**下载文件：**
 
 ```bash
-# Download single file
+# 下载单个文件
 aws s3 cp s3://my-ml-training-data-123456789/models/model.pth ./
 
-# Download directory
+# 下载目录
 aws s3 cp s3://my-ml-training-data-123456789/data/ ./training-data/ --recursive
 
-# Sync to local (download only new/changed files)
+# 同步到本地（仅下载新/更改的文件）
 aws s3 sync s3://my-ml-training-data-123456789/data/ ./training-data/
 ```
 
-**List Objects:**
+**列出对象：**
 
 ```bash
-# List all objects in bucket
+# 列出存储桶中的所有对象
 aws s3 ls s3://my-ml-training-data-123456789/ --recursive
 
-# List objects with size and timestamp
+# 列出对象并显示大小和时间戳
 aws s3 ls s3://my-ml-training-data-123456789/models/ --human-readable
 
-# Output:
+# 输出：
 2025-10-23 12:30:00  150.5 MiB model-v1.0.pth
 2025-10-23 13:45:00  200.1 MiB model-v1.1.pth
 ```
 
-**Delete Objects:**
+**删除对象：**
 
 ```bash
-# Delete single object
+# 删除单个对象
 aws s3 rm s3://my-ml-training-data-123456789/models/old-model.pth
 
-# Delete all objects in prefix
+# 删除前缀下的所有对象
 aws s3 rm s3://my-ml-training-data-123456789/experiments/failed/ --recursive
 
-# Delete bucket (must be empty first)
+# 删除存储桶（必须先清空）
 aws s3 rb s3://my-ml-training-data-123456789 --force
-# --force deletes all objects first, then bucket
+# --force 先删除所有对象，再删除存储桶
 ```
 
-### 3.3 S3 Storage Classes and Lifecycle Policies
+### 3.3 S3 存储类与生命周期策略
 
-**Storage Classes:**
+**存储类：**
 
-| Class | Use Case | Retrieval | Cost ($/GB/month) |
+| 类 | 用例 | 检索 | 成本（$/GB/月） |
 |-------|----------|-----------|-------------------|
-| **S3 Standard** | Frequent access | Immediate | $0.023 |
-| **S3 Intelligent-Tiering** | Unknown access patterns | Immediate | $0.023-$0.0125 (auto) |
-| **S3 Standard-IA** | Infrequent access | Immediate | $0.0125 |
-| **S3 One Zone-IA** | Infrequent, non-critical | Immediate | $0.01 |
-| **S3 Glacier Instant Retrieval** | Archive, instant access | Milliseconds | $0.004 |
-| **S3 Glacier Flexible Retrieval** | Archive | Minutes-hours | $0.0036 |
-| **S3 Glacier Deep Archive** | Long-term archive | Hours | $0.00099 |
+| **S3 Standard** | 频繁访问 | 即时 | $0.023 |
+| **S3 Intelligent-Tiering** | 未知访问模式 | 即时 | $0.023-$0.0125（自动） |
+| **S3 Standard-IA** | 不频繁访问 | 即时 | $0.0125 |
+| **S3 One Zone-IA** | 不频繁、非关键 | 即时 | $0.01 |
+| **S3 Glacier Instant Retrieval** | 归档、即时访问 | 毫秒 | $0.004 |
+| **S3 Glacier Flexible Retrieval** | 归档 | 分钟-小时 | $0.0036 |
+| **S3 Glacier Deep Archive** | 长期归档 | 小时 | $0.00099 |
 
-**Lifecycle Policy Example:**
+**生命周期策略示例：**
 
 ```bash
-# Create lifecycle policy JSON
+# 创建生命周期策略 JSON
 cat > lifecycle-policy.json <<'EOF'
 {
   "Rules": [
@@ -596,43 +596,43 @@ cat > lifecycle-policy.json <<'EOF'
 }
 EOF
 
-# Apply lifecycle policy to bucket
+# 将生命周期策略应用到存储桶
 aws s3api put-bucket-lifecycle-configuration \
   --bucket my-ml-training-data-123456789 \
   --lifecycle-configuration file://lifecycle-policy.json
 ```
 
-**Cost Savings Example:**
-- **Scenario**: 1TB of experiment data, accessed only for first 30 days
-- **S3 Standard (always)**: $23/month × 12 months = $276/year
-- **With lifecycle**:
-  - Month 1: Standard ($23)
-  - Months 2-3: Standard-IA ($12.50 × 2 = $25)
-  - Months 4-12: Glacier ($3.60 × 9 = $32.40)
-  - **Total**: $80.40/year (71% savings)
+**成本节省示例：**
+- **场景**：1TB 实验数据，仅在前 30 天访问
+- **S3 Standard（始终）**：每月 $23 × 12 个月 = 每年 $276
+- **使用生命周期**：
+  - 第 1 个月：Standard（$23）
+  - 第 2-3 个月：Standard-IA（$12.50 × 2 = $25）
+  - 第 4-12 个月：Glacier（$3.60 × 9 = $32.40）
+  - **总计**：每年 $80.40（节省 71%）
 
-### 3.4 S3 Versioning and Backup
+### 3.4 S3 版本控制与备份
 
-**Enable Versioning:**
+**启用版本控制：**
 
 ```bash
-# Enable versioning on bucket
+# 在存储桶上启用版本控制
 aws s3api put-bucket-versioning \
   --bucket my-ml-training-data-123456789 \
   --versioning-configuration Status=Enabled
 
-# Now every upload creates a new version (old versions retained)
+# 现在每次上传都创建一个新版本（旧版本保留）
 ```
 
-**Access Previous Versions:**
+**访问先前版本：**
 
 ```bash
-# List all versions of an object
+# 列出对象的所有版本
 aws s3api list-object-versions \
   --bucket my-ml-training-data-123456789 \
   --prefix models/model.pth
 
-# Download specific version
+# 下载特定版本
 aws s3api get-object \
   --bucket my-ml-training-data-123456789 \
   --key models/model.pth \
@@ -640,14 +640,14 @@ aws s3api get-object \
   ./model-old-version.pth
 ```
 
-**Why Versioning for ML:**
-- **Model Rollback**: Revert to previous model if new version performs poorly
-- **Experiment Reproducibility**: Access exact data/code used in past experiments
-- **Accidental Deletion Protection**: Recover deleted files
+**为什么 ML 需要版本控制：**
+- **模型回滚**：新版本表现不佳时回退到先前版本
+- **实验可重现性**：访问过去实验中使用的确切数据/代码
+- **意外删除保护**：恢复已删除的文件
 
-### 3.5 S3 Security and Access Control
+### 3.5 S3 安全与访问控制
 
-**Bucket Policies (Resource-Based):**
+**存储桶策略（基于资源）：**
 
 ```json
 {
@@ -664,14 +664,14 @@ aws s3api get-object \
 }
 ```
 
-Apply policy:
+应用策略：
 ```bash
 aws s3api put-bucket-policy \
   --bucket my-public-models-bucket \
   --policy file://bucket-policy.json
 ```
 
-**IAM Policies (User-Based):**
+**IAM 策略（基于用户）：**
 
 ```json
 {
@@ -693,10 +693,10 @@ aws s3api put-bucket-policy \
 }
 ```
 
-**Encryption:**
+**加密：**
 
 ```bash
-# Enable default encryption (AES-256)
+# 启用默认加密（AES-256）
 aws s3api put-bucket-encryption \
   --bucket my-ml-training-data-123456789 \
   --server-side-encryption-configuration '{
@@ -707,13 +707,13 @@ aws s3api put-bucket-encryption \
     }]
   }'
 
-# All new objects automatically encrypted
+# 所有新对象自动加密
 ```
 
-**Access Logging:**
+**访问日志：**
 
 ```bash
-# Enable S3 access logging
+# 启用 S3 访问日志
 aws s3api put-bucket-logging \
   --bucket my-ml-training-data-123456789 \
   --bucket-logging-status '{
@@ -726,36 +726,36 @@ aws s3api put-bucket-logging \
 
 ---
 
-## 4. RDS (Relational Database Service)
+## 4. RDS（Relational Database Service）
 
-### 4.1 RDS Overview
+### 4.1 RDS 概述
 
-**RDS = Managed Relational Databases**
+**RDS = 托管关系数据库**
 
-**Supported Engines:**
+**支持的引擎：**
 - **MySQL**
-- **PostgreSQL** (recommended for ML: supports JSON, vector extensions)
+- **PostgreSQL**（推荐用于 ML：支持 JSON、向量扩展）
 - **MariaDB**
 - **Oracle**
 - **SQL Server**
-- **Aurora** (AWS proprietary, MySQL/PostgreSQL compatible, 5x faster)
+- **Aurora**（AWS 专有，兼容 MySQL/PostgreSQL，快 5 倍）
 
-**Why RDS for ML:**
-- **Metadata Storage**: Experiment tracking (MLflow backend)
-- **Feature Store**: Serve features for real-time inference
-- **Application Backend**: User data, prediction history
-- **Analytics**: Query results, metrics
+**为什么 ML 需要 RDS：**
+- **元数据存储**：实验跟踪（MLflow 后端）
+- **特征存储**：为实时推理提供特征
+- **应用后端**：用户数据、预测历史
+- **分析**：查询结果、指标
 
-**RDS vs Self-Managed Database:**
-- **RDS Handles**: Backups, patching, high availability, scaling
-- **You Handle**: Schema design, queries, application integration
+**RDS vs 自行管理数据库：**
+- **RDS 处理**：备份、打补丁、高可用性、扩展
+- **你处理**：模式设计、查询、应用集成
 
-### 4.2 Launching an RDS Instance (CLI)
+### 4.2 启动 RDS 实例（CLI）
 
-**Create PostgreSQL Database:**
+**创建 PostgreSQL 数据库：**
 
 ```bash
-# Create RDS instance (db.t3.micro, free tier eligible)
+# 创建 RDS 实例（db.t3.micro，符合免费套餐条件）
 aws rds create-db-instance \
   --db-instance-identifier ml-metadata-db \
   --db-instance-class db.t3.micro \
@@ -769,29 +769,29 @@ aws rds create-db-instance \
   --publicly-accessible \
   --tags Key=Name,Value=ml-metadata-db Key=Environment,Value=dev
 
-# Wait for "available" status (takes 5-10 minutes)
+# 等待 "available" 状态（需要 5-10 分钟）
 aws rds wait db-instance-available --db-instance-identifier ml-metadata-db
 
-# Get connection endpoint
+# 获取连接端点
 aws rds describe-db-instances \
   --db-instance-identifier ml-metadata-db \
   --query 'DBInstances[0].Endpoint.Address' \
   --output text
-# Output: ml-metadata-db.c9akznl4qo5q.us-east-1.rds.amazonaws.com
+# 输出：ml-metadata-db.c9akznl4qo5q.us-east-1.rds.amazonaws.com
 ```
 
-**Connect to RDS:**
+**连接到 RDS：**
 
 ```bash
-# Install PostgreSQL client
+# 安装 PostgreSQL 客户端
 sudo apt install -y postgresql-client
 
-# Connect
+# 连接
 psql -h ml-metadata-db.c9akznl4qo5q.us-east-1.rds.amazonaws.com \
      -U admin \
      -d postgres
 
-# Inside psql:
+# 在 psql 内部：
 postgres=> CREATE DATABASE mlflow;
 postgres=> \c mlflow
 mlflow=> CREATE TABLE experiments (
@@ -801,12 +801,12 @@ mlflow=> CREATE TABLE experiments (
 );
 ```
 
-### 4.3 RDS High Availability (Multi-AZ)
+### 4.3 RDS 高可用性（Multi-AZ）
 
-**Multi-AZ Deployment:**
+**Multi-AZ 部署：**
 
 ```bash
-# Create Multi-AZ RDS (automatic failover)
+# 创建 Multi-AZ RDS（自动故障转移）
 aws rds create-db-instance \
   --db-instance-identifier ml-prod-db \
   --db-instance-class db.t3.small \
@@ -818,101 +818,101 @@ aws rds create-db-instance \
   --multi-az \
   --backup-retention-period 30
 
-# AWS automatically:
-# - Maintains standby replica in different AZ
-# - Synchronous replication
-# - Auto-failover in 60-120 seconds if primary fails
+# AWS 自动：
+# - 在不同 AZ 中维护备用副本
+# - 同步复制
+# - 主库故障时 60-120 秒自动故障转移
 ```
 
-**Read Replicas (for read scaling):**
+**只读副本（用于读扩展）：**
 
 ```bash
-# Create read replica
+# 创建只读副本
 aws rds create-db-instance-read-replica \
   --db-instance-identifier ml-prod-db-replica \
   --source-db-instance-identifier ml-prod-db
 
-# Use read replica for analytics queries (offload primary)
+# 使用只读副本进行分析查询（卸载主库）
 ```
 
-### 4.4 RDS Snapshots and Backups
+### 4.4 RDS 快照与备份
 
-**Automated Backups:**
-- Enabled by default, retention 1-35 days
-- Point-in-time recovery (restore to any second within retention)
+**自动备份：**
+- 默认启用，保留 1-35 天
+- 时间点恢复（恢复到保留期内的任意秒）
 
-**Manual Snapshots:**
+**手动快照：**
 
 ```bash
-# Create manual snapshot
+# 创建手动快照
 aws rds create-db-snapshot \
   --db-instance-identifier ml-metadata-db \
   --db-snapshot-identifier ml-metadata-backup-2025-10-23
 
-# List snapshots
+# 列出快照
 aws rds describe-db-snapshots \
   --db-instance-identifier ml-metadata-db
 
-# Restore from snapshot (creates new instance)
+# 从快照恢复（创建新实例）
 aws rds restore-db-instance-from-db-snapshot \
   --db-instance-identifier ml-metadata-db-restored \
   --db-snapshot-identifier ml-metadata-backup-2025-10-23
 ```
 
-### 4.5 RDS Cost Optimization
+### 4.5 RDS 成本优化
 
-**Pricing:**
-- **Instance**: Charged per hour (db.t3.micro: $0.017/hour = $12/month)
-- **Storage**: $0.115/GB/month (gp3)
-- **Backup**: First 100GB free, then $0.095/GB/month
-- **Data Transfer**: Inbound free, outbound $0.09/GB
+**定价：**
+- **实例**：按小时计费（db.t3.micro：$0.017/小时 = 每月 $12）
+- **存储**：$0.115/GB/月（gp3）
+- **备份**：前 100GB 免费，之后 $0.095/GB/月
+- **数据传输**：入站免费，出站 $0.09/GB
 
-**Cost Optimization Tips:**
-- **Stop instances** in dev/test (storage charges continue)
-- **Use reserved instances** for production (up to 69% savings)
-- **Delete old snapshots** (keep only necessary)
-- **Use Aurora Serverless** for variable workloads (pay per second)
+**成本优化技巧：**
+- **停止开发/测试中的实例**（存储费用继续）
+- **为生产使用预留实例**（最高节省 69%）
+- **删除旧快照**（仅保留必要的）
+- **为变化工作负载使用 Aurora Serverless**（按秒付费）
 
 ```bash
-# Stop RDS instance (dev environment)
+# 停止 RDS 实例（开发环境）
 aws rds stop-db-instance --db-instance-identifier ml-metadata-db
 
-# Start when needed
+# 需要时启动
 aws rds start-db-instance --db-instance-identifier ml-metadata-db
 ```
 
 ---
 
-## 5. IAM (Identity and Access Management)
+## 5. IAM（Identity and Access Management）
 
-### 5.1 IAM Fundamentals
+### 5.1 IAM 基础
 
-**IAM = Who can do what in AWS**
+**IAM = 谁能在 AWS 中做什么**
 
-**Core Concepts:**
-- **Users**: Individual people or applications
-- **Groups**: Collection of users (e.g., "Developers", "Data Scientists")
-- **Roles**: Temporary credentials for services/applications
-- **Policies**: JSON documents defining permissions
+**核心概念：**
+- **用户**：个人或应用
+- **组（Group）**：用户的集合（如"开发人员"、"数据科学家"）
+- **角色（Role）**：用于服务/应用的临时凭证
+- **策略（Policy）**：定义权限的 JSON 文档
 
-**Best Practices:**
-- **Never use root account** for daily tasks
-- **Enable MFA** (Multi-Factor Authentication)
-- **Principle of Least Privilege**: Grant minimum required permissions
-- **Use roles** for EC2/Lambda, not hardcoded access keys
+**最佳实践：**
+- **永远不要**将根账户用于日常任务
+- **启用 MFA**（多因素认证）
+- **最小权限原则**：授予最低必要权限
+- **为 EC2/Lambda 使用角色**，而非硬编码的访问密钥
 
-### 5.2 IAM Users and Groups
+### 5.2 IAM 用户和组
 
-**Create IAM User:**
+**创建 IAM 用户：**
 
 ```bash
-# Create user
+# 创建用户
 aws iam create-user --user-name alice
 
-# Add user to group
+# 将用户添加到组
 aws iam add-user-to-group --user-name alice --group-name DataScientists
 
-# Create access key (for CLI/SDK)
+# 创建访问密钥（用于 CLI/SDK）
 aws iam create-access-key --user-name alice
 {
   "AccessKey": {
@@ -922,39 +922,39 @@ aws iam create-access-key --user-name alice
   }
 }
 
-# Alice configures her CLI
+# Alice 配置她的 CLI
 aws configure
-# Uses the above access key and secret
+# 使用上述访问密钥和秘密密钥
 ```
 
-**Create IAM Group with Policy:**
+**创建带策略的 IAM 组：**
 
 ```bash
-# Create group
+# 创建组
 aws iam create-group --group-name DataScientists
 
-# Attach AWS managed policy
+# 附加 AWS 托管策略
 aws iam attach-group-policy \
   --group-name DataScientists \
   --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
 
-# Attach custom policy (see below)
+# 附加自定义策略（见下文）
 aws iam put-group-policy \
   --group-name DataScientists \
   --policy-name SageMakerAccess \
   --policy-document file://sagemaker-policy.json
 ```
 
-### 5.3 IAM Policies
+### 5.3 IAM 策略
 
-**Policy Structure:**
+**策略结构：**
 
 ```json
 {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Effect": "Allow",  // or "Deny"
+      "Effect": "Allow",  // 或 "Deny"
       "Action": [
         "s3:GetObject",
         "s3:PutObject"
@@ -972,7 +972,7 @@ aws iam put-group-policy \
 }
 ```
 
-**Example Policy: Data Scientist Access:**
+**示例策略：数据科学家访问：**
 
 ```json
 {
@@ -1025,36 +1025,36 @@ aws iam put-group-policy \
 }
 ```
 
-**Attach Policy to User:**
+**将策略附加到用户：**
 
 ```bash
-# Save policy to file
+# 将策略保存到文件
 cat > data-scientist-policy.json <<'EOF'
-{...policy JSON...}
+{...策略 JSON...}
 EOF
 
-# Create custom policy
+# 创建自定义策略
 aws iam create-policy \
   --policy-name DataScientistPolicy \
   --policy-document file://data-scientist-policy.json
 
-# Attach to user
+# 附加到用户
 aws iam attach-user-policy \
   --user-name alice \
   --policy-arn arn:aws:iam::123456789012:policy/DataScientistPolicy
 ```
 
-### 5.4 IAM Roles (for Services)
+### 5.4 IAM 角色（用于服务）
 
-**Why Roles?**
-- EC2 instance needs to access S3 (don't hardcode access keys!)
-- Lambda function needs to write to DynamoDB
-- ECS task needs to pull image from ECR
+**为什么需要角色？**
+- EC2 实例需要访问 S3（不要硬编码访问密钥！）
+- Lambda 函数需要写入 DynamoDB
+- ECS 任务需要从 ECR 拉取镜像
 
-**Create Role for EC2:**
+**为 EC2 创建角色：**
 
 ```bash
-# Create trust policy (who can assume this role)
+# 创建信任策略（谁可以承担此角色）
 cat > ec2-trust-policy.json <<'EOF'
 {
   "Version": "2012-10-17",
@@ -1070,56 +1070,56 @@ cat > ec2-trust-policy.json <<'EOF'
 }
 EOF
 
-# Create role
+# 创建角色
 aws iam create-role \
   --role-name EC2-S3-Access-Role \
   --assume-role-policy-document file://ec2-trust-policy.json
 
-# Attach S3 access policy to role
+# 将 S3 访问策略附加到角色
 aws iam attach-role-policy \
   --role-name EC2-S3-Access-Role \
   --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
 
-# Create instance profile (EC2 specific wrapper for role)
+# 创建实例配置文件（EC2 特定包装器用于角色）
 aws iam create-instance-profile --instance-profile-name EC2-S3-Profile
 
-# Add role to instance profile
+# 将角色添加到实例配置文件
 aws iam add-role-to-instance-profile \
   --instance-profile-name EC2-S3-Profile \
   --role-name EC2-S3-Access-Role
 
-# Launch EC2 with role
+# 使用角色启动 EC2
 aws ec2 run-instances \
   --image-id ami-0c55b159cbfafe1f0 \
   --instance-type t2.micro \
   --iam-instance-profile Name=EC2-S3-Profile
 ```
 
-**Now EC2 instance can access S3 without access keys:**
+**现在 EC2 实例无需访问密钥即可访问 S3：**
 
 ```bash
-# SSH to instance
+# SSH 到实例
 ssh -i keypair.pem ubuntu@<PUBLIC_IP>
 
-# AWS CLI automatically uses instance role
+# AWS CLI 自动使用实例角色
 aws s3 ls s3://my-ml-training-data-123456789/
-# Works! No credentials configured on instance
+# 可以工作！实例上未配置凭证
 ```
 
-### 5.5 MFA (Multi-Factor Authentication)
+### 5.5 MFA（多因素认证）
 
-**Enable MFA for IAM User:**
+**为 IAM 用户启用 MFA：**
 
 ```bash
-# Enable virtual MFA device (Google Authenticator, Authy)
+# 启用虚拟 MFA 设备（Google Authenticator、Authy）
 aws iam create-virtual-mfa-device \
   --virtual-mfa-device-name alice-mfa \
   --outfile alice-mfa-qr.png \
   --bootstrap-method QRCodePNG
 
-# Scan QR code with authenticator app, get two codes
+# 使用认证器应用扫描二维码，获取两个代码
 
-# Activate MFA
+# 激活 MFA
 aws iam enable-mfa-device \
   --user-name alice \
   --serial-number arn:aws:iam::123456789012:mfa/alice-mfa \
@@ -1127,7 +1127,7 @@ aws iam enable-mfa-device \
   --authentication-code2 789012
 ```
 
-**MFA-Protected Actions:**
+**MFA 保护的操作：**
 
 ```json
 {
@@ -1144,36 +1144,36 @@ aws iam enable-mfa-device \
 
 ---
 
-## 6. Putting It All Together: ML Inference Architecture
+## 6. 综合应用：ML 推理架构
 
-**Scenario:** Deploy a trained PyTorch model for real-time inference.
+**场景：** 部署训练好的 PyTorch 模型用于实时推理。
 
-**Architecture:**
+**架构：**
 
 ```
-User Request → [ALB] → [EC2 Auto-Scaling Group]
-                             ├─ EC2 Instance 1 (with IAM role)
-                             ├─ EC2 Instance 2
-                             └─ EC2 Instance 3
-                                   ↓
-                             [S3: model artifacts]
-                                   ↓
-                             [RDS: request logs, predictions]
+用户请求 → [ALB] → [EC2 Auto-Scaling Group]
+                         ├─ EC2 实例 1（附带 IAM 角色）
+                         ├─ EC2 实例 2
+                         └─ EC2 实例 3
+                               ↓
+                         [S3：模型产物]
+                               ↓
+                         [RDS：请求日志、预测结果]
 ```
 
-**Implementation Steps:**
+**实施步骤：**
 
-**1. Store Model in S3:**
+**1. 将模型存储在 S3 中：**
 ```bash
 aws s3 cp model.pth s3://my-ml-models/pytorch-classifier/v1.0/model.pth
 ```
 
-**2. Create IAM Role for EC2 (S3 + RDS access):**
+**2. 为 EC2 创建 IAM 角色（S3 + RDS 访问）：**
 ```bash
-# Create role with S3 read + RDS write permissions (see section 5.4)
+# 创建具有 S3 读 + RDS 写权限的角色（参见第 5.4 节）
 ```
 
-**3. Launch EC2 Instances with User Data:**
+**3. 使用 User Data 启动 EC2 实例：**
 ```bash
 # user-data.sh
 #!/bin/bash
@@ -1181,10 +1181,10 @@ apt-get update -y
 apt-get install -y python3-pip postgresql-client
 pip3 install torch flask boto3 psycopg2-binary
 
-# Download model from S3
+# 从 S3 下载模型
 aws s3 cp s3://my-ml-models/pytorch-classifier/v1.0/model.pth /opt/model.pth
 
-# Start inference server
+# 启动推理服务器
 cat > /opt/server.py <<EOF
 import torch
 from flask import Flask, request, jsonify
@@ -1201,7 +1201,7 @@ def predict():
     with torch.no_grad():
         prediction = model(input_tensor).item()
 
-    # Log to RDS
+    # 记录到 RDS
     conn = psycopg2.connect(
         host='ml-metadata-db.abc123.us-east-1.rds.amazonaws.com',
         database='predictions',
@@ -1221,53 +1221,53 @@ EOF
 python3 /opt/server.py
 ```
 
-**4. Create Load Balancer (CLI omitted, use Console or Terraform):**
-- Points to Auto-Scaling Group
-- Health checks: `/health` endpoint
-- Distributes traffic across instances
+**4. 创建负载均衡器（此处省略 CLI，使用控制台或 Terraform）：**
+- 指向 Auto-Scaling Group
+- 健康检查：`/health` 端点
+- 在实例间分发流量
 
-**5. Test:**
+**5. 测试：**
 ```bash
 curl -X POST http://my-alb-123456.us-east-1.elb.amazonaws.com/predict \
   -H "Content-Type: application/json" \
   -d '{"features": [0.5, 0.3, 0.8]}'
 
-# Response: {"prediction": 0.92}
+# 响应：{"prediction": 0.92}
 ```
 
 ---
 
-## 7. Key Takeaways
+## 7. 关键要点
 
-1. **EC2** provides flexible compute; choose instance types based on workload (GPU for training, CPU for lightweight inference).
+1. **EC2** 提供灵活的计算；根据工作负载选择实例类型（训练用 GPU、轻量推理用 CPU）。
 
-2. **S3** is the backbone of ML data storage; use lifecycle policies to optimize costs (move old experiments to Glacier).
+2. **S3** 是 ML 数据存储的支柱；使用生命周期策略优化成本（将旧实验移到 Glacier）。
 
-3. **RDS** manages databases for you; use for metadata, feature serving, and application backends.
+3. **RDS** 替你管理数据库；用于元数据、特征服务和应用后端。
 
-4. **IAM** is critical for security; use roles for EC2/Lambda, enforce least privilege, enable MFA.
+4. **IAM** 对安全至关重要；为 EC2/Lambda 使用角色、执行最小权限、启用 MFA。
 
-5. **AWS CLI** automates everything; learn it to script infrastructure provisioning and reduce manual work.
+5. **AWS CLI** 可以自动化所有操作；学习它来编写基础设施配置脚本并减少手动工作。
 
-6. **Cost Management**: Stop instances when not in use, use spot instances for training, leverage free tier, set billing alerts.
-
----
-
-## What's Next?
-
-**Lecture 03** covers **Networking & Security**—VPCs, subnets, security groups, NACLs, and advanced IAM policies. You'll learn to design secure, isolated network architectures for production ML systems.
-
-**Exercise 02** provides hands-on practice provisioning EC2 instances, attaching EBS volumes, uploading datasets to S3, and deploying RDS databases—all via Terraform and AWS CLI.
+6. **成本管理**：不使用时停止实例、为训练使用 Spot 实例、利用免费套餐、设置账单告警。
 
 ---
 
-## Further Reading
+## 下一步是什么？
 
-- **AWS EC2 User Guide**: https://docs.aws.amazon.com/ec2/
-- **AWS S3 User Guide**: https://docs.aws.amazon.com/s3/
-- **AWS RDS User Guide**: https://docs.aws.amazon.com/rds/
-- **AWS IAM Best Practices**: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
-- **AWS CLI Reference**: https://awscli.amazonaws.com/v2/documentation/api/latest/index.html
+**Lecture 03** 介绍**网络与安全**——VPC、子网、安全组、NACL 和高级 IAM 策略。你将学习为生产 ML 系统设计安全、隔离的网络架构。
+
+**练习 02** 提供配置 EC2 实例、挂载 EBS 卷、将数据集上传到 S3 以及部署 RDS 数据库的动手实践——全部通过 Terraform 和 AWS CLI 完成。
+
+---
+
+## 延伸阅读
+
+- **AWS EC2 User Guide**：https://docs.aws.amazon.com/ec2/
+- **AWS S3 User Guide**：https://docs.aws.amazon.com/s3/
+- **AWS RDS User Guide**：https://docs.aws.amazon.com/rds/
+- **AWS IAM Best Practices**：https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
+- **AWS CLI Reference**：https://awscli.amazonaws.com/v2/documentation/api/latest/index.html
 
 ---
 

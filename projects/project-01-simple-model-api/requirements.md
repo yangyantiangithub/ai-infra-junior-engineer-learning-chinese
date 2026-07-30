@@ -1,125 +1,125 @@
-# Project 01: Detailed Requirements Specification
+# Project 01：详细需求说明
 
-**Project:** Simple Model API Deployment
-**Role:** Junior AI Infrastructure Engineer
-**Version:** 1.0
-
----
-
-## Table of Contents
-
-1. [Functional Requirements](#functional-requirements)
-2. [Non-Functional Requirements](#non-functional-requirements)
-3. [API Specifications](#api-specifications)
-4. [Data Models](#data-models)
-5. [Error Handling](#error-handling)
-6. [Security Requirements](#security-requirements)
-7. [Performance Requirements](#performance-requirements)
-8. [Assessment Rubric](#assessment-rubric)
+**项目：** 简单模型 API 部署
+**角色：** 初级 AI 基础设施工程师
+**版本：** 1.0
 
 ---
 
-## Functional Requirements
+## 目录
 
-### FR-1: Model Loading and Inference
-
-#### FR-1.1: Model Selection and Loading
-**Description:** The application must load a pre-trained image classification model on startup.
-
-**Supported Models:**
-- ResNet-50 (recommended for beginners)
-- MobileNetV2 (alternative, lighter model)
-
-**Requirements:**
-- Model must be loaded during application initialization
-- Model weights should be downloaded automatically if not present
-- Loading errors must be caught and logged
-- Model must be set to evaluation mode (no training)
-
-**Acceptance Criteria:**
-- [ ] Model loads successfully within 30 seconds on startup
-- [ ] Application fails gracefully with clear error if model loading fails
-- [ ] Model is cached and not reloaded on each request
-- [ ] Loading progress is logged at INFO level
-
-#### FR-1.2: Image Upload Handling
-**Description:** Accept image uploads via HTTP POST requests.
-
-**Requirements:**
-- Support multipart/form-data file uploads
-- Accept common image formats: JPEG, PNG, BMP, GIF
-- Validate file is an actual image (not just by extension)
-- Enforce maximum file size limit (10MB)
-
-**Acceptance Criteria:**
-- [ ] Endpoint accepts multipart/form-data with 'file' field
-- [ ] Rejects non-image files with HTTP 400
-- [ ] Rejects files > 10MB with HTTP 413
-- [ ] Handles corrupted images gracefully with HTTP 400
-
-#### FR-1.3: Image Preprocessing
-**Description:** Preprocess uploaded images according to model requirements.
-
-**Requirements:**
-- Convert images to RGB format (handle grayscale and RGBA)
-- Resize images to 224x224 pixels
-- Apply ImageNet normalization (mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-- Convert to tensor format compatible with the ML framework
-
-**Acceptance Criteria:**
-- [ ] All images converted to RGB successfully
-- [ ] Images resized maintaining aspect ratio (center crop)
-- [ ] Normalization applied correctly
-- [ ] Preprocessing completes in < 50ms for typical images
-
-#### FR-1.4: Prediction Generation
-**Description:** Generate top-K predictions with class names and confidence scores.
-
-**Requirements:**
-- Return top-5 predictions by default
-- Include class name/label for each prediction
-- Include confidence score (probability) for each prediction
-- Apply softmax to convert logits to probabilities
-- Map class indices to human-readable labels (ImageNet classes)
-
-**Acceptance Criteria:**
-- [ ] Returns exactly 5 predictions (unless top_k parameter specified)
-- [ ] Predictions sorted by confidence (highest first)
-- [ ] Confidence scores sum to approximately 1.0 (within 0.01)
-- [ ] Class labels are human-readable (e.g., "golden retriever", not "n02099601")
-
-#### FR-1.5: Error Handling for Model Operations
-**Description:** Handle model-related errors gracefully.
-
-**Requirements:**
-- Catch out-of-memory errors during inference
-- Handle model file corruption or missing weights
-- Detect incompatible input shapes
-- Handle framework-specific errors (PyTorch/TensorFlow)
-
-**Acceptance Criteria:**
-- [ ] OOM errors return HTTP 503 with retry-after header
-- [ ] Missing model weights trigger automatic download or fail gracefully
-- [ ] Invalid input shapes return HTTP 400 with descriptive message
-- [ ] All model errors logged at ERROR level with stack traces
+1. [功能需求](#功能需求)
+2. [非功能需求](#非功能需求)
+3. [API 规范](#api-规范)
+4. [数据模型](#数据模型)
+5. [错误处理](#错误处理)
+6. [安全需求](#安全需求)
+7. [性能需求](#性能需求)
+8. [评估标准](#评估标准)
 
 ---
 
-### FR-2: REST API Implementation
+## 功能需求
 
-#### FR-2.1: /predict Endpoint
-**Description:** Primary endpoint for single-image inference.
+### FR-1：模型加载与推理
 
-**Specification:**
+#### FR-1.1：模型选择与加载
+**描述：** 应用必须在启动时加载一个预训练的图像分类模型。
+
+**支持的模型：**
+- ResNet-50（推荐给初学者）
+- MobileNetV2（替代方案，更轻量的模型）
+
+**需求：**
+- 模型必须在应用初始化期间加载
+- 如果模型权重不存在，应自动下载
+- 加载错误必须被捕获并记录日志
+- 模型必须设置为评估模式（非训练模式）
+
+**验收标准：**
+- [ ] 启动时模型在 30 秒内成功加载
+- [ ] 如果模型加载失败，应用以清晰错误信息优雅退出
+- [ ] 模型被缓存，不在每次请求时重新加载
+- [ ] 加载进度以 INFO 级别记录日志
+
+#### FR-1.2：图片上传处理
+**描述：** 通过 HTTP POST 请求接受图片上传。
+
+**需求：**
+- 支持 multipart/form-data 文件上传
+- 接受常见图片格式：JPEG、PNG、BMP、GIF
+- 验证文件确实是图片（不只检查扩展名）
+- 强制执行最大文件大小限制（10MB）
+
+**验收标准：**
+- [ ] 端点接受带有 'file' 字段的 multipart/form-data
+- [ ] 拒绝非图片文件，返回 HTTP 400
+- [ ] 拒绝大于 10MB 的文件，返回 HTTP 413
+- [ ] 优雅地处理损坏的图片，返回 HTTP 400
+
+#### FR-1.3：图片预处理
+**描述：** 根据模型要求预处理上传的图片。
+
+**需求：**
+- 将图片转换为 RGB 格式（处理灰度图和 RGBA）
+- 将图片调整为 224x224 像素
+- 应用 ImageNet 归一化（mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]）
+- 转换为与 ML 框架兼容的 tensor 格式
+
+**验收标准：**
+- [ ] 所有图片成功转换为 RGB
+- [ ] 图片保持宽高比调整大小（中心裁剪）
+- [ ] 归一化正确应用
+- [ ] 典型图片预处理在 50ms 内完成
+
+#### FR-1.4：预测生成
+**描述：** 生成 top-K 预测结果，包含类别名称和置信度分数。
+
+**需求：**
+- 默认返回前 5 个预测结果
+- 每个预测结果包含类别名称/标签
+- 每个预测结果包含置信度分数（概率）
+- 应用 softmax 将 logits 转换为概率
+- 将类别索引映射为人类可读的标签（ImageNet 类别）
+
+**验收标准：**
+- [ ] 返回正好 5 个预测结果（除非指定了 top_k 参数）
+- [ ] 预测结果按置信度排序（最高在前）
+- [ ] 置信度分数之和约为 1.0（误差在 0.01 以内）
+- [ ] 类别标签是人类可读的（例如 "golden retriever"，而不是 "n02099601"）
+
+#### FR-1.5：模型操作的错误处理
+**描述：** 优雅地处理模型相关的错误。
+
+**需求：**
+- 在推理过程中捕获内存不足错误
+- 处理模型文件损坏或权重缺失
+- 检测不兼容的输入形状
+- 处理框架特定错误（PyTorch/TensorFlow）
+
+**验收标准：**
+- [ ] OOM 错误返回 HTTP 503 并带有 retry-after 头部
+- [ ] 缺失的模型权重触发自动下载或优雅失败
+- [ ] 无效的输入形状返回 HTTP 400 并带有描述性消息
+- [ ] 所有模型错误以 ERROR 级别记录，包含堆栈跟踪
+
+---
+
+### FR-2：REST API 实现
+
+#### FR-2.1：/predict 端点
+**描述：** 单张图片推理的主要端点。
+
+**规范：**
 ```
 POST /predict
 Content-Type: multipart/form-data
 
-Request Body:
-- file: image file (required)
-- top_k: number of predictions to return (optional, default=5)
+请求体：
+- file: 图片文件（必填）
+- top_k: 返回的预测数量（可选，默认=5）
 
-Response (200 OK):
+响应（200 OK）：
 {
   "success": true,
   "predictions": [
@@ -134,7 +134,7 @@ Response (200 OK):
   "timestamp": "2025-10-18T10:30:45Z"
 }
 
-Error Response (4xx/5xx):
+错误响应（4xx/5xx）：
 {
   "success": false,
   "error": {
@@ -145,21 +145,21 @@ Error Response (4xx/5xx):
 }
 ```
 
-**Acceptance Criteria:**
-- [ ] Endpoint accessible at POST /predict
-- [ ] Accepts multipart/form-data requests
-- [ ] Returns JSON response
-- [ ] Includes latency measurement
-- [ ] Logs each request with correlation ID
+**验收标准：**
+- [ ] 端点可通过 POST /predict 访问
+- [ ] 接受 multipart/form-data 请求
+- [ ] 返回 JSON 响应
+- [ ] 包含延迟测量
+- [ ] 每次请求都记录关联 ID
 
-#### FR-2.2: /health Endpoint
-**Description:** Health check endpoint for monitoring and load balancers.
+#### FR-2.2：/health 端点
+**描述：** 用于监控和负载均衡的健康检查端点。
 
-**Specification:**
+**规范：**
 ```
 GET /health
 
-Response (200 OK):
+响应（200 OK）：
 {
   "status": "healthy",
   "model_loaded": true,
@@ -168,7 +168,7 @@ Response (200 OK):
   "timestamp": "2025-10-18T10:30:45Z"
 }
 
-Response (503 Service Unavailable):
+响应（503 服务不可用）：
 {
   "status": "unhealthy",
   "model_loaded": false,
@@ -177,21 +177,21 @@ Response (503 Service Unavailable):
 }
 ```
 
-**Acceptance Criteria:**
-- [ ] Responds in < 100ms
-- [ ] Returns 200 when application is healthy
-- [ ] Returns 503 when model not loaded or critical error
-- [ ] No authentication required
-- [ ] Can be called frequently (monitoring)
+**验收标准：**
+- [ ] 响应时间 < 100ms
+- [ ] 应用健康时返回 200
+- [ ] 模型未加载或发生严重错误时返回 503
+- [ ] 无需认证
+- [ ] 可频繁调用（监控用途）
 
-#### FR-2.3: /info Endpoint
-**Description:** Provides model and API metadata.
+#### FR-2.3：/info 端点
+**描述：** 提供模型和 API 元数据。
 
-**Specification:**
+**规范：**
 ```
 GET /info
 
-Response (200 OK):
+响应（200 OK）：
 {
   "model": {
     "name": "resnet50",
@@ -212,52 +212,52 @@ Response (200 OK):
 }
 ```
 
-**Acceptance Criteria:**
-- [ ] Returns complete metadata
-- [ ] Information is accurate and up-to-date
-- [ ] No authentication required
-- [ ] Useful for API discovery
+**验收标准：**
+- [ ] 返回完整的元数据
+- [ ] 信息准确且最新
+- [ ] 无需认证
+- [ ] 对 API 发现有用
 
-#### FR-2.4: Request Validation
-**Description:** Validate all incoming requests before processing.
+#### FR-2.4：请求验证
+**描述：** 在处理之前验证所有传入请求。
 
-**Requirements:**
-- Check Content-Type header for /predict
-- Validate file field exists in multipart form
-- Verify file is not empty
-- Check file size before reading into memory
-- Validate top_k parameter if provided (1-10 range)
+**需求：**
+- 检查 /predict 的 Content-Type 头部
+- 验证 multipart 表单中存在 file 字段
+- 确认文件不为空
+- 在读取到内存之前检查文件大小
+- 如果提供了 top_k 参数则进行验证（1-10 范围）
 
-**Acceptance Criteria:**
-- [ ] Missing file field returns HTTP 400
-- [ ] Empty files return HTTP 400
-- [ ] Invalid Content-Type returns HTTP 415
-- [ ] Invalid top_k returns HTTP 400 with explanation
+**验收标准：**
+- [ ] 缺少 file 字段返回 HTTP 400
+- [ ] 空文件返回 HTTP 400
+- [ ] 无效的 Content-Type 返回 HTTP 415
+- [ ] 无效的 top_k 返回 HTTP 400 并附带说明
 
-#### FR-2.5: Response Format
-**Description:** Consistent JSON response format across all endpoints.
+#### FR-2.5：响应格式
+**描述：** 所有端点使用一致的 JSON 响应格式。
 
-**Requirements:**
-- Use JSON as default content type
-- Include success/error indicator
-- Include timestamp in all responses
-- Use snake_case for field names
-- Pretty-print in development, minified in production
+**需求：**
+- 使用 JSON 作为默认 Content-Type
+- 包含成功/错误指示器
+- 所有响应中包含时间戳
+- 字段名使用 snake_case
+- 开发环境美化输出，生产环境压缩输出
 
-**Acceptance Criteria:**
-- [ ] All responses are valid JSON
-- [ ] Content-Type header set to application/json
-- [ ] Consistent field naming convention
-- [ ] Timestamps in ISO 8601 format
+**验收标准：**
+- [ ] 所有响应都是有效的 JSON
+- [ ] Content-Type 头部设置为 application/json
+- [ ] 一致的字段命名约定
+- [ ] 时间戳使用 ISO 8601 格式
 
 ---
 
-### FR-3: Error Handling
+### FR-3：错误处理
 
-#### FR-3.1: Structured Error Responses
-**Description:** Return structured, informative error responses.
+#### FR-3.1：结构化错误响应
+**描述：** 返回结构化、信息丰富的错误响应。
 
-**Error Response Format:**
+**错误响应格式：**
 ```json
 {
   "success": false,
@@ -266,261 +266,261 @@ Response (200 OK):
     "message": "Human-readable error message",
     "correlation_id": "req-xxxxxxxx",
     "timestamp": "2025-10-18T10:30:45Z",
-    "details": {}  // Optional additional context
+    "details": {}  // 可选的额外上下文
   }
 }
 ```
 
-**Error Codes:**
-- `INVALID_IMAGE_FORMAT` - File is not a valid image
-- `FILE_TOO_LARGE` - File exceeds size limit
-- `MISSING_FILE` - No file in request
-- `MODEL_ERROR` - Model inference failed
-- `OUT_OF_MEMORY` - Insufficient memory for operation
-- `TIMEOUT` - Request processing exceeded timeout
-- `INTERNAL_ERROR` - Unexpected server error
+**错误码：**
+- `INVALID_IMAGE_FORMAT` - 文件不是有效的图片
+- `FILE_TOO_LARGE` - 文件超出大小限制
+- `MISSING_FILE` - 请求中没有文件
+- `MODEL_ERROR` - 模型推理失败
+- `OUT_OF_MEMORY` - 操作内存不足
+- `TIMEOUT` - 请求处理超时
+- `INTERNAL_ERROR` - 意外的服务器错误
 
-**Acceptance Criteria:**
-- [ ] All errors use this format
-- [ ] Error codes are consistent and documented
-- [ ] Messages are clear and actionable
-- [ ] Correlation IDs enable request tracking
+**验收标准：**
+- [ ] 所有错误都使用此格式
+- [ ] 错误码一致且已记录
+- [ ] 消息清晰且可操作
+- [ ] 关联 ID 支持请求跟踪
 
-#### FR-3.2: Out-of-Memory Handling
-**Description:** Gracefully handle OOM conditions.
+#### FR-3.2：内存不足处理
+**描述：** 优雅地处理 OOM 情况。
 
-**Requirements:**
-- Catch memory errors during model loading
-- Catch memory errors during inference
-- Return HTTP 503 with Retry-After header
-- Log OOM events for capacity planning
-- Attempt to recover (clear caches, etc.)
+**需求：**
+- 在模型加载期间捕获内存错误
+- 在推理期间捕获内存错误
+- 返回 HTTP 503 并带有 Retry-After 头部
+- 记录 OOM 事件用于容量规划
+- 尝试恢复（清除缓存等）
 
-**Acceptance Criteria:**
-- [ ] OOM during inference doesn't crash application
-- [ ] Returns HTTP 503 with appropriate message
-- [ ] Retry-After header suggests reasonable delay (60s)
-- [ ] Application continues to serve requests after recovery
+**验收标准：**
+- [ ] 推理期间的 OOM 不会导致应用崩溃
+- [ ] 返回 HTTP 503 并带有适当的消息
+- [ ] Retry-After 头部建议合理的延迟（60 秒）
+- [ ] 恢复后应用继续服务请求
 
-#### FR-3.3: Invalid Input Handling
-**Description:** Handle all forms of invalid input.
+#### FR-3.3：无效输入处理
+**描述：** 处理所有形式的无效输入。
 
-**Invalid Input Types:**
-- Corrupted image files
-- Non-image files (PDFs, text files, etc.)
-- Images with unsupported formats
-- Extremely large images (> 10000x10000)
-- Empty files
-- Wrong Content-Type
+**无效输入类型：**
+- 损坏的图片文件
+- 非图片文件（PDF、文本文件等）
+- 不支持的格式的图片
+- 超大图片（> 10000x10000）
+- 空文件
+- 错误的 Content-Type
 
-**Acceptance Criteria:**
-- [ ] Each invalid input type has specific error code
-- [ ] No crashes or exceptions reach the user
-- [ ] Error messages help users correct the issue
-- [ ] All invalid inputs logged at WARNING level
+**验收标准：**
+- [ ] 每种无效输入类型都有特定的错误码
+- [ ] 没有崩溃或异常到达用户
+- [ ] 错误消息帮助用户纠正问题
+- [ ] 所有无效输入以 WARNING 级别记录日志
 
-#### FR-3.4: Request Timeout Handling
-**Description:** Enforce maximum request processing time.
+#### FR-3.4：请求超时处理
+**描述：** 强制执行最大请求处理时间。
 
-**Requirements:**
-- Maximum 30 seconds per request
-- Timeout applies to entire request lifecycle
-- Return HTTP 504 on timeout
-- Cancel ongoing inference on timeout
-- Log timeout events
+**需求：**
+- 每次请求最多 30 秒
+- 超时适用于整个请求生命周期
+- 超时时返回 HTTP 504
+- 超时时取消正在进行的推理
+- 记录超时事件
 
-**Acceptance Criteria:**
-- [ ] Requests exceeding 30s return HTTP 504
-- [ ] Timeout message is clear
-- [ ] Resources cleaned up on timeout
-- [ ] Timeout doesn't affect other requests
-
----
-
-## Non-Functional Requirements
-
-### NFR-1: Performance
-
-#### NFR-1.1: Latency Requirements
-- **P50 (median):** < 300ms for 224x224 images on CPU
-- **P95:** < 500ms for 224x224 images on CPU
-- **P99:** < 1000ms for 224x224 images on CPU
-- **Health check:** < 100ms
-
-**Measurement:** Latency measured from request received to response sent, excluding network time.
-
-#### NFR-1.2: Throughput
-- Minimum 10 concurrent requests supported
-- Recommended: 20-30 concurrent requests on t3.medium (AWS) or equivalent
-- No degradation in P95 latency under normal load
-
-#### NFR-1.3: Resource Usage
-- **Memory:** < 2GB under normal load (single worker)
-- **CPU:** Efficient use, no CPU-bound loops
-- **Startup Time:** < 30 seconds from container start to ready
-- **Shutdown Time:** Graceful shutdown within 10 seconds
-
-#### NFR-1.4: Scalability
-- Application must be stateless (no local state)
-- Support horizontal scaling (multiple instances)
-- No file system dependencies (except model weights)
-- Thread-safe or process-safe
+**验收标准：**
+- [ ] 超过 30 秒的请求返回 HTTP 504
+- [ ] 超时消息清晰
+- [ ] 超时时清理资源
+- [ ] 超时不影响其他请求
 
 ---
 
-### NFR-2: Reliability
+## 非功能需求
 
-#### NFR-2.1: Availability
-- **Target:** 99% uptime under normal conditions
-- **Recovery:** Automatic restart on crash (via container orchestration)
-- **Graceful Degradation:** Continue serving requests during high load (with increased latency)
+### NFR-1：性能
 
-#### NFR-2.2: Error Rates
-- **Target:** < 1% error rate under normal conditions
-- **Transient Errors:** Retry-able errors should return appropriate status codes
-- **Permanent Errors:** Clear error messages for unrecoverable errors
+#### NFR-1.1：延迟需求
+- **P50（中位数）：** CPU 上处理 224x224 图片 < 300ms
+- **P95：** CPU 上处理 224x224 图片 < 500ms
+- **P99：** CPU 上处理 224x224 图片 < 1000ms
+- **健康检查：** < 100ms
 
-#### NFR-2.3: Data Integrity
-- All uploaded images processed correctly
-- No data corruption during preprocessing
-- Predictions deterministic for same input (with eval mode)
+**测量方式：** 延迟从收到请求到发送响应计算，不包括网络时间。
 
----
+#### NFR-1.2：吞吐量
+- 支持至少 10 个并发请求
+- 推荐：在 t3.medium（AWS）或同等配置上支持 20-30 个并发请求
+- 正常负载下 P95 延迟无劣化
 
-### NFR-3: Security
+#### NFR-1.3：资源使用
+- **内存：** 正常负载下 < 2GB（单工作进程）
+- **CPU：** 高效使用，无 CPU 密集型循环
+- **启动时间：** 从容器启动到就绪 < 30 秒
+- **关闭时间：** 在 10 秒内优雅关闭
 
-#### NFR-3.1: Input Validation
-- Validate all user inputs
-- Prevent path traversal attacks
-- Prevent code injection via filenames
-- Sanitize error messages (no sensitive data)
-
-#### NFR-3.2: File Upload Security
-- Maximum file size enforced (10MB)
-- Verify file content matches declared type
-- No execution of uploaded files
-- Files not persisted to disk (memory only)
-
-#### NFR-3.3: Rate Limiting (Optional)
-- Recommended: 100 requests per minute per IP
-- Return HTTP 429 when limit exceeded
-- Include Retry-After header
-
-#### NFR-3.4: Logging Security
-- No sensitive data in logs
-- Log all authentication attempts (if auth added)
-- Correlation IDs for request tracking
-- Log rotation to prevent disk fill
+#### NFR-1.4：可扩展性
+- 应用必须是无状态的（无本地状态）
+- 支持水平扩展（多个实例）
+- 无文件系统依赖（模型权重除外）
+- 线程安全或进程安全
 
 ---
 
-### NFR-4: Maintainability
+### NFR-2：可靠性
 
-#### NFR-4.1: Code Quality
-- Follow PEP 8 style guide (Python)
-- Type hints on all function signatures
-- Docstrings (Google style) on all public functions
-- Maximum function length: 50 lines
-- Maximum file length: 500 lines
+#### NFR-2.1：可用性
+- **目标：** 正常条件下 99% 正常运行时间
+- **恢复：** 崩溃时自动重启（通过容器编排）
+- **优雅降级：** 高负载期间继续服务请求（延迟增加）
 
-#### NFR-4.2: Configuration Management
-- All configuration via environment variables or config file
-- No hardcoded values (ports, URLs, paths, etc.)
-- Default values for optional configurations
-- Configuration validation on startup
+#### NFR-2.2：错误率
+- **目标：** 正常条件下错误率 < 1%
+- **瞬时错误：** 可重试的错误应返回适当的状态码
+- **永久错误：** 对不可恢复的错误提供清晰错误消息
 
-#### NFR-4.3: Logging
-- Structured logging (JSON format recommended)
-- Log levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
-- Include timestamp, level, message, correlation_id
-- Log aggregation-friendly format
-
-#### NFR-4.4: Testing
-- Unit test coverage > 80%
-- Integration tests for all endpoints
-- Test error paths, not just happy paths
-- Performance tests for latency validation
+#### NFR-2.3：数据完整性
+- 所有上传的图片正确处理
+- 预处理期间无数据损坏
+- 同一输入的预测结果具有确定性（评估模式下）
 
 ---
 
-## API Specifications
+### NFR-3：安全性
 
-### Request Headers
+#### NFR-3.1：输入验证
+- 验证所有用户输入
+- 防止路径遍历攻击
+- 防止通过文件名进行代码注入
+- 清理错误消息（无敏感数据）
 
-**Required:**
-- `Content-Type: multipart/form-data` (for /predict)
+#### NFR-3.2：文件上传安全
+- 强制执行最大文件大小（10MB）
+- 验证文件内容与声明的类型一致
+- 不执行上传的文件
+- 文件不持久化到磁盘（仅内存）
 
-**Optional:**
-- `X-Request-ID: <uuid>` - Client-provided correlation ID
-- `Accept: application/json` - Response format (JSON only supported)
+#### NFR-3.3：速率限制（可选）
+- 推荐：每 IP 每分钟 100 次请求
+- 超出限制时返回 HTTP 429
+- 包含 Retry-After 头部
 
-### Response Headers
+#### NFR-3.4：日志安全
+- 日志中不包含敏感数据
+- 记录所有认证尝试（如添加了认证）
+- 用于请求跟踪的关联 ID
+- 日志轮转以防止磁盘填满
 
-**Always Included:**
+---
+
+### NFR-4：可维护性
+
+#### NFR-4.1：代码质量
+- 遵循 PEP 8 风格指南（Python）
+- 所有函数签名添加类型提示
+- 所有公共函数包含文档字符串（Google 风格）
+- 最大函数长度：50 行
+- 最大文件长度：500 行
+
+#### NFR-4.2：配置管理
+- 所有配置通过环境变量或配置文件
+- 无硬编码值（端口、URL、路径等）
+- 可选配置提供默认值
+- 启动时验证配置
+
+#### NFR-4.3：日志记录
+- 结构化日志（推荐 JSON 格式）
+- 日志级别：DEBUG、INFO、WARNING、ERROR、CRITICAL
+- 包含时间戳、级别、消息、correlation_id
+- 对日志聚合友好的格式
+
+#### NFR-4.4：测试
+- 单元测试覆盖率 > 80%
+- 所有端点的集成测试
+- 测试错误路径，而不仅仅是正常路径
+- 用于延迟验证的性能测试
+
+---
+
+## API 规范
+
+### 请求头部
+
+**必填：**
+- `Content-Type: multipart/form-data`（用于 /predict）
+
+**可选：**
+- `X-Request-ID: <uuid>` - 客户端提供的关联 ID
+- `Accept: application/json` - 响应格式（仅支持 JSON）
+
+### 响应头部
+
+**始终包含：**
 - `Content-Type: application/json`
-- `X-Correlation-ID: <uuid>` - Request tracking ID
-- `X-Response-Time: <ms>` - Processing time in milliseconds
+- `X-Correlation-ID: <uuid>` - 请求跟踪 ID
+- `X-Response-Time: <ms>` - 以毫秒为单位的处理时间
 
-**Conditional:**
-- `Retry-After: <seconds>` - For 503 and 429 responses
-- `Cache-Control: no-cache` - For /predict endpoint
+**条件性：**
+- `Retry-After: <seconds>` - 用于 503 和 429 响应
+- `Cache-Control: no-cache` - 用于 /predict 端点
 
 ---
 
-## Data Models
+## 数据模型
 
-### Prediction Object
+### 预测对象
 ```python
 from typing import TypedDict
 
 class Prediction(TypedDict):
-    class_name: str        # Human-readable class name
-    confidence: float      # Probability score (0.0 to 1.0)
-    rank: int             # Rank in top-K (1-based)
+    class_name: str        # 人类可读的类别名称
+    confidence: float      # 概率分数 (0.0 到 1.0)
+    rank: int             # 在 top-K 中的排名（从 1 开始）
 ```
 
-### Error Object
+### 错误对象
 ```python
 from typing import TypedDict, Optional
 
 class Error(TypedDict):
-    code: str                    # Error code
-    message: str                 # Human-readable message
-    correlation_id: str          # Request tracking ID
-    timestamp: str              # ISO 8601 timestamp
-    details: Optional[dict]      # Additional context (optional)
+    code: str                    # 错误码
+    message: str                 # 人类可读的消息
+    correlation_id: str          # 请求跟踪 ID
+    timestamp: str              # ISO 8601 时间戳
+    details: Optional[dict]      # 额外上下文（可选）
 ```
 
-### Model Info
+### 模型信息
 ```python
 from typing import TypedDict, List
 
 class ModelInfo(TypedDict):
-    name: str                    # Model name
-    framework: str               # ML framework (pytorch/tensorflow)
-    version: str                 # Framework version
-    input_shape: List[int]       # Expected input shape [H, W, C]
-    output_classes: int          # Number of output classes
+    name: str                    # 模型名称
+    framework: str               # ML 框架 (pytorch/tensorflow)
+    version: str                 # 框架版本
+    input_shape: List[int]       # 期望的输入形状 [H, W, C]
+    output_classes: int          # 输出类别数量
 ```
 
 ---
 
-## Error Handling
+## 错误处理
 
-### HTTP Status Codes
+### HTTP 状态码
 
-| Code | Meaning | Usage |
+| 码值 | 含义 | 用途 |
 |------|---------|-------|
-| 200 | OK | Successful prediction or info request |
-| 400 | Bad Request | Invalid input, malformed request |
-| 413 | Payload Too Large | File exceeds size limit |
-| 415 | Unsupported Media Type | Wrong Content-Type |
-| 429 | Too Many Requests | Rate limit exceeded |
-| 500 | Internal Server Error | Unexpected application error |
-| 503 | Service Unavailable | Model not loaded, OOM, overload |
-| 504 | Gateway Timeout | Request processing timeout |
+| 200 | OK | 成功的预测或信息请求 |
+| 400 | 错误请求 | 无效输入、格式错误的请求 |
+| 413 | 负载过大 | 文件超出大小限制 |
+| 415 | 不支持的媒体类型 | 错误的 Content-Type |
+| 429 | 请求过多 | 超出速率限制 |
+| 500 | 服务器内部错误 | 意外的应用错误 |
+| 503 | 服务不可用 | 模型未加载、OOM、过载 |
+| 504 | 网关超时 | 请求处理超时 |
 
-### Error Code Mapping
+### 错误码映射
 
 ```python
 ERROR_CODES = {
@@ -538,19 +538,19 @@ ERROR_CODES = {
 
 ---
 
-## Security Requirements
+## 安全需求
 
-### Input Validation Rules
+### 输入验证规则
 
-1. **File Size:** Maximum 10MB (10,485,760 bytes)
-2. **File Types:** JPEG, PNG, BMP, GIF (validated by content, not extension)
-3. **Image Dimensions:** Maximum 10,000 x 10,000 pixels
-4. **Filename:** Sanitize to prevent path traversal
-5. **Top-K Parameter:** Integer between 1 and 10
+1. **文件大小：** 最大 10MB（10,485,760 字节）
+2. **文件类型：** JPEG、PNG、BMP、GIF（按内容验证，而非扩展名）
+3. **图片尺寸：** 最大 10,000 x 10,000 像素
+4. **文件名：** 清理以防止路径遍历
+5. **Top-K 参数：** 介于 1 和 10 之间的整数
 
-### Security Headers
+### 安全头部
 
-Include these headers in all responses:
+在所有响应中包含这些头部：
 ```
 X-Content-Type-Options: nosniff
 X-Frame-Options: DENY
@@ -559,112 +559,112 @@ X-XSS-Protection: 1; mode=block
 
 ---
 
-## Performance Requirements
+## 性能需求
 
-### Latency Targets by Percentile
+### 按百分位数的延迟目标
 
-| Percentile | Target (CPU) | Measurement Method |
+| 百分位数 | 目标值（CPU） | 测量方法 |
 |------------|--------------|-------------------|
-| P50 | < 300ms | Server-side timing |
-| P95 | < 500ms | Server-side timing |
-| P99 | < 1000ms | Server-side timing |
-| P99.9 | < 2000ms | Server-side timing |
+| P50 | < 300ms | 服务端计时 |
+| P95 | < 500ms | 服务端计时 |
+| P99 | < 1000ms | 服务端计时 |
+| P99.9 | < 2000ms | 服务端计时 |
 
-### Resource Limits
+### 资源限制
 
-| Resource | Limit | Monitoring |
+| 资源 | 限制 | 监控方式 |
 |----------|-------|-----------|
-| Memory | 2GB | Container metrics |
-| CPU | 2 cores (burst) | Container metrics |
-| Disk I/O | Minimal | Logs only |
-| Network | 10 Mbps | Cloud monitoring |
+| 内存 | 2GB | 容器指标 |
+| CPU | 2 核（峰值） | 容器指标 |
+| 磁盘 I/O | 极少 | 仅日志 |
+| 网络 | 10 Mbps | 云监控 |
 
 ---
 
-## Assessment Rubric
+## 评估标准
 
-### Code Quality (25 points)
+### 代码质量（25 分）
 
-| Criteria | Points | Description |
+| 标准 | 分数 | 描述 |
 |----------|--------|-------------|
-| Code Organization | 5 | Well-structured modules, clear separation of concerns |
-| Code Style | 5 | PEP 8 compliant, consistent formatting |
-| Documentation | 5 | Comprehensive docstrings and comments |
-| Error Handling | 5 | Robust error handling, all cases covered |
-| Testing | 5 | >80% coverage, all scenarios tested |
+| 代码组织 | 5 | 结构良好的模块，清晰的关注点分离 |
+| 代码风格 | 5 | 符合 PEP 8，格式一致 |
+| 文档 | 5 | 全面的文档字符串和注释 |
+| 错误处理 | 5 | 健壮的错误处理，覆盖所有情况 |
+| 测试 | 5 | 覆盖率 > 80%，所有场景已测试 |
 
-### Functionality (30 points)
+### 功能（30 分）
 
-| Criteria | Points | Description |
+| 标准 | 分数 | 描述 |
 |----------|--------|-------------|
-| API Endpoints | 6 | All endpoints work correctly |
-| Model Inference | 6 | Accurate predictions, optimal performance |
-| Input Validation | 6 | Comprehensive validation, all edge cases |
-| Error Responses | 6 | Clear, structured error messages |
-| Performance | 6 | Meets all performance targets |
+| API 端点 | 6 | 所有端点正常工作 |
+| 模型推理 | 6 | 准确预测，最佳性能 |
+| 输入验证 | 6 | 全面的验证，所有边界情况 |
+| 错误响应 | 6 | 清晰、结构化的错误消息 |
+| 性能 | 6 | 满足所有性能目标 |
 
-### Containerization (15 points)
+### 容器化（15 分）
 
-| Criteria | Points | Description |
+| 标准 | 分数 | 描述 |
 |----------|--------|-------------|
-| Dockerfile | 5 | Optimized, multi-stage, minimal size |
-| Image Size | 5 | < 2GB, efficient layering |
-| Build Process | 5 | Efficient caching, fast builds |
+| Dockerfile | 5 | 优化、多阶段、最小体积 |
+| 镜像大小 | 5 | < 2GB，高效分层 |
+| 构建流程 | 5 | 高效缓存，快速构建 |
 
-### Deployment (20 points)
+### 部署（20 分）
 
-| Criteria | Points | Description |
+| 标准 | 分数 | 描述 |
 |----------|--------|-------------|
-| Cloud Setup | 5 | Correct cloud configuration, best practices |
-| Accessibility | 5 | Public URL, stable, fast |
-| Monitoring | 5 | Comprehensive logging and monitoring |
-| Security | 5 | Excellent security practices |
+| 云设置 | 5 | 正确的云配置，最佳实践 |
+| 可访问性 | 5 | 公共 URL，稳定，快速 |
+| 监控 | 5 | 全面的日志记录和监控 |
+| 安全性 | 5 | 优秀的安全实践 |
 
-### Documentation (10 points)
+### 文档（10 分）
 
-| Criteria | Points | Description |
+| 标准 | 分数 | 描述 |
 |----------|--------|-------------|
-| README | 5 | Comprehensive, clear, professional |
-| API Docs | 5 | Complete spec with examples |
+| README | 5 | 全面、清晰、专业 |
+| API 文档 | 5 | 包含示例的完整规范 |
 
-**Total: 100 points**
-**Passing Score: 70 points**
+**总计：100 分**
+**及格分数：70 分**
 
 ---
 
-## Appendix: Example Requests
+## 附录：示例请求
 
-### cURL Examples
+### cURL 示例
 
 ```bash
-# Health check
+# 健康检查
 curl -X GET http://localhost:5000/health
 
-# Get model info
+# 获取模型信息
 curl -X GET http://localhost:5000/info
 
-# Make prediction
+# 进行预测
 curl -X POST \
   -F "file=@dog.jpg" \
   http://localhost:5000/predict
 
-# Make prediction with custom top_k
+# 使用自定义 top_k 进行预测
 curl -X POST \
   -F "file=@dog.jpg" \
   -F "top_k=10" \
   http://localhost:5000/predict
 ```
 
-### Python Example
+### Python 示例
 
 ```python
 import requests
 
-# Health check
+# 健康检查
 response = requests.get('http://localhost:5000/health')
 print(response.json())
 
-# Make prediction
+# 进行预测
 with open('dog.jpg', 'rb') as f:
     files = {'file': f}
     response = requests.post('http://localhost:5000/predict', files=files)
@@ -673,6 +673,6 @@ with open('dog.jpg', 'rb') as f:
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** October 2025
-**Maintained by:** AI Infrastructure Curriculum Team
+**文档版本：** 1.0
+**最后更新：** 2025 年 10 月
+**维护者：** AI 基础设施课程团队

@@ -1,71 +1,71 @@
-# Git Cheat Sheet
+# Git 速查表
 
-Quick reference guide for essential Git commands and workflows.
-
----
-
-## Table of Contents
-
-- [Setup and Configuration](#setup-and-configuration)
-- [Basic Commands](#basic-commands)
-- [Branching](#branching)
-- [Remote Repositories](#remote-repositories)
-- [Undoing Changes](#undoing-changes)
-- [Viewing History](#viewing-history)
-- [Advanced Operations](#advanced-operations)
-- [Git Workflows](#git-workflows)
-- [Troubleshooting](#troubleshooting)
+基本 Git 命令和工作流程的快速参考指南。
 
 ---
 
-## Setup and Configuration
+## 目录
 
-### Initial Setup
+- [安装与配置](#安装与配置)
+- [基本命令](#基本命令)
+- [分支](#分支)
+- [远程仓库](#远程仓库)
+- [撤销更改](#撤销更改)
+- [查看历史](#查看历史)
+- [高级操作](#高级操作)
+- [Git 工作流](#git-工作流)
+- [故障排查](#故障排查)
+
+---
+
+## 安装与配置
+
+### 初始设置
 ```bash
-# Set username
+# 设置用户名
 git config --global user.name "Your Name"
 
-# Set email
+# 设置邮箱
 git config --global user.email "your.email@example.com"
 
-# Set default editor
+# 设置默认编辑器
 git config --global core.editor "vim"
 git config --global core.editor "code --wait"  # VS Code
 
-# Set default branch name
+# 设置默认分支名
 git config --global init.defaultBranch main
 
-# Enable color output
+# 启用颜色输出
 git config --global color.ui auto
 
-# View configuration
+# 查看配置
 git config --list
 git config --global --list
 git config user.name
 ```
 
-### SSH Setup
+### SSH 设置
 ```bash
-# Generate SSH key
+# 生成 SSH 密钥
 ssh-keygen -t ed25519 -C "your.email@example.com"
 
-# Start SSH agent
+# 启动 SSH agent
 eval "$(ssh-agent -s)"
 
-# Add SSH key
+# 添加 SSH 密钥
 ssh-add ~/.ssh/id_ed25519
 
-# Copy public key
+# 复制公钥
 cat ~/.ssh/id_ed25519.pub
-# Add to GitHub/GitLab settings
+# 添加到 GitHub/GitLab 设置中
 
-# Test connection
+# 测试连接
 ssh -T git@github.com
 ```
 
-### Aliases
+### 别名
 ```bash
-# Create shortcuts
+# 创建快捷方式
 git config --global alias.st status
 git config --global alias.co checkout
 git config --global alias.br branch
@@ -77,486 +77,486 @@ git config --global alias.lg 'log --oneline --graph --decorate --all'
 
 ---
 
-## Basic Commands
+## 基本命令
 
-### Repository Initialization
+### 仓库初始化
 ```bash
-# Initialize new repository
+# 初始化新仓库
 git init
 
-# Clone existing repository
+# 克隆现有仓库
 git clone <repository-url>
 git clone <repository-url> <directory-name>
 
-# Clone specific branch
+# 克隆特定分支
 git clone -b <branch-name> <repository-url>
 ```
 
-### Status and Information
+### 状态和信息
 ```bash
-# Check status
+# 检查状态
 git status
-git status -s  # short format
+git status -s  # 简短格式
 
-# Show changes
-git diff  # unstaged changes
-git diff --staged  # staged changes
-git diff HEAD  # all changes
+# 显示更改
+git diff  # 未暂存的更改
+git diff --staged  # 已暂存的更改
+git diff HEAD  # 所有更改
 
-# Show commit log
+# 显示提交日志
 git log
 git log --oneline
 git log --graph --oneline --all
 git log --author="John"
 git log --since="2 weeks ago"
 git log --until="yesterday"
-git log -p  # with patches
-git log -3  # last 3 commits
+git log -p  # 附带补丁
+git log -3  # 最近 3 个提交
 ```
 
-### Staging and Committing
+### 暂存和提交
 ```bash
-# Stage files
+# 暂存文件
 git add <file>
-git add .  # all files
-git add *.py  # all Python files
-git add -A  # all changes including deletions
+git add .  # 所有文件
+git add *.py  # 所有 Python 文件
+git add -A  # 所有更改包括删除
 
-# Unstage files
+# 取消暂存文件
 git reset <file>
-git restore --staged <file>  # new syntax
+git restore --staged <file>  # 新语法
 
-# Commit changes
-git commit -m "Commit message"
-git commit -am "Message"  # add and commit tracked files
-git commit --amend  # modify last commit
-git commit --amend --no-edit  # keep commit message
+# 提交更改
+git commit -m "提交信息"
+git commit -am "信息"  # 添加并提交已跟踪文件
+git commit --amend  # 修改上次提交
+git commit --amend --no-edit  # 保留提交信息
 
-# Remove files
-git rm <file>  # remove from repo and filesystem
-git rm --cached <file>  # remove from repo only
+# 删除文件
+git rm <file>  # 从仓库和文件系统删除
+git rm --cached <file>  # 仅从仓库删除
 
-# Move/rename files
-git mv <old-name> <new-name>
+# 移动/重命名文件
+git mv <旧名> <新名>
 ```
 
 ---
 
-## Branching
+## 分支
 
-### Creating and Switching Branches
+### 创建和切换分支
 ```bash
-# List branches
-git branch  # local branches
-git branch -r  # remote branches
-git branch -a  # all branches
+# 列出分支
+git branch  # 本地分支
+git branch -r  # 远程分支
+git branch -a  # 所有分支
 
-# Create branch
+# 创建分支
 git branch <branch-name>
 
-# Switch to branch
+# 切换到分支
 git checkout <branch-name>
-git switch <branch-name>  # new syntax
+git switch <branch-name>  # 新语法
 
-# Create and switch in one command
+# 创建并切换
 git checkout -b <branch-name>
-git switch -c <branch-name>  # new syntax
+git switch -c <branch-name>  # 新语法
 
-# Create branch from specific commit
+# 从特定提交创建分支
 git branch <branch-name> <commit-hash>
 
-# Delete branch
-git branch -d <branch-name>  # safe delete
-git branch -D <branch-name>  # force delete
+# 删除分支
+git branch -d <branch-name>  # 安全删除
+git branch -D <branch-name>  # 强制删除
 
-# Rename branch
-git branch -m <old-name> <new-name>
-git branch -m <new-name>  # rename current branch
+# 重命名分支
+git branch -m <旧名> <新名>
+git branch -m <新名>  # 重命名当前分支
 ```
 
-### Merging
+### 合并
 ```bash
-# Merge branch into current branch
+# 将分支合并到当前分支
 git merge <branch-name>
 
-# Merge with commit message
-git merge <branch-name> -m "Merge message"
+# 带提交信息的合并
+git merge <branch-name> -m "合并信息"
 
-# Abort merge
+# 中止合并
 git merge --abort
 
-# Merge strategies
-git merge --no-ff <branch-name>  # always create merge commit
-git merge --squash <branch-name>  # squash commits
+# 合并策略
+git merge --no-ff <branch-name>  # 始终创建合并提交
+git merge --squash <branch-name>  # 压缩提交
 ```
 
-### Rebasing
+### 变基
 ```bash
-# Rebase current branch onto another
+# 将当前分支变基到另一个分支
 git rebase <branch-name>
 
-# Interactive rebase
-git rebase -i HEAD~3  # last 3 commits
+# 交互式变基
+git rebase -i HEAD~3  # 最近 3 个提交
 git rebase -i <commit-hash>
 
-# Continue after resolving conflicts
+# 解决冲突后继续
 git rebase --continue
 
-# Skip current commit
+# 跳过当前提交
 git rebase --skip
 
-# Abort rebase
+# 中止变基
 git rebase --abort
 ```
 
 ---
 
-## Remote Repositories
+## 远程仓库
 
-### Managing Remotes
+### 管理远程仓库
 ```bash
-# List remotes
+# 列出远程仓库
 git remote
-git remote -v  # with URLs
+git remote -v  # 带 URL
 
-# Add remote
+# 添加远程仓库
 git remote add origin <repository-url>
 git remote add <name> <url>
 
-# Remove remote
+# 删除远程仓库
 git remote remove <name>
 
-# Rename remote
-git remote rename <old-name> <new-name>
+# 重命名远程仓库
+git remote rename <旧名> <新名>
 
-# Change remote URL
+# 更改远程仓库 URL
 git remote set-url origin <new-url>
 
-# Show remote info
+# 显示远程信息
 git remote show origin
 ```
 
-### Fetching and Pulling
+### 拉取和抓取
 ```bash
-# Fetch from remote (doesn't merge)
+# 从远程抓取（不合并）
 git fetch
 git fetch origin
-git fetch --all  # all remotes
+git fetch --all  # 所有远程
 
-# Pull (fetch + merge)
+# 拉取（抓取 + 合并）
 git pull
 git pull origin main
 
-# Pull with rebase
+# 变基方式拉取
 git pull --rebase
 ```
 
-### Pushing
+### 推送
 ```bash
-# Push to remote
+# 推送到远程
 git push
 git push origin main
 
-# Push and set upstream
+# 推送并设置上游
 git push -u origin main
 git push --set-upstream origin feature-branch
 
-# Push all branches
+# 推送所有分支
 git push --all
 
-# Push tags
+# 推送标签
 git push --tags
 
-# Force push (dangerous!)
+# 强制推送（危险！）
 git push --force
-git push --force-with-lease  # safer force push
+git push --force-with-lease  # 更安全的强制推送
 
-# Delete remote branch
+# 删除远程分支
 git push origin --delete <branch-name>
 ```
 
-### Tracking Branches
+### 跟踪分支
 ```bash
-# Create tracking branch
+# 创建跟踪分支
 git checkout -b <branch> origin/<branch>
 git checkout --track origin/<branch>
 
-# Set upstream for existing branch
+# 为现有分支设置上游
 git branch --set-upstream-to=origin/main main
 
-# View tracking branches
+# 查看跟踪分支
 git branch -vv
 ```
 
 ---
 
-## Undoing Changes
+## 撤销更改
 
-### Discard Changes
+### 丢弃更改
 ```bash
-# Discard unstaged changes in file
+# 丢弃文件的未暂存更改
 git checkout -- <file>
-git restore <file>  # new syntax
+git restore <file>  # 新语法
 
-# Discard all unstaged changes
+# 丢弃所有未暂存更改
 git checkout -- .
-git restore .  # new syntax
+git restore .  # 新语法
 
-# Unstage file
+# 取消暂存文件
 git reset HEAD <file>
-git restore --staged <file>  # new syntax
+git restore --staged <file>  # 新语法
 ```
 
-### Reset
+### 重置
 ```bash
-# Soft reset (keep changes staged)
+# 软重置（保留更改在暂存区）
 git reset --soft HEAD~1
 
-# Mixed reset (keep changes unstaged) - default
+# 混合重置（保留更改但取消暂存）- 默认
 git reset HEAD~1
 git reset --mixed HEAD~1
 
-# Hard reset (discard all changes)
+# 硬重置（丢弃所有更改）
 git reset --hard HEAD~1
 git reset --hard <commit-hash>
 
-# Reset to remote state
+# 重置到远程状态
 git reset --hard origin/main
 ```
 
-### Revert
+### 还原
 ```bash
-# Revert commit (creates new commit)
+# 还原提交（创建新提交）
 git revert <commit-hash>
 
-# Revert without committing
+# 还原但不提交
 git revert -n <commit-hash>
 
-# Revert merge commit
+# 还原合并提交
 git revert -m 1 <merge-commit-hash>
 ```
 
-### Clean
+### 清理
 ```bash
-# Remove untracked files
-git clean -n  # dry run
-git clean -f  # force remove files
-git clean -fd  # remove files and directories
-git clean -fX  # remove ignored files
-git clean -fx  # remove all untracked files
+# 删除未跟踪的文件
+git clean -n  # 预演
+git clean -f  # 强制删除文件
+git clean -fd  # 删除文件和目录
+git clean -fX  # 删除被忽略的文件
+git clean -fx  # 删除所有未跟踪的文件
 ```
 
 ---
 
-## Viewing History
+## 查看历史
 
-### Log Commands
+### 日志命令
 ```bash
-# Basic log
+# 基本日志
 git log
 git log --oneline
 
-# Graphical log
+# 图形化日志
 git log --graph --oneline --all
 git log --graph --pretty=format:'%h %d %s (%cr) <%an>'
 
-# Filter by author
+# 按作者筛选
 git log --author="John"
 
-# Filter by date
+# 按日期筛选
 git log --since="2 weeks ago"
 git log --after="2023-01-01" --before="2023-12-31"
 
-# Filter by file
+# 按文件筛选
 git log <file>
-git log --follow <file>  # follow renames
+git log --follow <file>  # 跟踪重命名
 
-# Search commits
+# 搜索提交
 git log --grep="bug fix"
-git log -S"function_name"  # search code
+git log -S"function_name"  # 搜索代码
 
-# Show stats
+# 显示统计
 git log --stat
 git log --shortstat
 ```
 
-### Show Command
+### Show 命令
 ```bash
-# Show commit details
+# 显示提交详情
 git show <commit-hash>
 git show HEAD
 git show HEAD~2
 
-# Show specific file from commit
+# 显示提交中的特定文件
 git show <commit-hash>:<file>
 
-# Show file at specific commit
+# 显示特定提交时的文件
 git show HEAD~3:path/to/file
 ```
 
-### Diff Commands
+### Diff 命令
 ```bash
-# Show unstaged changes
+# 显示未暂存的更改
 git diff
 
-# Show staged changes
+# 显示已暂存的更改
 git diff --staged
 git diff --cached
 
-# Compare branches
+# 比较分支
 git diff main..feature
-git diff main...feature  # since common ancestor
+git diff main...feature  # 从共同祖先起
 
-# Compare commits
+# 比较提交
 git diff <commit1> <commit2>
 git diff HEAD~2 HEAD
 
-# Diff specific file
+# 比较特定文件
 git diff <file>
 git diff main..feature <file>
 ```
 
 ### Blame
 ```bash
-# Show who changed each line
+# 显示每行是谁修改的
 git blame <file>
 
-# Show with line numbers
+# 带行号显示
 git blame -L 10,20 <file>
 
-# Show with commit info
+# 带提交信息显示
 git blame -l <file>
 ```
 
 ---
 
-## Advanced Operations
+## 高级操作
 
-### Stashing
+### 贮藏
 ```bash
-# Stash changes
+# 贮藏更改
 git stash
-git stash save "Work in progress"
+git stash save "工作进行中"
 
-# List stashes
+# 列出贮藏
 git stash list
 
-# Apply stash
-git stash apply  # keep stash
-git stash pop  # apply and delete stash
+# 应用贮藏
+git stash apply  # 保留贮藏
+git stash pop  # 应用并删除贮藏
 
-# Apply specific stash
+# 应用特定贮藏
 git stash apply stash@{2}
 
-# Drop stash
+# 删除贮藏
 git stash drop stash@{0}
 
-# Clear all stashes
+# 清除所有贮藏
 git stash clear
 
-# Create branch from stash
+# 从贮藏创建分支
 git stash branch <branch-name>
 ```
 
-### Cherry-picking
+### 捡选
 ```bash
-# Apply specific commit to current branch
+# 将特定提交应用到当前分支
 git cherry-pick <commit-hash>
 
-# Cherry-pick without committing
+# 捡选但不提交
 git cherry-pick -n <commit-hash>
 
-# Cherry-pick range
+# 捡选范围
 git cherry-pick <commit1>..<commit2>
 ```
 
-### Tags
+### 标签
 ```bash
-# List tags
+# 列出标签
 git tag
 git tag -l "v1.*"
 
-# Create lightweight tag
+# 创建轻量标签
 git tag v1.0.0
 
-# Create annotated tag
-git tag -a v1.0.0 -m "Version 1.0.0"
+# 创建注释标签
+git tag -a v1.0.0 -m "版本 1.0.0"
 
-# Tag specific commit
+# 标记特定提交
 git tag v1.0.0 <commit-hash>
 
-# Push tags
+# 推送标签
 git push origin v1.0.0
-git push origin --tags  # all tags
+git push origin --tags  # 所有标签
 
-# Delete tag
-git tag -d v1.0.0  # local
-git push origin --delete v1.0.0  # remote
+# 删除标签
+git tag -d v1.0.0  # 本地
+git push origin --delete v1.0.0  # 远程
 
-# Checkout tag
+# 检出标签
 git checkout v1.0.0
 ```
 
-### Submodules
+### 子模块
 ```bash
-# Add submodule
+# 添加子模块
 git submodule add <repository-url> <path>
 
-# Initialize submodules
+# 初始化子模块
 git submodule init
 
-# Update submodules
+# 更新子模块
 git submodule update
 git submodule update --remote
 
-# Clone with submodules
+# 带子模块克隆
 git clone --recursive <repository-url>
 
-# Update all submodules
+# 更新所有子模块
 git submodule foreach git pull origin main
 ```
 
 ---
 
-## Git Workflows
+## Git 工作流
 
-### Feature Branch Workflow
+### 功能分支工作流
 ```bash
-# 1. Create feature branch
+# 1. 创建功能分支
 git checkout -b feature/new-feature
 
-# 2. Make changes and commit
+# 2. 进行更改并提交
 git add .
-git commit -m "Add new feature"
+git commit -m "添加新功能"
 
-# 3. Push to remote
+# 3. 推送到远程
 git push -u origin feature/new-feature
 
-# 4. Create pull request (on GitHub/GitLab)
+# 4. 创建合并请求（在 GitHub/GitLab 上）
 
-# 5. After PR approved, merge and delete branch
+# 5. PR 批准后，合并并删除分支
 git checkout main
 git pull origin main
 git branch -d feature/new-feature
 ```
 
-### Gitflow Workflow
+### Gitflow 工作流
 ```bash
-# Main branches: main, develop
+# 主要分支：main, develop
 
-# Start feature
+# 开始功能
 git checkout develop
 git checkout -b feature/new-feature
 
-# Finish feature
+# 完成功能
 git checkout develop
 git merge --no-ff feature/new-feature
 git branch -d feature/new-feature
 git push origin develop
 
-# Start release
+# 开始发布
 git checkout -b release/1.0.0 develop
-# Make release commits
+# 进行发布提交
 git checkout main
 git merge --no-ff release/1.0.0
 git tag -a v1.0.0
@@ -564,9 +564,9 @@ git checkout develop
 git merge --no-ff release/1.0.0
 git branch -d release/1.0.0
 
-# Hotfix
+# 热修复
 git checkout -b hotfix/1.0.1 main
-# Fix bug
+# 修复 bug
 git checkout main
 git merge --no-ff hotfix/1.0.1
 git tag -a v1.0.1
@@ -575,119 +575,119 @@ git merge --no-ff hotfix/1.0.1
 git branch -d hotfix/1.0.1
 ```
 
-### Rebase Workflow
+### 变基工作流
 ```bash
-# Keep feature branch up-to-date with main
+# 保持功能分支与 main 同步
 git checkout feature/my-feature
 git fetch origin
 git rebase origin/main
 
-# Resolve conflicts if any
-# ... edit files ...
-git add <resolved-files>
+# 如有冲突则解决
+# ... 编辑文件 ...
+git add <已解决的文件>
 git rebase --continue
 
-# Force push (rewriting history)
+# 强制推送（重写历史）
 git push --force-with-lease origin feature/my-feature
 ```
 
 ---
 
-## Troubleshooting
+## 故障排查
 
-### Common Issues
+### 常见问题
 
-#### Merge Conflicts
+#### 合并冲突
 ```bash
-# 1. See conflicted files
+# 1. 查看冲突文件
 git status
 
-# 2. Edit files to resolve conflicts
-# Look for conflict markers: <<<<<<<, =======, >>>>>>>
+# 2. 编辑文件解决冲突
+# 查找冲突标记：<<<<<<<, =======, >>>>>>>
 
-# 3. Mark as resolved
-git add <resolved-files>
+# 3. 标记为已解决
+git add <已解决的文件>
 
-# 4. Complete merge
-git commit  # for merge
-git rebase --continue  # for rebase
+# 4. 完成合并
+git commit  # 用于合并
+git rebase --continue  # 用于变基
 ```
 
-#### Undo Last Commit
+#### 撤销上次提交
 ```bash
-# Keep changes staged
+# 保留更改在暂存区
 git reset --soft HEAD~1
 
-# Keep changes unstaged
+# 保留更改但取消暂存
 git reset HEAD~1
 
-# Discard changes
+# 丢弃更改
 git reset --hard HEAD~1
 ```
 
-#### Recover Deleted Branch
+#### 恢复已删除的分支
 ```bash
-# Find commit hash
+# 查找提交 hash
 git reflog
 
-# Recreate branch
+# 重建分支
 git branch <branch-name> <commit-hash>
 ```
 
-#### Remove Committed File
+#### 删除已提交的文件
 ```bash
-# Remove from history (dangerous!)
+# 从历史中删除（危险！）
 git filter-branch --tree-filter 'rm -f <file>' HEAD
 
-# Better: use git filter-repo (install separately)
+# 更好的方案：使用 git filter-repo（单独安装）
 git filter-repo --path <file> --invert-paths
 ```
 
-#### Fix Commit Message
+#### 修改提交信息
 ```bash
-# Last commit
-git commit --amend -m "New message"
+# 上次提交
+git commit --amend -m "新信息"
 
-# Older commit (interactive rebase)
+# 更早的提交（交互式变基）
 git rebase -i HEAD~3
-# Change 'pick' to 'reword' for commits to edit
+# 将要编辑的提交的 'pick' 改为 'reword'
 ```
 
-#### Sync Fork with Upstream
+#### 同步 fork 与上游
 ```bash
-# Add upstream remote
-git remote add upstream <original-repo-url>
+# 添加上游远程仓库
+git remote add upstream <原始仓库-url>
 
-# Fetch upstream
+# 抓取上游
 git fetch upstream
 
-# Merge upstream into local
+# 合并上游到本地
 git checkout main
 git merge upstream/main
 
-# Push to your fork
+# 推送到你的 fork
 git push origin main
 ```
 
 ---
 
-## Best Practices
+## 最佳实践
 
-### Commit Messages
+### 提交信息
 ```bash
-# Good commit message format:
+# 好的提交信息格式：
 # <type>(<scope>): <subject>
 #
 # <body>
 #
 # <footer>
 
-# Examples:
-git commit -m "feat(api): add user authentication endpoint"
-git commit -m "fix(database): resolve connection timeout issue"
-git commit -m "docs(readme): update installation instructions"
+# 示例：
+git commit -m "feat(api): 添加用户认证接口"
+git commit -m "fix(database): 解决连接超时问题"
+git commit -m "docs(readme): 更新安装说明"
 
-# Types: feat, fix, docs, style, refactor, test, chore
+# 类型：feat, fix, docs, style, refactor, test, chore
 ```
 
 ### .gitignore
@@ -700,70 +700,70 @@ __pycache__/
 venv/
 .venv/
 
-# IDEs
+# IDE
 .vscode/
 .idea/
 *.swp
 
-# OS
+# 操作系统
 .DS_Store
 Thumbs.db
 
-# Project specific
+# 项目特定
 /data/
 /logs/
 *.log
 ```
 
-### Tips
-1. **Commit often**: Small, focused commits
-2. **Pull before push**: Avoid conflicts
-3. **Use branches**: Keep main stable
-4. **Write good messages**: Explain why, not what
-5. **Review before commit**: `git diff --staged`
-6. **Don't commit secrets**: Use .gitignore
-7. **Use .gitignore early**: Before first commit
+### 技巧
+1. **频繁提交**：小而有针对性的提交
+2. **推送前先拉取**：避免冲突
+3. **使用分支**：保持 main 稳定
+4. **写好的提交信息**：解释为什么，而不是什么
+5. **提交前审查**：`git diff --staged`
+6. **不要提交密钥**：使用 .gitignore
+7. **尽早建立 .gitignore**：在第一次提交之前
 
 ---
 
-## Quick Reference
+## 快速参考
 
-### Essential Commands
+### 基本命令
 ```bash
-# Clone
+# 克隆
 git clone <url>
 
-# Status
+# 状态
 git status
 
-# Add
+# 添加
 git add <file>
 git add .
 
-# Commit
-git commit -m "message"
+# 提交
+git commit -m "信息"
 
-# Push
+# 推送
 git push origin main
 
-# Pull
+# 拉取
 git pull origin main
 
-# Branch
+# 分支
 git branch <name>
 git checkout <name>
 git checkout -b <name>
 
-# Merge
+# 合并
 git merge <branch>
 
-# Log
+# 日志
 git log --oneline
 ```
 
-### Useful Aliases
+### 有用的别名
 ```bash
-# Add to ~/.gitconfig or use git config --global alias.* commands
+# 添加到 ~/.gitconfig 或使用 git config --global alias.* 命令
 
 [alias]
     st = status -s
@@ -779,14 +779,14 @@ git log --oneline
 
 ---
 
-## Additional Resources
+## 额外资源
 
 - [Official Git Documentation](https://git-scm.com/doc)
-- [Pro Git Book](https://git-scm.com/book/en/v2) (free online)
+- [Pro Git Book](https://git-scm.com/book/en/v2)（免费在线阅读）
 - [GitHub Git Cheat Sheet](https://training.github.com/downloads/github-git-cheat-sheet/)
-- [Learn Git Branching](https://learngitbranching.js.org/) (interactive tutorial)
-- [Oh Shit, Git!?!](https://ohshitgit.com/) (fixing mistakes)
+- [Learn Git Branching](https://learngitbranching.js.org/)（交互式教程）
+- [Oh Shit, Git!?!](https://ohshitgit.com/)（修复错误）
 
 ---
 
-**Master these commands for effective version control!**
+**掌握这些命令以进行有效的版本控制！**

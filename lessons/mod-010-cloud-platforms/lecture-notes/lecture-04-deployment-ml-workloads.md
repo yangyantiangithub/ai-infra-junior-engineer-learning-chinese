@@ -1,87 +1,87 @@
-# Lecture 04: Deployment Patterns & ML Workloads on AWS
+# Lecture 04：AWS 上的部署模式与 ML 工作负载
 
-**Module**: Cloud Platforms
-**Level**: Junior AI Infrastructure Engineer
-**Duration**: 90 minutes
-**Prerequisites**: Lectures 01-03 (Cloud Fundamentals, AWS Core Services, Networking & Security)
-
----
-
-## Learning Objectives
-
-By the end of this lecture, you will be able to:
-1. Use Infrastructure as Code (IaC) with Terraform to provision AWS resources
-2. Deploy containerized ML applications using ECS and EKS
-3. Implement serverless ML inference with AWS Lambda
-4. Utilize AWS SageMaker for managed ML workflows
-5. Apply cost optimization strategies for ML workloads
-6. Design production-ready deployment architectures
+**模块**：云平台
+**级别**：初级 AI 基础设施工程师
+**时长**：90 分钟
+**前置要求**：讲座 01-03（云基础、AWS 核心服务、网络与安全）
 
 ---
 
-## 1. Infrastructure as Code (IaC) with Terraform
+## 学习目标
 
-### 1.1 Why Infrastructure as Code?
+到本讲座结束时，你将能够：
+1. 使用基础设施即代码（IaC）和 Terraform 配置 AWS 资源
+2. 使用 ECS 和 EKS 部署容器化 ML 应用
+3. 使用 AWS Lambda 实现无服务器 ML 推理
+4. 利用 AWS SageMaker 进行托管 ML 工作流
+5. 应用 ML 工作负载的成本优化策略
+6. 设计生产级部署架构
 
-**Manual Infrastructure Problems**:
-- **Inconsistency**: Different configurations across environments (dev, staging, prod)
-- **No Version Control**: Can't track changes or rollback
-- **Hard to Reproduce**: Difficult to recreate infrastructure if disaster occurs
-- **Slow**: Clicking through AWS Console is time-consuming
-- **No Collaboration**: Hard for teams to work together on infrastructure
+---
 
-**IaC Benefits**:
-- **Version Controlled**: Infrastructure changes tracked in Git
-- **Reproducible**: Same code → same infrastructure every time
-- **Fast**: Provision complex infrastructure in minutes
-- **Collaborative**: Teams can review infrastructure changes like code
-- **Self-Documenting**: Code describes what infrastructure exists
+## 1. 使用 Terraform 的基础设施即代码（IaC）
 
-### 1.2 Terraform Basics
+### 1.1 为什么需要基础设施即代码？
 
-**Terraform Workflow**:
+**手动基础设施的问题**：
+- **不一致**：不同环境（开发、预发布、生产）的配置不同
+- **无版本控制**：无法跟踪更改或回滚
+- **难以重现**：灾难发生后难以重建基础设施
+- **速度慢**：在 AWS 控制台中点击操作耗时
+- **无法协作**：团队难以共同处理基础设施
+
+**IaC 的优势**：
+- **版本控制**：基础设施更改在 Git 中跟踪
+- **可重现**：相同代码 → 每次都相同的基础设施
+- **快速**：几分钟内配置复杂基础设施
+- **协作**：团队可以像审查代码一样审查基础设施更改
+- **自我文档化**：代码描述了存在什么基础设施
+
+### 1.2 Terraform 基础
+
+**Terraform 工作流**：
 ```
-Write Code → Plan Changes → Apply Changes → Infrastructure Created
+编写代码 → 计划变更 → 应用变更 → 基础设施已创建
 ```
 
-**Terraform Architecture**:
+**Terraform 架构**：
 ```
 ┌──────────────────┐
-│  Terraform Code  │ (.tf files)
-│  (HCL Language)  │
+│  Terraform 代码  │（.tf 文件）
+│  （HCL 语言）    │
 └────────┬─────────┘
          │
          ▼
 ┌──────────────────┐
-│  Terraform CLI   │ (terraform plan/apply)
+│  Terraform CLI   │（terraform plan/apply）
 └────────┬─────────┘
          │
          ▼
 ┌──────────────────┐
-│   AWS Provider   │ (Translates to AWS API calls)
+│   AWS Provider   │（转换为 AWS API 调用）
 └────────┬─────────┘
          │
          ▼
 ┌──────────────────┐
-│   AWS Resources  │ (EC2, S3, VPC, etc.)
+│   AWS 资源       │（EC2、S3、VPC 等）
 └──────────────────┘
 ```
 
-### 1.3 Terraform Installation & Configuration
+### 1.3 Terraform 安装与配置
 
-**Install Terraform** (Ubuntu/Debian):
+**安装 Terraform**（Ubuntu/Debian）：
 ```bash
-# Download and install Terraform
+# 下载并安装 Terraform
 wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 sudo apt update && sudo apt install terraform
 
-# Verify installation
+# 验证安装
 terraform --version
-# Output: Terraform v1.6.0
+# 输出：Terraform v1.6.0
 ```
 
-**Configure AWS Provider**:
+**配置 AWS Provider**：
 ```hcl
 # provider.tf
 terraform {
@@ -97,7 +97,7 @@ terraform {
     key    = "ml-infrastructure/terraform.tfstate"
     region = "us-east-1"
 
-    # Enable state locking to prevent concurrent modifications
+    # 启用状态锁定以防止并发修改
     dynamodb_table = "terraform-state-lock"
     encrypt        = true
   }
@@ -116,14 +116,14 @@ provider "aws" {
 }
 ```
 
-**Why S3 Backend?**
-- **Remote State**: Team members can share Terraform state
-- **State Locking**: DynamoDB prevents multiple people from modifying infrastructure simultaneously
-- **Encryption**: State file contains sensitive data (IP addresses, resource IDs)
+**为什么使用 S3 后端？**
+- **远程状态**：团队成员可以共享 Terraform 状态
+- **状态锁定**：DynamoDB 防止多人同时修改基础设施
+- **加密**：状态文件包含敏感数据（IP 地址、资源 ID）
 
-### 1.4 Terraform Example: ML Inference Infrastructure
+### 1.4 Terraform 示例：ML 推理基础设施
 
-**Variables** (`variables.tf`):
+**变量**（`variables.tf`）：
 ```hcl
 variable "aws_region" {
   description = "AWS region for resources"
@@ -159,7 +159,7 @@ variable "max_instances" {
 }
 ```
 
-**VPC and Networking** (`network.tf`):
+**VPC 与网络**（`network.tf`）：
 ```hcl
 # VPC
 resource "aws_vpc" "ml_vpc" {
@@ -172,7 +172,7 @@ resource "aws_vpc" "ml_vpc" {
   }
 }
 
-# Public Subnets (for ALB)
+# 公有子网（用于 ALB）
 resource "aws_subnet" "public" {
   count             = 2
   vpc_id            = aws_vpc.ml_vpc.id
@@ -187,7 +187,7 @@ resource "aws_subnet" "public" {
   }
 }
 
-# Private Subnets (for EC2 instances)
+# 私有子网（用于 EC2 实例）
 resource "aws_subnet" "private" {
   count             = 2
   vpc_id            = aws_vpc.ml_vpc.id
@@ -209,7 +209,7 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
-# NAT Gateway (for private subnets to access internet)
+# NAT Gateway（用于私有子网访问互联网）
 resource "aws_eip" "nat" {
   count  = 2
   domain = "vpc"
@@ -229,7 +229,7 @@ resource "aws_nat_gateway" "main" {
   }
 }
 
-# Route Tables
+# 路由表
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.ml_vpc.id
 
@@ -257,7 +257,7 @@ resource "aws_route_table" "private" {
   }
 }
 
-# Route Table Associations
+# 路由表关联
 resource "aws_route_table_association" "public" {
   count          = 2
   subnet_id      = aws_subnet.public[count.index].id
@@ -270,15 +270,15 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private[count.index].id
 }
 
-# Data source for availability zones
+# 可用区数据源
 data "aws_availability_zones" "available" {
   state = "available"
 }
 ```
 
-**Security Groups** (`security.tf`):
+**安全组**（`security.tf`）：
 ```hcl
-# ALB Security Group (allow HTTP/HTTPS from internet)
+# ALB 安全组（允许来自互联网的 HTTP/HTTPS）
 resource "aws_security_group" "alb" {
   name        = "ml-alb-sg-${var.environment}"
   description = "Security group for ML inference ALB"
@@ -313,7 +313,7 @@ resource "aws_security_group" "alb" {
   }
 }
 
-# Application Security Group (allow traffic only from ALB)
+# 应用安全组（仅允许来自 ALB 的流量）
 resource "aws_security_group" "app" {
   name        = "ml-app-sg-${var.environment}"
   description = "Security group for ML inference application"
@@ -341,9 +341,9 @@ resource "aws_security_group" "app" {
 }
 ```
 
-**Auto Scaling Group with Launch Template** (`compute.tf`):
+**使用启动模板的 Auto Scaling 组**（`compute.tf`）：
 ```hcl
-# IAM Role for EC2 instances
+# EC2 实例的 IAM 角色
 resource "aws_iam_role" "ec2_role" {
   name = "ml-inference-ec2-role-${var.environment}"
 
@@ -371,7 +371,7 @@ resource "aws_iam_instance_profile" "ec2_profile" {
   role = aws_iam_role.ec2_role.name
 }
 
-# Launch Template
+# 启动模板
 resource "aws_launch_template" "ml_app" {
   name_prefix   = "ml-inference-${var.environment}-"
   image_id      = data.aws_ami.ubuntu.id
@@ -400,7 +400,7 @@ resource "aws_launch_template" "ml_app" {
   }
 }
 
-# Auto Scaling Group
+# Auto Scaling 组
 resource "aws_autoscaling_group" "ml_app" {
   name                = "ml-inference-asg-${var.environment}"
   vpc_zone_identifier = aws_subnet.private[*].id
@@ -424,7 +424,7 @@ resource "aws_autoscaling_group" "ml_app" {
   }
 }
 
-# Auto Scaling Policies
+# Auto Scaling 策略
 resource "aws_autoscaling_policy" "scale_up" {
   name                   = "ml-scale-up-${var.environment}"
   scaling_adjustment     = 2
@@ -441,7 +441,7 @@ resource "aws_autoscaling_policy" "scale_down" {
   autoscaling_group_name = aws_autoscaling_group.ml_app.name
 }
 
-# CloudWatch Alarms for Auto Scaling
+# 用于 Auto Scaling 的 CloudWatch 告警
 resource "aws_cloudwatch_metric_alarm" "high_cpu" {
   alarm_name          = "ml-high-cpu-${var.environment}"
   comparison_operator = "GreaterThanThreshold"
@@ -476,7 +476,7 @@ resource "aws_cloudwatch_metric_alarm" "low_cpu" {
   alarm_actions = [aws_autoscaling_policy.scale_down.arn]
 }
 
-# Data source for latest Ubuntu AMI
+# 最新 Ubuntu AMI 的数据源
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"]  # Canonical
@@ -488,7 +488,7 @@ data "aws_ami" "ubuntu" {
 }
 ```
 
-**Load Balancer** (`load-balancer.tf`):
+**负载均衡器**（`load-balancer.tf`）：
 ```hcl
 # Application Load Balancer
 resource "aws_lb" "ml_app" {
@@ -505,7 +505,7 @@ resource "aws_lb" "ml_app" {
   }
 }
 
-# Target Group
+# 目标组
 resource "aws_lb_target_group" "ml_app" {
   name     = "ml-tg-${var.environment}"
   port     = 5000
@@ -529,7 +529,7 @@ resource "aws_lb_target_group" "ml_app" {
   }
 }
 
-# Listener
+# 监听器
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.ml_app.arn
   port              = "80"
@@ -542,7 +542,7 @@ resource "aws_lb_listener" "http" {
 }
 ```
 
-**S3 Bucket for Models** (`storage.tf`):
+**用于模型的 S3 存储桶**（`storage.tf`）：
 ```hcl
 resource "aws_s3_bucket" "models" {
   bucket = "ml-models-${var.environment}-${data.aws_caller_identity.current.account_id}"
@@ -573,7 +573,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "models" {
 data "aws_caller_identity" "current" {}
 ```
 
-**Outputs** (`outputs.tf`):
+**输出**（`outputs.tf`）：
 ```hcl
 output "alb_dns_name" {
   description = "DNS name of the load balancer"
@@ -596,62 +596,62 @@ output "autoscaling_group_name" {
 }
 ```
 
-### 1.5 Terraform Workflow Commands
+### 1.5 Terraform 工作流命令
 
-**Initialize Terraform** (download providers and modules):
+**初始化 Terraform**（下载提供者和模块）：
 ```bash
 terraform init
 ```
 
-**Format Code** (standardize formatting):
+**格式化代码**（标准化格式）：
 ```bash
 terraform fmt -recursive
 ```
 
-**Validate Configuration** (check for errors):
+**验证配置**（检查错误）：
 ```bash
 terraform validate
 ```
 
-**Plan Changes** (preview what will be created):
+**计划变更**（预览将要创建的内容）：
 ```bash
 terraform plan -var="environment=dev" -out=tfplan
 ```
 
-**Apply Changes** (create infrastructure):
+**应用变更**（创建基础设施）：
 ```bash
 terraform apply tfplan
 ```
 
-**Show Current State**:
+**显示当前状态**：
 ```bash
 terraform show
 ```
 
-**Destroy Infrastructure** (delete all resources):
+**销毁基础设施**（删除所有资源）：
 ```bash
 terraform destroy -var="environment=dev"
 ```
 
-**Terraform State Management**:
+**Terraform 状态管理**：
 ```bash
-# List all resources in state
+# 列出状态中的所有资源
 terraform state list
 
-# Show details of a specific resource
+# 显示特定资源的详细信息
 terraform state show aws_lb.ml_app
 
-# Remove a resource from state (doesn't delete actual resource)
+# 从状态中移除资源（不删除实际资源）
 terraform state rm aws_lb.ml_app
 ```
 
 ---
 
-## 2. Container Orchestration: ECS and EKS
+## 2. 容器编排：ECS 和 EKS
 
-### 2.1 Amazon ECS (Elastic Container Service)
+### 2.1 Amazon ECS（Elastic Container Service）
 
-**ECS Architecture**:
+**ECS 架构**：
 ```
 ┌─────────────────────────────────────────────┐
 │         Application Load Balancer           │
@@ -661,30 +661,30 @@ terraform state rm aws_lb.ml_app
       │                     │
 ┌─────▼─────┐         ┌─────▼─────┐
 │  ECS Task │         │  ECS Task │
-│ Container │         │ Container │
+│  Container│         │  Container│
 │  Port 5000│         │  Port 5000│
 └───────────┘         └───────────┘
       │                     │
 ┌─────▼──────────────────────▼─────┐
 │        ECS Service               │
-│  (Desired count: 3 tasks)        │
+│  （期望数量：3 个任务）           │
 └──────────────┬───────────────────┘
                │
 ┌──────────────▼───────────────────┐
 │        ECS Cluster               │
-│  (EC2 or Fargate launch type)    │
+│  （EC2 或 Fargate 启动类型）     │
 └──────────────────────────────────┘
 ```
 
-**ECS Concepts**:
-- **Task Definition**: Blueprint for your application (like a Dockerfile)
-- **Task**: Running instance of a task definition
-- **Service**: Manages desired number of tasks, integrates with load balancer
-- **Cluster**: Logical grouping of tasks or services
+**ECS 概念**：
+- **任务定义（Task Definition）**：应用的蓝图（类似 Dockerfile）
+- **任务（Task）**：任务定义的运行实例
+- **服务（Service）**：管理期望数量的任务，与负载均衡器集成
+- **集群（Cluster）**：任务或服务的逻辑分组
 
-### 2.2 ECS Task Definition Example
+### 2.2 ECS 任务定义示例
 
-**Create Task Definition JSON** (`task-definition.json`):
+**创建任务定义 JSON**（`task-definition.json`）：
 ```json
 {
   "family": "ml-inference-task",
@@ -740,19 +740,19 @@ terraform state rm aws_lb.ml_app
 }
 ```
 
-**Register Task Definition**:
+**注册任务定义**：
 ```bash
 aws ecs register-task-definition --cli-input-json file://task-definition.json
 ```
 
-### 2.3 Create ECS Service
+### 2.3 创建 ECS 服务
 
-**Create ECS Cluster** (Fargate launch type):
+**创建 ECS 集群**（Fargate 启动类型）：
 ```bash
 aws ecs create-cluster --cluster-name ml-inference-cluster
 ```
 
-**Create ECS Service with ALB Integration**:
+**创建带 ALB 集成的 ECS 服务**：
 ```bash
 aws ecs create-service \
   --cluster ml-inference-cluster \
@@ -769,9 +769,9 @@ aws ecs create-service \
   --health-check-grace-period-seconds 60
 ```
 
-**Enable Auto Scaling for ECS Service**:
+**为 ECS 服务启用 Auto Scaling**：
 ```bash
-# Register scalable target
+# 注册可扩展目标
 aws application-autoscaling register-scalable-target \
   --service-namespace ecs \
   --scalable-dimension ecs:service:DesiredCount \
@@ -779,7 +779,7 @@ aws application-autoscaling register-scalable-target \
   --min-capacity 2 \
   --max-capacity 10
 
-# Create scaling policy based on CPU utilization
+# 基于 CPU 利用率的扩展策略
 aws application-autoscaling put-scaling-policy \
   --service-namespace ecs \
   --scalable-dimension ecs:service:DesiredCount \
@@ -796,19 +796,19 @@ aws application-autoscaling put-scaling-policy \
   }'
 ```
 
-### 2.4 Amazon EKS (Elastic Kubernetes Service)
+### 2.4 Amazon EKS（Elastic Kubernetes Service）
 
-**Why EKS over ECS?**
-- **Portability**: Run on any Kubernetes cluster (GCP GKE, Azure AKS, on-prem)
-- **Ecosystem**: Vast ecosystem of tools (Helm, Istio, ArgoCD)
-- **Flexibility**: More control over networking, storage, scheduling
-- **Multi-Cloud**: Easier to adopt multi-cloud strategy
+**为什么选择 EKS 而不是 ECS？**
+- **可移植性**：在任何 Kubernetes 集群上运行（GCP GKE、Azure AKS、本地）
+- **生态系统**：庞大的工具生态系统（Helm、Istio、ArgoCD）
+- **灵活性**：对网络、存储、调度的更多控制
+- **多云**：更容易采用多云策略
 
-**EKS Architecture**:
+**EKS 架构**：
 ```
 ┌────────────────────────────────────────┐
 │         EKS Control Plane              │
-│  (Managed by AWS - API Server, etcd)   │
+│  （AWS 管理 - API Server、etcd）       │
 └────────────────┬───────────────────────┘
                  │
       ┌──────────┴──────────┐
@@ -816,7 +816,7 @@ aws application-autoscaling put-scaling-policy \
 ┌─────▼─────┐         ┌─────▼─────┐
 │  Worker   │         │  Worker   │
 │  Node 1   │         │  Node 2   │
-│  (EC2)    │         │  (EC2)    │
+│  （EC2）  │         │  （EC2）  │
 └───────────┘         └───────────┘
       │                     │
    ┌──▼──┐               ┌──▼──┐
@@ -824,19 +824,19 @@ aws application-autoscaling put-scaling-policy \
    └─────┘               └─────┘
 ```
 
-### 2.5 Create EKS Cluster with eksctl
+### 2.5 使用 eksctl 创建 EKS 集群
 
-**Install eksctl**:
+**安装 eksctl**：
 ```bash
-# Install eksctl
+# 安装 eksctl
 curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/eksctl /usr/local/bin
 
-# Verify installation
+# 验证安装
 eksctl version
 ```
 
-**Create EKS Cluster** (this takes ~15-20 minutes):
+**创建 EKS 集群**（大约 15-20 分钟）：
 ```bash
 eksctl create cluster \
   --name ml-inference-cluster \
@@ -850,17 +850,17 @@ eksctl create cluster \
   --version 1.28
 ```
 
-**Configure kubectl**:
+**配置 kubectl**：
 ```bash
 aws eks update-kubeconfig --region us-east-1 --name ml-inference-cluster
 
-# Verify connection
+# 验证连接
 kubectl get nodes
 ```
 
-### 2.6 Deploy ML Application on EKS
+### 2.6 在 EKS 上部署 ML 应用
 
-**Deployment YAML** (`ml-deployment.yaml`):
+**部署 YAML**（`ml-deployment.yaml`）：
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -947,89 +947,89 @@ spec:
         averageUtilization: 80
 ```
 
-**Deploy to EKS**:
+**部署到 EKS**：
 ```bash
-# Apply deployment
+# 应用部署
 kubectl apply -f ml-deployment.yaml
 
-# Check deployment status
+# 检查部署状态
 kubectl get deployments
 kubectl get pods
 kubectl get svc ml-inference-service
 
-# Get load balancer URL
+# 获取负载均衡器 URL
 kubectl get svc ml-inference-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
 
-# Test inference endpoint
+# 测试推理端点
 curl http://<load-balancer-url>/predict -X POST -H "Content-Type: application/json" -d '{"image_url": "https://example.com/cat.jpg"}'
 ```
 
-**View Logs**:
+**查看日志**：
 ```bash
-# Get pod names
+# 获取 pod 名称
 kubectl get pods -l app=ml-inference
 
-# View logs for a specific pod
+# 查看特定 pod 的日志
 kubectl logs <pod-name>
 
-# Follow logs in real-time
+# 实时跟踪日志
 kubectl logs -f <pod-name>
 ```
 
-### 2.7 ECS vs EKS Decision Matrix
+### 2.7 ECS vs EKS 决策矩阵
 
-| Factor | ECS | EKS |
+| 因素 | ECS | EKS |
 |--------|-----|-----|
-| **Ease of Use** | ⭐⭐⭐⭐⭐ Simple, AWS-native | ⭐⭐⭐ Steeper learning curve |
-| **Cost** | ⭐⭐⭐⭐ No control plane cost | ⭐⭐⭐ $0.10/hour for control plane |
-| **Portability** | ⭐⭐ AWS-only | ⭐⭐⭐⭐⭐ Runs anywhere |
-| **Ecosystem** | ⭐⭐⭐ Growing | ⭐⭐⭐⭐⭐ Vast Kubernetes ecosystem |
-| **Integration** | ⭐⭐⭐⭐⭐ Deep AWS integration | ⭐⭐⭐⭐ Good AWS integration |
-| **Flexibility** | ⭐⭐⭐ Limited customization | ⭐⭐⭐⭐⭐ Highly customizable |
+| **易用性** | ⭐⭐⭐⭐⭐ 简单，AWS 原生 | ⭐⭐⭐ 学习曲线较陡 |
+| **成本** | ⭐⭐⭐⭐ 无控制平面成本 | ⭐⭐⭐ 控制平面 $0.10/小时 |
+| **可移植性** | ⭐⭐ 仅 AWS | ⭐⭐⭐⭐⭐ 随处运行 |
+| **生态系统** | ⭐⭐⭐ 增长中 | ⭐⭐⭐⭐⭐ 庞大的 Kubernetes 生态系统 |
+| **集成度** | ⭐⭐⭐⭐⭐ 深度 AWS 集成 | ⭐⭐⭐⭐ AWS 集成良好 |
+| **灵活性** | ⭐⭐⭐ 自定义有限 | ⭐⭐⭐⭐⭐ 高度可定制 |
 
-**Recommendation for Junior Engineers**:
-- **Start with ECS Fargate** for simplicity
-- **Learn Kubernetes** concepts with EKS once comfortable with containers
-- **Use EKS for production ML** if multi-cloud or portability is important
+**对初级工程师的建议**：
+- **从 ECS Fargate 开始**以求简单
+- 熟悉容器后**学习 Kubernetes 概念**和 EKS
+- 如果多云或可移植性重要，**对生产 ML 使用 EKS**
 
 ---
 
-## 3. Serverless ML Inference with AWS Lambda
+## 3. 使用 AWS Lambda 的无服务器 ML 推理
 
-### 3.1 When to Use Serverless for ML?
+### 3.1 何时为 ML 使用无服务器？
 
-**Good Fit for Lambda**:
-- ✅ **Infrequent Predictions**: Sporadic traffic (< 1000 req/hour)
-- ✅ **Small Models**: Model size < 250MB (uncompressed)
-- ✅ **Fast Inference**: Prediction time < 15 minutes
-- ✅ **Variable Load**: Traffic spikes unpredictably
-- ✅ **Cost Optimization**: Pay only when running
+**适合 Lambda 的场景**：
+- ✅ **不频繁预测**：零星流量（< 1000 请求/小时）
+- ✅ **小型模型**：模型大小 < 250MB（未压缩）
+- ✅ **快速推理**：预测时间 < 15 分钟
+- ✅ **变化负载**：流量不可预测地波动
+- ✅ **成本优化**：仅在运行时付费
 
-**Not Good for Lambda**:
-- ❌ **Large Models**: Deep learning models > 250MB
-- ❌ **Long Inference**: Predictions taking > 15 minutes
-- ❌ **High Throughput**: Sustained high traffic (better with ECS/EKS)
-- ❌ **GPU Required**: Lambda doesn't support GPU
+**不适合 Lambda 的场景**：
+- ❌ **大型模型**：深度学习模型 > 250MB
+- ❌ **长时间推理**：预测耗时 > 15 分钟
+- ❌ **高吞吐量**：持续高流量（更适合 ECS/EKS）
+- ❌ **需要 GPU**：Lambda 不支持 GPU
 
-### 3.2 Lambda Inference Example
+### 3.2 Lambda 推理示例
 
-**Lambda Function** (`lambda_function.py`):
+**Lambda 函数**（`lambda_function.py`）：
 ```python
 import json
 import boto3
 import pickle
 import numpy as np
 
-# Initialize S3 client
+# 初始化 S3 客户端
 s3 = boto3.client('s3')
 
-# Global variable to cache model (persists across invocations)
+# 用于缓存模型的全局变量（跨调用持久化）
 model = None
 MODEL_BUCKET = 'ml-models-prod'
 MODEL_KEY = 'sklearn_model.pkl'
 
 def load_model():
-    """Load model from S3 (cached after first invocation)"""
+    """从 S3 加载模型（首次调用后缓存）"""
     global model
     if model is None:
         print("Loading model from S3...")
@@ -1040,26 +1040,26 @@ def load_model():
 
 def lambda_handler(event, context):
     """
-    Lambda handler for ML inference
+    ML 推理的 Lambda 处理程序
 
-    Event format:
+    事件格式：
     {
         "features": [1.2, 3.4, 5.6, 7.8]
     }
     """
     try:
-        # Parse input
+        # 解析输入
         body = json.loads(event['body']) if 'body' in event else event
         features = np.array(body['features']).reshape(1, -1)
 
-        # Load model (cached after first call)
+        # 加载模型（首次调用后缓存）
         model = load_model()
 
-        # Make prediction
+        # 进行预测
         prediction = model.predict(features)
         probability = model.predict_proba(features)
 
-        # Return response
+        # 返回响应
         return {
             'statusCode': 200,
             'headers': {
@@ -1083,28 +1083,28 @@ def lambda_handler(event, context):
         }
 ```
 
-**Package Lambda Function**:
+**打包 Lambda 函数**：
 ```bash
-# Create deployment package directory
+# 创建部署包目录
 mkdir lambda-package
 cd lambda-package
 
-# Install dependencies
+# 安装依赖
 pip install numpy scikit-learn -t .
 
-# Copy function code
+# 复制函数代码
 cp ../lambda_function.py .
 
-# Create ZIP file
+# 创建 ZIP 文件
 zip -r lambda-package.zip .
 
-# Upload to S3
+# 上传到 S3
 aws s3 cp lambda-package.zip s3://my-lambda-code-bucket/
 ```
 
-**Create Lambda Function**:
+**创建 Lambda 函数**：
 ```bash
-# Create IAM role for Lambda
+# 为 Lambda 创建 IAM 角色
 cat > trust-policy.json <<EOF
 {
   "Version": "2012-10-17",
@@ -1124,7 +1124,7 @@ aws iam create-role \
   --role-name ml-lambda-execution-role \
   --assume-role-policy-document file://trust-policy.json
 
-# Attach policies
+# 附加策略
 aws iam attach-role-policy \
   --role-name ml-lambda-execution-role \
   --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
@@ -1133,7 +1133,7 @@ aws iam attach-role-policy \
   --role-name ml-lambda-execution-role \
   --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
 
-# Create Lambda function
+# 创建 Lambda 函数
 aws lambda create-function \
   --function-name ml-inference-lambda \
   --runtime python3.11 \
@@ -1145,24 +1145,24 @@ aws lambda create-function \
   --environment Variables={MODEL_BUCKET=ml-models-prod,MODEL_KEY=sklearn_model.pkl}
 ```
 
-### 3.3 API Gateway Integration
+### 3.3 API Gateway 集成
 
-**Create REST API**:
+**创建 REST API**：
 ```bash
-# Create REST API
+# 创建 REST API
 aws apigateway create-rest-api \
   --name "ML Inference API" \
   --description "Serverless ML inference API"
 
-# Get API ID (from output above)
+# 获取 API ID（从上面输出）
 API_ID="abc123defg"
 
-# Get root resource ID
+# 获取根资源 ID
 aws apigateway get-resources --rest-api-id $API_ID
 
 ROOT_ID="xyz789"
 
-# Create /predict resource
+# 创建 /predict 资源
 aws apigateway create-resource \
   --rest-api-id $API_ID \
   --parent-id $ROOT_ID \
@@ -1170,14 +1170,14 @@ aws apigateway create-resource \
 
 PREDICT_RESOURCE_ID="pred123"
 
-# Create POST method
+# 创建 POST 方法
 aws apigateway put-method \
   --rest-api-id $API_ID \
   --resource-id $PREDICT_RESOURCE_ID \
   --http-method POST \
   --authorization-type NONE
 
-# Integrate with Lambda
+# 与 Lambda 集成
 aws apigateway put-integration \
   --rest-api-id $API_ID \
   --resource-id $PREDICT_RESOURCE_ID \
@@ -1186,7 +1186,7 @@ aws apigateway put-integration \
   --integration-http-method POST \
   --uri arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:123456789012:function:ml-inference-lambda/invocations
 
-# Grant API Gateway permission to invoke Lambda
+# 授权 API Gateway 调用 Lambda
 aws lambda add-permission \
   --function-name ml-inference-lambda \
   --statement-id apigateway-invoke \
@@ -1194,13 +1194,13 @@ aws lambda add-permission \
   --principal apigateway.amazonaws.com \
   --source-arn "arn:aws:execute-api:us-east-1:123456789012:$API_ID/*/POST/predict"
 
-# Deploy API
+# 部署 API
 aws apigateway create-deployment \
   --rest-api-id $API_ID \
   --stage-name prod
 ```
 
-**Test API**:
+**测试 API**：
 ```bash
 curl -X POST https://$API_ID.execute-api.us-east-1.amazonaws.com/prod/predict \
   -H "Content-Type: application/json" \
@@ -1209,14 +1209,14 @@ curl -X POST https://$API_ID.execute-api.us-east-1.amazonaws.com/prod/predict \
 
 ---
 
-## 4. AWS SageMaker for Managed ML
+## 4. 用于托管 ML 的 AWS SageMaker
 
-### 4.1 SageMaker Components
+### 4.1 SageMaker 组件
 
-**SageMaker Platform**:
+**SageMaker 平台**：
 ```
 ┌──────────────────────────────────────────────┐
-│           SageMaker Studio                   │  (Jupyter-based IDE)
+│           SageMaker Studio                   │  （Jupyter 基础的 IDE）
 └──────────────────┬───────────────────────────┘
                    │
     ┌──────────────┼──────────────┐
@@ -1233,28 +1233,28 @@ curl -X POST https://$API_ID.execute-api.us-east-1.amazonaws.com/prod/predict \
          └───────────────────┘
 ```
 
-**Key SageMaker Features**:
-- **Built-in Algorithms**: XGBoost, Linear Learner, Image Classification
-- **Managed Training**: Automatic provisioning and scaling
-- **Hyperparameter Tuning**: Automated optimization
-- **Model Registry**: Version control for models
-- **Endpoints**: Managed inference with auto-scaling
-- **SageMaker Pipelines**: MLOps workflow orchestration
+**关键 SageMaker 功能**：
+- **内置算法**：XGBoost、Linear Learner、Image Classification
+- **托管训练**：自动配置和扩展
+- **超参数调优**：自动优化
+- **模型注册表**：模型的版本控制
+- **端点**：带自动扩缩容的托管推理
+- **SageMaker Pipelines**：MLOps 工作流编排
 
-### 4.2 SageMaker Training Job Example
+### 4.2 SageMaker 训练作业示例
 
-**Train a Model Using SageMaker**:
+**使用 SageMaker 训练模型**：
 ```python
 import sagemaker
 from sagemaker import get_execution_role
 from sagemaker.sklearn import SKLearn
 
-# Initialize SageMaker session
+# 初始化 SageMaker 会话
 sagemaker_session = sagemaker.Session()
 role = get_execution_role()
 
-# Define training script
-# (Assumes you have train.py in local directory)
+# 定义训练脚本
+# （假设你本地目录中有 train.py）
 sklearn_estimator = SKLearn(
     entry_point='train.py',
     role=role,
@@ -1268,11 +1268,11 @@ sklearn_estimator = SKLearn(
     }
 )
 
-# Start training job
+# 开始训练作业
 sklearn_estimator.fit({'training': 's3://my-bucket/training-data/'})
 ```
 
-**Training Script** (`train.py`):
+**训练脚本**（`train.py`）：
 ```python
 import argparse
 import os
@@ -1283,57 +1283,57 @@ import joblib
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    # Hyperparameters
+    # 超参数
     parser.add_argument('--n_estimators', type=int, default=100)
     parser.add_argument('--max_depth', type=int, default=10)
 
-    # SageMaker specific arguments
+    # SageMaker 特定参数
     parser.add_argument('--model-dir', type=str, default=os.environ.get('SM_MODEL_DIR'))
     parser.add_argument('--train', type=str, default=os.environ.get('SM_CHANNEL_TRAINING'))
 
     args = parser.parse_args()
 
-    # Load training data
+    # 加载训练数据
     train_data = pd.read_csv(os.path.join(args.train, 'train.csv'))
     X_train = train_data.drop('target', axis=1)
     y_train = train_data['target']
 
-    # Train model
+    # 训练模型
     model = RandomForestClassifier(
         n_estimators=args.n_estimators,
         max_depth=args.max_depth
     )
     model.fit(X_train, y_train)
 
-    # Save model
+    # 保存模型
     joblib.dump(model, os.path.join(args.model_dir, 'model.joblib'))
 ```
 
-### 4.3 Deploy Model to SageMaker Endpoint
+### 4.3 将模型部署到 SageMaker 端点
 
-**Deploy Trained Model**:
+**部署训练好的模型**：
 ```python
-# Deploy model to endpoint
+# 将模型部署到端点
 predictor = sklearn_estimator.deploy(
     initial_instance_count=2,
     instance_type='ml.t2.medium',
     endpoint_name='ml-inference-endpoint'
 )
 
-# Make predictions
+# 进行预测
 import numpy as np
 test_data = np.array([[1.2, 3.4, 5.6, 7.8]])
 prediction = predictor.predict(test_data)
 print(f"Prediction: {prediction}")
 ```
 
-**Configure Auto Scaling**:
+**配置 Auto Scaling**：
 ```python
 import boto3
 
 client = boto3.client('application-autoscaling')
 
-# Register scalable target
+# 注册可扩展目标
 client.register_scalable_target(
     ServiceNamespace='sagemaker',
     ResourceId='endpoint/ml-inference-endpoint/variant/AllTraffic',
@@ -1342,7 +1342,7 @@ client.register_scalable_target(
     MaxCapacity=5
 )
 
-# Create scaling policy
+# 创建扩展策略
 client.put_scaling_policy(
     PolicyName='ml-endpoint-scaling-policy',
     ServiceNamespace='sagemaker',
@@ -1360,24 +1360,24 @@ client.put_scaling_policy(
 )
 ```
 
-### 4.4 SageMaker Pipelines (MLOps)
+### 4.4 SageMaker Pipelines（MLOps）
 
-**Define ML Pipeline**:
+**定义 ML 流水线**：
 ```python
 from sagemaker.workflow.pipeline import Pipeline
 from sagemaker.workflow.steps import ProcessingStep, TrainingStep
 from sagemaker.workflow.parameters import ParameterInteger
 
-# Define pipeline parameters
+# 定义流水线参数
 instance_count = ParameterInteger(name="InstanceCount", default_value=1)
 
-# Processing step
+# 处理步骤
 processing_step = ProcessingStep(
     name="PreprocessData",
-    # ... processing configuration
+    # ... 处理配置
 )
 
-# Training step
+# 训练步骤
 training_step = TrainingStep(
     name="TrainModel",
     estimator=sklearn_estimator,
@@ -1386,37 +1386,37 @@ training_step = TrainingStep(
     }
 )
 
-# Create pipeline
+# 创建流水线
 pipeline = Pipeline(
     name="ml-training-pipeline",
     parameters=[instance_count],
     steps=[processing_step, training_step]
 )
 
-# Create/update pipeline
+# 创建/更新流水线
 pipeline.upsert(role_arn=role)
 
-# Start pipeline execution
+# 开始流水线执行
 execution = pipeline.start()
 ```
 
 ---
 
-## 5. Cost Optimization for ML Workloads
+## 5. ML 工作负载的成本优化
 
-### 5.1 Compute Cost Optimization
+### 5.1 计算成本优化
 
-**EC2 Pricing Models**:
-| Model | Cost Savings | Use Case |
+**EC2 定价模型**：
+| 模型 | 成本节省 | 用例 |
 |-------|--------------|----------|
-| **On-Demand** | Baseline (1x) | Production inference (unpredictable load) |
-| **Reserved Instances** | 30-40% | Steady-state workloads (1-3 year commitment) |
-| **Spot Instances** | 50-90% | Batch training (fault-tolerant) |
-| **Savings Plans** | 25-35% | Flexible commitment (any instance family) |
+| **按需** | 基准（1x） | 生产推理（不可预测负载） |
+| **预留实例** | 30-40% | 稳态工作负载（1-3 年承诺） |
+| **Spot 实例** | 50-90% | 批处理训练（容错） |
+| **Savings Plans** | 25-35% | 灵活承诺（任何实例系列） |
 
-**Use Spot Instances for Training**:
+**使用 Spot 实例进行训练**：
 ```bash
-# Launch training job with Spot instances
+# 使用 Spot 实例启动训练作业
 aws sagemaker create-training-job \
   --training-job-name ml-training-spot \
   --algorithm-specification TrainingImage=<image-uri>,TrainingInputMode=File \
@@ -1429,23 +1429,23 @@ aws sagemaker create-training-job \
   --checkpoint-config S3Uri=s3://my-bucket/checkpoints
 ```
 
-**Spot Instance Best Practices**:
-- ✅ **Use for Training**: Models can resume from checkpoints
-- ✅ **Enable Checkpointing**: Save progress frequently
-- ✅ **Use Multiple Instance Types**: Increase spot availability
-- ❌ **Don't Use for Inference**: Interruptions affect user requests
+**Spot 实例最佳实践**：
+- ✅ **用于训练**：模型可以从检查点恢复
+- ✅ **启用 Checkpointing**：频繁保存进度
+- ✅ **使用多种实例类型**：提高 Spot 可用性
+- ❌ **不要用于推理**：中断会影响用户请求
 
-### 5.2 Storage Cost Optimization
+### 5.2 存储成本优化
 
-**S3 Storage Classes**:
-| Class | Cost | Access Time | Use Case |
+**S3 存储类**：
+| 类 | 成本 | 访问时间 | 用例 |
 |-------|------|-------------|----------|
-| **S3 Standard** | $0.023/GB | Instant | Active models |
-| **S3 Intelligent-Tiering** | $0.0025-0.023/GB | Instant | Unknown access patterns |
-| **S3 Glacier Instant Retrieval** | $0.004/GB | Instant | Archived models (accessed quarterly) |
-| **S3 Glacier Deep Archive** | $0.00099/GB | 12 hours | Long-term archives |
+| **S3 Standard** | $0.023/GB | 即时 | 活跃模型 |
+| **S3 Intelligent-Tiering** | $0.0025-0.023/GB | 即时 | 未知访问模式 |
+| **S3 Glacier Instant Retrieval** | $0.004/GB | 即时 | 归档模型（每季度访问） |
+| **S3 Glacier Deep Archive** | $0.00099/GB | 12 小时 | 长期归档 |
 
-**Lifecycle Policy Example**:
+**生命周期策略示例**：
 ```json
 {
   "Rules": [
@@ -1480,18 +1480,18 @@ aws sagemaker create-training-job \
 }
 ```
 
-**Apply Lifecycle Policy**:
+**应用生命周期策略**：
 ```bash
 aws s3api put-bucket-lifecycle-configuration \
   --bucket ml-models-bucket \
   --lifecycle-configuration file://lifecycle-policy.json
 ```
 
-### 5.3 Right-Sizing Instances
+### 5.3 合理调整实例规格
 
-**Monitor Resource Utilization**:
+**监控资源利用率**：
 ```bash
-# Get CloudWatch metrics for EC2 CPU utilization
+# 获取 EC2 CPU 利用率的 CloudWatch 指标
 aws cloudwatch get-metric-statistics \
   --namespace AWS/EC2 \
   --metric-name CPUUtilization \
@@ -1500,28 +1500,18 @@ aws cloudwatch get-metric-statistics \
   --end-time 2025-10-23T23:59:59Z \
   --period 3600 \
   --statistics Average
-
-# Analyze memory utilization (requires CloudWatch agent)
-aws cloudwatch get-metric-statistics \
-  --namespace CWAgent \
-  --metric-name mem_used_percent \
-  --dimensions Name=InstanceId,Value=i-0abc123def456 \
-  --start-time 2025-10-01T00:00:00Z \
-  --end-time 2025-10-23T23:59:59Z \
-  --period 3600 \
-  --statistics Average
 ```
 
-**Right-Sizing Decision Matrix**:
-- **CPU < 30%**: Consider smaller instance type
-- **CPU 30-70%**: Optimal utilization
-- **CPU > 70%**: Consider larger instance or scaling out
-- **Memory < 50%**: Over-provisioned memory
-- **Memory > 80%**: Risk of OOM errors, increase memory
+**规格调整决策矩阵**：
+- **CPU < 30%**：考虑更小的实例类型
+- **CPU 30-70%**：最优利用率
+- **CPU > 70%**：考虑更大实例或水平扩展
+- **内存 < 50%**：内存过度配置
+- **内存 > 80%**：OOM 错误风险，增加内存
 
-### 5.4 Cost Monitoring and Alerts
+### 5.4 成本监控与告警
 
-**Enable Cost Allocation Tags**:
+**启用成本分配标签**：
 ```bash
 aws ce create-cost-category-definition \
   --name "ML-Project-Costs" \
@@ -1547,97 +1537,55 @@ aws ce create-cost-category-definition \
   ]'
 ```
 
-**Create Budget with Alert**:
-```bash
-cat > budget.json <<EOF
-{
-  "BudgetName": "ML-Monthly-Budget",
-  "BudgetLimit": {
-    "Amount": "500",
-    "Unit": "USD"
-  },
-  "TimeUnit": "MONTHLY",
-  "BudgetType": "COST",
-  "CostFilters": {
-    "TagKeyValue": ["user:Project$ML-Infrastructure"]
-  }
-}
-EOF
+### 5.5 成本优化检查清单
 
-cat > notifications.json <<EOF
-[
-  {
-    "Notification": {
-      "NotificationType": "ACTUAL",
-      "ComparisonOperator": "GREATER_THAN",
-      "Threshold": 80,
-      "ThresholdType": "PERCENTAGE"
-    },
-    "Subscribers": [
-      {
-        "SubscriptionType": "EMAIL",
-        "Address": "ml-team@example.com"
-      }
-    ]
-  }
-]
-EOF
+**基础设施**：
+- [ ] 对训练作业使用 Spot 实例
+- [ ] 为推理启用自动扩缩容
+- [ ] 根据利用率合理调整实例规格
+- [ ] 对稳态工作负载使用预留实例
+- [ ] 删除未使用的资源（已停止的 EC2、旧快照）
 
-aws budgets create-budget \
-  --account-id 123456789012 \
-  --budget file://budget.json \
-  --notifications-with-subscribers file://notifications.json
-```
+**存储**：
+- [ ] 实施 S3 生命周期策略
+- [ ] 对未知模式使用 S3 Intelligent-Tiering
+- [ ] 存储前压缩大型数据集
+- [ ] 删除旧的 CloudWatch 日志（> 30 天）
+- [ ] 使用 EBS 快照而非保留卷
 
-### 5.5 Cost Optimization Checklist
+**网络**：
+- [ ] 使用 VPC 端点避免 NAT Gateway 成本
+- [ ] 最小化跨区域数据传输
+- [ ] 使用 CloudFront 提供静态资产
+- [ ] 仅在需要时启用 S3 Transfer Acceleration
 
-**Infrastructure**:
-- [ ] Use Spot instances for training jobs
-- [ ] Enable auto-scaling for inference
-- [ ] Right-size instances based on utilization
-- [ ] Use Reserved Instances for steady workloads
-- [ ] Delete unused resources (stopped EC2, old snapshots)
-
-**Storage**:
-- [ ] Implement S3 lifecycle policies
-- [ ] Use S3 Intelligent-Tiering for unknown patterns
-- [ ] Compress large datasets before storing
-- [ ] Delete old CloudWatch Logs (> 30 days)
-- [ ] Use EBS snapshots instead of keeping volumes
-
-**Networking**:
-- [ ] Use VPC endpoints to avoid NAT Gateway costs
-- [ ] Minimize cross-region data transfer
-- [ ] Use CloudFront for serving static assets
-- [ ] Enable S3 Transfer Acceleration only if needed
-
-**Monitoring**:
-- [ ] Set up cost allocation tags
-- [ ] Create budgets with alerts
-- [ ] Review AWS Cost Explorer monthly
-- [ ] Use AWS Trusted Advisor recommendations
-- [ ] Enable AWS Compute Optimizer
+**监控**：
+- [ ] 设置成本分配标签
+- [ ] 创建带告警的预算
+- [ ] 每月查看 AWS Cost Explorer
+- [ ] 使用 AWS Trusted Advisor 建议
+- [ ] 启用 AWS Compute Optimizer
 
 ---
 
-## 6. Production-Ready Deployment Architecture
+## 6. 生产级部署架构
 
-### 6.1 Complete ML Infrastructure Architecture
+### 6.1 完整 ML 基础设施架构
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         Route 53 (DNS)                          │
+│                         Route 53（DNS）                         │
 └────────────────────────────┬────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
-│                    CloudFront (CDN)                             │
-│              (Cache predictions, DDoS protection)               │
+│                    CloudFront（CDN）                             │
+│              （缓存预测结果、DDoS 防护）                         │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                  ┌───────────┴───────────┐
                  │                       │
         ┌────────▼────────┐     ┌────────▼────────┐
-        │   VPC (us-east-1)│     │  VPC (us-west-2)│
+        │   VPC（us-east-1）│     │  VPC（us-west-2）│
         │                  │     │                  │
         │  ┌────────────┐  │     │  ┌────────────┐ │
         │  │    ALB     │  │     │  │    ALB     │ │
@@ -1645,38 +1593,38 @@ aws budgets create-budget \
         │        │         │     │        │        │
         │  ┌─────▼──────┐  │     │  ┌─────▼──────┐ │
         │  │  ECS/EKS   │  │     │  │  ECS/EKS   │ │
-        │  │  (Fargate) │  │     │  │  (Fargate) │ │
-        │  │  3 tasks   │  │     │  │  3 tasks   │ │
+        │  │  （Fargate）│  │     │  │  （Fargate）│ │
+        │  │  3 个任务   │  │     │  │  3 个任务   │ │
         │  └─────┬──────┘  │     │  └─────┬──────┘ │
         │        │         │     │        │        │
         │  ┌─────▼──────┐  │     │  ┌─────▼──────┐ │
-        │  │    RDS     │  │     │  │ RDS Replica│ │
-        │  │ Multi-AZ   │  │     │  │ (Read-only)│ │
+        │  │    RDS     │  │     │  │ RDS 副本   │ │
+        │  │ Multi-AZ   │  │     │  │ （只读）    │ │
         │  └────────────┘  │     │  └────────────┘ │
         └──────────────────┘     └──────────────────┘
                  │                       │
                  └───────────┬───────────┘
                              │
                     ┌────────▼────────┐
-                    │  S3 (Models)    │
-                    │  - Versioning   │
-                    │  - Encryption   │
-                    │  - Lifecycle    │
+                    │  S3（模型）     │
+                    │  - 版本控制     │
+                    │  - 加密         │
+                    │  - 生命周期     │
                     └─────────────────┘
                              │
                     ┌────────▼────────┐
                     │  CloudWatch     │
-                    │  - Metrics      │
-                    │  - Logs         │
-                    │  - Alarms       │
+                    │  - 指标         │
+                    │  - 日志         │
+                    │  - 告警         │
                     └─────────────────┘
 ```
 
-### 6.2 Deployment Strategy: Blue/Green Deployment
+### 6.2 部署策略：蓝绿部署
 
-**Blue/Green with ECS**:
+**使用 ECS 的蓝绿部署**：
 ```bash
-# Step 1: Deploy new version (Green) alongside existing (Blue)
+# 第 1 步：在现有版本（蓝）旁边部署新版本（绿）
 aws ecs update-service \
   --cluster ml-inference-cluster \
   --service ml-inference-service \
@@ -1684,24 +1632,23 @@ aws ecs update-service \
   --desired-count 3 \
   --deployment-configuration "maximumPercent=200,minimumHealthyPercent=100"
 
-# Step 2: Wait for new tasks to be healthy
+# 第 2 步：等待新任务健康
 aws ecs wait services-stable \
   --cluster ml-inference-cluster \
   --services ml-inference-service
 
-# Step 3: Monitor metrics (error rate, latency)
-# If metrics are good, deployment is complete
-# If metrics are bad, rollback:
-
+# 第 3 步：监控指标（错误率、延迟）
+# 如果指标正常，部署完成
+# 如果指标异常，回滚：
 aws ecs update-service \
   --cluster ml-inference-cluster \
   --service ml-inference-service \
   --task-definition ml-inference-task:1
 ```
 
-**Canary Deployment** (gradual rollout):
+**金丝雀部署**（逐步发布）：
 ```bash
-# Route 10% of traffic to new version
+# 将 10% 的流量路由到新版本
 aws elbv2 modify-listener \
   --listener-arn <listener-arn> \
   --default-actions Type=forward,ForwardConfig='{
@@ -1711,97 +1658,88 @@ aws elbv2 modify-listener \
     ]
   }'
 
-# Monitor for 30 minutes, then increase to 50%
-# If successful, switch 100% to green
+# 监控 30 分钟，然后增加到 50%
+# 如果成功，将 100% 切换到绿色
 ```
 
 ---
 
-## 7. Summary and Best Practices
+## 7. 总结与最佳实践
 
-### Key Takeaways
+### 关键要点
 
-1. **Infrastructure as Code**:
-   - Always use Terraform/CloudFormation for production
-   - Version control all infrastructure changes
-   - Use remote state with locking
+1. **基础设施即代码**：
+   - 对生产始终使用 Terraform/CloudFormation
+   - 对所有基础设施变更进行版本控制
+   - 使用带锁定的远程状态
 
-2. **Container Orchestration**:
-   - **ECS**: Simple, AWS-native, good for getting started
-   - **EKS**: Portable, powerful, better for complex workloads
-   - Always use Fargate for serverless containers
+2. **容器编排**：
+   - **ECS**：简单、AWS 原生、适合入门
+   - **EKS**：可移植、强大、适合复杂工作负载
+   - 对无服务器容器始终使用 Fargate
 
-3. **Serverless ML**:
-   - Great for low-traffic, small models
-   - Use Lambda + API Gateway for cost optimization
-   - Cache models globally to reduce cold starts
+3. **无服务器 ML**：
+   - 适合低流量、小型模型
+   - 使用 Lambda + API Gateway 进行成本优化
+   - 全局缓存模型以减少冷启动
 
-4. **SageMaker**:
-   - Managed platform reduces operational overhead
-   - Use for end-to-end ML lifecycle
-   - Built-in monitoring and auto-scaling
+4. **SageMaker**：
+   - 托管平台减少运维开销
+   - 用于端到端 ML 生命周期
+   - 内置监控和自动扩缩容
 
-5. **Cost Optimization**:
-   - Use Spot instances for training (50-90% savings)
-   - Implement auto-scaling for inference
-   - Right-size instances based on actual usage
-   - Use S3 lifecycle policies for storage
+5. **成本优化**：
+   - 对训练使用 Spot 实例（节省 50-90%）
+   - 为推理实施自动扩缩容
+   - 根据实际使用情况合理调整实例规格
+   - 使用 S3 生命周期策略管理存储
 
-### Production Checklist
+### 生产检查清单
 
-**Infrastructure**:
-- [ ] Multi-AZ deployment for high availability
-- [ ] Auto-scaling configured (CPU and request-based)
-- [ ] Load balancer health checks enabled
-- [ ] VPC with public and private subnets
-- [ ] Security groups following least privilege
+**基础设施**：
+- [ ] Multi-AZ 部署以实现高可用
+- [ ] 配置了自动扩缩容（基于 CPU 和请求）
+- [ ] 负载均衡器健康检查已启用
+- [ ] 带公有和私有子网的 VPC
+- [ ] 遵循最少权限的安全组
 
-**Monitoring**:
-- [ ] CloudWatch metrics for all resources
-- [ ] CloudWatch Alarms for critical metrics
-- [ ] Centralized logging (CloudWatch Logs or ELK)
-- [ ] Cost monitoring and budgets
-- [ ] Performance monitoring (latency, throughput)
+**监控**：
+- [ ] 所有资源的 CloudWatch 指标
+- [ ] 关键指标的 CloudWatch 告警
+- [ ] 集中式日志（CloudWatch Logs 或 ELK）
+- [ ] 成本监控和预算
+- [ ] 性能监控（延迟、吞吐量）
 
-**Security**:
-- [ ] IAM roles with minimal permissions
-- [ ] Secrets stored in Secrets Manager
-- [ ] Encryption at rest and in transit
-- [ ] Regular security audits
-- [ ] VPC Flow Logs enabled
+**安全**：
+- [ ] 最少权限的 IAM 角色
+- [ ] 密钥存储在 Secrets Manager
+- [ ] 静态和传输中加密
+- [ ] 定期安全审计
+- [ ] VPC Flow Logs 已启用
 
-**Operations**:
-- [ ] Blue/Green or Canary deployment strategy
-- [ ] Automated rollback on failures
-- [ ] Backup and disaster recovery plan
-- [ ] Documentation for runbooks
-- [ ] On-call rotation and incident response
+**运维**：
+- [ ] 蓝绿或金丝雀部署策略
+- [ ] 失败时自动回滚
+- [ ] 备份和灾难恢复计划
+- [ ] 运行手册文档
+- [ ] 值班轮换和事件响应
 
 ---
 
-## Next Steps
+## 下一步
 
-In the next module, you will:
-- Complete hands-on exercises deploying ML infrastructure
-- Build a complete production-ready ML platform
-- Practice cost optimization techniques
-- Implement monitoring and alerting from Module 009
+在下一个模块中，你将：
+- 完成部署 ML 基础设施的动手练习
+- 构建完整的生产级 ML 平台
+- 练习成本优化技术
+- 实施来自模块 009 的监控和告警
 
-**Recommended Reading**:
-- AWS Well-Architected Framework (ML Lens)
-- Terraform AWS Provider Documentation
-- Kubernetes Documentation
+**推荐阅读**：
+- AWS Well-Architected Framework（ML Lens）
+- Terraform AWS Provider 文档
+- Kubernetes 文档
 - SageMaker Developer Guide
 
 ---
 
-## Exercise Preview
-
-**Module 010 Exercises**:
-1. **Exercise 01**: AWS Account Setup & IAM Best Practices
-2. **Exercise 02**: Provision EC2 and S3 with CLI
-3. **Exercise 03**: Build Production VPC with Terraform
-4. **Exercise 04**: Deploy Containerized ML Service (ECS/EKS)
-5. **Exercise 05**: SageMaker Training + Cost Optimization
-
-Get ready to apply everything you've learned across all 10 modules!
+**End of Lecture 04**
