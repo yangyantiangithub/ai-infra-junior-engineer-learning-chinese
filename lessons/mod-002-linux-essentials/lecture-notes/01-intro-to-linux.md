@@ -198,7 +198,7 @@ Linus Torvalds，一位芬兰计算机科学系学生，创建了 **Linux 内核
 - **AI 基础设施自动化的最常用 shell**
 
 ```bash
-# 检查你当前的 shell
+# 检查你当前的 shell 一个环境变量，值是当前用户默认登录 Shell 的绝对路径
 echo $SHELL
 # /bin/bash
 
